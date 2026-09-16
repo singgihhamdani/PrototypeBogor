@@ -1,0 +1,64 @@
+{
+  "agencyName": "Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR)",
+  "government": "Pemerintah Kabupaten Bogor",
+  "province": "Jawa Barat",
+  "division": "Bidang Bina Konstruksi / Jasa Konstruksi",
+  "address": "Jl. Bersih No. 1, Komplek Perkantoran Pemkab Bogor, Kel. Tengah, Kec. Cibinong, Kab. Bogor 16914",
+  "phone": "(021) 8753545",
+  "email": "dpupr@bogorkab.go.id",
+  "website": "https://dpupr.bogorkab.go.id",
+  "headOfAgency": {
+    "name": "Iwan Setiawan, ST, MT",
+    "nip": "197204151998031005",
+    "position": "Kepala Dinas PUPR Kab. Bogor"
+  },
+  "picSipjaki": {
+    "name": "H. Raden Ridwan, ST, M.Si",
+    "nip": "198006122005011008",
+    "position": "Kepala Bidang Jasa Konstruksi",
+    "phone": "081298765432",
+    "email": "ridwan.jakon@bogorkab.go.id"
+  },
+  "operatorSipjaki": {
+    "name": "Bayu Pratama, S.Kom",
+    "nip": "199103252019031004",
+    "position": "Pengelola Sistem Informasi Jasa Konstruksi",
+    "phone": "085712345678",
+    "email": "bayu.sipjaki@bogorkab.go.id"
+  },
+  "personnel": {
+    "functionalSupervisors": 12,
+    "certifiedInspectors": 8,
+    "adminStaff": 6,
+    "contractStaff": 4
+  },
+  "budget2026": {
+    "paguTotal": 4850000000,
+    "realization": 2650000000,
+    "activities": [
+      {"name": "Pengawasan Tertib Usaha, Penyelenggaraan & Pemanfaatan", "pagu": 1750000000, "realisasi": 1100000000},
+      {"name": "Pelatihan dan Fasilitasi Sertifikasi SKK Tenaga Kerja", "pagu": 1850000000, "realisasi": 980000000},
+      {"name": "Pengembangan Sistem Informasi Jasa Konstruksi (SIJAKON)", "pagu": 750000000, "realisasi": 420000000},
+      {"name": "Penyusunan Rantai Pasok & Standar Biaya Satuan", "pagu": 500000000, "realisasi": 150000000}
+    ]
+  },
+  "decree": {
+    "number": "SK.BUPATI/600/215/Kpts/DPUPR/2026",
+    "date": "2026-01-15",
+    "about": "Pembentukan Tim Pembina dan Pengawas Penyelenggaraan Jasa Konstruksi Kabupaten Bogor Tahun Anggaran 2026",
+    "documentUrl": "/documents/SK_Tim_Pembina_Jakon_2026.pdf",
+    "status": "Aktif / Terverifikasi Kementerian PUPR"
+  },
+  "sipjakiStatus": {
+    "accountStatus": "Terhubung (Active Sync)",
+    "lastSync": "2026-09-16 10:30:22 WIB",
+    "completenessScore": 96,
+    "pillarScores": {
+      "tertibUsaha": 85,
+      "tertibPenyelenggaraan": 78,
+      "tertibPemanfaatan": 72,
+      "sipjakiReporting": 95,
+      "pelatihanTkk": 90
+    }
+  }
+}

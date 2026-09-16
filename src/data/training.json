@@ -1,0 +1,77 @@
+[
+  {
+    "id": "TR-2026-001",
+    "title": "Bimtek SMKK (Sistem Manajemen Keselamatan Konstruksi) Petugas K3",
+    "category": "K3 Konstruksi",
+    "batch": "Angkatan I / 2026",
+    "startDate": "2026-04-10",
+    "endDate": "2026-04-14",
+    "location": "Auditorium Dinas PUPR Kab. Bogor",
+    "quota": 40,
+    "registered": 40,
+    "passed": 38,
+    "status": "Selesai",
+    "organizer": "Bidang Jasa Konstruksi DPUPR bekerjasama dengan Balai Jasa Konstruksi Wilayah III",
+    "instructor": "Ir. Budi Santoso, MT (Asesor BNSP)",
+    "skkLevel": "Jenjang 5 (Teknisi/Analis)",
+    "participants": [
+      {"nik": "3201011203900001", "name": "Ahmad Fauzi", "bujk": "PT Bangun Jaya Konstruksi", "score": 88, "certNo": "SKK-SMKK-2026-001", "status": "Lulus"},
+      {"nik": "3201021508880004", "name": "Rian Hidayat", "bujk": "CV Karya Mandiri Utama", "score": 92, "certNo": "SKK-SMKK-2026-002", "status": "Lulus"},
+      {"nik": "3201032104920002", "name": "Deni Setiawan", "bujk": "PT Mitra Pembangunan Nusantara", "score": 85, "certNo": "SKK-SMKK-2026-003", "status": "Lulus"}
+    ]
+  },
+  {
+    "id": "TR-2026-002",
+    "title": "Sertifikasi Kompetensi Kerja (SKK) Tukang Pasang Bata & Plesteran",
+    "category": "Tenaga Terampil",
+    "batch": "Angkatan II / 2026",
+    "startDate": "2026-05-18",
+    "endDate": "2026-05-20",
+    "location": "Workshop Balai Latihan Kerja (BLK) Cibinong",
+    "quota": 50,
+    "registered": 50,
+    "passed": 47,
+    "status": "Selesai",
+    "organizer": "Bidang Jasa Konstruksi bekerjasama dengan LSP Gataki Konstruksi Mandiri",
+    "instructor": "Supriyanto, ST (Master Asesor)",
+    "skkLevel": "Jenjang 1-2 (Operator/Tukang)",
+    "participants": [
+      {"nik": "3201050801850003", "name": "Mamat Rahmat", "bujk": "CV Teknik Sejahtera", "score": 89, "certNo": "SKK-TUK-2026-041", "status": "Lulus"},
+      {"nik": "3201061907870005", "name": "Ujang Sulaeman", "bujk": "CV Anugerah Konstruksi", "score": 91, "certNo": "SKK-TUK-2026-042", "status": "Lulus"}
+    ]
+  },
+  {
+    "id": "TR-2026-003",
+    "title": "Pelatihan Building Information Modeling (BIM) Authoring Jenjang Muda",
+    "category": "Teknologi & Digitalisasi",
+    "batch": "Angkatan I / 2026",
+    "startDate": "2026-08-25",
+    "endDate": "2026-08-29",
+    "location": "Lab Komputer Bappedalitbang Kab. Bogor",
+    "quota": 30,
+    "registered": 28,
+    "passed": 0,
+    "status": "Sedang Berjalan",
+    "organizer": "Bidang Jasa Konstruksi DPUPR Kab. Bogor",
+    "instructor": "Radityo Prabowo, ST, M.Sc (BIM Specialist)",
+    "skkLevel": "Jenjang 6 (Ahli Muda)",
+    "participants": []
+  },
+  {
+    "id": "TR-2026-004",
+    "title": "Sosialisasi Tertib Penyelenggaraan Jasa Konstruksi & Regulasi Terbaru",
+    "category": "Tata Kelola & Regulasi",
+    "batch": "Tahap III / 2026",
+    "startDate": "2026-09-22",
+    "endDate": "2026-09-22",
+    "location": "Hotel Lorin Sentul, Babakan Madang",
+    "quota": 100,
+    "registered": 74,
+    "passed": 0,
+    "status": "Pendaftaran Dibuka",
+    "organizer": "DPUPR Kab. Bogor",
+    "instructor": "Tim Pembina Jasa Konstruksi Ditjen Bina Konstruksi Kementerian PUPR",
+    "skkLevel": "Semua Jenjang",
+    "participants": []
+  }
+]

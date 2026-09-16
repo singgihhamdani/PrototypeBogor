@@ -1,0 +1,52 @@
+[
+  {
+    "id": "REG-001",
+    "category": "Peraturan Daerah",
+    "number": "Perda Kab. Bogor No. 2 Tahun 2020",
+    "year": 2020,
+    "title": "Penyelenggaraan Jasa Konstruksi di Kabupaten Bogor",
+    "summary": "Pedoman pembinaan, pengawasan, izin usaha, pengembangan SDM jasa konstruksi serta pemanfaatan produk konstruksi daerah.",
+    "fileSize": "3.4 MB",
+    "dateEnacted": "2020-04-12"
+  },
+  {
+    "id": "REG-002",
+    "category": "Undang-Undang",
+    "number": "UU No. 2 Tahun 2017 jo. UU No. 6 Tahun 2023",
+    "year": 2023,
+    "title": "Undang-Undang tentang Jasa Konstruksi",
+    "summary": "Regulasi induk tata kelola jasa konstruksi nasional, kewenangan pemerintah pusat dan pemerintah daerah.",
+    "fileSize": "5.1 MB",
+    "dateEnacted": "2023-03-31"
+  },
+  {
+    "id": "REG-003",
+    "category": "Peraturan Menteri PUPR",
+    "number": "Permen PUPR No. 1 Tahun 2023",
+    "year": 2023,
+    "title": "Pedoman Pengawasan Penyelenggaraan Jasa Konstruksi yang Dilaksanakan Pemerintah Daerah Provinsi, Kabupaten, dan Kota",
+    "summary": "Standar operasional SIMAK, indikator pengawasan 3 tertib, format pelaporan berkala melalui SIPJAKI.",
+    "fileSize": "4.8 MB",
+    "dateEnacted": "2023-01-20"
+  },
+  {
+    "id": "REG-004",
+    "category": "Peraturan Menteri PUPR",
+    "number": "Permen PUPR No. 10 Tahun 2021",
+    "year": 2021,
+    "title": "Pedoman Sistem Manajemen Keselamatan Konstruksi (SMKK)",
+    "summary": "Penerapan SMKK pada setiap penyelenggaraan jasa konstruksi, rancangan konseptual K3, biaya penerapan SMKK.",
+    "fileSize": "6.2 MB",
+    "dateEnacted": "2021-04-01"
+  },
+  {
+    "id": "REG-005",
+    "category": "Surat Edaran Bupati",
+    "number": "SE Bupati Bogor No. 600/188-DPUPR/2025",
+    "year": 2025,
+    "title": "Kewajiban Penggunaan Tenaga Kerja Konstruksi Bersertifikat Kompetensi Kerja pada Proyek Pemerintah Daerah",
+    "summary": "Instruksi kepada seluruh PPK dan penyedia jasa konstruksi wajib mempekerjakan TKK bersertifikat SKK aktif.",
+    "fileSize": "1.2 MB",
+    "dateEnacted": "2025-02-14"
+  }
+]
