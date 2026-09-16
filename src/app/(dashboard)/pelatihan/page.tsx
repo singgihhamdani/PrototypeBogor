@@ -2,9 +2,8 @@
 import { useState } from "react";
 import { 
   GraduationCap, Search, Calendar, Users, Award, Download, 
-  CheckCircle2, Clock, Plus, QrCode, FileCheck, Eye
+  CheckCircle2, Clock, Plus, QrCode, FileCheck, Eye, X
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import trainingData from "@/data/training.json";
 
 export default function PelatihanPage() {
@@ -35,157 +34,238 @@ export default function PelatihanPage() {
   );
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary flex items-center gap-1">
-              <GraduationCap className="h-3 w-3" /> Pilar 5: Pengembangan SDM & TKK
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <GraduationCap style={{ width: "12px", height: "12px" }} /> Pilar 5: Pengembangan SDM & TKK
             </span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", backgroundColor: "#F1F5F9", padding: "3px 10px", borderRadius: "9999px" }}>
               Integrasi: BNSP & SIPJAKI
             </span>
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 mt-1">
+          <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
             Pelatihan & Sertifikasi Tenaga Kerja Konstruksi (TKK)
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
             Fasilitasi uji kompetensi, sertifikasi SKK, bimtek K3 SMKK, dan penerbitan e-Certificate Jasa Konstruksi
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button
+            type="button"
             onClick={() => alert("Mengunduh Rekapitulasi TKK Tersertifikasi Kab. Bogor (.xlsx)...")}
-            className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition-colors"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#FFFFFF",
+              border: "1px solid #CBD5E1",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#334155",
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+            }}
           >
-            <Download className="h-4 w-4" /> Export Data
+            <Download style={{ width: "15px", height: "15px" }} /> Export Data
           </button>
           <button
-            onClick={() => alert("Form Buka Pelatihan / Bimtek Baru")}
-            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-white hover:bg-primary-dark transition-all shadow-sm"
+            type="button"
+            onClick={() => alert("Membuka Formulir Pembukaan Pelatihan / Bimtek Baru...")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#0F2E5C",
+              border: "none",
+              borderBottom: "3px solid #FFC000",
+              padding: "10px 20px",
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#FFFFFF",
+              cursor: "pointer",
+              boxShadow: "0 4px 10px rgba(15, 46, 92, 0.2)"
+            }}
           >
-            <Plus className="h-4 w-4" /> Buka Pelatihan Baru
+            <Plus style={{ width: "15px", height: "15px", color: "#FFC000" }} /> Buka Pelatihan Baru
           </button>
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Program Pelatihan</span>
-            <GraduationCap className="h-4 w-4 text-primary" />
+      {/* 4 Metrics Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px" }}>
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Program Pelatihan</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#EBF2FA", color: "#0F2E5C", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <GraduationCap style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-slate-900 mt-2">{trainingData.length}</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">TA 2026 (4 Angkatan)</p>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>{trainingData.length}</p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>TA 2026 (4 Angkatan)</p>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Total Peserta Terdaftar</span>
-            <Users className="h-4 w-4 text-blue" />
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Peserta Terdaftar</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#EFF6FF", color: "#1E40AF", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Users style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-blue mt-2">
-            {trainingData.reduce((acc, t) => acc + t.registered, 0)}
-          </p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Dari Kuota 220 Orang</p>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#1E40AF", margin: 0, lineHeight: 1.1 }}>
+              {trainingData.reduce((acc, t) => acc + t.registered, 0)}
+            </p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Dari Kuota 220 Orang</p>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">TKK Lulus Bersertifikat</span>
-            <Award className="h-4 w-4 text-accent" />
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Lulus Bersertifikat</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#ECFDF5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Award style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-accent mt-2">
-            {trainingData.reduce((acc, t) => acc + t.passed, 0)}
-          </p>
-          <p className="text-[11px] text-accent font-semibold mt-0.5">Tersertifikasi BNSP / SKK</p>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#059669", margin: 0, lineHeight: 1.1 }}>
+              {trainingData.reduce((acc, t) => acc + t.passed, 0)}
+            </p>
+            <p style={{ fontSize: "11px", color: "#059669", fontWeight: 700, margin: "4px 0 0 0" }}>Tersertifikasi BNSP / SKK</p>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Target Daerah 2026</span>
-            <FileCheck className="h-4 w-4 text-amber" />
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Target Daerah 2026</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#FFFBEB", color: "#D97706", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <FileCheck style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-slate-900 mt-2">500 <span className="text-sm font-normal text-slate-400">TKK</span></p>
-          <div className="w-full bg-slate-100 rounded-full h-1.5 mt-2">
-            <div className="bg-accent h-1.5 rounded-full" style={{ width: "38%" }}></div>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>500 <span style={{ fontSize: "14px", fontWeight: 600, color: "#64748B" }}>TKK</span></p>
+            <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden", marginTop: "6px" }}>
+              <div style={{ width: "38%", height: "100%", backgroundColor: "#059669", borderRadius: "9999px" }} />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      {/* Tab Navigation */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "1px solid #E2E8F0", paddingBottom: "10px" }}>
         {[
           { id: "programs", label: "Program Pelatihan & Bimtek" },
           { id: "tkk", label: "Database TKK Tersertifikasi" },
           { id: "cert", label: "Verifikasi e-Certificate QR" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={cn(
-              "rounded-xl px-4 py-2 text-sm font-bold transition-all",
-              activeTab === tab.id
-                ? "bg-primary text-white shadow-xs"
-                : "text-slate-600 hover:bg-slate-100"
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
+        ].map((tab) => {
+          const isSel = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              style={{
+                padding: "8px 18px",
+                borderRadius: "10px",
+                fontSize: "12px",
+                fontWeight: 800,
+                border: "none",
+                cursor: "pointer",
+                backgroundColor: isSel ? "#0F2E5C" : "transparent",
+                color: isSel ? "#FFFFFF" : "#64748B",
+                boxShadow: isSel ? "0 2px 6px rgba(15, 46, 92, 0.2)" : "none",
+                transition: "all 0.15s ease"
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab 1: Programs */}
       {activeTab === "programs" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: "20px" }}>
           {trainingData.map((t) => (
-            <div key={t.id} className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm space-y-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="font-mono text-xs font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">
-                    {t.id}
+            <div 
+              key={t.id} 
+              style={{
+                borderRadius: "18px",
+                border: "1px solid #E2E8F0",
+                backgroundColor: "#FFFFFF",
+                padding: "24px",
+                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                gap: "18px"
+              }}
+            >
+              <div>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span style={{ fontFamily: "monospace", fontSize: "11px", fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "2px 8px", borderRadius: "6px" }}>
+                        {t.id}
+                      </span>
+                      <span style={{ fontSize: "11px", fontWeight: 700, backgroundColor: "#F1F5F9", color: "#475569", padding: "2px 8px", borderRadius: "9999px" }}>
+                        {t.category}
+                      </span>
+                    </div>
+                    <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: "8px 0 0 0", lineHeight: 1.35 }}>
+                      {t.title}
+                    </h3>
+                    <p style={{ fontSize: "11px", color: "#64748B", margin: "4px 0 0 0" }}>
+                      {t.batch} • Jenjang SKK: {t.skkLevel}
+                    </p>
+                  </div>
+                  <span 
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: 800,
+                      padding: "4px 10px",
+                      borderRadius: "9999px",
+                      flexShrink: 0,
+                      backgroundColor: t.status === "Selesai" ? "#ECFDF5" : t.status === "Sedang Berjalan" ? "#EFF6FF" : "#FFFBEB",
+                      color: t.status === "Selesai" ? "#059669" : t.status === "Sedang Berjalan" ? "#1E40AF" : "#D97706"
+                    }}
+                  >
+                    {t.status}
                   </span>
-                  <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                    {t.category}
-                  </span>
-                  <h3 className="text-base font-bold text-slate-900 mt-2">{t.title}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{t.batch} • Jenjang: {t.skkLevel}</p>
                 </div>
-                <span className={cn(
-                  "rounded-full px-2.5 py-1 text-[11px] font-bold shrink-0",
-                  t.status === "Selesai" ? "bg-accent/10 text-accent" :
-                  t.status === "Sedang Berjalan" ? "bg-blue/10 text-blue" : "bg-amber/10 text-amber"
-                )}>
-                  {t.status}
-                </span>
+
+                <div style={{ backgroundColor: "#F8FAFC", borderRadius: "12px", border: "1px solid #E2E8F0", padding: "12px 14px", display: "flex", flexDirection: "column", gap: "8px", fontSize: "12px", color: "#475569" }}>
+                  <p style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
+                    <Calendar style={{ width: "14px", height: "14px", color: "#94A3B8" }} />
+                    <span>{t.startDate} s/d {t.endDate}</span>
+                  </p>
+                  <p style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
+                    <Users style={{ width: "14px", height: "14px", color: "#94A3B8" }} />
+                    <span>Penyelenggara: {t.organizer}</span>
+                  </p>
+                  <p style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
+                    <Award style={{ width: "14px", height: "14px", color: "#94A3B8" }} />
+                    <span>Instruktur: {t.instructor}</span>
+                  </p>
+                </div>
               </div>
 
-              <div className="space-y-2 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl">
-                <p className="flex items-center gap-2">
-                  <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                  <span>{t.startDate} s/d {t.endDate}</span>
-                </p>
-                <p className="flex items-center gap-2">
-                  <Users className="h-3.5 w-3.5 text-slate-400" />
-                  <span>Penyelenggara: {t.organizer}</span>
-                </p>
-                <p className="flex items-center gap-2">
-                  <Award className="h-3.5 w-3.5 text-slate-400" />
-                  <span>Instruktur: {t.instructor}</span>
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+              <div style={{ paddingTop: "12px", borderTop: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px" }}>
                 <div>
-                  <span className="text-slate-400">Kuota Terisi: </span>
-                  <span className="font-bold text-slate-800">{t.registered} / {t.quota} orang</span>
+                  <span style={{ color: "#64748B" }}>Kuota: </span>
+                  <span style={{ fontWeight: 800, color: "#0F172A" }}>{t.registered} / {t.quota} orang</span>
                 </div>
                 {t.passed > 0 && (
-                  <span className="font-bold text-accent">
-                    {t.passed} Peserta Lulus (100% Sertifikasi)
+                  <span style={{ fontWeight: 800, color: "#059669", backgroundColor: "#ECFDF5", padding: "3px 10px", borderRadius: "6px", fontSize: "11px" }}>
+                    {t.passed} Peserta Lulus SKK
                   </span>
                 )}
               </div>
@@ -196,59 +276,71 @@ export default function PelatihanPage() {
 
       {/* Tab 2: Database TKK */}
       {activeTab === "tkk" && (
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+          {/* Search bar */}
+          <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <Search style={{ width: "16px", height: "16px", color: "#94A3B8" }} />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari berdasarkan nama TKK, NIK, atau nama badan usaha..."
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              style={{
+                border: "none",
+                outline: "none",
+                width: "100%",
+                fontSize: "13px",
+                color: "#0F172A",
+                backgroundColor: "transparent"
+              }}
             />
           </div>
 
-          <div className="rounded-2xl border border-slate-200/60 bg-white overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
-              <table className="w-full">
+          {/* Table Container */}
+          <div style={{ borderRadius: "18px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3 px-4">Nama & NIK</th>
-                    <th className="py-3 px-4">Badan Usaha / BUJK</th>
-                    <th className="py-3 px-4">Program Pelatihan</th>
-                    <th className="py-3 px-4">Nomor Sertifikat SKK</th>
-                    <th className="py-3 px-4">Nilai Uji</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-center">E-Sertifikat</th>
+                  <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "2px solid #E2E8F0", textAlign: "left" }}>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NAMA & NIK</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>BADAN USAHA / BUJK</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>PROGRAM PELATIHAN</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NO. SERTIFIKAT SKK</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NILAI</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>STATUS</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px", textAlign: "center" }}>E-SERTIFIKAT</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody>
                   {filteredTkk.map((tkk) => (
-                    <tr key={tkk.nik} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3.5 px-4">
-                        <p className="font-bold text-slate-900 text-sm">{tkk.name}</p>
-                        <p className="text-slate-400 font-mono mt-0.5">NIK: {tkk.nik}</p>
+                    <tr key={tkk.nik} style={{ borderBottom: "1px solid #F1F5F9", transition: "background-color 0.15s ease" }}>
+                      <td style={{ padding: "16px 18px" }}>
+                        <p style={{ fontWeight: 800, color: "#0F172A", margin: 0, fontSize: "13px" }}>{tkk.name}</p>
+                        <p style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", margin: "2px 0 0 0" }}>NIK: {tkk.nik}</p>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-700 font-medium">
+                      <td style={{ padding: "16px 18px", color: "#334155", fontWeight: 600 }}>
                         {tkk.bujk}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600">
-                        <p className="font-semibold text-slate-800">{tkk.trainingTitle}</p>
-                        <p className="text-[11px] text-slate-400">{tkk.skkLevel}</p>
+                      <td style={{ padding: "16px 18px" }}>
+                        <p style={{ fontWeight: 700, color: "#0F172A", margin: 0 }}>{tkk.trainingTitle}</p>
+                        <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>Jenjang: {tkk.skkLevel}</p>
                       </td>
-                      <td className="py-3.5 px-4 font-mono font-bold text-primary">
-                        {tkk.certNo}
+                      <td style={{ padding: "16px 18px" }}>
+                        <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 8px", borderRadius: "6px", fontSize: "11px" }}>
+                          {tkk.certNo}
+                        </span>
                       </td>
-                      <td className="py-3.5 px-4 font-bold text-slate-800">
-                        {tkk.score} / 100
+                      <td style={{ padding: "16px 18px", fontWeight: 800, color: "#0F172A", fontSize: "13px" }}>
+                        {tkk.score} <span style={{ fontSize: "11px", color: "#94A3B8" }}>/100</span>
                       </td>
-                      <td className="py-3.5 px-4">
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-accent/10 text-accent">
+                      <td style={{ padding: "16px 18px" }}>
+                        <span style={{ display: "inline-block", backgroundColor: "#ECFDF5", color: "#059669", padding: "3px 10px", borderRadius: "9999px", fontSize: "11px", fontWeight: 800 }}>
                           {tkk.status}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-center">
+                      <td style={{ padding: "16px 18px", textAlign: "center" }}>
                         <button
+                          type="button"
                           onClick={() => {
                             setSelectedCert({
                               name: tkk.name,
@@ -258,9 +350,21 @@ export default function PelatihanPage() {
                               trainingTitle: tkk.trainingTitle,
                             });
                           }}
-                          className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-2.5 py-1.5 font-semibold text-primary hover:bg-primary hover:text-white transition-all"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            borderRadius: "8px",
+                            backgroundColor: "#F1F5F9",
+                            color: "#0F2E5C",
+                            padding: "6px 12px",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            border: "1px solid #E2E8F0",
+                            cursor: "pointer"
+                          }}
                         >
-                          <Eye className="h-3.5 w-3.5" /> Lihat Sertifikat
+                          <Eye style={{ width: "13px", height: "13px" }} /> Lihat
                         </button>
                       </td>
                     </tr>
@@ -274,106 +378,87 @@ export default function PelatihanPage() {
 
       {/* Tab 3: Cert Verification Preview */}
       {activeTab === "cert" && (
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-8 max-w-2xl mx-auto shadow-md text-center space-y-6">
-          <div className="flex justify-center">
-            <div className="h-16 w-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-              <QrCode className="h-10 w-10" />
+        <div style={{ borderRadius: "18px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "36px", maxWidth: "680px", margin: "0 auto", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", textAlign: "center", display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ height: "64px", width: "64px", borderRadius: "18px", backgroundColor: "#EBF2FA", color: "#0F2E5C", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <QrCode style={{ width: "36px", height: "36px" }} />
             </div>
           </div>
-
           <div>
-            <h2 className="text-xl font-extrabold text-slate-900">Verifikasi Keaslian e-Certificate</h2>
-            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-              Setiap sertifikat kompetensi yang diterbitkan dilengkapi tanda tangan elektronik dan QR Code yang terhubung ke database BNSP & SIJAKON Bogor.
+            <h2 style={{ fontSize: "18px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
+              Verifikasi Keaslian e-Certificate TKK
+            </h2>
+            <p style={{ fontSize: "13px", color: "#64748B", margin: "6px 0 0 0" }}>
+              Pindai QR Code pada sertifikat fisik atau masukkan nomor registrasi SKK / NIK untuk memvalidasi keabsahan data di SIPJAKI PUPR
             </p>
           </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-left space-y-3 text-xs">
-            <div className="flex justify-between border-b border-slate-200 pb-2">
-              <span className="text-slate-500">Penerbit:</span>
-              <span className="font-bold text-slate-800">Dinas PUPR Kab. Bogor & Balai Jasa Konstruksi Wil. III</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-200 pb-2">
-              <span className="text-slate-500">Standar Acuan:</span>
-              <span className="font-bold text-slate-800">SKKNI & Permen PUPR No. 1/2023</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-500">Metode Verifikasi:</span>
-              <span className="font-mono font-bold text-accent">Scan QR Code / Masukkan No. SKK</span>
-            </div>
-          </div>
-
-          <div className="flex justify-center gap-3">
+          <div style={{ display: "flex", gap: "10px", maxWidth: "460px", margin: "0 auto", width: "100%" }}>
             <input
               type="text"
-              placeholder="Masukkan Nomor Sertifikat (Contoh: SKK-SMKK-2026-001)"
-              className="rounded-xl border border-slate-200 py-2.5 px-4 text-xs w-72 focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="Masukkan No. Sertifikat (cth: SKK-2026-0012)"
+              style={{ flex: 1, borderRadius: "10px", border: "1px solid #CBD5E1", padding: "10px 14px", fontSize: "13px", outline: "none" }}
             />
             <button
-              onClick={() => alert("Sertifikat Ditemukan: Valid & Terdaftar di SIJAKON Bogor")}
-              className="rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white hover:bg-primary-dark transition-all"
+              type="button"
+              onClick={() => alert("Memverifikasi nomor sertifikat ke server LPJK & BNSP...")}
+              style={{ borderRadius: "10px", backgroundColor: "#0F2E5C", color: "#FFFFFF", border: "none", padding: "10px 20px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}
             >
-              Verifikasi
+              Cek Validasi
             </button>
           </div>
         </div>
       )}
 
-      {/* Modal e-Certificate Preview */}
+      {/* Modal e-Certificate */}
       {selectedCert && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl border-4 border-primary/20 space-y-6 text-center relative">
-            <button
-              onClick={() => setSelectedCert(null)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 font-bold text-xl"
-            >
-              ✕
-            </button>
-
-            {/* Certificate Header */}
-            <div className="border-b-2 border-primary/20 pb-4">
-              <p className="text-xs uppercase tracking-widest font-bold text-primary">Pemerintah Kabupaten Bogor</p>
-              <h2 className="text-xl font-black text-slate-900 mt-1">SERTIFIKAT KOMPETENSI KERJA</h2>
-              <p className="font-mono text-xs text-slate-500 mt-0.5">No. Registrasi: {selectedCert.certNo}</p>
-            </div>
-
-            {/* Certificate Body */}
-            <div className="space-y-3 py-2">
-              <p className="text-xs text-slate-500">Diberikan dengan predikat sangat memuaskan kepada:</p>
-              <h3 className="text-2xl font-black text-primary tracking-wide">{selectedCert.name}</h3>
-              <p className="text-xs text-slate-600 font-mono">NIK: {selectedCert.nik} • {selectedCert.bujk}</p>
-              <p className="text-xs text-slate-500 max-w-md mx-auto pt-2">
-                Telah dinyatakan <strong>LULUS DAN KOMPETEN</strong> dalam mengikuti program:
-              </p>
-              <p className="text-base font-bold text-slate-900 bg-primary/5 py-2 px-4 rounded-xl inline-block">
-                {selectedCert.trainingTitle}
-              </p>
-            </div>
-
-            {/* Certificate Footer */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-left text-xs">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 bg-slate-100 rounded-lg flex items-center justify-center">
-                  <QrCode className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <p className="font-bold text-slate-800">Digital Signature Verified</p>
-                  <p className="text-[10px] text-slate-400">BSrE - Badan Siber dan Sandi Negara</p>
-                </div>
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "20px" }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", maxWidth: "560px", width: "100%", padding: "28px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: "18px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F1F5F9", paddingBottom: "14px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Award style={{ width: "20px", height: "20px", color: "#059669" }} />
+                <h3 style={{ fontSize: "16px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
+                  Salinan e-Certificate TKK
+                </h3>
               </div>
-
-              <div className="text-right">
-                <p className="text-[10px] text-slate-400">Cibinong, Kab. Bogor</p>
-                <p className="font-bold text-slate-900 mt-1">Kepala Dinas PUPR Kab. Bogor</p>
-              </div>
-            </div>
-
-            <div className="flex justify-center gap-2 pt-2">
-              <button
-                onClick={() => alert(`Mengunduh Salinan PDF e-Certificate ${selectedCert.certNo}...`)}
-                className="flex items-center gap-1.5 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white hover:bg-primary-dark transition-all"
+              <button 
+                onClick={() => setSelectedCert(null)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B" }}
               >
-                <Download className="h-4 w-4" /> Unduh PDF Sertifikat
+                <X style={{ width: "20px", height: "20px" }} />
+              </button>
+            </div>
+
+            <div style={{ backgroundColor: "#F8FAFC", borderRadius: "14px", border: "1px solid #E2E8F0", padding: "20px", display: "flex", flexDirection: "column", gap: "12px", fontSize: "13px" }}>
+              <div>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Nama Tenaga Kerja:</span>
+                <p style={{ margin: "2px 0 0 0", fontWeight: 800, color: "#0F172A", fontSize: "16px" }}>{selectedCert.name}</p>
+                <p style={{ margin: "2px 0 0 0", fontSize: "12px", fontFamily: "monospace", color: "#64748B" }}>NIK: {selectedCert.nik}</p>
+              </div>
+
+              <div>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Badan Usaha (BUJK):</span>
+                <p style={{ margin: "2px 0 0 0", fontWeight: 600, color: "#0F172A" }}>{selectedCert.bujk}</p>
+              </div>
+
+              <div>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Bidang Pelatihan & Kompetensi:</span>
+                <p style={{ margin: "2px 0 0 0", fontWeight: 700, color: "#0F2E5C" }}>{selectedCert.trainingTitle}</p>
+              </div>
+
+              <div>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Nomor Registrasi Sertifikat:</span>
+                <p style={{ margin: "2px 0 0 0", fontFamily: "monospace", fontWeight: 800, color: "#059669" }}>{selectedCert.certNo}</p>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
+              <button
+                type="button"
+                onClick={() => alert("Mengunduh sertifikat digital resmi bertanda tangan elektronik...")}
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "10px", backgroundColor: "#0F2E5C", color: "#FFFFFF", border: "none", padding: "8px 18px", fontSize: "12px", fontWeight: 800, cursor: "pointer" }}
+              >
+                <Download style={{ width: "14px", height: "14px" }} /> Unduh e-Certificate (PDF)
               </button>
             </div>
           </div>

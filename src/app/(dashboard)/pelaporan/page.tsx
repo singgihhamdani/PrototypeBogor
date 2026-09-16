@@ -1,10 +1,9 @@
 "use client";
 import { useState } from "react";
 import { 
-  FileBarChart, Download, RefreshCw, CheckCircle2, AlertCircle, 
-  Calendar, Building2, ShieldCheck, FileSpreadsheet, FileText, Send
+  FileBarChart, Download, RefreshCw, CheckCircle2, 
+  Calendar, FileSpreadsheet, FileText
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function PelaporanPage() {
   const [syncing, setSyncing] = useState(false);
@@ -72,47 +71,84 @@ export default function PelaporanPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary flex items-center gap-1">
-              <FileBarChart className="h-3 w-3" /> Pelaporan Berkala
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <FileBarChart style={{ width: "12px", height: "12px" }} /> Pelaporan Berkala
             </span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-accent/10 text-accent">
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#059669", backgroundColor: "#ECFDF5", padding: "3px 10px", borderRadius: "9999px" }}>
               Standar Permen PUPR 1/2023
             </span>
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 mt-1">
+          <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
             Pelaporan & Ekspor Sinkronisasi SIPJAKI
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
             Kompilasi rekapitulasi 5 pilar pengawasan jasa konstruksi Kab. Bogor dan pengiriman berkala ke Kementerian PUPR
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button
+            type="button"
             onClick={handleSyncAll}
             disabled={syncing}
-            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-white hover:bg-primary-dark transition-all shadow-sm"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#0F2E5C",
+              border: "none",
+              borderBottom: "3px solid #FFC000",
+              padding: "10px 20px",
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#FFFFFF",
+              cursor: "pointer",
+              boxShadow: "0 4px 10px rgba(15, 46, 92, 0.2)"
+            }}
           >
-            <RefreshCw className={cn("h-4 w-4", syncing && "animate-spin")} /> 
-            {syncing ? "Menyinkronkan..." : "Kirim Semua ke SIPJAKI"}
+            <RefreshCw style={{ width: "15px", height: "15px" }} />
+            <span>{syncing ? "Menyinkronkan..." : "Kirim Semua ke SIPJAKI"}</span>
           </button>
         </div>
       </div>
 
-      {/* Filter & Selector */}
-      <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-slate-400" />
-          <span className="text-xs font-bold text-slate-700">Pilih Periode Laporan:</span>
+      {/* Filter & Export Card */}
+      <div 
+        style={{
+          borderRadius: "16px",
+          border: "1px solid #E2E8F0",
+          backgroundColor: "#FFFFFF",
+          padding: "16px 20px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "14px"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <Calendar style={{ width: "16px", height: "16px", color: "#64748B" }} />
+          <span style={{ fontSize: "12px", fontWeight: 700, color: "#475569" }}>Pilih Periode Pelaporan:</span>
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-slate-50 py-1.5 px-3 text-xs font-bold text-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            style={{
+              borderRadius: "10px",
+              border: "1px solid #CBD5E1",
+              backgroundColor: "#F8FAFC",
+              padding: "8px 14px",
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#0F2E5C",
+              outline: "none"
+            }}
           >
             <option value="Semester I - 2026">Semester I - TA 2026 (Jan - Jun)</option>
             <option value="Semester II - 2026">Semester II - TA 2026 (Jul - Des)</option>
@@ -120,73 +156,123 @@ export default function PelaporanPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button
+            type="button"
             onClick={() => alert(`Mengunduh Paket Rekapitulasi Lengkap Format SIPJAKI (${period})...`)}
-            className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition-colors"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              borderRadius: "10px",
+              backgroundColor: "#F1F5F9",
+              border: "1px solid #E2E8F0",
+              padding: "8px 14px",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#0F2E5C",
+              cursor: "pointer"
+            }}
           >
-            <FileSpreadsheet className="h-4 w-4 text-accent" /> Unduh Bundel Excel (.ZIP)
+            <FileSpreadsheet style={{ width: "14px", height: "14px", color: "#059669" }} />
+            <span>Unduh Bundel Excel (.ZIP)</span>
           </button>
           <button
+            type="button"
             onClick={() => alert(`Mencetak Laporan Eksekutif Bupati (${period})...`)}
-            className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 transition-colors"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              borderRadius: "10px",
+              backgroundColor: "#F1F5F9",
+              border: "1px solid #E2E8F0",
+              padding: "8px 14px",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#0F2E5C",
+              cursor: "pointer"
+            }}
           >
-            <FileText className="h-4 w-4 text-primary" /> Unduh Buku Laporan (PDF)
+            <FileText style={{ width: "14px", height: "14px", color: "#1E40AF" }} />
+            <span>Unduh Buku Laporan (PDF)</span>
           </button>
         </div>
       </div>
 
-      {/* Table of Module Reports */}
-      <div className="rounded-2xl border border-slate-200/60 bg-white overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      {/* Table Container */}
+      <div style={{ borderRadius: "18px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                <th className="py-3 px-4">Modul & Judul Laporan</th>
-                <th className="py-3 px-4">Kategori Pilar</th>
-                <th className="py-3 px-4">Cakupan Audit</th>
-                <th className="py-3 px-4">Skor Kepatuhan</th>
-                <th className="py-3 px-4">Status Pengiriman</th>
-                <th className="py-3 px-4">Tanggal Kirim</th>
-                <th className="py-3 px-4 text-center">Aksi</th>
+              <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "2px solid #E2E8F0", textAlign: "left" }}>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>MODUL & JUDUL LAPORAN</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>KATEGORI PILAR</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>CAKUPAN AUDIT</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>SKOR KEPATUHAN</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>STATUS</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>TANGGAL KIRIM</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px", textAlign: "center" }}>AKSI</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+            <tbody>
               {reports.map((rep) => (
-                <tr key={rep.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="py-3.5 px-4">
-                    <p className="font-bold text-slate-900 text-sm">{rep.title}</p>
-                    <p className="font-mono text-slate-400 mt-0.5">{rep.id}</p>
+                <tr key={rep.id} style={{ borderBottom: "1px solid #F1F5F9", transition: "background-color 0.15s ease" }}>
+                  <td style={{ padding: "16px 18px" }}>
+                    <p style={{ fontWeight: 800, color: "#0F172A", margin: 0, fontSize: "13px" }}>{rep.title}</p>
+                    <p style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", margin: "2px 0 0 0" }}>{rep.id}</p>
                   </td>
-                  <td className="py-3.5 px-4">
-                    <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                  <td style={{ padding: "16px 18px" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 700, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "4px 10px", borderRadius: "6px" }}>
                       {rep.category}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4 text-slate-600 font-medium">
+                  <td style={{ padding: "16px 18px", color: "#334155", fontWeight: 600 }}>
                     {rep.coverage}
                   </td>
-                  <td className="py-3.5 px-4 font-bold text-slate-900">
+                  <td style={{ padding: "16px 18px", fontWeight: 800, color: "#0F172A", fontSize: "13px" }}>
                     {rep.score}
                   </td>
-                  <td className="py-3.5 px-4">
-                    <span className={cn(
-                      "rounded-full px-2.5 py-1 text-[11px] font-bold inline-flex items-center gap-1",
-                      rep.status.includes("Terkirim") ? "bg-accent/10 text-accent" : "bg-amber/10 text-amber"
-                    )}>
-                      <CheckCircle2 className="h-3 w-3" />
+                  <td style={{ padding: "16px 18px" }}>
+                    <span 
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        borderRadius: "9999px",
+                        padding: "4px 10px",
+                        fontSize: "11px",
+                        fontWeight: 800,
+                        backgroundColor: rep.status.includes("Terkirim") ? "#ECFDF5" : "#FFFBEB",
+                        color: rep.status.includes("Terkirim") ? "#059669" : "#D97706"
+                      }}
+                    >
+                      <CheckCircle2 style={{ width: "13px", height: "13px" }} />
                       {rep.status}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4 text-slate-500 font-mono">
+                  <td style={{ padding: "16px 18px", color: "#64748B", fontFamily: "monospace" }}>
                     {rep.date}
                   </td>
-                  <td className="py-3.5 px-4 text-center">
+                  <td style={{ padding: "16px 18px", textAlign: "center" }}>
                     <button
-                      onClick={() => alert(`Mengunduh file laporan ${rep.id}...`)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1.5 font-semibold text-slate-700 hover:bg-primary hover:text-white transition-all"
+                      type="button"
+                      onClick={() => alert(`Mengunduh berkas laporan ${rep.id} (${rep.format})...`)}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        borderRadius: "8px",
+                        backgroundColor: "#F1F5F9",
+                        color: "#0F2E5C",
+                        padding: "6px 12px",
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        border: "1px solid #E2E8F0",
+                        cursor: "pointer"
+                      }}
                     >
-                      <Download className="h-3.5 w-3.5" /> Unduh
+                      <Download style={{ width: "13px", height: "13px" }} /> Unduh
                     </button>
                   </td>
                 </tr>

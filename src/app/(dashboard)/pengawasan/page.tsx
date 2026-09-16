@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ClipboardCheck, CheckCircle2, XCircle, MinusCircle, RotateCw } from "lucide-react";
+import { ClipboardCheck, CheckCircle2, XCircle, MinusCircle, RotateCw, Download, Send, ShieldCheck, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Answer = "ya" | "tidak" | "na" | null;
@@ -9,35 +9,34 @@ interface CheckItem {
   id: string;
   question: string;
   answer: Answer;
+  ref: string;
 }
 
 const initialChecklist: Record<string, CheckItem[]> = {
   "Tertib Usaha": [
-    { id: "TU01", question: "Badan Usaha memiliki NIB (Nomor Induk Berusaha) yang masih berlaku", answer: null },
-    { id: "TU02", question: "Memiliki SBU (Sertifikat Badan Usaha) sesuai klasifikasi pekerjaan", answer: null },
-    { id: "TU03", question: "SBU masih dalam masa berlaku pada saat pelaksanaan", answer: null },
-    { id: "TU04", question: "Memiliki PJT (Penanggung Jawab Teknik) bersertifikat kompetensi", answer: null },
-    { id: "TU05", question: "Memiliki PJSK (Penanggung Jawab Sistem K3 Konstruksi)", answer: null },
-    { id: "TU06", question: "BUJK terdaftar dalam sistem SIPJAKI PUPR", answer: null },
-    { id: "TU07", question: "Tenaga kerja konstruksi memiliki sertifikat kompetensi (SKK/SKTK)", answer: null },
+    { id: "TU-01", question: "Badan Usaha memiliki NIB (Nomor Induk Berusaha) yang terdaftar dan masih aktif di OSS-RBA", answer: "ya", ref: "Pasal 5 Permen PUPR 1/2023" },
+    { id: "TU-02", question: "Memiliki SBU (Sertifikat Badan Usaha) yang masih berlaku sesuai sub-klasifikasi pekerjaan", answer: "ya", ref: "Pasal 6 Permen PUPR 1/2023" },
+    { id: "TU-03", question: "Kualifikasi BUJK sesuai dengan nilai paket pekerjaan yang dikerjakan (Kecil/Menengah/Besar)", answer: "ya", ref: "PP No. 14 Tahun 2021" },
+    { id: "TU-04", question: "Memiliki PJT (Penanggung Jawab Teknik) bersertifikat kompetensi kerja (SKK Konstruksi aktif)", answer: "ya", ref: "Pasal 8 Permen PUPR 1/2023" },
+    { id: "TU-05", question: "Memiliki PJSK (Penanggung Jawab Sistem Keselamatan Konstruksi) yang ditunjuk resmi", answer: null, ref: "Permen PUPR 10/2021 SMKK" },
+    { id: "TU-06", question: "Data badan usaha telah tersinkronisasi dan terverifikasi pada portal SIPJAKI PUPR", answer: "ya", ref: "Permen PUPR 1/2023" },
+    { id: "TU-07", question: "Seluruh Tenaga Kerja Konstruksi (TKK) terampil memiliki sertifikat SKK/SKTK yang sah", answer: null, ref: "UU No. 2 Tahun 2017" },
   ],
   "Tertib Penyelenggaraan": [
-    { id: "TP01", question: "Kontrak kerja konstruksi tersedia dan lengkap", answer: null },
-    { id: "TP02", question: "Metode pelaksanaan (method statement) telah disetujui", answer: null },
-    { id: "TP03", question: "Jadwal pelaksanaan (time schedule) tersedia dan dimonitor", answer: null },
-    { id: "TP04", question: "Gambar kerja (shop drawing) tersedia di lokasi proyek", answer: null },
-    { id: "TP05", question: "Laporan progres fisik disampaikan secara berkala", answer: null },
-    { id: "TP06", question: "Laporan keuangan/realisasi anggaran tersedia", answer: null },
-    { id: "TP07", question: "Standar K3 Konstruksi diterapkan di lokasi proyek", answer: null },
-    { id: "TP08", question: "Pengawas/konsultan pengawas tersedia di lapangan", answer: null },
+    { id: "TP-01", question: "Dokumen Kontrak Kerja Konstruksi telah ditandatangani lengkap dengan Standar Syarat Umum/Khusus", answer: "ya", ref: "Permen PUPR 1/2023" },
+    { id: "TP-02", question: "Rencana Mutu Pekerjaan Konstruksi (RMPK) dan Metode Kerja (Method Statement) telah disetujui PPK", answer: "ya", ref: "Permen PUPR 10/2021" },
+    { id: "TP-03", question: "Jadwal Pelaksanaan (Time Schedule / Kurva-S) tersedia dan dilakukan pemantauan deviasi berkala", answer: "ya", ref: "Spesifikasi Umum 2020" },
+    { id: "TP-04", question: "Gambar Kerja (Shop Drawing) dan As-Built Drawing sementara tersedia lengkap di direksi keet", answer: null, ref: "Permen PUPR 1/2023" },
+    { id: "TP-05", question: "Laporan Harian, Mingguan, dan Bulanan disampaikan secara tertib kepada Pengawas/Konsultan", answer: "ya", ref: "Syarat Khusus Kontrak" },
+    { id: "TP-06", question: "Rencana Keselamatan Konstruksi (RKK) diterapkan di lapangan (APD lengkap, induksi K3, rambu K3)", answer: null, ref: "Permen PUPR 10/2021" },
+    { id: "TP-07", question: "Pengujian mutu material beton/aspal (Uji Kuat Tekan / Core Drill) terdokumentasi dan memenuhi syarat", answer: null, ref: "Spesifikasi Teknis" },
   ],
   "Tertib Pemanfaatan": [
-    { id: "TM01", question: "Hasil pekerjaan sesuai dengan spesifikasi teknis kontrak", answer: null },
-    { id: "TM02", question: "Berita Acara Serah Terima (BAST/PHO) telah dilaksanakan", answer: null },
-    { id: "TM03", question: "Masa pemeliharaan (maintenance period) berjalan", answer: null },
-    { id: "TM04", question: "Bangunan/infrastruktur dimanfaatkan sesuai peruntukan", answer: null },
-    { id: "TM05", question: "Dokumentasi as-built drawing tersedia", answer: null },
-    { id: "TM06", question: "SLF (Sertifikat Laik Fungsi) telah diurus (jika bangunan gedung)", answer: null },
+    { id: "TM-01", question: "Hasil pekerjaan fisik telah melalui proses Serah Terima Pertama Pekerjaan (BAST-1 / PHO)", answer: "ya", ref: "Pasal 24 Permen 1/2023" },
+    { id: "TM-02", question: "Masa Pemeliharaan (Defect Liability Period) berjalan sesuai jangka waktu dalam kontrak", answer: "ya", ref: "Permen PUPR 1/2023" },
+    { id: "TM-03", question: "Bangunan gedung/infrastruktur dimanfaatkan sesuai peruntukan fungsi yang direncanakan", answer: "ya", ref: "UU Bangunan Gedung" },
+    { id: "TM-04", question: "Tersedia SOP Operasional dan Pemeliharaan (O&P) bagi instansi pengguna jasa/OPD", answer: null, ref: "Permen PUPR 1/2023" },
+    { id: "TM-05", question: "Dokumen Sertifikat Laik Fungsi (SLF) telah diproses untuk bangunan gedung publik", answer: null, ref: "PP No. 16 Tahun 2021" },
   ],
 };
 
@@ -68,94 +67,282 @@ export default function PengawasanPage() {
     return Math.round((allItems.filter((i) => i.answer === "ya").length / answered.length) * 100);
   })();
 
-  const statusLabel = totalScore >= 80 ? "TERTIB" : totalScore >= 60 ? "CUKUP TERTIB" : totalScore > 0 ? "KURANG TERTIB" : "BELUM DINILAI";
-  const statusColor = totalScore >= 80 ? "text-accent" : totalScore >= 60 ? "text-amber" : totalScore > 0 ? "text-rose" : "text-slate-400";
-  const statusBg = totalScore >= 80 ? "bg-accent" : totalScore >= 60 ? "bg-amber" : totalScore > 0 ? "bg-rose" : "bg-slate-300";
+  const statusLabel = totalScore >= 80 ? "TERTIB (Sangat Baik)" : totalScore >= 60 ? "CUKUP TERTIB" : totalScore > 0 ? "KURANG TERTIB" : "BELUM DINILAI";
+  const statusColor = totalScore >= 80 ? "#059669" : totalScore >= 60 ? "#D97706" : totalScore > 0 ? "#DC2626" : "#64748B";
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* Header Bar */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">Pengawasan & SIMAK</h1>
-          <p className="text-sm text-slate-500 mt-1">Checklist digital Permen PUPR No. 1/2023 — Instrumen SIMAK</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Instrumen SIMAK PUPR
+            </span>
+          </div>
+          <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
+            Audit & Pengawasan SIMAK Digital
+          </h1>
+          <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
+            Sistem Informasi Manajemen Pengawasan Konstruksi — Checklist Digital Permen PUPR No. 1/2023
+          </p>
         </div>
-        <button onClick={resetAll} className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200">
-          <RotateCw className="h-4 w-4" /> Reset
-        </button>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <button 
+            onClick={resetAll}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              borderRadius: "12px",
+              backgroundColor: "#FFFFFF",
+              border: "1px solid #CBD5E1",
+              padding: "10px 16px",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#475569",
+              cursor: "pointer"
+            }}
+          >
+            <RotateCw style={{ width: "15px", height: "15px" }} /> Reset Jawaban
+          </button>
+          <button 
+            onClick={() => alert(`Laporan Hasil Audit SIMAK (${totalScore}%) siap dikirimkan ke portal SIPJAKI Kementerian PUPR!`)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#0F2E5C",
+              border: "none",
+              borderBottom: "3px solid #FFC000",
+              padding: "10px 20px",
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#FFFFFF",
+              cursor: "pointer",
+              boxShadow: "0 4px 10px rgba(15, 46, 92, 0.2)"
+            }}
+          >
+            <Send style={{ width: "15px", height: "15px", color: "#FFC000" }} /> Simpan & Kirim SIPJAKI
+          </button>
+        </div>
       </div>
 
-      {/* Score gauge */}
-      <div className="rounded-2xl border border-slate-200/60 bg-white p-6">
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          <div className="relative">
-            <svg width="160" height="160" className="transform -rotate-90">
-              <circle cx="80" cy="80" r="65" fill="none" stroke="#E2E8F0" strokeWidth="14" />
-              <circle cx="80" cy="80" r="65" fill="none" stroke={totalScore >= 80 ? "#10B981" : totalScore >= 60 ? "#F59E0B" : totalScore > 0 ? "#EF4444" : "#CBD5E1"} strokeWidth="14"
-                strokeDasharray={2 * Math.PI * 65} strokeDashoffset={2 * Math.PI * 65 - (totalScore / 100) * 2 * Math.PI * 65}
-                strokeLinecap="round" className="transition-all duration-700 ease-out" />
+      {/* Score Summary Card */}
+      <div 
+        style={{
+          borderRadius: "18px",
+          border: "1px solid #E2E8F0",
+          backgroundColor: "#FFFFFF",
+          padding: "24px 28px",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+          display: "flex",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "32px"
+        }}
+      >
+        {/* Left: Overall Gauge */}
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <div style={{ position: "relative", width: "120px", height: "120px" }}>
+            <svg width="120" height="120" style={{ transform: "rotate(-90deg)" }}>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#E2E8F0" strokeWidth="12" />
+              <circle
+                cx="60" cy="60" r="50" fill="none" stroke={statusColor} strokeWidth="12"
+                strokeDasharray={2 * Math.PI * 50} strokeDashoffset={2 * Math.PI * 50 - (totalScore / 100) * 2 * Math.PI * 50}
+                strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.8s ease-out" }}
+              />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-extrabold text-slate-900">{totalScore}%</span>
-              <span className={cn("text-xs font-bold", statusColor)}>{statusLabel}</span>
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", lineHeight: 1 }}>{totalScore}%</span>
+              <span style={{ fontSize: "10px", fontWeight: 700, color: "#64748B", marginTop: "2px" }}>Skor SIMAK</span>
             </div>
           </div>
-          <div className="flex-1 space-y-3 w-full">
-            {Object.entries(checklist).map(([tab, items]) => {
-              const score = calcScore(items);
-              return (
-                <div key={tab} className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-slate-600 w-44 shrink-0">{tab}</span>
-                  <div className="flex-1 h-3 rounded-full bg-slate-200 overflow-hidden">
-                    <div className={cn("h-full rounded-full transition-all duration-500",
-                      score >= 80 ? "bg-accent" : score >= 60 ? "bg-amber" : score > 0 ? "bg-rose" : "bg-slate-300"
-                    )} style={{ width: `${score}%` }} />
-                  </div>
-                  <span className="text-sm font-bold text-slate-700 w-12 text-right">{score}%</span>
-                </div>
-              );
-            })}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", color: "#64748B" }}>
+              Status Kepatuhan Proyek
+            </span>
+            <span style={{ fontSize: "16px", fontWeight: 900, color: statusColor }}>
+              {statusLabel}
+            </span>
+            <p style={{ fontSize: "12px", color: "#64748B", margin: "4px 0 0 0", maxWidth: "260px" }}>
+              Berdasarkan evaluasi kumulatif 3 Tertib (Usaha, Penyelenggaraan, Pemanfaatan).
+            </p>
           </div>
+        </div>
+
+        <div style={{ height: "80px", width: "1px", backgroundColor: "#E2E8F0" }} />
+
+        {/* Right: Breakdown of 3 Tertib */}
+        <div style={{ flex: 1, minWidth: "280px", display: "flex", flexDirection: "column", gap: "12px" }}>
+          {Object.entries(checklist).map(([tab, items]) => {
+            const score = calcScore(items);
+            const color = score >= 80 ? "#059669" : score >= 60 ? "#D97706" : "#DC2626";
+            return (
+              <div key={tab} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontSize: "12px", fontWeight: 700, color: "#334155", width: "160px", flexShrink: 0 }}>
+                  {tab}
+                </span>
+                <div style={{ flex: 1, height: "8px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
+                  <div 
+                    style={{ 
+                      height: "100%", 
+                      width: `${score}%`, 
+                      backgroundColor: color, 
+                      borderRadius: "9999px",
+                      transition: "width 0.5s ease" 
+                    }} 
+                  />
+                </div>
+                <span style={{ fontSize: "12px", fontWeight: 800, color: color, width: "45px", textAlign: "right" }}>
+                  {score}%
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-200 pb-px">
-        {Object.keys(checklist).map((tab) => (
-          <button key={tab} onClick={() => setActiveTab(tab)}
-            className={cn("px-4 py-2.5 text-sm font-semibold transition-colors border-b-2",
-              activeTab === tab ? "border-primary text-primary" : "border-transparent text-slate-500 hover:text-slate-700"
-            )}
-          >{tab} <span className="ml-1 text-xs text-slate-400">({calcScore(checklist[tab])}%)</span></button>
-        ))}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "2px solid #E2E8F0", paddingBottom: "2px" }}>
+        {Object.keys(checklist).map((tab) => {
+          const isSelected = activeTab === tab;
+          const score = calcScore(checklist[tab]);
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                padding: "10px 18px",
+                fontSize: "13px",
+                fontWeight: 800,
+                border: "none",
+                cursor: "pointer",
+                borderBottom: isSelected ? "3px solid #0F2E5C" : "3px solid transparent",
+                backgroundColor: "transparent",
+                color: isSelected ? "#0F2E5C" : "#64748B",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                transition: "all 0.15s ease"
+              }}
+            >
+              <span>{tab}</span>
+              <span 
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 800,
+                  padding: "2px 8px",
+                  borderRadius: "9999px",
+                  backgroundColor: isSelected ? "#EBF2FA" : "#F1F5F9",
+                  color: isSelected ? "#0F2E5C" : "#64748B"
+                }}
+              >
+                {score}%
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Checklist items */}
-      <div className="rounded-2xl border border-slate-200/60 bg-white divide-y divide-slate-100">
-        {checklist[activeTab].map((item) => (
-          <div key={item.id} className={cn("flex items-center gap-4 px-5 py-4 transition-colors",
-            item.answer === "ya" && "bg-accent/5",
-            item.answer === "tidak" && "bg-rose/5",
-          )}>
-            <span className="text-xs font-bold text-slate-400 w-10 shrink-0">{item.id}</span>
-            <p className="flex-1 text-sm text-slate-700">{item.question}</p>
-            <div className="flex items-center gap-2">
-              {(["ya", "tidak", "na"] as Answer[]).map((val) => (
-                <button key={val} onClick={() => toggleAnswer(activeTab, item.id, val)}
-                  className={cn("flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-bold transition-all",
-                    item.answer === val
-                      ? val === "ya" ? "bg-accent text-white" : val === "tidak" ? "bg-rose text-white" : "bg-slate-500 text-white"
-                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                  )}
+      {/* Checklist Question Cards */}
+      <div 
+        style={{
+          borderRadius: "18px",
+          border: "1px solid #E2E8F0",
+          backgroundColor: "#FFFFFF",
+          overflow: "hidden",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)"
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {checklist[activeTab].map((item, idx) => (
+            <div 
+              key={item.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "16px",
+                padding: "18px 24px",
+                borderBottom: idx < checklist[activeTab].length - 1 ? "1px solid #F1F5F9" : "none",
+                backgroundColor: item.answer === "ya" ? "rgba(16, 185, 129, 0.03)" : item.answer === "tidak" ? "rgba(239, 68, 68, 0.03)" : "#FFFFFF"
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", flex: 1, minWidth: "280px" }}>
+                <span 
+                  style={{
+                    fontFamily: "monospace",
+                    fontSize: "11px",
+                    fontWeight: 800,
+                    backgroundColor: "#F1F5F9",
+                    color: "#0F2E5C",
+                    padding: "4px 8px",
+                    borderRadius: "6px",
+                    flexShrink: 0
+                  }}
                 >
-                  {val === "ya" && <CheckCircle2 className="h-3.5 w-3.5" />}
-                  {val === "tidak" && <XCircle className="h-3.5 w-3.5" />}
-                  {val === "na" && <MinusCircle className="h-3.5 w-3.5" />}
-                  {val === "ya" ? "Ya" : val === "tidak" ? "Tidak" : "N/A"}
-                </button>
-              ))}
+                  {item.id}
+                </span>
+                <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                  <p style={{ fontSize: "13px", fontWeight: 600, color: "#1E293B", margin: 0, lineHeight: 1.5 }}>
+                    {item.question}
+                  </p>
+                  <span style={{ fontSize: "11px", color: "#94A3B8" }}>
+                    Dasar Acuan: {item.ref}
+                  </span>
+                </div>
+              </div>
+
+              {/* 3 Action Pill Buttons */}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                {(["ya", "tidak", "na"] as Answer[]).map((val) => {
+                  const isChecked = item.answer === val;
+                  let bg = "#F1F5F9";
+                  let fg = "#64748B";
+                  let border = "1px solid #E2E8F0";
+
+                  if (isChecked) {
+                    if (val === "ya") { bg = "#059669"; fg = "#FFFFFF"; border = "1px solid #059669"; }
+                    if (val === "tidak") { bg = "#DC2626"; fg = "#FFFFFF"; border = "1px solid #DC2626"; }
+                    if (val === "na") { bg = "#475569"; fg = "#FFFFFF"; border = "1px solid #475569"; }
+                  }
+
+                  return (
+                    <button
+                      key={val}
+                      onClick={() => toggleAnswer(activeTab, item.id, val)}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "8px 14px",
+                        borderRadius: "10px",
+                        fontSize: "11px",
+                        fontWeight: 800,
+                        backgroundColor: bg,
+                        color: fg,
+                        border: border,
+                        cursor: "pointer",
+                        boxShadow: isChecked ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
+                        transition: "all 0.15s ease"
+                      }}
+                    >
+                      {val === "ya" && <CheckCircle2 style={{ width: "14px", height: "14px" }} />}
+                      {val === "tidak" && <XCircle style={{ width: "14px", height: "14px" }} />}
+                      {val === "na" && <MinusCircle style={{ width: "14px", height: "14px" }} />}
+                      <span>{val === "ya" ? "Memenuhi (Ya)" : val === "tidak" ? "Tidak Memenuhi" : "N/A"}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

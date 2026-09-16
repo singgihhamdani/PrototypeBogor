@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Package, Search, Download, Plus, Eye, ChevronRight, TrendingUp, DollarSign, Calendar, CheckCircle2 } from "lucide-react";
+import { Package, Search, Download, Plus, Eye, ChevronRight, TrendingUp, DollarSign, Calendar, CheckCircle2, Award } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import projectsData from "@/data/projects.json";
 
@@ -23,100 +23,233 @@ export default function PaketPekerjaanPage() {
   const avgProgress = Math.round(projectsData.reduce((acc, curr) => acc + curr.physProgress, 0) / projectsData.length);
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* Header Bar */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2.5">
-            <Package className="h-7 w-7 text-primary" /> Paket Pekerjaan Konstruksi
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Pilar 2: Tertib Penyelenggaraan
+            </span>
+          </div>
+          <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
+            Paket Pekerjaan Konstruksi Kab. Bogor
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Data pemantauan progres fisik & keuangan proyek konstruksi Kab. Bogor TA 2026 (Format Sinkronisasi SIPJAKI)
+          <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
+            Pemantauan progres fisik, realisasi keuangan, dan Kurva-S proyek APBD/DAK TA 2026 (Format Sinkronisasi SIPJAKI)
           </p>
         </div>
-        <div className="flex gap-2">
+
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button 
             onClick={() => alert("Mengunduh Rekapitulasi Paket Pekerjaan (Format Template SIPJAKI .xlsx)...")}
-            className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#FFFFFF",
+              border: "1px solid #CBD5E1",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#334155",
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+            }}
           >
-            <Download className="h-4 w-4" /> Export SIPJAKI
+            <Download style={{ width: "16px", height: "16px" }} /> Export SIPJAKI
           </button>
           <button 
-            onClick={() => alert("Form Tambah Paket Pekerjaan Baru")}
-            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-white hover:bg-primary-dark transition-colors shadow-sm"
+            onClick={() => alert("Membuka Formulir Tambah Paket Pekerjaan Baru...")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#0F2E5C",
+              border: "none",
+              borderBottom: "3px solid #FFC000",
+              padding: "10px 20px",
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#FFFFFF",
+              cursor: "pointer",
+              boxShadow: "0 4px 10px rgba(15, 46, 92, 0.2)"
+            }}
           >
-            <Plus className="h-4 w-4" /> Tambah Paket
+            <Plus style={{ width: "16px", height: "16px", color: "#FFC000" }} /> Tambah Paket
           </button>
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Total Paket</span>
-            <Package className="h-4 w-4 text-primary" />
+      {/* 4 Stats Cards */}
+      <div 
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "18px"
+        }}
+      >
+        <div 
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #E2E8F0",
+            backgroundColor: "#FFFFFF",
+            padding: "20px 22px",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Total Paket Tercatat</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#EBF2FA", color: "#0F2E5C", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Package style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-slate-900 mt-2">{projectsData.length}</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Tercatat di sistem</p>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>{projectsData.length}</p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Terdaftar pada sistem SIJAKON</p>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Total Nilai Kontrak</span>
-            <DollarSign className="h-4 w-4 text-accent" />
+        <div 
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #E2E8F0",
+            backgroundColor: "#FFFFFF",
+            padding: "20px 22px",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Total Nilai Kontrak</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#EFF6FF", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <DollarSign style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-xl font-extrabold text-slate-900 mt-2">{formatCurrency(totalValue)}</p>
-          <p className="text-[11px] text-accent font-medium mt-0.5">Pagu & Kontrak Aktif</p>
+          <div>
+            <p style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1, fontFamily: "monospace" }}>{formatCurrency(totalValue)}</p>
+            <p style={{ fontSize: "11px", color: "#2563EB", margin: "4px 0 0 0", fontWeight: 600 }}>Pagu & Kontrak Berjalan</p>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Rata-rata Progres Fisik</span>
-            <TrendingUp className="h-4 w-4 text-blue" />
+        <div 
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #E2E8F0",
+            backgroundColor: "#FFFFFF",
+            padding: "20px 22px",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Rata-rata Progres Fisik</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#ECFDF5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <TrendingUp style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-blue mt-2">{avgProgress}%</p>
-          <div className="w-full bg-slate-100 rounded-full h-1.5 mt-2">
-            <div className="bg-blue h-1.5 rounded-full" style={{ width: `${avgProgress}%` }}></div>
+          <div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+              <p style={{ fontSize: "28px", fontWeight: 900, color: "#059669", margin: 0, lineHeight: 1.1 }}>{avgProgress}%</p>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>Realisasi</span>
+            </div>
+            <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "9999px", marginTop: "8px", overflow: "hidden" }}>
+              <div style={{ width: `${avgProgress}%`, height: "100%", backgroundColor: "#059669", borderRadius: "9999px" }} />
+            </div>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Status Selesai</span>
-            <CheckCircle2 className="h-4 w-4 text-accent" />
+        <div 
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #E2E8F0",
+            backgroundColor: "#FFFFFF",
+            padding: "20px 22px",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Status Pekerjaan Selesai</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#FFFBEB", color: "#D97706", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <CheckCircle2 style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-slate-900 mt-2">
-            {projectsData.filter((p) => p.status === "Selesai").length} <span className="text-sm font-normal text-slate-400">/ {projectsData.length}</span>
-          </p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Serah Terima Pertama (PHO)</p>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>
+              {projectsData.filter((p) => p.status === "Selesai").length} <span style={{ fontSize: "14px", fontWeight: 500, color: "#94A3B8" }}>/ {projectsData.length} Paket</span>
+            </p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Serah Terima Pertama (PHO)</p>
+          </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[260px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+      {/* Filter and Search Bar */}
+      <div 
+        style={{
+          borderRadius: "16px",
+          border: "1px solid #E2E8F0",
+          backgroundColor: "#FFFFFF",
+          padding: "16px 20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "14px",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)"
+        }}
+      >
+        <div style={{ position: "relative", flex: 1, minWidth: "260px" }}>
+          <Search style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94A3B8" }} />
           <input
-            type="text"
-            value={search}
+            type="text" 
+            value={search} 
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari ID paket, nama pekerjaan, kontraktor..."
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            placeholder="Cari ID paket, nama pekerjaan, penyedia jasa..."
+            style={{
+              width: "100%",
+              height: "40px",
+              borderRadius: "10px",
+              border: "1px solid #CBD5E1",
+              backgroundColor: "#F8FAFC",
+              paddingLeft: "40px",
+              paddingRight: "16px",
+              fontSize: "12px",
+              color: "#0F172A",
+              outline: "none"
+            }}
           />
         </div>
 
-        {/* Sumber Dana filter */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
-          <span className="text-[11px] font-bold text-slate-400 px-2 uppercase">Sumber:</span>
+        {/* Source filter */}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#F1F5F9", padding: "4px", borderRadius: "10px" }}>
+          <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", padding: "0 6px" }}>SUMBER:</span>
           {["Semua", "APBD", "DAK", "APBN"].map((s) => (
             <button
               key={s}
               onClick={() => setFilterSource(s)}
-              className={cn(
-                "rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all",
-                filterSource === s ? "bg-white text-primary shadow-xs" : "text-slate-600 hover:text-slate-900"
-              )}
+              style={{
+                padding: "6px 12px",
+                borderRadius: "8px",
+                fontSize: "11px",
+                fontWeight: 800,
+                border: "none",
+                cursor: "pointer",
+                backgroundColor: filterSource === s ? "#0F2E5C" : "transparent",
+                color: filterSource === s ? "#FFFFFF" : "#475569",
+                transition: "all 0.15s ease"
+              }}
             >
               {s}
             </button>
@@ -124,16 +257,23 @@ export default function PaketPekerjaanPage() {
         </div>
 
         {/* Status filter */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
-          <span className="text-[11px] font-bold text-slate-400 px-2 uppercase">Status:</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#F1F5F9", padding: "4px", borderRadius: "10px" }}>
+          <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", padding: "0 6px" }}>STATUS:</span>
           {["Semua", "Pelaksanaan", "Selesai"].map((st) => (
             <button
               key={st}
               onClick={() => setFilterStatus(st)}
-              className={cn(
-                "rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all",
-                filterStatus === st ? "bg-white text-primary shadow-xs" : "text-slate-600 hover:text-slate-900"
-              )}
+              style={{
+                padding: "6px 12px",
+                borderRadius: "8px",
+                fontSize: "11px",
+                fontWeight: 800,
+                border: "none",
+                cursor: "pointer",
+                backgroundColor: filterStatus === st ? "#0F2E5C" : "transparent",
+                color: filterStatus === st ? "#FFFFFF" : "#475569",
+                transition: "all 0.15s ease"
+              }}
             >
               {st}
             </button>
@@ -141,95 +281,138 @@ export default function PaketPekerjaanPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="rounded-2xl border border-slate-200/60 bg-white overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      {/* Enterprise Data Table */}
+      <div 
+        style={{
+          borderRadius: "18px",
+          border: "1px solid #E2E8F0",
+          backgroundColor: "#FFFFFF",
+          overflow: "hidden",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)"
+        }}
+      >
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                <th className="py-3 px-4">Kode & Nama Paket</th>
-                <th className="py-3 px-4">Sumber / OPD</th>
-                <th className="py-3 px-4">Penyedia Jasa</th>
-                <th className="py-3 px-4">Nilai Kontrak</th>
-                <th className="py-3 px-4">Progres Fisik</th>
-                <th className="py-3 px-4">Progres Keu</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-center">Aksi</th>
+              <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "2px solid #E2E8F0", textAlign: "left" }}>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>KODE & NAMA PAKET</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>SUMBER / OPD</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>PENYEDIA JASA</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NILAI KONTRAK</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>PROGRES FISIK</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>PROGRES KEU</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>STATUS</th>
+                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px", textAlign: "center" }}>AKSI</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {filtered.map((p) => (
-                <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-start gap-2">
-                      <span className="font-mono text-[11px] font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+                <tr 
+                  key={p.id} 
+                  style={{ borderBottom: "1px solid #F1F5F9", transition: "background-color 0.15s ease" }}
+                >
+                  <td style={{ padding: "16px 18px" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
+                      <span style={{ fontFamily: "monospace", fontSize: "11px", fontWeight: 700, backgroundColor: "#F1F5F9", color: "#475569", padding: "2px 6px", borderRadius: "4px" }}>
                         {p.id}
                       </span>
                       <div>
-                        <Link href={`/paket-pekerjaan/${p.id}`} className="text-sm font-semibold text-slate-800 hover:text-primary transition-colors">
+                        <Link href={`/paket-pekerjaan/${p.id}`} style={{ fontWeight: 800, color: "#0F172A", textDecoration: "none", fontSize: "13px" }}>
                           {p.name}
                         </Link>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
+                        <span style={{ display: "block", fontSize: "11px", color: "#64748B", marginTop: "2px" }}>
                           {p.startDate} s/d {p.endDate}
-                        </p>
+                        </span>
                       </div>
                     </div>
                   </td>
-                  <td className="py-3.5 px-4">
-                    <span className="inline-block rounded px-2 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-700">
+
+                  <td style={{ padding: "16px 18px" }}>
+                    <span style={{ fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "4px 8px", borderRadius: "6px", fontSize: "11px" }}>
                       {p.source}
                     </span>
-                    <p className="text-xs text-slate-500 mt-1">{p.owner}</p>
+                    <p style={{ fontSize: "11px", color: "#64748B", margin: "4px 0 0 0" }}>{p.owner}</p>
                   </td>
-                  <td className="py-3.5 px-4">
-                    <p className="text-sm font-medium text-slate-800">{p.contractor}</p>
-                    <p className="text-[11px] font-mono text-slate-400">NIB: {p.nib}</p>
+
+                  <td style={{ padding: "16px 18px" }}>
+                    <p style={{ fontSize: "13px", fontWeight: 700, color: "#1E293B", margin: 0 }}>{p.contractor}</p>
+                    <p style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", margin: "2px 0 0 0" }}>NIB: {p.nib}</p>
                   </td>
-                  <td className="py-3.5 px-4 font-mono text-sm font-semibold text-slate-900">
+
+                  <td style={{ padding: "16px 18px", fontFamily: "monospace", fontSize: "13px", fontWeight: 800, color: "#0F172A" }}>
                     {formatCurrency(p.contractValue)}
                   </td>
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 bg-slate-100 rounded-full h-2">
+
+                  <td style={{ padding: "16px 18px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <div style={{ width: "70px", height: "8px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
                         <div 
-                          className={cn(
-                            "h-2 rounded-full",
-                            p.physProgress >= 100 ? "bg-accent" : p.physProgress > 50 ? "bg-primary" : "bg-amber"
-                          )} 
-                          style={{ width: `${p.physProgress}%` }}
+                          style={{ 
+                            width: `${p.physProgress}%`, 
+                            height: "100%", 
+                            backgroundColor: p.physProgress >= 100 ? "#059669" : p.physProgress > 50 ? "#0F2E5C" : "#D97706",
+                            borderRadius: "9999px" 
+                          }} 
                         />
                       </div>
-                      <span className="text-xs font-bold text-slate-700">{p.physProgress}%</span>
+                      <span style={{ fontWeight: 800, color: "#0F172A", fontSize: "12px" }}>{p.physProgress}%</span>
                     </div>
-                    <span className="text-[10px] text-slate-400">{p.physMonth}</span>
+                    <span style={{ fontSize: "10px", color: "#94A3B8" }}>Bulan: {p.physMonth}</span>
                   </td>
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 bg-slate-100 rounded-full h-2">
+
+                  <td style={{ padding: "16px 18px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <div style={{ width: "70px", height: "8px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
                         <div 
-                          className="bg-accent h-2 rounded-full" 
-                          style={{ width: `${p.finProgress}%` }}
+                          style={{ 
+                            width: `${p.finProgress}%`, 
+                            height: "100%", 
+                            backgroundColor: "#059669",
+                            borderRadius: "9999px" 
+                          }} 
                         />
                       </div>
-                      <span className="text-xs font-bold text-slate-700">{p.finProgress}%</span>
+                      <span style={{ fontWeight: 800, color: "#059669", fontSize: "12px" }}>{p.finProgress}%</span>
                     </div>
-                    <span className="text-[10px] text-slate-400">{p.finMonth}</span>
+                    <span style={{ fontSize: "10px", color: "#94A3B8" }}>Bulan: {p.finMonth}</span>
                   </td>
-                  <td className="py-3.5 px-4">
-                    <span className={cn(
-                      "rounded-full px-2.5 py-1 text-[11px] font-bold inline-flex items-center gap-1",
-                      p.status === "Selesai" ? "bg-accent/10 text-accent" : "bg-blue/10 text-blue"
-                    )}>
-                      <span className={cn("h-1.5 w-1.5 rounded-full", p.status === "Selesai" ? "bg-accent" : "bg-blue")} />
+
+                  <td style={{ padding: "16px 18px" }}>
+                    <span 
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        borderRadius: "9999px",
+                        padding: "4px 12px",
+                        fontSize: "11px",
+                        fontWeight: 800,
+                        backgroundColor: p.status === "Selesai" ? "#ECFDF5" : "#EFF6FF",
+                        color: p.status === "Selesai" ? "#059669" : "#2563EB"
+                      }}
+                    >
+                      <span style={{ height: "6px", width: "6px", borderRadius: "9999px", backgroundColor: p.status === "Selesai" ? "#059669" : "#2563EB" }} />
                       {p.status}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4 text-center">
+
+                  <td style={{ padding: "16px 18px", textAlign: "center" }}>
                     <Link
                       href={`/paket-pekerjaan/${p.id}`}
-                      className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-primary hover:text-white transition-all"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        borderRadius: "8px",
+                        backgroundColor: "#F1F5F9",
+                        color: "#0F2E5C",
+                        padding: "6px 12px",
+                        fontSize: "11px",
+                        fontWeight: 800,
+                        textDecoration: "none"
+                      }}
                     >
-                      <Eye className="h-3.5 w-3.5" /> Detail
+                      <Eye style={{ width: "14px", height: "14px" }} /> Detail
                     </Link>
                   </td>
                 </tr>

@@ -6,6 +6,7 @@ import {
   Eye, EyeOff, ShieldCheck, Building2, 
   ArrowRight, Key, Mail, Lock, Sparkles
 } from "lucide-react";
+import Logo, { BrandIcon } from "@/components/ui/logo";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@sijakon.bogor.go.id");
@@ -67,46 +68,8 @@ export default function LoginPage() {
             gap: "16px"
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            {/* Badges */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
-              <div 
-                style={{
-                  height: "36px",
-                  padding: "0 10px",
-                  borderRadius: "8px",
-                  backgroundColor: "#FFC000",
-                  color: "#0F2E5C",
-                  fontWeight: 900,
-                  fontSize: "12px",
-                  letterSpacing: "0.5px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                PUPR
-              </div>
-              <div style={{ height: "20px", width: "1px", backgroundColor: "rgba(255,255,255,0.2)" }} />
-              <div 
-                style={{
-                  height: "36px",
-                  padding: "0 10px",
-                  borderRadius: "8px",
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  color: "#FFFFFF",
-                  fontWeight: 900,
-                  fontSize: "11px",
-                  letterSpacing: "0.5px",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                KAB. BOGOR
-              </div>
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <BrandIcon size={40} />
 
             <div style={{ display: "flex", flexDirection: "column" }}>
               <span 
@@ -225,20 +188,10 @@ export default function LoginPage() {
                 <span>Prototype TA 2026</span>
               </div>
 
-              {/* Title */}
-              <div>
-                <h2 
-                  style={{
-                    fontSize: "26px",
-                    fontWeight: 900,
-                    color: "#FFFFFF",
-                    letterSpacing: "-0.5px",
-                    lineHeight: 1.15
-                  }}
-                >
-                  SIJAKON BOGOR
-                </h2>
-                <div style={{ height: "5px", width: "50px", backgroundColor: "#FFC000", borderRadius: "9999px", margin: "8px 0 12px 0" }} />
+              {/* Title with Logo */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <Logo size={48} theme="dark" subtitle="DPUPR KABUPATEN BOGOR" />
+                <div style={{ height: "4px", width: "48px", backgroundColor: "#FFC000", borderRadius: "9999px" }} />
                 <p 
                   style={{
                     fontSize: "12px",

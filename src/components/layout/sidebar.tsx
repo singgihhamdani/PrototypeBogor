@@ -7,6 +7,7 @@ import {
   ChevronLeft, ChevronRight, ShieldAlert
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Logo, { BrandIcon } from "@/components/ui/logo";
 
 const menuItems = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -62,54 +63,14 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           flexShrink: 0
         }}
       >
-        {!collapsed && (
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
-            <div 
-              style={{
-                height: "36px",
-                width: "36px",
-                borderRadius: "10px",
-                backgroundColor: "#FFC000",
-                color: "#0F2E5C",
-                fontWeight: 900,
-                fontSize: "12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-              }}
-            >
-              PUPR
-            </div>
-            <div style={{ lineHeight: 1.15 }}>
-              <span style={{ display: "block", fontSize: "14px", fontWeight: 900, color: "#FFFFFF", letterSpacing: "0.5px" }}>
-                SIJAKON
-              </span>
-              <span style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#FFC000", letterSpacing: "1px" }}>
-                KAB. BOGOR
-              </span>
-            </div>
+        {!collapsed ? (
+          <Link href="/" style={{ display: "inline-flex", textDecoration: "none" }}>
+            <Logo size={38} theme="dark" subtitle="DPUPR KAB. BOGOR" />
           </Link>
-        )}
-        {collapsed && (
-          <div 
-            style={{
-              height: "36px",
-              width: "36px",
-              borderRadius: "10px",
-              backgroundColor: "#FFC000",
-              color: "#0F2E5C",
-              fontWeight: 900,
-              fontSize: "12px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-            }}
-          >
-            PUPR
-          </div>
+        ) : (
+          <Link href="/" style={{ display: "inline-flex", textDecoration: "none" }}>
+            <BrandIcon size={38} />
+          </Link>
         )}
       </div>
 

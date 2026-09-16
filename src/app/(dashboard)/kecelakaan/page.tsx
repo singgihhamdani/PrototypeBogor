@@ -2,9 +2,8 @@
 import { useState } from "react";
 import { 
   ShieldAlert, Plus, Search, Calendar, MapPin, AlertTriangle, 
-  CheckCircle2, FileText, Send, Eye, ShieldCheck, Download, ArrowUpRight
+  CheckCircle2, FileText, Send, Eye, ShieldCheck, Download, X
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import incidentsData from "@/data/incidents.json";
 import projectsData from "@/data/projects.json";
 
@@ -66,163 +65,227 @@ export default function KecelakaanPage() {
   );
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose/10 text-rose flex items-center gap-1">
-              <ShieldAlert className="h-3 w-3" /> Modul SMKK & K3 Konstruksi
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#DC2626", backgroundColor: "#FEF2F2", padding: "3px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <ShieldAlert style={{ width: "12px", height: "12px" }} /> Modul SMKK & K3 Konstruksi
             </span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", backgroundColor: "#F1F5F9", padding: "3px 10px", borderRadius: "9999px" }}>
               Sinkronisasi: SIPJAKI PUPR
             </span>
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 mt-1">
+          <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
             Pelaporan Kecelakaan Kerja Konstruksi
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
             Pencatatan insiden K3, investigasi penyebab, tindakan perbaikan, dan integrasi data insiden ke Kementerian PUPR
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button
+            type="button"
             onClick={() => setActiveTab("list")}
-            className={cn(
-              "rounded-xl px-4 py-2.5 text-sm font-semibold transition-all",
-              activeTab === "list" ? "bg-primary text-white shadow-sm" : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
-            )}
+            style={{
+              borderRadius: "12px",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 800,
+              cursor: "pointer",
+              backgroundColor: activeTab === "list" ? "#0F2E5C" : "#FFFFFF",
+              color: activeTab === "list" ? "#FFFFFF" : "#475569",
+              border: activeTab === "list" ? "none" : "1px solid #CBD5E1",
+              borderBottom: activeTab === "list" ? "3px solid #FFC000" : "1px solid #CBD5E1",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+            }}
           >
             Daftar Insiden ({incidents.length})
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("create")}
-            className={cn(
-              "flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold transition-all",
-              activeTab === "create" ? "bg-rose text-white shadow-sm" : "bg-rose/10 text-rose hover:bg-rose/20"
-            )}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              borderRadius: "12px",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 800,
+              cursor: "pointer",
+              backgroundColor: activeTab === "create" ? "#DC2626" : "#FEF2F2",
+              color: activeTab === "create" ? "#FFFFFF" : "#DC2626",
+              border: "none",
+              boxShadow: "0 2px 6px rgba(220, 38, 38, 0.2)"
+            }}
           >
-            <Plus className="h-4 w-4" /> Lapor Kecelakaan
+            <Plus style={{ width: "15px", height: "15px" }} /> Lapor Kecelakaan Baru
           </button>
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Total Insiden K3</span>
-            <ShieldAlert className="h-4 w-4 text-rose" />
+      {/* 4 Metric Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px" }}>
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Total Insiden K3</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#FEF2F2", color: "#DC2626", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <ShieldAlert style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-slate-900 mt-2">{incidents.length}</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Tercatat TA 2026</p>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>{incidents.length}</p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Tercatat di TA 2026</p>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Luka Ringan</span>
-            <AlertTriangle className="h-4 w-4 text-amber" />
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Luka Ringan</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#FFFBEB", color: "#D97706", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <AlertTriangle style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-amber mt-2">
-            {incidents.filter(i => i.severity === "Luka Ringan").length}
-          </p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Rawat Jalan / Pulih</p>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#D97706", margin: 0, lineHeight: 1.1 }}>
+              {incidents.filter(i => i.severity === "Luka Ringan").length}
+            </p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Rawat Jalan / Pulih</p>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Luka Berat / Fatal</span>
-            <ShieldAlert className="h-4 w-4 text-rose" />
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Luka Berat / Fatal</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#FEF2F2", color: "#DC2626", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <ShieldAlert style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-rose mt-2">
-            {incidents.filter(i => i.severity === "Luka Berat" || i.severity === "Meninggal Dunia").length}
-          </p>
-          <p className="text-[11px] text-slate-400 mt-0.5">0 Korban Fatalitas (Meninggal)</p>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#DC2626", margin: 0, lineHeight: 1.1 }}>
+              {incidents.filter(i => i.severity === "Luka Berat" || i.severity === "Meninggal Dunia").length}
+            </p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Zero Fatal Accident</p>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium">Zero Fatal Accident</span>
-            <ShieldCheck className="h-4 w-4 text-accent" />
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Status Penanganan</span>
+            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#ECFDF5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <CheckCircle2 style={{ width: "18px", height: "18px" }} />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold text-accent mt-2">100%</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Tercapai Sejauh Ini</p>
+          <div>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#059669", margin: 0, lineHeight: 1.1 }}>100%</p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Tuntas Investigasi</p>
+          </div>
         </div>
       </div>
 
-      {/* Tab: List */}
+      {/* Tab: List Incidents */}
       {activeTab === "list" && (
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+          {/* Search bar */}
+          <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <Search style={{ width: "16px", height: "16px", color: "#94A3B8" }} />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari berdasarkan nama proyek, penyedia jasa, atau jenis kecelakaan..."
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="Cari berdasarkan nama proyek, kontraktor pelaksana, atau jenis insiden..."
+              style={{
+                border: "none",
+                outline: "none",
+                width: "100%",
+                fontSize: "13px",
+                color: "#0F172A",
+                backgroundColor: "transparent"
+              }}
             />
           </div>
 
-          <div className="rounded-2xl border border-slate-200/60 bg-white overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
-              <table className="w-full">
+          {/* Table Container */}
+          <div style={{ borderRadius: "18px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3 px-4">No. Laporan / Tanggal</th>
-                    <th className="py-3 px-4">Paket & Pelaksana</th>
-                    <th className="py-3 px-4">Jenis Insiden</th>
-                    <th className="py-3 px-4">Tingkat Keparahan</th>
-                    <th className="py-3 px-4">Korban</th>
-                    <th className="py-3 px-4">Ref SIPJAKI</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-center">Aksi</th>
+                  <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "2px solid #E2E8F0", textAlign: "left" }}>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NO. LAPORAN / TANGGAL</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>PAKET & PELAKSANA</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>JENIS INSIDEN</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>KEPARAHAN</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>KORBAN</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>REF SIPJAKI</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>STATUS</th>
+                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px", textAlign: "center" }}>AKSI</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody>
                   {filteredIncidents.map((inc) => (
-                    <tr key={inc.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3.5 px-4">
-                        <p className="font-mono font-bold text-slate-900">{inc.id}</p>
-                        <p className="text-slate-400 mt-0.5">{inc.date} {inc.time}</p>
+                    <tr key={inc.id} style={{ borderBottom: "1px solid #F1F5F9", transition: "background-color 0.15s ease" }}>
+                      <td style={{ padding: "16px 18px" }}>
+                        <p style={{ fontFamily: "monospace", fontWeight: 800, color: "#0F172A", margin: 0, fontSize: "12px" }}>{inc.id}</p>
+                        <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>{inc.date} • {inc.time}</p>
                       </td>
-                      <td className="py-3.5 px-4">
-                        <p className="font-semibold text-slate-800 text-sm">{inc.projectName}</p>
-                        <p className="text-slate-500">{inc.contractor} • Kec. {inc.district}</p>
+                      <td style={{ padding: "16px 18px" }}>
+                        <p style={{ fontWeight: 800, color: "#0F172A", margin: 0, fontSize: "13px" }}>{inc.projectName}</p>
+                        <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>{inc.contractor} • Kec. {inc.district}</p>
                       </td>
-                      <td className="py-3.5 px-4 font-medium text-slate-700">
+                      <td style={{ padding: "16px 18px", color: "#334155", fontWeight: 600 }}>
                         {inc.incidentType}
                       </td>
-                      <td className="py-3.5 px-4">
-                        <span className={cn(
-                          "rounded-full px-2.5 py-1 font-bold inline-block",
-                          inc.severity === "Luka Ringan" ? "bg-amber/10 text-amber" :
-                          inc.severity === "Luka Berat" ? "bg-rose/10 text-rose" : "bg-slate-100 text-slate-600"
-                        )}>
+                      <td style={{ padding: "16px 18px" }}>
+                        <span 
+                          style={{
+                            display: "inline-block",
+                            borderRadius: "9999px",
+                            padding: "4px 12px",
+                            fontSize: "11px",
+                            fontWeight: 800,
+                            backgroundColor: inc.severity === "Luka Ringan" ? "#FFFBEB" : "#FEF2F2",
+                            color: inc.severity === "Luka Ringan" ? "#D97706" : "#DC2626"
+                          }}
+                        >
                           {inc.severity}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600">
-                        <p className="font-semibold">{inc.victimName}</p>
-                        <p className="text-slate-400">{inc.victimRole}</p>
+                      <td style={{ padding: "16px 18px" }}>
+                        <p style={{ fontWeight: 700, color: "#0F172A", margin: 0 }}>{inc.victimName}</p>
+                        <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>{inc.victimRole}</p>
                       </td>
-                      <td className="py-3.5 px-4">
-                        <span className="font-mono text-[11px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                      <td style={{ padding: "16px 18px" }}>
+                        <span style={{ fontFamily: "monospace", fontSize: "11px", backgroundColor: "#F1F5F9", color: "#334155", padding: "3px 8px", borderRadius: "6px", fontWeight: 600 }}>
                           {inc.sipjakiRef}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4">
-                        <span className="text-[11px] font-semibold text-slate-700 flex items-center gap-1">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-accent" /> {inc.status}
+                      <td style={{ padding: "16px 18px" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 700, color: "#059669", backgroundColor: "#ECFDF5", padding: "4px 10px", borderRadius: "9999px" }}>
+                          <CheckCircle2 style={{ width: "13px", height: "13px" }} /> {inc.status}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-center">
+                      <td style={{ padding: "16px 18px", textAlign: "center" }}>
                         <button
+                          type="button"
                           onClick={() => setSelectedIncident(inc)}
-                          className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1.5 font-semibold text-slate-700 hover:bg-primary hover:text-white transition-all"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            borderRadius: "8px",
+                            backgroundColor: "#F1F5F9",
+                            color: "#0F2E5C",
+                            padding: "6px 12px",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            border: "1px solid #E2E8F0",
+                            cursor: "pointer"
+                          }}
                         >
-                          <Eye className="h-3.5 w-3.5" /> Kronologi
+                          <Eye style={{ width: "13px", height: "13px" }} /> Detail
                         </button>
                       </td>
                     </tr>
@@ -234,228 +297,138 @@ export default function KecelakaanPage() {
         </div>
       )}
 
-      {/* Tab: Create (Form Sesuai SIPJAKI) */}
+      {/* Tab: Create Incident Report */}
       {activeTab === "create" && (
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm">
-          <div className="border-b border-slate-100 pb-4 mb-6">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-rose" /> Formulir Laporan Kecelakaan Kerja Konstruksi (Format SIPJAKI)
+        <div style={{ borderRadius: "18px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "26px 30px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <div style={{ borderBottom: "1px solid #F1F5F9", paddingBottom: "16px", marginBottom: "22px" }}>
+            <h2 style={{ fontSize: "17px", fontWeight: 800, color: "#0F172A", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+              <FileText style={{ width: "18px", height: "18px", color: "#DC2626" }} /> Formulir Laporan Kecelakaan Kerja Konstruksi (Format SIPJAKI)
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p style={{ fontSize: "12px", color: "#64748B", margin: "4px 0 0 0" }}>
               Sesuai Permen PUPR No. 10/2021 tentang SMKK dan Sistem Informasi Pembina Jasa Konstruksi
             </p>
           </div>
 
-          <form onSubmit={handleCreate} className="space-y-6">
+          <form onSubmit={handleCreate} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             {/* Bagian 1: Identitas Pekerjaan */}
             <div>
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">
+              <h3 style={{ fontSize: "13px", fontWeight: 800, color: "#0F172A", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" }}>
                 1. Identitas Proyek & Lokasi
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                     Pilih Paket Pekerjaan *
                   </label>
                   <select
                     value={formData.projectId}
                     onChange={(e) => setFormData({...formData, projectId: e.target.value})}
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm focus:ring-2 focus:ring-primary/20"
-                    required
+                    style={{ width: "100%", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", padding: "10px 14px", fontSize: "13px", fontWeight: 600, color: "#0F172A", outline: "none" }}
                   >
                     {projectsData.map(p => (
-                      <option key={p.id} value={p.id}>{p.id} - {p.name} ({p.contractor})</option>
+                      <option key={p.id} value={p.id}>{p.id} - {p.name}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Wilayah Kecamatan *
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                    Kecamatan Lokasi Kejadian *
                   </label>
                   <input
                     type="text"
                     value={formData.district}
                     onChange={(e) => setFormData({...formData, district: e.target.value})}
-                    placeholder="Contoh: Cibinong, Ciawi, dll"
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm focus:ring-2 focus:ring-primary/20"
-                    required
+                    style={{ width: "100%", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", padding: "10px 14px", fontSize: "13px", fontWeight: 600, color: "#0F172A", outline: "none" }}
                   />
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Detail Titik Lokasi Kejadian *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.locationDetail}
-                    onChange={(e) => setFormData({...formData, locationDetail: e.target.value})}
-                    placeholder="Contoh: STA 05+100, Lantai 3 Ruang Lab, Zona Galian Selatan"
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm focus:ring-2 focus:ring-primary/20"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Bagian 2: Waktu & Klasifikasi */}
-            <div className="pt-4 border-t border-slate-100">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">
-                2. Waktu & Jenis Insiden
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                     Tanggal Kejadian *
                   </label>
                   <input
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData({...formData, date: e.target.value})}
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm focus:ring-2 focus:ring-primary/20"
-                    required
+                    style={{ width: "100%", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", padding: "10px 14px", fontSize: "13px", fontWeight: 600, color: "#0F172A", outline: "none" }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Waktu / Jam Kejadian *
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                    Waktu Kejadian (WIB) *
                   </label>
                   <input
                     type="time"
                     value={formData.time}
                     onChange={(e) => setFormData({...formData, time: e.target.value})}
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm focus:ring-2 focus:ring-primary/20"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Jenis Kecelakaan Kerja *
-                  </label>
-                  <select
-                    value={formData.incidentType}
-                    onChange={(e) => setFormData({...formData, incidentType: e.target.value})}
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="Tertimpa Material / Benda Jatuh">Tertimpa Material / Benda Jatuh</option>
-                    <option value="Jatuh dari Ketinggian">Jatuh dari Ketinggian</option>
-                    <option value="Terpeleset / Tersandung">Terpeleset / Tersandung</option>
-                    <option value="Longsor Tebing Galian">Longsor Tebing Galian</option>
-                    <option value="Tersengat Aliran Listrik">Tersengat Aliran Listrik</option>
-                    <option value="Terkena Alat Berat / Kendaraan">Terkena Alat Berat / Kendaraan</option>
-                    <option value="Kebakaran / Ledakan">Kebakaran / Ledakan</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Tingkat Keparahan *
-                  </label>
-                  <select
-                    value={formData.severity}
-                    onChange={(e) => setFormData({...formData, severity: e.target.value})}
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="Luka Ringan">Luka Ringan (Rawat Jalan)</option>
-                    <option value="Luka Berat">Luka Berat (Rawat Inap / Cacat Sementara)</option>
-                    <option value="Meninggal Dunia">Meninggal Dunia (Fatal)</option>
-                    <option value="Nir-Korban (Near Miss)">Nir-Korban (Near Miss / Nyaris Celaka)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Bagian 3: Data Korban */}
-            <div className="pt-4 border-t border-slate-100">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">
-                3. Identitas Korban & Cedera
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Nama Korban</label>
-                  <input
-                    type="text"
-                    value={formData.victimName}
-                    onChange={(e) => setFormData({...formData, victimName: e.target.value})}
-                    placeholder="Nama Lengkap Pekerja"
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Jabatan / Profesi</label>
-                  <input
-                    type="text"
-                    value={formData.victimRole}
-                    onChange={(e) => setFormData({...formData, victimRole: e.target.value})}
-                    placeholder="Contoh: Pekerja Pembesian, Tukang Cat, Operator"
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Bagian Tubuh Terluka</label>
-                  <input
-                    type="text"
-                    value={formData.injuryDetail}
-                    onChange={(e) => setFormData({...formData, injuryDetail: e.target.value})}
-                    placeholder="Contoh: Memar lengan kanan, Fraktur jari, dll"
-                    className="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm"
+                    style={{ width: "100%", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", padding: "10px 14px", fontSize: "13px", fontWeight: 600, color: "#0F172A", outline: "none" }}
                   />
                 </div>
               </div>
             </div>
 
-            {/* Bagian 4: Kronologi & Tindakan */}
-            <div className="pt-4 border-t border-slate-100">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">
-                4. Kronologi Kejadian & Rencana Pencegahan
+            {/* Bagian 2: Kronologi & Penanganan */}
+            <div>
+              <h3 style={{ fontSize: "13px", fontWeight: 800, color: "#0F172A", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" }}>
+                2. Kronologi & Tindakan Korektif
               </h3>
-              <div className="space-y-4">
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px" }}>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Uraian Kronologi Singkat Kejadian *
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                    Kronologi Kejadian Singkat *
                   </label>
                   <textarea
                     rows={3}
                     value={formData.chronology}
                     onChange={(e) => setFormData({...formData, chronology: e.target.value})}
-                    placeholder="Jelaskan secara runtut bagaimana kecelakaan tersebut terjadi..."
-                    className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm focus:ring-2 focus:ring-primary/20"
-                    required
+                    placeholder="Uraikan kronologi singkat insiden K3, pemicu kejadian, dan kondisi di tempat kerja..."
+                    style={{ width: "100%", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", padding: "10px 14px", fontSize: "13px", fontWeight: 500, color: "#0F172A", outline: "none" }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Tindakan Pengendalian & Perbaikan (Corrective Action) *
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                    Tindakan Korektif & Pencegahan (Corrective Action) *
                   </label>
                   <textarea
                     rows={2}
                     value={formData.correctiveAction}
                     onChange={(e) => setFormData({...formData, correctiveAction: e.target.value})}
-                    placeholder="Langkah pertolongan pertama yang telah dilakukan dan pencegahan agar tidak berulang..."
-                    className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm focus:ring-2 focus:ring-primary/20"
-                    required
+                    placeholder="Langkah perbaikan yang telah dilakukan kontraktor agar insiden tidak terulang..."
+                    style={{ width: "100%", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", padding: "10px 14px", fontSize: "13px", fontWeight: 500, color: "#0F172A", outline: "none" }}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", paddingTop: "16px", borderTop: "1px solid #F1F5F9" }}>
               <button
                 type="button"
                 onClick={() => setActiveTab("list")}
-                className="rounded-xl px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+                style={{ borderRadius: "10px", padding: "10px 20px", fontSize: "12px", fontWeight: 700, color: "#64748B", backgroundColor: "#F1F5F9", border: "none", cursor: "pointer" }}
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white hover:bg-primary-dark transition-all shadow-sm"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  borderRadius: "10px",
+                  backgroundColor: "#DC2626",
+                  color: "#FFFFFF",
+                  padding: "10px 24px",
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  border: "none",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 10px rgba(220, 38, 38, 0.25)"
+                }}
               >
-                <Send className="h-4 w-4" /> Simpan & Sinkronkan SIPJAKI
+                <Send style={{ width: "14px", height: "14px" }} /> Simpan & Kirim ke SIPJAKI
               </button>
             </div>
           </form>
@@ -464,51 +437,56 @@ export default function KecelakaanPage() {
 
       {/* Modal Detail Kronologi */}
       {selectedIncident && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-xl border border-slate-200 space-y-4">
-            <div className="flex items-start justify-between">
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "20px" }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", maxWidth: "600px", width: "100%", padding: "28px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: "18px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F1F5F9", paddingBottom: "14px" }}>
               <div>
-                <span className="font-mono text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
+                <span style={{ fontFamily: "monospace", fontSize: "11px", fontWeight: 800, color: "#DC2626", backgroundColor: "#FEF2F2", padding: "2px 8px", borderRadius: "4px" }}>
                   {selectedIncident.id}
                 </span>
-                <h3 className="text-lg font-bold text-slate-900 mt-1">{selectedIncident.projectName}</h3>
-                <p className="text-xs text-slate-400">{selectedIncident.contractor} • {selectedIncident.date} ({selectedIncident.time} WIB)</p>
+                <h3 style={{ fontSize: "16px", fontWeight: 900, color: "#0F172A", margin: "6px 0 0 0" }}>
+                  {selectedIncident.projectName}
+                </h3>
               </div>
-              <button
+              <button 
                 onClick={() => setSelectedIncident(null)}
-                className="text-slate-400 hover:text-slate-600 font-bold text-lg"
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B" }}
               >
-                ✕
+                <X style={{ width: "20px", height: "20px" }} />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs bg-slate-50 p-4 rounded-xl">
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontSize: "13px" }}>
               <div>
-                <p className="font-bold text-slate-700">Jenis Insiden & Keparahan:</p>
-                <p className="text-slate-600">{selectedIncident.incidentType} — <span className="font-bold text-rose">{selectedIncident.severity}</span></p>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Penyedia Jasa & Lokasi:</span>
+                <p style={{ margin: "2px 0 0 0", fontWeight: 600, color: "#0F172A" }}>{selectedIncident.contractor} • Kec. {selectedIncident.district}</p>
               </div>
+
               <div>
-                <p className="font-bold text-slate-700">Korban & Cedera:</p>
-                <p className="text-slate-600">{selectedIncident.victimName} ({selectedIncident.victimRole}): {selectedIncident.injuryDetail}</p>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Waktu Kejadian:</span>
+                <p style={{ margin: "2px 0 0 0", fontWeight: 600, color: "#0F172A" }}>{selectedIncident.date} pukul {selectedIncident.time} WIB</p>
               </div>
+
               <div>
-                <p className="font-bold text-slate-700">Kronologi Kejadian:</p>
-                <p className="text-slate-600 leading-relaxed">{selectedIncident.chronology}</p>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Kronologi Kejadian:</span>
+                <p style={{ margin: "2px 0 0 0", color: "#334155", lineHeight: 1.5, backgroundColor: "#F8FAFC", padding: "12px", borderRadius: "10px", border: "1px solid #E2E8F0" }}>
+                  {selectedIncident.chronology}
+                </p>
               </div>
+
               <div>
-                <p className="font-bold text-slate-700">Tindakan Perbaikan / Penanganan:</p>
-                <p className="text-slate-600 leading-relaxed">{selectedIncident.correctiveAction}</p>
-              </div>
-              <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                <span className="text-slate-500">Nomor Registrasi SIPJAKI:</span>
-                <span className="font-mono font-bold text-slate-900">{selectedIncident.sipjakiRef}</span>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Tindakan Korektif:</span>
+                <p style={{ margin: "2px 0 0 0", color: "#059669", fontWeight: 600, lineHeight: 1.5, backgroundColor: "#ECFDF5", padding: "12px", borderRadius: "10px", border: "1px solid #A7F3D0" }}>
+                  {selectedIncident.correctiveAction}
+                </p>
               </div>
             </div>
 
-            <div className="flex justify-end">
+            <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
               <button
+                type="button"
                 onClick={() => setSelectedIncident(null)}
-                className="rounded-xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition-colors"
+                style={{ borderRadius: "10px", backgroundColor: "#0F2E5C", color: "#FFFFFF", border: "none", padding: "8px 20px", fontSize: "12px", fontWeight: 800, cursor: "pointer" }}
               >
                 Tutup
               </button>

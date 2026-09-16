@@ -2,9 +2,8 @@
 import { useState } from "react";
 import { 
   Settings, Users, KeyRound, Shield, RefreshCw, CheckCircle2, 
-  Save, Globe, Bell, Lock, Server
+  Save, Globe, Bell, Lock, Server, Plus
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function PengaturanPage() {
   const [activeTab, setActiveTab] = useState<"api" | "users" | "general">("api");
@@ -26,42 +25,53 @@ export default function PengaturanPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary flex items-center gap-1">
-            <Settings className="h-3 w-3" /> Konfigurasi Sistem
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+          <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <Settings style={{ width: "12px", height: "12px" }} /> Konfigurasi Sistem
           </span>
         </div>
-        <h1 className="text-2xl font-extrabold text-slate-900 mt-1">
+        <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
           Pengaturan Sistem & Integrasi SIPJAKI
         </h1>
-        <p className="text-sm text-slate-500 mt-0.5">
+        <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
           Manajemen kredensial API Kementerian PUPR, hak akses pengguna, serta preferensi sinkronisasi data
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "1px solid #E2E8F0", paddingBottom: "10px" }}>
         {[
           { id: "api", label: "Integrasi API SIPJAKI", icon: Server },
           { id: "users", label: "Manajemen Pengguna & Role", icon: Users },
           { id: "general", label: "Preferensi Umum", icon: Globe },
         ].map((tab) => {
           const Icon = tab.icon;
+          const isSel = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={cn(
-                "flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all",
-                activeTab === tab.id
-                  ? "bg-primary text-white shadow-xs"
-                  : "text-slate-600 hover:bg-slate-100"
-              )}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 18px",
+                borderRadius: "10px",
+                fontSize: "12px",
+                fontWeight: 800,
+                border: "none",
+                cursor: "pointer",
+                backgroundColor: isSel ? "#0F2E5C" : "transparent",
+                color: isSel ? "#FFFFFF" : "#64748B",
+                boxShadow: isSel ? "0 2px 6px rgba(15, 46, 92, 0.2)" : "none",
+                transition: "all 0.15s ease"
+              }}
             >
-              <Icon className="h-4 w-4" /> {tab.label}
+              <Icon style={{ width: "14px", height: "14px", color: isSel ? "#FFC000" : "#94A3B8" }} />
+              <span>{tab.label}</span>
             </button>
           );
         })}
@@ -69,80 +79,147 @@ export default function PengaturanPage() {
 
       {/* Tab: API */}
       {activeTab === "api" && (
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm space-y-6">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <KeyRound className="h-5 w-5 text-primary" /> Koneksi Gateway SIPJAKI Kementerian PUPR
+        <div 
+          style={{
+            borderRadius: "18px",
+            border: "1px solid #E2E8F0",
+            backgroundColor: "#FFFFFF",
+            padding: "26px 30px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "22px"
+          }}
+        >
+          <div style={{ borderBottom: "1px solid #F1F5F9", paddingBottom: "14px" }}>
+            <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#0F172A", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+              <KeyRound style={{ width: "18px", height: "18px", color: "#0F2E5C" }} /> Koneksi Gateway SIPJAKI Kementerian PUPR
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p style={{ fontSize: "12px", color: "#64748B", margin: "4px 0 0 0" }}>
               Digunakan untuk sinkronisasi otomatis data 5 pilar (Tertib Usaha, Penyelenggaraan, Pemanfaatan, K3, dan TKK)
             </p>
           </div>
 
-          <div className="space-y-4 max-w-2xl text-xs">
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "700px" }}>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                 SIPJAKI API Base URL
               </label>
               <input
                 type="text"
                 readOnly
                 value="https://sipjaki.pu.go.id/api/v2/integration"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 font-mono text-slate-700"
+                style={{
+                  width: "100%",
+                  borderRadius: "10px",
+                  border: "1px solid #CBD5E1",
+                  backgroundColor: "#F8FAFC",
+                  padding: "10px 14px",
+                  fontSize: "13px",
+                  fontFamily: "monospace",
+                  color: "#334155"
+                }}
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                 API Secret Token (Pemerintah Kabupaten Bogor)
               </label>
-              <div className="flex gap-2">
+              <div style={{ display: "flex", gap: "10px" }}>
                 <input
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  className="flex-1 rounded-xl border border-slate-200 bg-white p-2.5 font-mono text-slate-900 focus:ring-2 focus:ring-primary/20"
+                  style={{
+                    flex: 1,
+                    borderRadius: "10px",
+                    border: "1px solid #CBD5E1",
+                    backgroundColor: "#FFFFFF",
+                    padding: "10px 14px",
+                    fontSize: "13px",
+                    fontFamily: "monospace",
+                    color: "#0F172A",
+                    outline: "none"
+                  }}
                 />
                 <button
                   type="button"
                   onClick={() => alert("Tes Koneksi: Ping ke SIPJAKI Kementerian PUPR Sukses! Latensi 42ms.")}
-                  className="rounded-xl bg-slate-100 px-4 py-2 font-bold text-slate-700 hover:bg-slate-200 transition-colors"
+                  style={{
+                    borderRadius: "10px",
+                    backgroundColor: "#F1F5F9",
+                    border: "1px solid #CBD5E1",
+                    padding: "10px 18px",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    color: "#0F2E5C",
+                    cursor: "pointer"
+                  }}
                 >
                   Uji Koneksi
                 </button>
               </div>
             </div>
 
-            <div className="pt-2 flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px", backgroundColor: "#F8FAFC", borderRadius: "14px", border: "1px solid #E2E8F0" }}>
               <div>
-                <p className="font-bold text-slate-800">Sinkronisasi Otomatis Terjadwal</p>
-                <p className="text-slate-500 text-[11px] mt-0.5">Kirim rekapitulasi data setiap hari pukul 23:59 WIB</p>
+                <p style={{ fontSize: "13px", fontWeight: 800, color: "#0F172A", margin: 0 }}>Sinkronisasi Otomatis Terjadwal</p>
+                <p style={{ fontSize: "11px", color: "#64748B", margin: "3px 0 0 0" }}>Kirim rekapitulasi data setiap hari pukul 23:59 WIB</p>
               </div>
               <button
                 type="button"
                 onClick={() => setAutoSync(!autoSync)}
-                className={cn(
-                  "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
-                  autoSync ? "bg-primary" : "bg-slate-300"
-                )}
+                style={{
+                  position: "relative",
+                  display: "inline-flex",
+                  height: "26px",
+                  width: "48px",
+                  borderRadius: "9999px",
+                  border: "none",
+                  cursor: "pointer",
+                  backgroundColor: autoSync ? "#0F2E5C" : "#CBD5E1",
+                  transition: "background-color 0.2s ease"
+                }}
               >
                 <span
-                  className={cn(
-                    "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
-                    autoSync ? "translate-x-5" : "translate-x-0"
-                  )}
+                  style={{
+                    display: "inline-block",
+                    height: "20px",
+                    width: "20px",
+                    borderRadius: "9999px",
+                    backgroundColor: "#FFFFFF",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                    transform: autoSync ? "translate(24px, 3px)" : "translate(4px, 3px)",
+                    transition: "transform 0.2s ease"
+                  }}
                 />
               </button>
             </div>
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-slate-100">
+          <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: "14px", borderTop: "1px solid #F1F5F9" }}>
             <button
+              type="button"
               onClick={handleSave}
-              className="flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-white hover:bg-primary-dark transition-all shadow-sm"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                borderRadius: "12px",
+                backgroundColor: "#0F2E5C",
+                border: "none",
+                borderBottom: "3px solid #FFC000",
+                padding: "10px 24px",
+                fontSize: "12px",
+                fontWeight: 800,
+                color: "#FFFFFF",
+                cursor: "pointer",
+                boxShadow: "0 4px 10px rgba(15, 46, 92, 0.2)"
+              }}
             >
-              {saved ? <CheckCircle2 className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-              {saved ? "Tersimpan!" : "Simpan Pengaturan API"}
+              {saved ? <CheckCircle2 style={{ width: "15px", height: "15px" }} /> : <Save style={{ width: "15px", height: "15px" }} />}
+              <span>{saved ? "Pengaturan Tersimpan!" : "Simpan Pengaturan API"}</span>
             </button>
           </div>
         </div>
@@ -150,53 +227,77 @@ export default function PengaturanPage() {
 
       {/* Tab: Users */}
       {activeTab === "users" && (
-        <div className="rounded-2xl border border-slate-200/60 bg-white overflow-hidden shadow-xs">
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div style={{ borderRadius: "18px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", overflow: "hidden", boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)" }}>
+          <div style={{ padding: "20px 24px", borderBottom: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
             <div>
-              <h2 className="text-base font-bold text-slate-900">Daftar Pengguna & Hak Akses</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Peran akun dalam input audit SIMAK, verifikasi BUJK, dan pelaporan</p>
+              <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#0F172A", margin: 0 }}>Daftar Pengguna & Hak Akses</h2>
+              <p style={{ fontSize: "12px", color: "#64748B", margin: "3px 0 0 0" }}>Peran akun dalam input audit SIMAK, verifikasi BUJK, dan pelaporan</p>
             </div>
             <button
-              onClick={() => alert("Form Tambah Akun Pengguna Baru")}
-              className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary-dark transition-all"
+              type="button"
+              onClick={() => alert("Membuka Formulir Penambahan Akun Pengguna Baru...")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                borderRadius: "10px",
+                backgroundColor: "#0F2E5C",
+                border: "none",
+                borderBottom: "3px solid #FFC000",
+                padding: "8px 16px",
+                fontSize: "12px",
+                fontWeight: 800,
+                color: "#FFFFFF",
+                cursor: "pointer"
+              }}
             >
-              + Tambah Pengguna
+              <Plus style={{ width: "14px", height: "14px", color: "#FFC000" }} /> Tambah Pengguna
             </button>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-left font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="py-3 px-4">Nama Lengkap</th>
-                  <th className="py-3 px-4">Role / Peran</th>
-                  <th className="py-3 px-4">Email Instansi</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-center">Aksi</th>
+                <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "2px solid #E2E8F0", textAlign: "left" }}>
+                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NAMA LENGKAP</th>
+                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>ROLE / PERAN</th>
+                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>EMAIL INSTANSI</th>
+                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>STATUS</th>
+                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px", textAlign: "center" }}>AKSI</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody>
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-3.5 px-4">
-                      <p className="font-bold text-slate-900 text-sm">{u.name}</p>
-                      <p className="text-slate-400 font-mono text-[11px]">{u.id}</p>
+                  <tr key={u.id} style={{ borderBottom: "1px solid #F1F5F9", transition: "background-color 0.15s ease" }}>
+                    <td style={{ padding: "16px 18px" }}>
+                      <p style={{ fontWeight: 800, color: "#0F172A", margin: 0, fontSize: "13px" }}>{u.name}</p>
+                      <p style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", margin: "2px 0 0 0" }}>{u.id}</p>
                     </td>
-                    <td className="py-3.5 px-4 font-semibold text-primary">
+                    <td style={{ padding: "16px 18px", color: "#0F2E5C", fontWeight: 700 }}>
                       {u.role}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-600 font-mono">
+                    <td style={{ padding: "16px 18px", color: "#475569", fontFamily: "monospace" }}>
                       {u.email}
                     </td>
-                    <td className="py-3.5 px-4">
-                      <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-accent/10 text-accent">
+                    <td style={{ padding: "16px 18px" }}>
+                      <span style={{ display: "inline-block", backgroundColor: "#ECFDF5", color: "#059669", padding: "3px 10px", borderRadius: "9999px", fontSize: "11px", fontWeight: 800 }}>
                         {u.status}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-center">
+                    <td style={{ padding: "16px 18px", textAlign: "center" }}>
                       <button
-                        onClick={() => alert(`Edit hak akses untuk ${u.name}`)}
-                        className="rounded-lg bg-slate-100 px-2.5 py-1.5 font-semibold text-slate-700 hover:bg-slate-200"
+                        type="button"
+                        onClick={() => alert(`Mengatur hak akses peran pengguna: ${u.name}`)}
+                        style={{
+                          borderRadius: "8px",
+                          backgroundColor: "#F1F5F9",
+                          color: "#0F2E5C",
+                          border: "1px solid #E2E8F0",
+                          padding: "6px 14px",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          cursor: "pointer"
+                        }}
                       >
                         Edit Role
                       </button>
@@ -211,39 +312,55 @@ export default function PengaturanPage() {
 
       {/* Tab: General */}
       {activeTab === "general" && (
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm space-y-4 max-w-2xl text-xs">
-          <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">
-            Preferensi Lingkungan Sistem
-          </h2>
-
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">Nama Aplikasi</label>
-            <input
-              type="text"
-              readOnly
-              value="SIJAKON - Sistem Informasi Jasa Konstruksi Kab. Bogor"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 font-medium text-slate-800"
-            />
+        <div 
+          style={{
+            borderRadius: "18px",
+            border: "1px solid #E2E8F0",
+            backgroundColor: "#FFFFFF",
+            padding: "26px 30px",
+            maxWidth: "720px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "18px"
+          }}
+        >
+          <div style={{ borderBottom: "1px solid #F1F5F9", paddingBottom: "14px" }}>
+            <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#0F172A", margin: 0 }}>
+              Preferensi Lingkungan Sistem
+            </h2>
           </div>
 
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">Versi Rilis</label>
-            <input
-              type="text"
-              readOnly
-              value="v1.0-prototype (Preview for Vercel Deployment)"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 font-mono text-slate-800"
-            />
-          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>Nama Aplikasi</label>
+              <input
+                type="text"
+                readOnly
+                value="SIJAKON - Sistem Informasi Jasa Konstruksi Kab. Bogor"
+                style={{ width: "100%", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#F8FAFC", padding: "10px 14px", fontSize: "13px", fontWeight: 600, color: "#0F172A" }}
+              />
+            </div>
 
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">Zona Waktu</label>
-            <input
-              type="text"
-              readOnly
-              value="Asia/Jakarta (WIB, UTC+7)"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-slate-800"
-            />
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>Versi Rilis</label>
+              <input
+                type="text"
+                readOnly
+                value="v1.0-prototype (Preview for Vercel Deployment)"
+                style={{ width: "100%", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#F8FAFC", padding: "10px 14px", fontSize: "13px", fontFamily: "monospace", color: "#0F172A" }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>Zona Waktu Server</label>
+              <input
+                type="text"
+                readOnly
+                value="Asia/Jakarta (WIB, UTC+7)"
+                style={{ width: "100%", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#F8FAFC", padding: "10px 14px", fontSize: "13px", color: "#0F172A" }}
+              />
+            </div>
           </div>
         </div>
       )}

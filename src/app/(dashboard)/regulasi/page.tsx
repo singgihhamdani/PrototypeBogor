@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
-import { BookOpen, Search, Download, FileText, Calendar } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { BookOpen, Search, Download, Calendar, FileText } from "lucide-react";
 import regulationsData from "@/data/regulations.json";
 
 export default function RegulasiPage() {
@@ -17,79 +16,156 @@ export default function RegulasiPage() {
   });
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* Header */}
       <div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary flex items-center gap-1">
-            <BookOpen className="h-3 w-3" /> Basis Hukum & Kebijakan
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+          <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <BookOpen style={{ width: "12px", height: "12px" }} /> Basis Hukum & Kebijakan
           </span>
         </div>
-        <h1 className="text-2xl font-extrabold text-slate-900 mt-1">
+        <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
           Regulasi & Dasar Hukum Jasa Konstruksi
         </h1>
-        <p className="text-sm text-slate-500 mt-0.5">
+        <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
           Himpunan peraturan perundang-undangan daerah dan nasional terkait tertib pembinaan dan pengawasan jasa konstruksi
         </p>
       </div>
 
-      {/* Filter */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[260px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+      {/* Filter and Search Bar */}
+      <div 
+        style={{
+          borderRadius: "16px",
+          border: "1px solid #E2E8F0",
+          backgroundColor: "#FFFFFF",
+          padding: "16px 20px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "14px"
+        }}
+      >
+        <div style={{ position: "relative", flex: 1, minWidth: "260px" }}>
+          <Search style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94A3B8" }} />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari nomor peraturan, judul regulasi, atau kata kunci..."
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            style={{
+              width: "100%",
+              height: "42px",
+              borderRadius: "10px",
+              border: "1px solid #CBD5E1",
+              backgroundColor: "#F8FAFC",
+              paddingLeft: "42px",
+              paddingRight: "16px",
+              fontSize: "13px",
+              color: "#0F172A",
+              outline: "none"
+            }}
           />
         </div>
 
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
-          {["Semua", "Peraturan Daerah", "Undang-Undang", "Peraturan Menteri PUPR", "Surat Edaran Bupati"].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategory(cat)}
-              className={cn(
-                "rounded-lg px-3 py-1.5 text-xs font-bold transition-all",
-                category === cat ? "bg-white text-primary shadow-xs" : "text-slate-600 hover:text-slate-900"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#F1F5F9", padding: "4px", borderRadius: "10px", flexWrap: "wrap" }}>
+          {["Semua", "Peraturan Daerah", "Undang-Undang", "Peraturan Menteri PUPR", "Surat Edaran Bupati"].map((cat) => {
+            const isSelected = category === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  border: "none",
+                  cursor: "pointer",
+                  backgroundColor: isSelected ? "#0F2E5C" : "transparent",
+                  color: isSelected ? "#FFFFFF" : "#475569",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                {cat}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Regulations List */}
-      <div className="space-y-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
         {filtered.map((reg) => (
-          <div key={reg.id} className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm hover:border-primary/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1.5 max-w-3xl">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
+          <div 
+            key={reg.id} 
+            style={{
+              borderRadius: "16px",
+              border: "1px solid #E2E8F0",
+              backgroundColor: "#FFFFFF",
+              padding: "22px 24px",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.03)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "18px",
+              transition: "border-color 0.15s ease"
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxWidth: "820px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontFamily: "monospace", fontSize: "11px", fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "3px 8px", borderRadius: "6px" }}>
                   {reg.number}
                 </span>
-                <span className="text-xs text-slate-400 font-semibold">• {reg.category} (Tahun {reg.year})</span>
+                <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 700 }}>
+                  • {reg.category} (Tahun {reg.year})
+                </span>
               </div>
-              <h3 className="text-base font-bold text-slate-900">{reg.title}</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">{reg.summary}</p>
-              <p className="text-[11px] text-slate-400 flex items-center gap-1 pt-1">
-                <Calendar className="h-3 w-3" /> Tanggal Pengundangan: {reg.dateEnacted}
+              <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: 0, lineHeight: 1.35 }}>
+                {reg.title}
+              </h3>
+              <p style={{ fontSize: "12px", color: "#475569", margin: 0, lineHeight: 1.5 }}>
+                {reg.summary}
+              </p>
+              <p style={{ fontSize: "11px", color: "#94A3B8", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                <Calendar style={{ width: "12px", height: "12px" }} /> Diundangkan: {reg.dateEnacted}
               </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-xs text-slate-400 font-mono">{reg.fileSize}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
+              <span style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", fontWeight: 600 }}>{reg.fileSize}</span>
               <button
+                type="button"
                 onClick={() => alert(`Mengunduh dokumen resmi ${reg.number} (PDF)...`)}
-                className="flex items-center gap-1.5 rounded-xl bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary hover:bg-primary hover:text-white transition-all"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  borderRadius: "10px",
+                  backgroundColor: "#F1F5F9",
+                  color: "#0F2E5C",
+                  border: "1px solid #E2E8F0",
+                  padding: "9px 16px",
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease"
+                }}
               >
-                <Download className="h-4 w-4" /> Unduh Dokumen
+                <Download style={{ width: "14px", height: "14px" }} />
+                <span>Unduh Dokumen</span>
               </button>
             </div>
           </div>
         ))}
+
+        {filtered.length === 0 && (
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", border: "1px solid #E2E8F0", padding: "48px 24px", textAlign: "center", color: "#94A3B8", fontSize: "13px" }}>
+            Tidak ada dokumen regulasi yang sesuai dengan pencarian Anda.
+          </div>
+        )}
       </div>
     </div>
   );
