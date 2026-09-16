@@ -1,16 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0F5132;
-  --color-primary-dark: #0A3622;
-  --color-primary-light: #E8F5E9;
-  --color-accent: #10B981;
-  --color-accent-hover: #059669;
+  --color-primary: #0F2E5C;
+  --color-primary-dark: #091A36;
+  --color-primary-light: #EBF2FA;
+  --color-secondary: #1E40AF;
+  --color-accent: #F59E0B;
+  --color-accent-hover: #D97706;
+  --color-pupr-yellow: #FFC000;
+  --color-pupr-blue: #0A2540;
+  --color-pupr-navy: #0F2E5C;
   --color-amber: #F59E0B;
   --color-rose: #EF4444;
-  --color-blue: #3B82F6;
+  --color-blue: #2563EB;
+  --color-emerald: #10B981;
   --color-slate-50: #F8FAFC;
   --color-slate-100: #F1F5F9;
   --color-slate-200: #E2E8F0;
@@ -21,46 +26,60 @@
   --color-slate-700: #334155;
   --color-slate-800: #1E293B;
   --color-slate-900: #0F172A;
-  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pupr-navy: #0F2E5C;
+  --pupr-blue: #1E3A8A;
+  --pupr-yellow: #F59E0B;
+  --pupr-gold: #FFC000;
+}
+
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
 
 body {
-  font-family: var(--font-sans);
-  background-color: var(--color-slate-50);
-  color: var(--color-slate-800);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background-color: #F8FAFC;
+  color: #1E293B;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--color-slate-300); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-slate-400); }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
 
-/* Skeleton shimmer */
+/* Shimmer & Animations */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, var(--color-slate-100) 25%, var(--color-slate-200) 50%, var(--color-slate-100) 75%);
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 8px;
 }
 
-/* Gauge animation */
-@keyframes gauge-fill {
-  from { stroke-dashoffset: 251; }
-}
-
-/* Fade in */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* PUPR Gradient classes */
+.bg-pupr-gradient {
+  background: linear-gradient(135deg, #091A36 0%, #0F2E5C 60%, #163B75 100%);
+}
+.bg-pupr-yellow-gradient {
+  background: linear-gradient(135deg, #FFC000 0%, #F59E0B 100%);
 }
