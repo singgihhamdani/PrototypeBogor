@@ -2,6 +2,8 @@
 
 @import "tailwindcss";
 
+@source "../src";
+
 @theme {
   --color-primary: #0F2E5C;
   --color-primary-dark: #091A36;
@@ -26,14 +28,14 @@
   --color-slate-700: #334155;
   --color-slate-800: #1E293B;
   --color-slate-900: #0F172A;
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 :root {
   --pupr-navy: #0F2E5C;
   --pupr-blue: #1E3A8A;
-  --pupr-yellow: #F59E0B;
-  --pupr-gold: #FFC000;
+  --pupr-yellow: #FFC000;
+  --pupr-amber: #F59E0B;
 }
 
 * { 
@@ -49,6 +51,14 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Fallback utilities to ensure perfect rendering even across all browsers */
+.space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; }
+.space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+.space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+.space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+.space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.25rem; }
+.space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -74,12 +84,4 @@ body {
 }
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
-}
-
-/* PUPR Gradient classes */
-.bg-pupr-gradient {
-  background: linear-gradient(135deg, #091A36 0%, #0F2E5C 60%, #163B75 100%);
-}
-.bg-pupr-yellow-gradient {
-  background: linear-gradient(135deg, #FFC000 0%, #F59E0B 100%);
 }

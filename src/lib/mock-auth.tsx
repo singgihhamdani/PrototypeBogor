@@ -24,18 +24,27 @@ const DEMO_USER: User = {
 };
 
 const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
+  user: DEMO_USER,
+  isAuthenticated: true,
   login: () => false,
   logout: () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(DEMO_USER);
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("sijakon_user") : null;
-    if (stored) setUser(JSON.parse(stored));
+    try {
+      const stored = typeof window !== "undefined" ? localStorage.getItem("sijakon_user") : null;
+      if (stored !== null) {
+        setUser(stored ? JSON.parse(stored) : null);
+      } else {
+        setUser(DEMO_USER);
+        localStorage.setItem("sijakon_user", JSON.stringify(DEMO_USER));
+      }
+    } catch {
+      setUser(DEMO_USER);
+    }
   }, []);
 
   const login = (email: string, password: string): boolean => {
@@ -49,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("sijakon_user");
+    localStorage.setItem("sijakon_user", "");
   };
 
   return (

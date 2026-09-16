@@ -1,5 +1,5 @@
 "use client";
-import { Bell, Search, LogOut, User, ShieldCheck, ExternalLink } from "lucide-react";
+import { Bell, Search, LogOut, User, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/mock-auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,79 +15,237 @@ export default function Topbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur-md px-6 shadow-2xs">
+    <header 
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 30,
+        height: "64px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderBottom: "1px solid #E2E8F0",
+        backgroundColor: "rgba(255, 255, 255, 0.95)",
+        backdropFilter: "blur(8px)",
+        padding: "0 32px",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.02)"
+      }}
+    >
       {/* Search Bar */}
-      <div className="relative w-full max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+      <div style={{ position: "relative", width: "100%", maxWidth: "420px" }}>
+        <Search style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94A3B8" }} />
         <input
           type="text"
-          placeholder="Cari nomor kontrak, BUJK, NIB, atau regulasi... (Ctrl+K)"
-          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-xs text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F2E5C]/20 focus:border-[#0F2E5C] transition-all"
+          placeholder="Cari nomor kontrak, BUJK, NIB... (Ctrl+K)"
+          style={{
+            width: "100%",
+            height: "40px",
+            borderRadius: "12px",
+            border: "1px solid #E2E8F0",
+            backgroundColor: "#F8FAFC",
+            paddingLeft: "42px",
+            paddingRight: "60px",
+            fontSize: "12px",
+            color: "#1E293B",
+            outline: "none"
+          }}
         />
-        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-4 items-center rounded border border-slate-200 bg-slate-100 px-1 text-[9px] font-bold text-slate-400">
+        <kbd 
+          style={{
+            position: "absolute",
+            right: "12px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            height: "20px",
+            display: "inline-flex",
+            alignItems: "center",
+            borderRadius: "6px",
+            border: "1px solid #E2E8F0",
+            backgroundColor: "#F1F5F9",
+            padding: "0 6px",
+            fontSize: "10px",
+            fontWeight: 700,
+            color: "#64748B"
+          }}
+        >
           Ctrl K
         </kbd>
       </div>
 
       {/* Right Side Controls */}
-      <div className="flex items-center gap-3 ml-4">
+      <div style={{ display: "flex", alignItems: "center", gap: "16px", marginLeft: "16px" }}>
         {/* SIPJAKI National Sync Badge */}
-        <div className="hidden lg:flex items-center gap-2 rounded-full bg-[#EBF2FA] border border-[#0F2E5C]/15 px-3 py-1 text-xs">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="font-bold text-[#0F2E5C]">SIPJAKI PUPR</span>
-          <span className="text-[10px] text-slate-500">• Terhubung</span>
+        <div 
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            borderRadius: "9999px",
+            backgroundColor: "#EBF2FA",
+            border: "1px solid rgba(15, 46, 92, 0.15)",
+            padding: "4px 12px",
+            fontSize: "12px"
+          }}
+        >
+          <span style={{ height: "8px", width: "8px", borderRadius: "9999px", backgroundColor: "#10B981" }} />
+          <span style={{ fontWeight: 800, color: "#0F2E5C" }}>SIPJAKI PUPR</span>
+          <span style={{ fontSize: "11px", color: "#64748B" }}>• Terhubung</span>
         </div>
 
         {/* TA 2026 Pill */}
-        <div className="hidden sm:flex items-center gap-1 rounded-full bg-[#FFFBEB] border border-amber-200 px-3 py-1">
-          <span className="text-[11px] font-black text-[#B45309]">TA 2026</span>
+        <div 
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            borderRadius: "9999px",
+            backgroundColor: "#FFFBEB",
+            border: "1px solid #FDE68A",
+            padding: "4px 12px"
+          }}
+        >
+          <span style={{ fontSize: "11px", fontWeight: 900, color: "#B45309" }}>TA 2026</span>
         </div>
 
         {/* Notifications */}
         <button 
           onClick={() => alert("Notifikasi Sistem: 3 Laporan Audit SIMAK menunggu verifikasi.")}
-          className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
+          style={{
+            position: "relative",
+            display: "flex",
+            height: "36px",
+            width: "36px",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "10px",
+            color: "#64748B",
+            backgroundColor: "transparent",
+            border: "none",
+            cursor: "pointer"
+          }}
         >
-          <Bell className="h-4 w-4" />
-          <span className="absolute 1.5 -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white">
+          <Bell style={{ width: "18px", height: "18px" }} />
+          <span 
+            style={{
+              position: "absolute",
+              right: "2px",
+              top: "2px",
+              display: "flex",
+              height: "16px",
+              width: "16px",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "9999px",
+              backgroundColor: "#EF4444",
+              fontSize: "9px",
+              fontWeight: 800,
+              color: "#FFFFFF"
+            }}
+          >
             3
           </span>
         </button>
 
-        <div className="h-6 w-[1px] bg-slate-200"></div>
+        <div style={{ height: "24px", width: "1px", backgroundColor: "#E2E8F0" }} />
 
         {/* User profile dropdown */}
-        <div className="relative">
+        <div style={{ position: "relative" }}>
           <button
             onClick={() => setShowUser(!showUser)}
-            className="flex items-center gap-2 rounded-xl p-1.5 hover:bg-slate-100 transition-colors"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              borderRadius: "10px",
+              padding: "4px 8px",
+              backgroundColor: "transparent",
+              border: "none",
+              cursor: "pointer"
+            }}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#0F2E5C] text-[#FFC000] text-xs font-black border border-[#FFC000]/40 shadow-xs">
+            <div 
+              style={{
+                display: "flex",
+                height: "34px",
+                width: "34px",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "10px",
+                backgroundColor: "#0F2E5C",
+                color: "#FFC000",
+                fontSize: "12px",
+                fontWeight: 900,
+                border: "1px solid rgba(255, 192, 0, 0.4)",
+                boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)"
+              }}
+            >
               AD
             </div>
-            <div className="hidden md:block text-left leading-tight">
-              <span className="block text-xs font-bold text-slate-800">{user?.name || "Admin DPUPR"}</span>
-              <span className="block text-[10px] font-semibold text-slate-400">{user?.role || "Super Admin"}</span>
+            <div style={{ textAlign: "left", lineHeight: 1.2 }}>
+              <span style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B" }}>{user?.name || "Admin DPUPR"}</span>
+              <span style={{ display: "block", fontSize: "10px", fontWeight: 600, color: "#64748B" }}>{user?.role || "Super Admin"}</span>
             </div>
           </button>
 
           {showUser && (
-            <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl z-50 animate-fade-in">
-              <div className="px-3 py-2 border-b border-slate-100 mb-1">
-                <p className="text-xs font-bold text-slate-800">{user?.name}</p>
-                <p className="text-[11px] text-slate-400 truncate">{user?.email}</p>
+            <div 
+              style={{
+                position: "absolute",
+                right: 0,
+                top: "100%",
+                marginTop: "8px",
+                width: "220px",
+                borderRadius: "14px",
+                border: "1px solid #E2E8F0",
+                backgroundColor: "#FFFFFF",
+                padding: "8px",
+                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                zIndex: 50
+              }}
+            >
+              <div style={{ padding: "8px 12px", borderBottom: "1px solid #F1F5F9", marginBottom: "4px" }}>
+                <p style={{ fontSize: "12px", fontWeight: 800, color: "#1E293B", margin: 0 }}>{user?.name}</p>
+                <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</p>
               </div>
               <button 
                 onClick={() => { setShowUser(false); router.push("/profil-opd"); }}
-                className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  alignItems: "center",
+                  gap: "8px",
+                  borderRadius: "8px",
+                  padding: "8px 12px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "#334155",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left"
+                }}
               >
-                <User className="h-4 w-4 text-[#0F2E5C]" /> Profil OPD & Akun
+                <User style={{ width: "16px", height: "16px", color: "#0F2E5C" }} /> Profil OPD & Akun
               </button>
               <button
                 onClick={handleLogout}
-                className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  alignItems: "center",
+                  gap: "8px",
+                  borderRadius: "8px",
+                  padding: "8px 12px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "#DC2626",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left"
+                }}
               >
-                <LogOut className="h-4 w-4" /> Keluar Sesi
+                <LogOut style={{ width: "16px", height: "16px" }} /> Keluar Sesi
               </button>
             </div>
           )}

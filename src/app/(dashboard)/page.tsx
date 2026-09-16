@@ -60,31 +60,55 @@ export default function DashboardPage() {
           }}
         />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-[#FFC000] border border-white/10">
-              <Landmark className="h-3.5 w-3.5" />
-              <span>DPUPR Kabupaten Bogor • Wilayah Kerja 40 Kecamatan</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Dashboard Pembinaan & Pengawasan Jasa Konstruksi
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-200 max-w-2xl leading-relaxed">
-              Pemantauan terpadu kepatuhan 5 Pilar Jasa Konstruksi, status audit digital SIMAK lapangan, dan sinkronisasi real-time ke SIPJAKI Kementerian PUPR.
-            </p>
+        <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "16px", maxWidth: "900px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", backgroundColor: "rgba(255,255,255,0.1)", padding: "4px 12px", fontSize: "11px", fontWeight: 700, color: "#FFC000", border: "1px solid rgba(255,255,255,0.15)", alignSelf: "flex-start" }}>
+            <Landmark style={{ width: "14px", height: "14px" }} />
+            <span>DPUPR Kabupaten Bogor • Wilayah Kerja 40 Kecamatan</span>
           </div>
+          
+          <h1 style={{ fontSize: "26px", fontWeight: 900, color: "#FFFFFF", letterSpacing: "-0.5px", margin: 0, lineHeight: 1.2 }}>
+            Dashboard Pembinaan & Pengawasan Jasa Konstruksi
+          </h1>
+          
+          <p style={{ fontSize: "13px", color: "#CBD5E1", margin: 0, lineHeight: 1.6, maxWidth: "720px" }}>
+            Pemantauan terpadu kepatuhan 5 Pilar Jasa Konstruksi, status audit digital SIMAK lapangan, dan sinkronisasi real-time ke SIPJAKI Kementerian PUPR.
+          </p>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingTop: "4px" }}>
             <Link
               href="/pengawasan"
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#FFC000] hover:bg-[#F59E0B] text-[#0F2E5C] px-5 py-2.5 text-xs font-black shadow-md transition-all"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                borderRadius: "12px",
+                backgroundColor: "#FFC000",
+                color: "#0F2E5C",
+                padding: "10px 18px",
+                fontSize: "12px",
+                fontWeight: 900,
+                textDecoration: "none",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.15)"
+              }}
             >
               <span>Mulai Audit SIMAK</span>
-              <ArrowUpRight className="h-4 w-4" />
+              <ArrowUpRight style={{ width: "16px", height: "16px" }} />
             </Link>
             <Link
               href="/webgis"
-              className="flex items-center justify-center gap-2 rounded-xl bg-white/15 hover:bg-white/20 text-white px-5 py-2.5 text-xs font-bold border border-white/20 transition-all"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                borderRadius: "12px",
+                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                color: "#FFFFFF",
+                padding: "10px 18px",
+                fontSize: "12px",
+                fontWeight: 700,
+                textDecoration: "none",
+                border: "1px solid rgba(255, 255, 255, 0.2)"
+              }}
             >
               <span>Buka Peta WebGIS</span>
             </Link>

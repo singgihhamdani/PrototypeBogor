@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/mock-auth";
 import { 
-  Eye, EyeOff, ShieldCheck, MapPin, Building2, 
-  ArrowRight, Key, Mail, Lock, CheckCircle2, Landmark, Sparkles
+  Eye, EyeOff, ShieldCheck, Building2, 
+  ArrowRight, Key, Mail, Lock, Sparkles
 } from "lucide-react";
 
 export default function LoginPage() {
@@ -36,188 +36,507 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between bg-[#F8FAFC] selection:bg-[#F59E0B] selection:text-white">
+    <div 
+      style={{
+        minHeight: "100vh",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        backgroundColor: "#F1F5F9",
+        fontFamily: "'Plus Jakarta Sans', sans-serif"
+      }}
+    >
       {/* Top Header Bar PUPR Standard */}
-      <header className="w-full bg-[#0F2E5C] border-b-4 border-[#FFC000] px-6 py-3 shadow-md">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* PUPR & Pemkab Logo Badges */}
-            <div className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-xl bg-[#FFC000] text-[#0F2E5C] font-black flex items-center justify-center text-sm shadow-sm border border-white/20">
+      <header 
+        style={{
+          width: "100%",
+          backgroundColor: "#0F2E5C",
+          borderBottom: "4px solid #FFC000",
+          padding: "12px 24px",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+        }}
+      >
+        <div 
+          style={{
+            maxWidth: "1140px",
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "16px"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* Badges */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+              <div 
+                style={{
+                  height: "36px",
+                  padding: "0 10px",
+                  borderRadius: "8px",
+                  backgroundColor: "#FFC000",
+                  color: "#0F2E5C",
+                  fontWeight: 900,
+                  fontSize: "12px",
+                  letterSpacing: "0.5px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
                 PUPR
               </div>
-              <div className="h-7 w-[1px] bg-white/20"></div>
-              <div className="h-10 w-10 rounded-xl bg-white/10 text-white font-black flex items-center justify-center text-sm border border-white/20">
-                BOGOR
+              <div style={{ height: "20px", width: "1px", backgroundColor: "rgba(255,255,255,0.2)" }} />
+              <div 
+                style={{
+                  height: "36px",
+                  padding: "0 10px",
+                  borderRadius: "8px",
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  color: "#FFFFFF",
+                  fontWeight: 900,
+                  fontSize: "11px",
+                  letterSpacing: "0.5px",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                KAB. BOGOR
               </div>
             </div>
-            <div className="text-white leading-tight">
-              <h1 className="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-[#FFC000]">
+
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span 
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 900,
+                  color: "#FFC000",
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  lineHeight: 1.2
+                }}
+              >
                 DINAS PEKERJAAN UMUM DAN PENATAAN RUANG
-              </h1>
-              <p className="text-[11px] text-white/80 font-medium tracking-wide">
+              </span>
+              <span 
+                style={{
+                  fontSize: "11px",
+                  color: "rgba(255, 255, 255, 0.8)",
+                  fontWeight: 500,
+                  lineHeight: 1.2
+                }}
+              >
                 Pemerintah Kabupaten Bogor • Terintegrasi SIPJAKI Kementerian PUPR
-              </p>
+              </span>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 text-[11px] text-white/80 bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
-            <ShieldCheck className="h-4 w-4 text-[#FFC000]" />
-            <span>Portal Resmi Pembinaan Jasa Konstruksi</span>
+          <div 
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "12px",
+              fontWeight: 600,
+              color: "#FFFFFF",
+              backgroundColor: "rgba(255,255,255,0.1)",
+              padding: "6px 14px",
+              borderRadius: "9999px",
+              border: "1px solid rgba(255,255,255,0.15)",
+              flexShrink: 0
+            }}
+          >
+            <ShieldCheck style={{ width: "16px", height: "16px", color: "#FFC000" }} />
+            <span>Portal Pembinaan Jasa Konstruksi</span>
           </div>
         </div>
       </header>
 
       {/* Main Login Card Section */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
-          
-          {/* Left Hero Banner (5 Cols) - Deep PUPR Blue & Construction Accent */}
-          <div className="lg:col-span-5 bg-gradient-to-br from-[#091A36] via-[#0F2E5C] to-[#163B75] p-8 sm:p-10 text-white flex flex-col justify-between relative overflow-hidden">
+      <main 
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "24px 16px"
+        }}
+      >
+        <div 
+          style={{
+            maxWidth: "940px",
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
+            borderRadius: "24px",
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 25px 50px -12px rgba(15, 46, 92, 0.25)",
+            border: "1px solid #E2E8F0",
+            overflow: "hidden"
+          }}
+        >
+          {/* Left Hero Banner */}
+          <div 
+            style={{
+              background: "linear-gradient(135deg, #07182E 0%, #0F2E5C 50%, #163B75 100%)",
+              padding: "36px",
+              color: "#FFFFFF",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              minWidth: 0,
+              overflow: "hidden",
+              position: "relative"
+            }}
+          >
             {/* Background Pattern */}
             <div 
-              className="absolute inset-0 opacity-10 pointer-events-none"
               style={{
+                position: "absolute",
+                inset: 0,
+                opacity: 0.08,
                 backgroundImage: "radial-gradient(#FFC000 1px, transparent 1px)",
-                backgroundSize: "20px 20px"
+                backgroundSize: "20px 20px",
+                pointerEvents: "none"
               }}
             />
 
-            <div className="relative z-10 space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-[#FFC000] border border-white/10">
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Prototype Sistem TA 2026</span>
+            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "20px" }}>
+              {/* Badge */}
+              <div 
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  padding: "4px 12px",
+                  borderRadius: "9999px",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  color: "#FFC000",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  alignSelf: "flex-start"
+                }}
+              >
+                <Sparkles style={{ width: "12px", height: "12px" }} />
+                <span>Prototype TA 2026</span>
               </div>
 
+              {/* Title */}
               <div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight tracking-tight">
+                <h2 
+                  style={{
+                    fontSize: "26px",
+                    fontWeight: 900,
+                    color: "#FFFFFF",
+                    letterSpacing: "-0.5px",
+                    lineHeight: 1.15
+                  }}
+                >
                   SIJAKON BOGOR
                 </h2>
-                <div className="h-1.5 w-16 bg-[#FFC000] rounded-full mt-2 mb-3"></div>
-                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
+                <div style={{ height: "5px", width: "50px", backgroundColor: "#FFC000", borderRadius: "9999px", margin: "8px 0 12px 0" }} />
+                <p 
+                  style={{
+                    fontSize: "12px",
+                    color: "#CBD5E1",
+                    lineHeight: 1.6,
+                    margin: 0
+                  }}
+                >
                   Sistem Informasi Pembinaan, Pengawasan SIMAK, dan Sinkronisasi 5 Pilar Jasa Konstruksi Kabupaten Bogor dengan SIPJAKI Nasional.
                 </p>
               </div>
 
-              {/* 3 Core Highlights */}
-              <div className="space-y-3 pt-2">
-                <div className="flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
-                  <Building2 className="h-5 w-5 text-[#FFC000] shrink-0 mt-0.5" />
-                  <div className="text-xs">
-                    <p className="font-bold text-white">40 Wilayah Kecamatan</p>
-                    <p className="text-slate-300 text-[11px]">Monitoring proyek fisik & BUJK berbasis peta WebGIS spasial.</p>
+              {/* Highlights */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div 
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                    padding: "12px",
+                    borderRadius: "14px",
+                    border: "1px solid rgba(255,255,255,0.1)"
+                  }}
+                >
+                  <div 
+                    style={{
+                      height: "34px",
+                      width: "34px",
+                      borderRadius: "10px",
+                      backgroundColor: "rgba(255,192,0,0.15)",
+                      color: "#FFC000",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0
+                    }}
+                  >
+                    <Building2 style={{ width: "18px", height: "18px" }} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "12px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>40 Kecamatan Terpetakan</p>
+                    <p style={{ fontSize: "11px", color: "#94A3B8", margin: 0 }}>Sebaran BUJK & paket pekerjaan WebGIS.</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
-                  <ShieldCheck className="h-5 w-5 text-[#FFC000] shrink-0 mt-0.5" />
-                  <div className="text-xs">
-                    <p className="font-bold text-white">Standar Permen PUPR 1/2023</p>
-                    <p className="text-slate-300 text-[11px]">Audit digital SIMAK (Tertib Usaha, Penyelenggaraan & Pemanfaatan).</p>
+                <div 
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                    padding: "12px",
+                    borderRadius: "14px",
+                    border: "1px solid rgba(255,255,255,0.1)"
+                  }}
+                >
+                  <div 
+                    style={{
+                      height: "34px",
+                      width: "34px",
+                      borderRadius: "10px",
+                      backgroundColor: "rgba(255,192,0,0.15)",
+                      color: "#FFC000",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0
+                    }}
+                  >
+                    <ShieldCheck style={{ width: "18px", height: "18px" }} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "12px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>Standar Permen PUPR 1/2023</p>
+                    <p style={{ fontSize: "11px", color: "#94A3B8", margin: 0 }}>Audit digital 3 Tertib & pelaporan K3.</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Bottom Slogan */}
-            <div className="relative z-10 pt-6 mt-6 border-t border-white/15 flex items-center justify-between text-[11px] text-white/70">
-              <span className="font-semibold tracking-wider text-[#FFC000]">SIGAP MEMBANGUN NEGERI</span>
-              <span>v1.0 Preview</span>
+            <div 
+              style={{
+                position: "relative",
+                zIndex: 1,
+                paddingTop: "20px",
+                marginTop: "24px",
+                borderTop: "1px solid rgba(255,255,255,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontSize: "11px",
+                color: "rgba(255,255,255,0.7)"
+              }}
+            >
+              <span style={{ fontWeight: 800, letterSpacing: "0.5px", color: "#FFC000" }}>SIGAP MEMBANGUN NEGERI</span>
+              <span style={{ fontFamily: "monospace", fontSize: "10px" }}>v1.0 Preview</span>
             </div>
           </div>
 
-          {/* Right Form Area (7 Cols) */}
-          <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-between bg-white">
-            <div className="max-w-md mx-auto w-full space-y-6">
+          {/* Right Form Area */}
+          <div 
+            style={{
+              padding: "36px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minWidth: 0,
+              backgroundColor: "#FFFFFF"
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               
               <div>
-                <span className="text-xs font-bold text-[#0F2E5C] bg-[#EBF2FA] px-3 py-1 rounded-full uppercase tracking-wider">
-                  Masuk Portal Petugas
+                <span 
+                  style={{
+                    display: "inline-block",
+                    fontSize: "10px",
+                    fontWeight: 800,
+                    color: "#0F2E5C",
+                    backgroundColor: "#EBF2FA",
+                    padding: "4px 10px",
+                    borderRadius: "9999px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    marginBottom: "8px"
+                  }}
+                >
+                  Portal Masuk Petugas
                 </span>
-                <h3 className="text-2xl font-black text-slate-900 mt-2 tracking-tight">
+                <h3 
+                  style={{
+                    fontSize: "22px",
+                    fontWeight: 900,
+                    color: "#0F172A",
+                    letterSpacing: "-0.5px",
+                    margin: 0
+                  }}
+                >
                   Silakan Masuk
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                  Akses modul pembinaan dan evaluasi jasa konstruksi
+                <p 
+                  style={{
+                    fontSize: "12px",
+                    color: "#64748B",
+                    margin: "4px 0 0 0"
+                  }}
+                >
+                  Akses dashboard evaluasi dan pembinaan jasa konstruksi
                 </p>
               </div>
 
-              {/* Demo Account Banner */}
-              <div className="rounded-2xl border border-[#FFC000]/40 bg-[#FFFBEB] p-4 shadow-xs">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#B45309]">
-                    <Key className="h-3.5 w-3.5" />
-                    <span>Akun Demo Prototype (Tinjauan Tim):</span>
+              {/* Demo Credentials Box */}
+              <div 
+                style={{
+                  borderRadius: "14px",
+                  border: "1px solid #FCD34D",
+                  backgroundColor: "#FFFBEB",
+                  padding: "12px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 700, color: "#B45309" }}>
+                    <Key style={{ width: "14px", height: "14px" }} />
+                    <span>Akun Demo Prototype:</span>
                   </div>
                   <button
                     type="button"
                     onClick={setDemoCredentials}
-                    className="text-[10px] font-bold text-[#0F2E5C] bg-white border border-amber-300 px-2 py-0.5 rounded-md hover:bg-[#FFC000] transition-colors"
+                    style={{
+                      fontSize: "10px",
+                      fontWeight: 800,
+                      color: "#0F2E5C",
+                      backgroundColor: "#FFFFFF",
+                      border: "1px solid #FCD34D",
+                      padding: "2px 8px",
+                      borderRadius: "6px",
+                      cursor: "pointer"
+                    }}
                   >
                     Auto-Fill
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-xs font-mono text-slate-700 bg-white/80 p-2.5 rounded-xl border border-amber-200/60">
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-sans">Email:</span>
-                    <span className="font-semibold text-[#0F2E5C]">admin@sijakon.bogor.go.id</span>
+                <div 
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "8px",
+                    fontSize: "11px",
+                    backgroundColor: "#FFFFFF",
+                    padding: "8px 10px",
+                    borderRadius: "8px",
+                    border: "1px solid #FDE68A"
+                  }}
+                >
+                  <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: "9px", color: "#94A3B8", display: "block", textTransform: "uppercase" }}>Email:</span>
+                    <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#0F2E5C", fontSize: "11px" }}>admin@sijakon.bogor.go.id</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 block font-sans">Password:</span>
-                    <span className="font-semibold text-[#0F2E5C]">demo2026</span>
+                    <span style={{ fontSize: "9px", color: "#94A3B8", display: "block", textTransform: "uppercase" }}>Password:</span>
+                    <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#0F2E5C", fontSize: "11px" }}>demo2026</span>
                   </div>
                 </div>
               </div>
 
-              {/* Form Input */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Alamat Email Instansi
+              {/* Form Inputs */}
+              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <label style={{ fontSize: "11px", fontWeight: 700, color: "#334155", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    Alamat Email
                   </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <div style={{ position: "relative" }}>
+                    <Mail style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94A3B8" }} />
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="admin@sijakon.bogor.go.id"
                       required
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#0F2E5C] focus:ring-3 focus:ring-[#0F2E5C]/15 outline-none transition-all"
+                      style={{
+                        width: "100%",
+                        height: "42px",
+                        borderRadius: "10px",
+                        border: "1px solid #CBD5E1",
+                        backgroundColor: "#F8FAFC",
+                        paddingLeft: "38px",
+                        paddingRight: "12px",
+                        fontSize: "13px",
+                        color: "#0F172A",
+                        outline: "none"
+                      }}
                     />
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <label style={{ fontSize: "11px", fontWeight: 700, color: "#334155", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       Kata Sandi
                     </label>
-                    <span className="text-[11px] text-slate-400">Demo mode</span>
+                    <span style={{ fontSize: "10px", color: "#94A3B8" }}>Demo mode</span>
                   </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <div style={{ position: "relative" }}>
+                    <Lock style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94A3B8" }} />
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       required
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#0F2E5C] focus:ring-3 focus:ring-[#0F2E5C]/15 outline-none transition-all"
+                      style={{
+                        width: "100%",
+                        height: "42px",
+                        borderRadius: "10px",
+                        border: "1px solid #CBD5E1",
+                        backgroundColor: "#F8FAFC",
+                        paddingLeft: "38px",
+                        paddingRight: "40px",
+                        fontSize: "13px",
+                        color: "#0F172A",
+                        outline: "none"
+                      }}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      style={{
+                        position: "absolute",
+                        right: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "#94A3B8"
+                      }}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? <EyeOff style={{ width: "16px", height: "16px" }} /> : <Eye style={{ width: "16px", height: "16px" }} />}
                     </button>
                   </div>
                 </div>
 
                 {error && (
-                  <div className="rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700 font-semibold flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0" />
+                  <div 
+                    style={{
+                      borderRadius: "10px",
+                      backgroundColor: "#FEF2F2",
+                      border: "1px solid #FECACA",
+                      padding: "8px 12px",
+                      fontSize: "12px",
+                      color: "#B91C1C",
+                      fontWeight: 600
+                    }}
+                  >
                     {error}
                   </div>
                 )}
@@ -225,25 +544,39 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0F2E5C] hover:bg-[#091A36] text-white py-3 px-4 text-sm font-bold shadow-lg shadow-[#0F2E5C]/20 border-b-2 border-[#FFC000] transition-all hover:translate-y-[-1px] active:translate-y-[0px] disabled:opacity-70 disabled:cursor-not-allowed"
+                  style={{
+                    width: "100%",
+                    height: "46px",
+                    marginTop: "6px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    borderRadius: "12px",
+                    backgroundColor: "#0F2E5C",
+                    color: "#FFFFFF",
+                    fontSize: "13px",
+                    fontWeight: 800,
+                    border: "none",
+                    borderBottom: "3px solid #FFC000",
+                    cursor: loading ? "not-allowed" : "pointer",
+                    boxShadow: "0 4px 12px rgba(15, 46, 92, 0.25)"
+                  }}
                 >
                   {loading ? (
-                    <span className="flex items-center gap-2">
-                      <span className="h-4 w-4 border-2 border-white/30 border-t-[#FFC000] rounded-full animate-spin" />
-                      Memverifikasi Sesi...
-                    </span>
+                    <span>Memverifikasi Sesi...</span>
                   ) : (
                     <>
                       <span>Masuk ke Dashboard SIJAKON</span>
-                      <ArrowRight className="h-4 w-4 text-[#FFC000]" />
+                      <ArrowRight style={{ width: "16px", height: "16px", color: "#FFC000" }} />
                     </>
                   )}
                 </button>
               </form>
 
-              <div className="pt-2 text-center">
-                <p className="text-[11px] text-slate-400">
-                  Didukung oleh Bidang Jasa Konstruksi DPUPR Kab. Bogor & Balai Jasa Konstruksi Wilayah III
+              <div style={{ paddingTop: "6px", textAlign: "center" }}>
+                <p style={{ fontSize: "11px", color: "#94A3B8", margin: 0 }}>
+                  Dinas Pekerjaan Umum dan Penataan Ruang Kabupaten Bogor
                 </p>
               </div>
 
@@ -254,10 +587,30 @@ export default function LoginPage() {
       </main>
 
       {/* Footer PUPR */}
-      <footer className="w-full border-t border-slate-200 bg-white py-4 px-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© 2026 Dinas Pekerjaan Umum dan Penataan Ruang Kabupaten Bogor. Hak Cipta Dilindungi.</p>
-          <div className="flex items-center gap-4 text-slate-400">
+      <footer 
+        style={{
+          width: "100%",
+          borderTop: "1px solid #E2E8F0",
+          backgroundColor: "#FFFFFF",
+          padding: "12px 24px",
+          textAlign: "center",
+          fontSize: "11px",
+          color: "#64748B"
+        }}
+      >
+        <div 
+          style={{
+            maxWidth: "1140px",
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "8px"
+          }}
+        >
+          <p style={{ margin: 0 }}>© 2026 Dinas Pekerjaan Umum dan Penataan Ruang Kabupaten Bogor. Hak Cipta Dilindungi.</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#94A3B8" }}>
             <span>SIPJAKI Terintegrasi</span>
             <span>•</span>
             <span>Permen PUPR No. 1/2023</span>
