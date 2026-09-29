@@ -51,7 +51,7 @@ export default function PesertaPortalPage() {
               Selamat Datang, {user?.name || "Ahmad Fauzi, A.Md"}
             </h1>
             <p style={{ fontSize: "13px", color: "#E0F2FE", margin: "8px 0 0 0", lineHeight: 1.6 }}>
-              Jabatan Kerja: <strong>Pelaksana Lapangan Pekerjaan Gedung</strong> • Kualifikasi: <strong>Jenjang 4 (Teknisi / Analis)</strong> • Penyelenggara: <strong>Dinas PUPR Kab. Bogor bekerjasama dengan LSP Konstruksi Indonesia Mandiri (BNSP)</strong>
+              Jabatan Kerja: <strong>Pelaksana Lapangan Pekerjaan Gedung</strong> • Kualifikasi: <strong>Jenjang 4 (Teknisi / Analis)</strong> • Penyelenggara: <strong>Dinas PU Kab. Bogor bekerjasama dengan LSP Konstruksi Indonesia Mandiri (BNSP)</strong>
             </p>
 
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "18px", flexWrap: "wrap" }}>
@@ -226,7 +226,7 @@ export default function PesertaPortalPage() {
                 waktu: "08.00 - 16.00 WIB (8 JP)",
                 materi: "Pembacaan Gambar Kerja (Shop Drawing), Spesifikasi Teknis, dan Perhitungan Volume Pekerjaan",
                 instruktur: "Siti Rahmawati, ST, MT (Praktisi Pengawas Struktur)",
-                lokasi: "Studio Desain & Lab Komputer DPUPR Kab. Bogor",
+                lokasi: "Studio Desain & Lab Komputer DPU Kab. Bogor",
                 status: "Hadir Lengkap",
                 score: "88 / 100",
                 fileModul: "Modul_02_ShopDrawing_Spesifikasi.pdf"
@@ -353,7 +353,7 @@ export default function PesertaPortalPage() {
             </div>
             <div>
               <span style={{ color: "#0369A1", fontWeight: 700, display: "block" }}>Tempat Uji Kompetensi (TUK):</span>
-              <span style={{ fontWeight: 800, color: "#0F172A" }}>TUK Mandiri Dinas PUPR Kab. Bogor</span>
+              <span style={{ fontWeight: 800, color: "#0F172A" }}>TUK Mandiri Dinas PU Kab. Bogor</span>
               <span style={{ fontSize: "10px", color: "#64748B", display: "block" }}>Jl. Raya Tegar Beriman No. 45, Cibinong</span>
             </div>
             <div>
@@ -363,7 +363,7 @@ export default function PesertaPortalPage() {
             </div>
             <div>
               <span style={{ color: "#0369A1", fontWeight: 700, display: "block" }}>Nomor Berita Acara Asesmen (BAA):</span>
-              <span style={{ fontWeight: 800, color: "#0F172A", fontFamily: "monospace" }}>042/BAA-LSP/PUPR-BGR/IX/2026</span>
+              <span style={{ fontWeight: 800, color: "#0F172A", fontFamily: "monospace" }}>042/BAA-LSP/DPU-BGR/IX/2026</span>
               <span style={{ fontSize: "10px", color: "#059669", display: "block", fontWeight: 700 }}>Tanggal: 18 September 2026</span>
             </div>
           </div>
@@ -502,7 +502,7 @@ export default function PesertaPortalPage() {
                 Nomor Registrasi Sertifikat BNSP / SIPJAKI:
               </span>
               <span style={{ fontSize: "20px", fontWeight: 900, fontFamily: "monospace", color: "#0F2E5C" }}>
-                SKK-2026-DPUPR-BG-0042
+                SKK-2026-DPU-BG-0042
               </span>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "12px", fontSize: "12px" }}>

@@ -160,7 +160,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       >
         {!collapsed ? (
           <Link href="/" style={{ display: "inline-flex", textDecoration: "none" }}>
-            <Logo size={38} theme="dark" subtitle="DPUPR KAB. BOGOR" />
+            <Logo size={38} theme="dark" subtitle="DPU KAB. BOGOR" />
           </Link>
         ) : (
           <Link href="/" style={{ display: "inline-flex", textDecoration: "none" }}>

@@ -143,4 +143,4 @@ Platform mendukung **6 role** dengan portal adaptif:
 
 ---
 
-*Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor — TA 2026*
+*Dinas Pekerjaan Umum (DPU) Kabupaten Bogor — TA 2026*

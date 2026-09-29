@@ -94,8 +94,8 @@ export const DEMO_USERS: Record<string, User> = {
     name: 'Ir. H. Raden Ridwan, ST, M.Si',
     email: 'admin@sijakon.bogor.go.id',
     role: 'SUPER_ADMIN',
-    roleLabel: 'Super Admin DPUPR',
-    instansi: 'Dinas PUPR Kabupaten Bogor',
+    roleLabel: 'Super Admin DPU',
+    instansi: 'Dinas PU Kabupaten Bogor',
     jabatan: 'Kepala Bidang Bina Konstruksi',
     permissions: [
       '*:*', // Full access
@@ -110,7 +110,7 @@ export const DEMO_USERS: Record<string, User> = {
     roleLabel: 'Admin Bidang (Bina Konstruksi)',
     variant: 'BINA_KONSTRUKSI',
     variantLabel: 'Seksi Bina Konstruksi',
-    instansi: 'Dinas PUPR Kabupaten Bogor',
+    instansi: 'Dinas PU Kabupaten Bogor',
     jabatan: 'Staf Teknis Pembinaan Jakon',
     permissions: [
       'bujk:read', 'bujk:create', 'bujk:update', 'bujk:verify', 'bujk:export',
@@ -129,7 +129,7 @@ export const DEMO_USERS: Record<string, User> = {
     roleLabel: 'Admin Bidang (Tim Pengawas / Asesor)',
     variant: 'PENGAWAS_ASESOR',
     variantLabel: 'Tim Pengawas & Asesor Lapangan',
-    instansi: 'Dinas PUPR Kabupaten Bogor',
+    instansi: 'Dinas PU Kabupaten Bogor',
     jabatan: 'Pejabat Fungsional Pembina Jasa Konstruksi',
     permissions: [
       'bujk:read',
@@ -146,9 +146,9 @@ export const DEMO_USERS: Record<string, User> = {
     name: 'Drs. H. Suryanto Putra, M.Si',
     email: 'kadis@sijakon.bogor.go.id',
     role: 'EKSEKUTIF',
-    roleLabel: 'Pimpinan Eksekutif DPUPR',
-    instansi: 'Dinas PUPR Kabupaten Bogor',
-    jabatan: 'Kepala Dinas PUPR',
+    roleLabel: 'Pimpinan Eksekutif DPU',
+    instansi: 'Dinas PU Kabupaten Bogor',
+    jabatan: 'Kepala Dinas PU',
     permissions: [
       'dashboard:read',
       'bujk:read', 'bujk:export',

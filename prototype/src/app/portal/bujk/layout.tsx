@@ -82,7 +82,7 @@ export default function BujkPortalLayout({ children }: { children: React.ReactNo
                   PORTAL BUJK REKANAN
                 </span>
                 <span style={{ fontSize: "11px", color: "#FDBA74", fontWeight: 700 }}>
-                  DPUPR KABUPATEN BOGOR
+                  DPU KABUPATEN BOGOR
                 </span>
               </div>
             </Link>

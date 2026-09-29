@@ -214,7 +214,7 @@ export default function Topbar() {
               </div>
               <div style={{ textAlign: "left", lineHeight: 1.2 }}>
                 <span style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {user?.name || "Admin DPUPR"}
+                  {user?.name || "Admin DPU"}
                 </span>
                 <span style={{ display: "block", fontSize: "10px", fontWeight: 600, color: "#64748B" }}>
                   {user?.roleLabel || "Super Admin"}

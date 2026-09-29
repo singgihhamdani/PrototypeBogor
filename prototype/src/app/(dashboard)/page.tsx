@@ -222,7 +222,7 @@ export default function DashboardPage() {
           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", backgroundColor: "rgba(255,255,255,0.12)", padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#FFC000", border: "1px solid rgba(255,255,255,0.15)" }}>
               <Landmark style={{ width: "14px", height: "14px" }} />
-              <span>DPUPR KABUPATEN BOGOR • WILAYAH PEMBINAAN 40 KECAMATAN</span>
+              <span>DPU KABUPATEN BOGOR • WILAYAH PEMBINAAN 40 KECAMATAN</span>
             </div>
 
             <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", backgroundColor: "rgba(255, 192, 0, 0.15)", padding: "6px 12px", fontSize: "11px", fontWeight: 800, color: "#FFC000", border: "1px solid rgba(255, 192, 0, 0.3)" }}>

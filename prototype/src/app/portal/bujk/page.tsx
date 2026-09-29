@@ -158,7 +158,7 @@ export default function BujkPortalPage() {
             Paket Pekerjaan Terkait (Tenant-Isolated)
           </h2>
           <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>
-            Hanya menampilkan kontrak pekerjaan Dinas PUPR yang dimenangkan oleh <strong>PT Bangun Jaya Konstruksi</strong>
+            Hanya menampilkan kontrak pekerjaan Dinas PU yang dimenangkan oleh <strong>PT Bangun Jaya Konstruksi</strong>
           </p>
         </div>
 
@@ -255,7 +255,7 @@ export default function BujkPortalPage() {
         {uploadSuccess && (
           <div style={{ padding: "12px 16px", borderRadius: "12px", backgroundColor: "#ECFDF5", border: "1px solid #A7F3D0", color: "#065F46", fontSize: "13px", fontWeight: 700, marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
             <CheckCircle2 style={{ width: "18px", height: "18px" }} />
-            <span>Dokumen berhasil diunggah! Berkas sedang diverifikasi oleh Tim Pengawas Lapangan DPUPR.</span>
+            <span>Dokumen berhasil diunggah! Berkas sedang diverifikasi oleh Tim Pengawas Lapangan DPU.</span>
           </div>
         )}
 

@@ -137,7 +137,7 @@ export default function ExecutiveDashboardView() {
               Ringkasan Kinerja & Kepatuhan Jasa Konstruksi TA 2026
             </h1>
             <p style={{ fontSize: "14px", color: "#D1FAE5", margin: 0, maxWidth: "820px", lineHeight: 1.5 }}>
-              Laporan strategis pimpinan daerah mengenai efektivitas 5 Pilar Pembinaan Jasa Konstruksi, status 342 paket pekerjaan DPUPR, serta kepatuhan 1.240 BUJK di 40 Kecamatan se-Kabupaten Bogor.
+              Laporan strategis pimpinan daerah mengenai efektivitas 5 Pilar Pembinaan Jasa Konstruksi, status 342 paket pekerjaan DPU, serta kepatuhan 1.240 BUJK di 40 Kecamatan se-Kabupaten Bogor.
             </p>
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function ExecutiveDashboardView() {
               Evaluasi Kepatuhan Tertib Konstruksi per Wilayah Pembinaan
             </h2>
             <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>
-              Berdasarkan hasil pengawasan SIMAK digital dan audit lapangan Tim Asesor Dinas PUPR
+              Berdasarkan hasil pengawasan SIMAK digital dan audit lapangan Tim Asesor Dinas PU
             </p>
           </div>
           <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "4px 12px", borderRadius: "9999px" }}>

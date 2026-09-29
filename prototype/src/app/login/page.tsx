@@ -89,7 +89,7 @@ export default function LoginPage() {
                   lineHeight: 1.2
                 }}
               >
-                DINAS PEKERJAAN UMUM DAN PENATAAN RUANG
+                DINAS PEKERJAAN UMUM
               </span>
               <span 
                 style={{
@@ -219,7 +219,7 @@ export default function LoginPage() {
 
               {/* Title with Logo */}
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                <Logo size={48} theme="dark" subtitle="DPUPR KABUPATEN BOGOR" />
+                <Logo size={48} theme="dark" subtitle="DPU KABUPATEN BOGOR" />
                 <div style={{ height: "4px", width: "48px", backgroundColor: "#FFC000", borderRadius: "9999px" }} />
                 <p 
                   style={{
@@ -584,7 +584,7 @@ export default function LoginPage() {
             gap: "8px"
           }}
         >
-          <p style={{ margin: 0 }}>© 2026 Dinas Pekerjaan Umum dan Penataan Ruang Kabupaten Bogor. Hak Cipta Dilindungi.</p>
+          <p style={{ margin: 0 }}>© 2026 Dinas Pekerjaan Umum (DPU) Kabupaten Bogor. Hak Cipta Dilindungi.</p>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#94A3B8" }}>
             <span>SIPJAKI Terintegrasi</span>
             <span>•</span>

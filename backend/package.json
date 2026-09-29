@@ -2,7 +2,7 @@
   "name": "sijakon-backend",
   "version": "1.0.0",
   "description": "Backend API SIJAKON BOGOR (NestJS + Prisma ORM + PostgreSQL)",
-  "author": "DPUPR Kabupaten Bogor",
+  "author": "DPU Kabupaten Bogor",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
