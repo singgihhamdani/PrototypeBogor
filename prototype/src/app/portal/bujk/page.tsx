@@ -27,7 +27,9 @@ export default function BujkPortalPage() {
       
       {/* 1. Hero Summary Card */}
       <div
+        id="dashboard"
         style={{
+          scrollMarginTop: "120px",
           borderRadius: "20px",
           background: "linear-gradient(135deg, #0A2540 0%, #163B75 70%, #EA580C 100%)",
           padding: "28px 32px",

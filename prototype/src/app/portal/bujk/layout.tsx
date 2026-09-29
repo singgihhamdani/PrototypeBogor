@@ -1,20 +1,31 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { 
   Building2, FileText, ClipboardList, ShieldAlert, LogOut, 
-  Sparkles, Bell, ArrowLeft, CheckCircle2, ChevronDown 
+  Sparkles, ArrowLeft, ChevronDown 
 } from "lucide-react";
-import Logo, { BrandIcon } from "@/components/ui/logo";
-import { useAuth, ROLE_CONFIGS } from "@/lib/mock-auth";
+import { BrandIcon } from "@/components/ui/logo";
+import { useAuth } from "@/lib/mock-auth";
 import RoleSwitcherModal from "@/components/layout/role-switcher-modal";
 
 export default function BujkPortalLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
   const [showSwitcher, setShowSwitcher] = useState(false);
+  const [activeHash, setActiveHash] = useState<string>("#dashboard");
+
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash || "#dashboard";
+      setActiveHash(hash);
+    };
+
+    handleHash();
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -22,10 +33,10 @@ export default function BujkPortalLayout({ children }: { children: React.ReactNo
   };
 
   const navLinks = [
-    { label: "Dashboard Badan Usaha", href: "/portal/bujk", icon: Building2 },
-    { label: "Status SBU & NIB", href: "/portal/bujk#sbu", icon: FileText },
-    { label: "Paket Proyek Berjalan", href: "/portal/bujk#proyek", icon: ClipboardList },
-    { label: "Pelaporan SIMAK & K3", href: "/portal/bujk#simak", icon: ShieldAlert },
+    { hash: "#dashboard", label: "Dashboard Badan Usaha", href: "/portal/bujk#dashboard", icon: Building2 },
+    { hash: "#sbu", label: "Status SBU & NIB", href: "/portal/bujk#sbu", icon: FileText },
+    { hash: "#proyek", label: "Paket Proyek Berjalan", href: "/portal/bujk#proyek", icon: ClipboardList },
+    { hash: "#simak", label: "Pelaporan SIMAK & K3", href: "/portal/bujk#simak", icon: ShieldAlert },
   ];
 
   return (
@@ -64,7 +75,7 @@ export default function BujkPortalLayout({ children }: { children: React.ReactNo
         >
           {/* Logo & Portal Identity */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <Link href="/portal/bujk" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+            <Link href="/portal/bujk#dashboard" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
               <BrandIcon size={36} />
               <div>
                 <span style={{ fontSize: "14px", fontWeight: 900, color: "#FFFFFF", letterSpacing: "0.5px", display: "block" }}>
@@ -127,7 +138,7 @@ export default function BujkPortalLayout({ children }: { children: React.ReactNo
               <ChevronDown style={{ width: "12px", height: "12px" }} />
             </button>
 
-            {/* Back to Internal Dinas if authorized */}
+            {/* Back to Internal Dinas */}
             <Link
               href="/"
               style={{
@@ -170,10 +181,10 @@ export default function BujkPortalLayout({ children }: { children: React.ReactNo
           </div>
         </div>
 
-        {/* Subnav Tabs */}
+        {/* Subnav Tabs with Dynamic Active State */}
         <div
           style={{
-            backgroundColor: "rgba(10, 37, 64, 0.8)",
+            backgroundColor: "rgba(10, 37, 64, 0.95)",
             borderTop: "1px solid rgba(255,255,255,0.1)"
           }}
         >
@@ -184,30 +195,33 @@ export default function BujkPortalLayout({ children }: { children: React.ReactNo
               padding: "0 24px",
               display: "flex",
               alignItems: "center",
-              gap: "20px"
+              gap: "28px"
             }}
           >
             {navLinks.map((link) => {
               const Icon = link.icon;
+              const isActive = activeHash === link.hash || (activeHash === "" && link.hash === "#dashboard");
               return (
-                <Link
+                <a
                   key={link.label}
                   href={link.href}
+                  onClick={() => setActiveHash(link.hash)}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
-                    padding: "12px 4px",
+                    padding: "12px 2px",
                     fontSize: "12px",
-                    fontWeight: 700,
-                    color: "#FFFFFF",
+                    fontWeight: isActive ? 800 : 600,
+                    color: isActive ? "#FFFFFF" : "rgba(255, 255, 255, 0.65)",
                     textDecoration: "none",
-                    borderBottom: "2px solid #EA580C"
+                    borderBottom: isActive ? "3px solid #FB923C" : "3px solid transparent",
+                    transition: "all 0.15s ease"
                   }}
                 >
-                  <Icon style={{ width: "16px", height: "16px", color: "#FB923C" }} />
+                  <Icon style={{ width: "16px", height: "16px", color: isActive ? "#FB923C" : "rgba(255, 255, 255, 0.5)" }} />
                   <span>{link.label}</span>
-                </Link>
+                </a>
               );
             })}
           </div>
