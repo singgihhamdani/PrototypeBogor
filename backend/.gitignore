@@ -1,0 +1,39 @@
+# ============================================
+# SIJAKON Backend .gitignore
+# ============================================
+
+# Compiled output
+/dist
+
+# Dependencies
+/node_modules
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Testing
+/coverage
+/.nyc_output
+
+# Prisma (generated client is auto-generated)
+# Keep schema.prisma and migrations/

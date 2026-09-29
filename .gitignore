@@ -1,0 +1,86 @@
+# ============================================
+# SIJAKON BOGOR - Root .gitignore
+# ============================================
+
+# ---- Dependencies ----
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ---- Environment & Secrets ----
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+*.cert
+
+# ---- Next.js (Prototype) ----
+prototype/.next/
+prototype/out/
+prototype/build/
+
+# ---- NestJS (Backend) ----
+backend/dist/
+backend/coverage/
+
+# ---- Build Outputs ----
+dist/
+build/
+out/
+
+# ---- Prisma ----
+# Keep prisma/schema.prisma and migrations in VCS
+# Ignore generated client (auto-generated on `prisma generate`)
+
+# ---- Python (Generator Scripts) ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+*.egg-info/
+
+# ---- Testing ----
+coverage/
+*.lcov
+.nyc_output/
+
+# ---- Logs ----
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---- OS Files ----
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ---- IDEs ----
+.idea/
+.vscode/settings.json
+.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# ---- Docker (keep compose, ignore runtime) ----
+docker-compose.override.yml
+
+# ---- Extracted/Temp Files ----
+extracted_*.txt
+
+# ---- Vercel ----
+.vercel

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "NEWS-001",
+    "title": "Dinas PUPR Kabupaten Bogor Gelar Bimtek SMKK untuk 40 Kontraktor Lokal",
+    "category": "Pembinaan & Pelatihan",
+    "date": "2026-08-18",
+    "author": "Humas DPUPR",
+    "summary": "Peningkatan kapasitas pelaku usaha jasa konstruksi dalam mengimplementasikan standar keselamatan kerja konstruksi guna mewujudkan zero fatal accident.",
+    "readTime": "3 min",
+    "featured": true,
+    "tags": ["SMKK", "K3", "Pelatihan", "BUJK"]
+  },
+  {
+    "id": "NEWS-002",
+    "title": "Akselerasi Integrasi SIJAKON Bogor dengan SIPJAKI Nasional Kementerian PUPR",
+    "category": "Teknologi & Sistem",
+    "date": "2026-08-12",
+    "author": "Tim TI Jasa Konstruksi",
+    "summary": "Sinkronisasi data 5 pilar pengawasan jasa konstruksi daerah ke pusat untuk mewujudkan satu data jasa konstruksi nasional yang transparan dan akuntabel.",
+    "readTime": "4 min",
+    "featured": true,
+    "tags": ["SIPJAKI", "Satu Data", "Integrasi", "Kementerian PUPR"]
+  },
+  {
+    "id": "NEWS-003",
+    "title": "Tim Pengawas Jasa Konstruksi Tuntaskan Audit SIMAK Lapangan Tahap II",
+    "category": "Pengawasan",
+    "date": "2026-07-30",
+    "author": "Pengawas Jakon",
+    "summary": "Sebanyak 25 paket pekerjaan strategis APBD 2026 diperiksa kesesuaian tertib penyelenggaraan, mutu material beton, dan dokumen as-built drawing.",
+    "readTime": "5 min",
+    "featured": false,
+    "tags": ["SIMAK", "Audit", "Tertib Penyelenggaraan", "APBD"]
+  }
+]

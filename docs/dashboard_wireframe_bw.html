@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframe Skematik Dashboard — SIJAKON Kabupaten Bogor 2026 (Monochrome / Print-Ready)</title>
+  
+  <style>
+    /* ==========================================================================
+       WIREFRAME MONOCHROME (BLACK & WHITE / CLEAN LINE & SHAPE)
+       Dirancang khusus untuk keperluan screenshot dokumen Microsoft Word & KAK
+       ========================================================================== */
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #FFFFFF;
+      color: #000000;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .wireframe-container {
+      width: 1100px;
+      border: 2px solid #000000;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP APPLICATION HEADER */
+    .app-header {
+      border-bottom: 2px solid #000000;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #FAFAFA;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .box-logo {
+      width: 38px;
+      height: 38px;
+      border: 1.5px solid #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      background: #FFFFFF;
+    }
+
+    .title-app {
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    .title-sub {
+      font-size: 11px;
+      color: #444444;
+    }
+
+    .header-search {
+      border: 1.5px solid #000000;
+      padding: 6px 14px;
+      width: 380px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      background: #FFFFFF;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .pill-btn {
+      border: 1.5px solid #000000;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: bold;
+      background: #FFFFFF;
+    }
+
+    .avatar-box {
+      width: 32px;
+      height: 32px;
+      border: 1.5px solid #000000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 11px;
+    }
+
+    /* MAIN BODY LAYOUT (SIDEBAR + CONTENT) */
+    .app-body {
+      display: flex;
+      min-height: 750px;
+    }
+
+    /* SIDEBAR NAVIGATION */
+    .sidebar-nav {
+      width: 220px;
+      border-right: 2px solid #000000;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    .nav-group-title {
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #888888;
+      padding-bottom: 3px;
+      margin-bottom: 6px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
+      border: 1px solid #CCCCCC;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-item.active {
+      border: 1.5px solid #000000;
+      background: #EEEEEE;
+      font-weight: bold;
+    }
+
+    .nav-tag {
+      border: 1px solid #000000;
+      font-size: 9px;
+      padding: 1px 4px;
+    }
+
+    /* MAIN VIEW AREA */
+    .main-view {
+      flex: 1;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #FFFFFF;
+    }
+
+    /* BREADCRUMB & PAGE HEADER */
+    .page-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1.5px solid #000000;
+      padding-bottom: 8px;
+    }
+
+    .page-title-row h2 {
+      font-size: 16px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .page-title-row .filter-box {
+      border: 1px solid #000000;
+      padding: 4px 10px;
+      font-size: 11px;
+      background: #FFFFFF;
+    }
+
+    /* STATS / KPI GRID (4 BOXES) */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .kpi-box {
+      border: 1.5px solid #000000;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #FFFFFF;
+      min-height: 80px;
+    }
+
+    .kpi-label {
+      font-size: 10.5px;
+      color: #333333;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .kpi-num {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 4px 0;
+    }
+
+    .kpi-sub {
+      font-size: 10px;
+      color: #555555;
+      border-top: 1px dashed #AAAAAA;
+      padding-top: 4px;
+    }
+
+    /* SECTION 1: WEBGIS & SPLIT VIEW */
+    .section-card {
+      border: 1.5px solid #000000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-card-header {
+      border-bottom: 1.5px solid #000000;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #F4F4F4;
+    }
+
+    .split-view-container {
+      display: grid;
+      grid-template-columns: 62% 38%;
+      height: 280px;
+    }
+
+    /* MAP CANVAS WIREFRAME (SHAPE & LINES) */
+    .map-canvas-wireframe {
+      border-right: 1.5px solid #000000;
+      position: relative;
+      background: #FAFAFA;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    /* Peta Schematic Drawing with pure shapes */
+    .map-grid-lines {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        linear-gradient(to right, #E0E0E0 1px, transparent 1px),
+        linear-gradient(to bottom, #E0E0E0 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: 0.6;
+    }
+
+    .district-polygon {
+      position: absolute;
+      border: 1.5px dashed #444444;
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .poly-1 { top: 20px; left: 30px; width: 140px; height: 90px; }
+    .poly-2 { top: 80px; left: 160px; width: 180px; height: 120px; }
+    .poly-3 { top: 130px; left: 40px; width: 120px; height: 110px; }
+
+    .map-pin {
+      position: absolute;
+      border: 1.5px solid #000000;
+      background: #FFFFFF;
+      padding: 2px 6px;
+      font-size: 9.5px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 2px 2px 0px #000000;
+      z-index: 2;
+    }
+
+    .pin-1 { top: 45px; left: 60px; }
+    .pin-2 { top: 110px; left: 200px; }
+    .pin-3 { top: 160px; left: 80px; }
+    .pin-4 { top: 180px; left: 260px; }
+
+    .map-legend {
+      position: relative;
+      z-index: 2;
+      align-self: flex-start;
+      border: 1px solid #000000;
+      background: #FFFFFF;
+      padding: 4px 8px;
+      font-size: 9.5px;
+      display: flex;
+      gap: 10px;
+    }
+
+    /* RIGHT SIDE: TABLE LIST */
+    .table-list-pane {
+      display: flex;
+      flex-direction: column;
+      background: #FFFFFF;
+    }
+
+    .table-subhead {
+      border-bottom: 1px solid #000000;
+      padding: 6px 10px;
+      font-size: 10.5px;
+      font-weight: bold;
+      background: #EEEEEE;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .table-items {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .table-row-item {
+      border-bottom: 1px solid #DDDDDD;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 11px;
+    }
+
+    .table-row-item.highlight {
+      background: #F0F0F0;
+      border-left: 3px solid #000000;
+    }
+
+    .row-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+    }
+
+    .row-meta {
+      display: flex;
+      justify-content: space-between;
+      color: #555555;
+      font-size: 10px;
+    }
+
+    .wire-bar-container {
+      height: 6px;
+      border: 1px solid #000000;
+      background: #FFFFFF;
+      margin-top: 3px;
+    }
+
+    .wire-bar-fill {
+      height: 100%;
+      background: #444444;
+    }
+
+    /* SECTION 2: 2-COLUMNS BOTTOM (KURVA S & CHECKLIST PENGAWASAN) */
+    .bottom-two-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .wire-box-panel {
+      border: 1.5px solid #000000;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .panel-head {
+      font-size: 12px;
+      font-weight: bold;
+      border-bottom: 1px solid #000000;
+      padding-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Kurva S Schematic Chart */
+    .chart-schematic {
+      height: 140px;
+      border-left: 1.5px solid #000000;
+      border-bottom: 1.5px solid #000000;
+      position: relative;
+      margin: 10px 10px 20px 24px;
+    }
+
+    .chart-y-axis {
+      position: absolute;
+      left: -24px;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 8.5px;
+      color: #444444;
+    }
+
+    .chart-x-axis {
+      position: absolute;
+      bottom: -18px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8.5px;
+      color: #444444;
+    }
+
+    /* Gauge / Speedometer Wireframe */
+    .gauge-schematic-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px;
+      border: 1px dashed #000000;
+    }
+
+    .circle-gauge {
+      width: 70px;
+      height: 70px;
+      border: 2px solid #000000;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .checklist-wire {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 10.5px;
+    }
+
+    .chk-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chk-box {
+      width: 12px;
+      height: 12px;
+      border: 1px solid #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: bold;
+    }
+
+    /* FOOTER WIREFRAME ANNOTATION */
+    .wireframe-footer-note {
+      border-top: 1px solid #888888;
+      padding: 8px 12px;
+      font-size: 10px;
+      color: #444444;
+      display: flex;
+      justify-content: space-between;
+      background: #FAFAFA;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wireframe-container">
+    
+    <!-- TOP HEADER -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="box-logo">[ LOGO ]</div>
+        <div>
+          <div class="title-app">SIJAKON BOGOR 2026</div>
+          <div class="title-sub">Dinas Pekerjaan Umum & Penataan Ruang Kab. Bogor</div>
+        </div>
+      </div>
+
+      <div class="header-search">
+        <span>[ 🔍 Cari Proyek, BUJK, NIB, KBLI... ]</span>
+        <span style="border:1px solid #000; padding:1px 4px; font-size:10px;">Ctrl + K</span>
+      </div>
+
+      <div class="header-right">
+        <div class="pill-btn">🗓️ TA 2026 ▾</div>
+        <div class="pill-btn">🔔 [3]</div>
+        <div class="avatar-box">[AD]</div>
+        <span style="font-weight:bold; font-size:11px;">Admin Dinas ▾</span>
+      </div>
+    </header>
+
+    <!-- APP BODY -->
+    <div class="app-body">
+      
+      <!-- SIDEBAR -->
+      <nav class="sidebar-nav">
+        <div>
+          <div class="nav-group-title">Menu Utama</div>
+          <ul class="nav-list">
+            <li class="nav-item active">📊 Dashboard Eksekutif</li>
+            <li class="nav-item">🏢 Master BUJK & SBU <span class="nav-tag">1.240</span></li>
+            <li class="nav-item">🗺️ WebGIS 40 Kecamatan</li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Pengawasan & Sertifikasi</div>
+          <ul class="nav-list">
+            <li class="nav-item">📋 Pengawasan Permen 1/2023</li>
+            <li class="nav-item">🎓 Pelatihan TKK & e-Cert</li>
+            <li class="nav-item">📑 Pelaporan & Rekapitulasi</li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Sistem & Publikasi</div>
+          <ul class="nav-list">
+            <li class="nav-item">📑 Regulasi & Warta Jakon</li>
+            <li class="nav-item">⚙️ Pengaturan RBAC & Log</li>
+          </ul>
+        </div>
+
+        <div style="margin-top:auto; border-top:1px dashed #888; padding-top:8px; font-size:10px; color:#555;">
+          [ Versi Sistem 2.0.0 ]<br>Status: Online (Production)
+        </div>
+      </nav>
+
+      <!-- MAIN CONTENT VIEW -->
+      <main class="main-view">
+        
+        <!-- PAGE TITLE ROW -->
+        <div class="page-title-row">
+          <div>
+            <h2>Dashboard Pembinaan & Pengawasan Jasa Konstruksi</h2>
+            <div style="font-size:11px; color:#444; margin-top:2px;">Ringkasan sebaran proyek spasial, evaluasi kepatuhan dan master badan usaha</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <div class="filter-box">[ Filter Kecamatan: Semua (40) ▾ ]</div>
+            <div class="filter-box" style="font-weight:bold; background:#EEE;">[ 💾 Export SHP / Excel ]</div>
+          </div>
+        </div>
+
+        <!-- 4 KPI SUMMARY CARDS -->
+        <section class="kpi-grid">
+          <div class="kpi-box">
+            <div class="kpi-label">Badan Usaha (BUJK)</div>
+            <div class="kpi-num">1.240</div>
+            <div class="kpi-sub">▲ +12% YoY (1.180 SBU Aktif)</div>
+          </div>
+
+          <div class="kpi-box">
+            <div class="kpi-label">Paket Proyek Fisik</div>
+            <div class="kpi-num">342 Paket</div>
+            <div class="kpi-sub">Total Nilai: Rp 428,5 Miliar</div>
+          </div>
+
+          <div class="kpi-box">
+            <div class="kpi-label">Tenaga Kerja (TKK)</div>
+            <div class="kpi-num">4.850 Org</div>
+            <div class="kpi-sub">24 Batch Bimtek Tersertifikasi</div>
+          </div>
+
+          <div class="kpi-box">
+            <div class="kpi-label">Skor Kepatuhan (SMKK)</div>
+            <div class="kpi-num">88.5%</div>
+            <div class="kpi-sub">Status: [ TERTIB KONSTRUKSI ]</div>
+          </div>
+        </section>
+
+        <!-- WEBGIS & SPLIT VIEW COMPONENT -->
+        <section class="section-card">
+          <div class="section-card-header">
+            <span>🗺️ WEBGIS SEBARAN PROYEK & BADAN USAHA (SPLIT-VIEW SYNCHRONIZATION)</span>
+            <span style="font-weight:normal; font-size:11px;">[ Layer: Paket APBD ▾ ] &nbsp; [ 🎯 Reset View ]</span>
+          </div>
+
+          <div class="split-view-container">
+            
+            <!-- LEFT: MAP WIREFRAME CANVAS -->
+            <div class="map-canvas-wireframe">
+              <div class="map-grid-lines"></div>
+
+              <!-- Schematic district boundary shapes -->
+              <div class="district-polygon poly-1">
+                <span style="font-size:9px; color:#666; padding:2px;">[ Poligon Kec. Babakan Madang ]</span>
+              </div>
+              <div class="district-polygon poly-2">
+                <span style="font-size:9px; color:#666; padding:2px;">[ Poligon Kec. Cibinong & Sukaraja ]</span>
+              </div>
+              <div class="district-polygon poly-3">
+                <span style="font-size:9px; color:#666; padding:2px;">[ Poligon Kec. Leuwiliang ]</span>
+              </div>
+
+              <!-- Pins -->
+              <div class="map-pin pin-1">📍 Peningkatan Jalan Sentul (78%)</div>
+              <div class="map-pin pin-2">📍 Gedung Lab DPUPR (64%)</div>
+              <div class="map-pin pin-3">📍 Drainase Leuwiliang (91%)</div>
+              <div class="map-pin pin-4">📍 Jembatan Cileungsi (42%)</div>
+
+              <div class="map-legend">
+                <span>[ ■ Titik Proyek APBD ]</span>
+                <span>[ □ Kantor Domisili BUJK ]</span>
+                <span>[ -- Batas 40 Kecamatan ]</span>
+              </div>
+            </div>
+
+            <!-- RIGHT: FILTERED PROJECTS LIST -->
+            <div class="table-list-pane">
+              <div class="table-subhead">
+                <span>DAFTAR PROYEK DALAM LAYAR (BBOX)</span>
+                <span>[ 4 Data ]</span>
+              </div>
+
+              <div class="table-items">
+                <div class="table-row-item highlight">
+                  <div class="row-header">
+                    <span>1. Peningkatan Jalan Ruas Sentul</span>
+                    <span>[ 78% ]</span>
+                  </div>
+                  <div class="row-meta">
+                    <span>Kec. Babakan Madang</span>
+                    <span>Rp 14,8 M</span>
+                  </div>
+                  <div class="wire-bar-container">
+                    <div class="wire-bar-fill" style="width:78%;"></div>
+                  </div>
+                </div>
+
+                <div class="table-row-item">
+                  <div class="row-header">
+                    <span>2. Pembangunan Lab Uji DPUPR</span>
+                    <span>[ 64% ]</span>
+                  </div>
+                  <div class="row-meta">
+                    <span>Kec. Cibinong</span>
+                    <span>Rp 8,2 M</span>
+                  </div>
+                  <div class="wire-bar-container">
+                    <div class="wire-bar-fill" style="width:64%;"></div>
+                  </div>
+                </div>
+
+                <div class="table-row-item">
+                  <div class="row-header">
+                    <span>3. Drainase Perkotaan Leuwiliang</span>
+                    <span>[ 91% ]</span>
+                  </div>
+                  <div class="row-meta">
+                    <span>Kec. Leuwiliang</span>
+                    <span>Rp 3,1 M</span>
+                  </div>
+                  <div class="wire-bar-container">
+                    <div class="wire-bar-fill" style="width:91%;"></div>
+                  </div>
+                </div>
+
+                <div class="table-row-item">
+                  <div class="row-header">
+                    <span>4. Rehabilitasi Jembatan Cileungsi</span>
+                    <span>[ 42% ]</span>
+                  </div>
+                  <div class="row-meta">
+                    <span>Kec. Cileungsi</span>
+                    <span>Rp 5,6 M</span>
+                  </div>
+                  <div class="wire-bar-container">
+                    <div class="wire-bar-fill" style="width:42%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- BOTTOM TWO PANELS (KURVA S & CHECKLIST AUDIT) -->
+        <section class="bottom-two-cols">
+          
+          <!-- Kurva S Schematic -->
+          <div class="wire-box-panel">
+            <div class="panel-head">
+              <span>📈 KURVA S MONITORING DEVIASI PROGRES FISIK</span>
+              <span style="font-weight:normal; font-size:10px;">Minggu ke-24</span>
+            </div>
+
+            <div class="chart-schematic">
+              <div class="chart-y-axis">
+                <span>100%</span>
+                <span>50%</span>
+                <span>0%</span>
+              </div>
+
+              <!-- Schematic SVG curves -->
+              <svg width="100%" height="100%" style="overflow:visible;">
+                <!-- Target Plan (Dashed) -->
+                <path d="M 0,135 Q 120,110 200,60 T 360,10" fill="none" stroke="#888888" stroke-width="2" stroke-dasharray="4,4" />
+                <!-- Actual Realization (Solid) -->
+                <path d="M 0,135 Q 110,100 190,50 T 260,28" fill="none" stroke="#000000" stroke-width="2.5" />
+                <!-- Current point dot -->
+                <circle cx="260" cy="28" r="4" fill="#000000" />
+              </svg>
+
+              <div class="chart-x-axis">
+                <span>M-1</span>
+                <span>M-8</span>
+                <span>M-16</span>
+                <span>M-24 (Kini)</span>
+                <span>M-32</span>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:center; gap:16px; font-size:10px; color:#333;">
+              <span>- - - Rencana Target (%)</span>
+              <span>─── Realisasi Fisik Lapangan (%)</span>
+            </div>
+          </div>
+
+          <!-- Kepatuhan Permen 1/2023 -->
+          <div class="wire-box-panel">
+            <div class="panel-head">
+              <span>⚖️ EVALUASI PENGAWASAN (PERMEN PUPR 1/2023)</span>
+              <span style="font-weight:normal; font-size:10px;">[ Detail Audit ]</span>
+            </div>
+
+            <div class="gauge-schematic-row">
+              <div class="circle-gauge">
+                <span>88.5%</span>
+                <span style="font-size:8px;">TERTIB</span>
+              </div>
+              <div class="checklist-wire">
+                <div class="chk-item">
+                  <div class="chk-box">✓</div>
+                  <span>Tertib Usaha: NIB, SBU & SKK Tenaga Kerja (92.0%)</span>
+                </div>
+                <div class="chk-item">
+                  <div class="chk-box">✓</div>
+                  <span>Tertib Penyelenggaraan: Standar SMKK & Mutu (86.5%)</span>
+                </div>
+                <div class="chk-item">
+                  <div class="chk-box">✓</div>
+                  <span>Tertib Pemanfaatan: Kelaikan Fungsi Bangunan (87.0%)</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="font-size:10.5px; border-top:1px dashed #888; padding-top:6px; display:flex; justify-content:space-between;">
+              <span>Status Rekomendasi: <strong>Surat Keterangan Tertib Terbit</strong></span>
+              <span>[ Cetak BA Pengawasan ]</span>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+    </div>
+
+    <!-- FOOTER ANNOTATION -->
+    <footer class="wireframe-footer-note">
+      <span>Dokumen Wireframe Skematik — SIJAKON Kabupaten Bogor TA 2026</span>
+      <span>Format: Clean Monochrome Line & Shape (Word / Print Ready)</span>
+    </footer>
+
+  </div>
+
+</body>
+</html>

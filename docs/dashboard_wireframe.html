@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIJAKON BOGOR — Dashboard Eksekutif & WebGIS Spasial TA 2026</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS for WebGIS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary: #0F5132;
+      --primary-dark: #0A3622;
+      --primary-light: #E8F5E9;
+      --accent: #10B981;
+      --accent-hover: #059669;
+      --slate-900: #0F172A;
+      --slate-800: #1E293B;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748B;
+      --slate-300: #CBD5E1;
+      --slate-200: #E2E8F0;
+      --slate-100: #F1F5F9;
+      --slate-50: #F8FAFC;
+      --amber: #F59E0B;
+      --rose: #EF4444;
+      --blue: #3B82F6;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #F8FAFC;
+      color: var(--slate-800);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* ==================== SIDEBAR ==================== */
+    aside.sidebar {
+      width: 280px;
+      background: var(--slate-900);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      transition: width 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 20px;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .brand-text h1 {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-text .badge {
+      font-size: 10px;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--slate-400);
+      margin-top: 2px;
+    }
+
+    .sidebar-menu {
+      padding: 18px 12px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .menu-category {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate-500);
+      font-weight: 700;
+      padding: 12px 12px 6px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      color: var(--slate-300);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .menu-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: white;
+    }
+
+    .menu-item.active {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.18), rgba(16, 185, 129, 0.04));
+      color: var(--accent);
+      font-weight: 600;
+      border-left: 3px solid var(--accent);
+    }
+
+    .menu-item i {
+      width: 18px;
+      height: 18px;
+      color: inherit;
+    }
+
+    .menu-badge {
+      margin-left: auto;
+      background: var(--primary);
+      color: white;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 14px;
+      border: 2px solid var(--accent);
+    }
+
+    .user-info h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .user-info p {
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    /* ==================== MAIN CONTENT ==================== */
+    main.main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* Header Bar */
+    header.topbar {
+      height: 72px;
+      background: white;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .search-cmd {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--slate-100);
+      padding: 9px 16px;
+      border-radius: var(--radius-full);
+      color: var(--slate-500);
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      width: 340px;
+    }
+
+    .search-cmd:hover {
+      border-color: var(--slate-300);
+      background: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-cmd kbd {
+      background: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      border: 1px solid var(--slate-300);
+      color: var(--slate-600);
+      margin-left: auto;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .fiscal-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12.5px;
+      font-weight: 700;
+      border: 1px solid rgba(15, 81, 50, 0.2);
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--slate-200);
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--slate-700);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: var(--slate-50);
+      border-color: var(--slate-300);
+    }
+
+    .icon-btn .dot-alert {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      background: var(--rose);
+      border-radius: var(--radius-full);
+      border: 2px solid white;
+    }
+
+    /* Page Container */
+    .page-container {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Page Hero / Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, #0F5132 0%, #0F172A 100%);
+      border-radius: var(--radius-lg);
+      padding: 26px 30px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::after {
+      content: "";
+      position: absolute;
+      right: -50px;
+      top: -50px;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-text h2 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-text p {
+      font-size: 13.5px;
+      color: var(--slate-300);
+      margin-top: 6px;
+      max-width: 620px;
+      line-height: 1.5;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--slate-900);
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      font-size: 13.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #34D399;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-size: 13.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      border: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .kpi-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kpi-icon.emerald { background: #ECFDF5; color: #059669; }
+    .kpi-icon.blue { background: #EFF6FF; color: #2563EB; }
+    .kpi-icon.amber { background: #FFFBEB; color: #D97706; }
+    .kpi-icon.purple { background: #FAF5FF; color: #7C3AED; }
+
+    .kpi-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kpi-badge.up { background: #DCFCE7; color: #15803D; }
+    .kpi-badge.info { background: #DBEAFE; color: #1E40AF; }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--slate-900);
+    }
+
+    .kpi-label {
+      font-size: 13px;
+      color: var(--slate-500);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .kpi-progress-bar {
+      margin-top: 14px;
+      height: 6px;
+      background: var(--slate-100);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .kpi-progress-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+    }
+
+    /* WebGIS & Split-View Section */
+    .gis-section-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .card-header-bar {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--slate-200);
+      background: #FAFAFC;
+    }
+
+    .card-title-group h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--slate-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-group p {
+      font-size: 12.5px;
+      color: var(--slate-500);
+      margin-top: 2px;
+    }
+
+    .gis-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .select-filter {
+      padding: 7px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--slate-300);
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--slate-700);
+      background: white;
+      cursor: pointer;
+    }
+
+    /* Split-View Layout (Map 60% : Table 40%) */
+    .split-grid {
+      display: grid;
+      grid-template-columns: 62% 38%;
+      height: 480px;
+    }
+
+    #webgis-map {
+      height: 100%;
+      width: 100%;
+      background: #E2E8F0;
+    }
+
+    .split-table-side {
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--slate-200);
+      background: white;
+      height: 100%;
+    }
+
+    .table-side-header {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--slate-50);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--slate-700);
+    }
+
+    .table-list-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .project-item-card {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--slate-200);
+      margin-bottom: 8px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .project-item-card:hover {
+      border-color: var(--accent);
+      background: var(--slate-50);
+      transform: translateY(-1px);
+    }
+
+    .project-item-card.active {
+      border-color: var(--primary);
+      background: #F0FDF4;
+      border-left: 4px solid var(--primary);
+    }
+
+    .project-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .project-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-900);
+      line-height: 1.3;
+    }
+
+    .badge-status {
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-status.on-track { background: #DCFCE7; color: #166534; }
+    .badge-status.delay { background: #FEE2E2; color: #991B1B; }
+
+    .project-meta-row {
+      font-size: 11.5px;
+      color: var(--slate-500);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .prog-bar-mini {
+      height: 5px;
+      background: var(--slate-100);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .prog-fill-mini {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+    }
+
+    /* 2-Columns Bottom Section */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .content-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-sm);
+      padding: 22px;
+    }
+
+    .content-card-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--slate-900);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Permen PUPR 1/2023 Live Gauge Demo */
+    .gauge-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 16px;
+      background: var(--slate-50);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--slate-200);
+    }
+
+    .gauge-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) 0% 88.5%, #E2E8F0 88.5% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .gauge-inner {
+      width: 70px;
+      height: 70px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--slate-900);
+    }
+
+    .gauge-inner span {
+      font-size: 9.5px;
+      color: var(--slate-500);
+      font-weight: 600;
+    }
+
+    .gauge-desc h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .gauge-desc p {
+      font-size: 12px;
+      color: var(--slate-600);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* Side-by-Side Reviewer Modal Simulation */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: var(--radius-lg);
+      width: 1000px;
+      max-width: 95vw;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: modalPop 0.25s ease-out;
+    }
+
+    @keyframes modalPop {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 16px 24px;
+      background: var(--slate-900);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 55% 45%;
+      overflow: hidden;
+    }
+
+    .pdf-viewer-pane {
+      background: #525659;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+    }
+
+    .doc-preview-mockup {
+      width: 85%;
+      height: 90%;
+      background: white;
+      color: #333;
+      border-radius: 4px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      padding: 24px;
+      font-size: 11px;
+      text-align: left;
+      overflow: hidden;
+      line-height: 1.6;
+    }
+
+    .review-form-pane {
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: white;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--slate-700);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--slate-300);
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    /* Command Palette Modal */
+    .cmd-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 12vh;
+      z-index: 120;
+    }
+    .cmd-overlay.open { display: flex; }
+    .cmd-box {
+      width: 580px;
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+    }
+    .cmd-input-row {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--slate-200);
+    }
+    .cmd-input-row input {
+      border: none;
+      outline: none;
+      font-size: 15px;
+      font-family: inherit;
+      width: 100%;
+    }
+    .cmd-results {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    .cmd-item {
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13.5px;
+      color: var(--slate-700);
+      cursor: pointer;
+    }
+    .cmd-item:hover {
+      background: var(--slate-100);
+      color: var(--primary);
+    }
+
+    /* Toast */
+    .toast-popup {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--slate-900);
+      color: white;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      font-size: 13.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 200;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .toast-popup.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-logo">
+        <i data-lucide="building-2"></i>
+      </div>
+      <div class="brand-text">
+        <h1>SIJAKON <span class="badge">BOGOR 2026</span></h1>
+        <p>DPUPR Kabupaten Bogor</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <div class="menu-category">Menu Utama</div>
+      <a class="menu-item active" onclick="showToast('Halaman Dashboard Aktif')">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Dashboard Eksekutif</span>
+      </a>
+      <a class="menu-item" onclick="openReviewerModal()">
+        <i data-lucide="shield-check"></i>
+        <span>Side-by-Side Reviewer</span>
+        <span class="menu-badge">Demo</span>
+      </a>
+      <a class="menu-item" onclick="showToast('Navigasi ke Master BUJK')">
+        <i data-lucide="briefcase"></i>
+        <span>Master BUJK & SBU</span>
+        <span class="menu-badge">1.240</span>
+      </a>
+      <a class="menu-item" onclick="showToast('Navigasi ke WebGIS Sebaran Proyek')">
+        <i data-lucide="map"></i>
+        <span>WebGIS 40 Kecamatan</span>
+      </a>
+
+      <div class="menu-category">Pengawasan & Sertifikasi</div>
+      <a class="menu-item" onclick="showToast('Navigasi ke Audit Permen 1/2023')">
+        <i data-lucide="clipboard-check"></i>
+        <span>Pengawasan (Permen 1/2023)</span>
+      </a>
+      <a class="menu-item" onclick="showToast('Navigasi ke Pelatihan & e-Cert')">
+        <i data-lucide="graduation-cap"></i>
+        <span>Pelatihan TKK & e-Cert</span>
+      </a>
+      <a class="menu-item" onclick="showToast('Navigasi ke Pelaporan Eksekutif')">
+        <i data-lucide="file-spreadsheet"></i>
+        <span>Pelaporan & Rekap Data</span>
+      </a>
+
+      <div class="menu-category">Sistem & Publikasi</div>
+      <a class="menu-item" onclick="showToast('Navigasi ke Repositori Regulasi')">
+        <i data-lucide="file-text"></i>
+        <span>Regulasi & Warta Jakon</span>
+      </a>
+      <a class="menu-item" onclick="showToast('Navigasi ke Pengaturan RBAC')">
+        <i data-lucide="settings"></i>
+        <span>Pengaturan & Audit Log</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-avatar">AD</div>
+      <div class="user-info">
+        <h4>Administrator Dinas</h4>
+        <p>DPUPR Kab. Bogor</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="main-content">
+    
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="search-cmd" onclick="openCmdPalette()">
+        <i data-lucide="search" style="width:16px;height:16px;"></i>
+        <span>Cari BUJK, Proyek, NIB, Regulasi...</span>
+        <kbd>Ctrl + K</kbd>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="fiscal-pill">
+          <i data-lucide="calendar" style="width:14px;height:14px;"></i>
+          <span>Tahun Anggaran 2026</span>
+        </div>
+
+        <button class="icon-btn" onclick="showToast('3 Notifikasi Sistem: 2 SBU perlu perpanjangan')">
+          <i data-lucide="bell" style="width:18px;height:18px;"></i>
+          <span class="dot-alert"></span>
+        </button>
+
+        <button class="icon-btn" onclick="openReviewerModal()">
+          <i data-lucide="file-check-2" style="width:18px;height:18px;"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="page-container">
+      
+      <!-- Hero Banner -->
+      <section class="hero-banner">
+        <div class="hero-text">
+          <h2>Sistem Informasi Pembinaan & Pengawasan Jasa Konstruksi</h2>
+          <p>Pusat kendali geospasial WebGIS, monitoring progres fisik, audit kepatuhan Permen PUPR No. 1/2023, dan rekapitulasi pelaporan eksekutif di 40 Kecamatan Kabupaten Bogor.</p>
+        </div>
+        <div class="hero-cta">
+          <button class="btn-primary" onclick="openReviewerModal()">
+            <i data-lucide="eye" style="width:16px;height:16px;"></i>
+            <span>Verifikasi Berkas</span>
+          </button>
+          <button class="btn-outline" onclick="showToast('Ekspor Laporan Shapefile / Excel diproses...')">
+            <i data-lucide="download" style="width:16px;height:16px;"></i>
+            <span>Export SHP/Excel</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI Summary Cards -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon emerald"><i data-lucide="building-2"></i></div>
+            <span class="kpi-badge up">▲ +12% YoY</span>
+          </div>
+          <div class="kpi-value">1.240</div>
+          <div class="kpi-label">Badan Usaha (BUJK) Terdaftar</div>
+          <div class="kpi-progress-bar">
+            <div class="kpi-progress-fill" style="width: 82%; background: #059669;"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon blue"><i data-lucide="hard-hat"></i></div>
+            <span class="kpi-badge info">342 Paket</span>
+          </div>
+          <div class="kpi-value">Rp 428,5 M</div>
+          <div class="kpi-label">Total Nilai Paket Konstruksi 2026</div>
+          <div class="kpi-progress-bar">
+            <div class="kpi-progress-fill" style="width: 68%; background: #2563EB;"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon purple"><i data-lucide="award"></i></div>
+            <span class="kpi-badge up">▲ 24 Batch</span>
+          </div>
+          <div class="kpi-value">4.850</div>
+          <div class="kpi-label">Tenaga Kerja (TKK) Tersertifikasi</div>
+          <div class="kpi-progress-bar">
+            <div class="kpi-progress-fill" style="width: 90%; background: #7C3AED;"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon amber"><i data-lucide="scale"></i></div>
+            <span class="kpi-badge up" style="background:#FEF3C7;color:#B45309;">Permen 1/2023</span>
+          </div>
+          <div class="kpi-value">88.5%</div>
+          <div class="kpi-label">Skor Kepatuhan Tertib Konstruksi</div>
+          <div class="kpi-progress-bar">
+            <div class="kpi-progress-fill" style="width: 88.5%; background: #D97706;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WebGIS Split-View Section -->
+      <section class="gis-section-card">
+        <div class="card-header-bar">
+          <div class="card-title-group">
+            <h3><i data-lucide="map-pin" style="color:var(--primary);"></i> WebGIS Sebaran Proyek & Lokasi BUJK (40 Kecamatan)</h3>
+            <p>Peta interaktif tersinkronisasi langsung dengan daftar proyek di sisi kanan (Dynamic Bounding Box Filter)</p>
+          </div>
+          <div class="gis-controls">
+            <select class="select-filter" id="layerFilter" onchange="filterMapLayer(this.value)">
+              <option value="all">📍 Semua Layer (Proyek + BUJK)</option>
+              <option value="projects">🏗️ Khusus Paket Proyek APBD</option>
+              <option value="bujk">🏢 Khusus Kantor Domisili BUJK</option>
+            </select>
+            <button class="btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="resetMapView()">
+              <i data-lucide="crosshair" style="width:14px;height:14px;"></i> Reset Peta
+            </button>
+          </div>
+        </div>
+
+        <div class="split-grid">
+          <!-- Left Map Container -->
+          <div id="webgis-map"></div>
+
+          <!-- Right Project List -->
+          <div class="split-table-side">
+            <div class="table-side-header">
+              <span>DAFTAR PAKET PEKERJAAN TERPILIH</span>
+              <span id="projectCountBadge" style="background:var(--primary-light);color:var(--primary-dark);padding:2px 8px;border-radius:99px;font-size:11px;">4 Proyek di Layar</span>
+            </div>
+
+            <div class="table-list-scroll" id="projectListContainer">
+              <!-- Item 1 -->
+              <div class="project-item-card active" onclick="focusProject(-6.4839, 106.8329, 'Peningkatan Jalan Ruas Sentul - Babakan Madang')">
+                <div class="project-header-row">
+                  <div class="project-name">Peningkatan Jalan Ruas Sentul - Babakan Madang</div>
+                  <span class="badge-status on-track">Fisik: 78%</span>
+                </div>
+                <div class="project-meta-row">
+                  <span>📍 Kec. Babakan Madang</span>
+                  <span>💰 Rp 14,8 M</span>
+                </div>
+                <div class="prog-bar-mini">
+                  <div class="prog-fill-mini" style="width: 78%;"></div>
+                </div>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="project-item-card" onclick="focusProject(-6.4912, 106.8521, 'Pembangunan Gedung Laboratorium DPUPR Cibinong')">
+                <div class="project-header-row">
+                  <div class="project-name">Pembangunan Gedung Laboratorium Uji DPUPR</div>
+                  <span class="badge-status on-track">Fisik: 64%</span>
+                </div>
+                <div class="project-meta-row">
+                  <span>📍 Kec. Cibinong</span>
+                  <span>💰 Rp 8,2 M</span>
+                </div>
+                <div class="prog-bar-mini">
+                  <div class="prog-fill-mini" style="width: 64%; background: #3B82F6;"></div>
+                </div>
+              </div>
+
+              <!-- Item 3 -->
+              <div class="project-item-card" onclick="focusProject(-6.5891, 106.9214, 'Rehabilitasi Jembatan Cileungsi - Klapanunggal')">
+                <div class="project-header-row">
+                  <div class="project-name">Rehabilitasi Jembatan Ruas Cileungsi</div>
+                  <span class="badge-status delay">Deviasi -6%</span>
+                </div>
+                <div class="project-meta-row">
+                  <span>📍 Kec. Cileungsi</span>
+                  <span>💰 Rp 5,6 M</span>
+                </div>
+                <div class="prog-bar-mini">
+                  <div class="prog-fill-mini" style="width: 42%; background: #EF4444;"></div>
+                </div>
+              </div>
+
+              <!-- Item 4 -->
+              <div class="project-item-card" onclick="focusProject(-6.5802, 106.6251, 'Pembangunan Drainase Lingkungan Leuwiliang')">
+                <div class="project-header-row">
+                  <div class="project-name">Pembangunan Drainase Perkotaan Leuwiliang</div>
+                  <span class="badge-status on-track">Fisik: 91%</span>
+                </div>
+                <div class="project-meta-row">
+                  <span>📍 Kec. Leuwiliang</span>
+                  <span>💰 Rp 3,1 M</span>
+                </div>
+                <div class="prog-bar-mini">
+                  <div class="prog-fill-mini" style="width: 91%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Grid: Kurva S & Pengawasan Scoring -->
+      <section class="bottom-grid">
+        <!-- Kurva S Real-time Chart -->
+        <div class="content-card">
+          <div class="content-card-title">
+            <span>📈 Monitoring Deviasi Kurva S (APBD TA 2026)</span>
+            <span style="font-size:12px;color:var(--slate-500);font-weight:500;">Update Minggu ke-24</span>
+          </div>
+          <div style="height: 220px; position: relative;">
+            <canvas id="kurvaSChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Live Scoring Permen 1/2023 -->
+        <div class="content-card">
+          <div class="content-card-title">
+            <span>⚖️ Evaluasi Tertib Jasa Konstruksi (Permen PUPR 1/2023)</span>
+            <button class="btn-outline" style="color:var(--primary);border-color:var(--primary);padding:4px 10px;font-size:12px;" onclick="openReviewerModal()">
+              Buka Instrumen Audit
+            </button>
+          </div>
+          <div class="gauge-wrapper">
+            <div class="gauge-circle">
+              <div class="gauge-inner">
+                88.5%
+                <span>TERTIB</span>
+              </div>
+            </div>
+            <div class="gauge-desc">
+              <h4>Indeks Kepatuhan Standar Penyelenggaraan</h4>
+              <p>• Tertib Usaha: <strong>92.0%</strong> (Izin NIB, SBU & SKK Tenaga Kerja)<br>
+                 • Tertib Penyelenggaraan: <strong>86.5%</strong> (Penerapan SMKK & Mutu)<br>
+                 • Tertib Pemanfaatan: <strong>87.0%</strong> (Kelaikan Fungsi Bangunan)</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== SIDE-BY-SIDE REVIEWER MODAL ==================== -->
+  <div class="modal-overlay" id="reviewerModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i data-lucide="split"></i> Side-by-Side Reviewer — Verifikasi Berkas Legalitas BUJK</h3>
+        <button onclick="closeReviewerModal()" style="background:none;border:none;color:white;cursor:pointer;">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- PDF Viewer Pane -->
+        <div class="pdf-viewer-pane">
+          <div class="doc-preview-mockup">
+            <div style="border-bottom: 2px solid #0F5132; padding-bottom: 8px; margin-bottom: 12px; font-weight: bold; font-size: 13px; text-align: center;">
+              LEMBAGA PENGEMBANGAN JASA KONSTRUKSI (LPJK)<br>
+              <span style="font-size: 11px; font-weight: normal;">SERTIFIKAT BADAN USAHA JASA KONSTRUKSI (SBUJK)</span>
+            </div>
+            <p><strong>Nama BUJK:</strong> PT WIJAYA KARYA BOGOR SEJAHTERA</p>
+            <p><strong>NIB:</strong> 1289381290123 &nbsp;|&nbsp; <strong>NPWP:</strong> 01.234.567.8-403.000</p>
+            <p><strong>KBLI:</strong> 42101 (Konstruksi Bangunan Sipil Jalan)</p>
+            <p><strong>Kualifikasi:</strong> Menengah (M1)</p>
+            <p><strong>Masa Berlaku:</strong> 15 Mei 2024 s/d 14 Mei 2027</p>
+            <div style="margin-top: 24px; padding: 10px; background: #ECFDF5; border-left: 3px solid #059669; font-size: 10.5px;">
+              ✅ Dokumen Digital Terotentikasi BSRE & Terverifikasi LSBU
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Checklist Form -->
+        <div class="review-form-pane">
+          <h4 style="font-size: 14px; font-weight: 800; color: var(--slate-900);">Checklist Verifikator Dinas</h4>
+          
+          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" checked style="accent-color: var(--primary);"> NIB 13 Digit Valid & Aktif di OSS RBA
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" checked style="accent-color: var(--primary);"> SBU KBLI 42101 Masa Berlaku Valid
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" checked style="accent-color: var(--primary);"> SKK Penanggung Jawab Teknis (PJT) Terdaftar
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" checked style="accent-color: var(--primary);"> Domisili Kantor di Wilayah Kab. Bogor
+            </label>
+          </div>
+
+          <div class="form-group" style="margin-top: 10px;">
+            <label>Catatan Verifikator:</label>
+            <textarea class="form-control" rows="3" placeholder="Tuliskan catatan atau rekomendasi..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: auto;">
+            <button class="btn-primary" style="flex:1; justify-content:center;" onclick="approveDoc()">
+              <i data-lucide="check"></i> Setujui Berkas
+            </button>
+            <button class="btn-outline" style="color:var(--rose);border-color:var(--rose);flex:1; justify-content:center;" onclick="rejectDoc()">
+              <i data-lucide="x"></i> Tolak Berkas
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== COMMAND PALETTE ==================== -->
+  <div class="cmd-overlay" id="cmdPalette" onclick="closeCmdPalette(event)">
+    <div class="cmd-box" onclick="event.stopPropagation()">
+      <div class="cmd-input-row">
+        <i data-lucide="search" style="color:var(--slate-400);"></i>
+        <input type="text" placeholder="Ketik perintah atau cari modul..." id="cmdInput" autofocus>
+      </div>
+      <div class="cmd-results">
+        <div class="cmd-item" onclick="openReviewerModal(); closeCmdPaletteDirect();">
+          <i data-lucide="split"></i>
+          <span>Buka Side-by-Side Reviewer Verifikasi Dokumen</span>
+        </div>
+        <div class="cmd-item" onclick="resetMapView(); closeCmdPaletteDirect();">
+          <i data-lucide="map"></i>
+          <span>Lihat Peta Sebaran 40 Kecamatan</span>
+        </div>
+        <div class="cmd-item" onclick="showToast('Membuka Laporan Pengawasan Permen 1/2023'); closeCmdPaletteDirect();">
+          <i data-lucide="scale"></i>
+          <span>Instrumen Evaluasi Pengawasan Permen PUPR 1/2023</span>
+        </div>
+        <div class="cmd-item" onclick="showToast('Exporting Shapefile .SHP'); closeCmdPaletteDirect();">
+          <i data-lucide="file-archive"></i>
+          <span>Export Data Proyek ke Format Shapefile (.SHP)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-popup" id="toastBox">
+    <i data-lucide="info" style="color:var(--accent);"></i>
+    <span id="toastMsg">Pemberitahuan Sistem</span>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Leaflet WebGIS Map Initialization (Kabupaten Bogor Center: -6.55, 106.82)
+    let map = L.map('webgis-map', { zoomControl: false }).setView([-6.52, 106.82], 11);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Modern Positron CartoDB Tiles
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; DPUPR Kab. Bogor & CartoDB',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Mock Projects Markers
+    const projectsData = [
+      { id: 1, lat: -6.4839, lng: 106.8329, name: "Peningkatan Jalan Sentul - Babakan Madang", kec: "Babakan Madang", val: "Rp 14,8 M", prog: "78%", type: "project" },
+      { id: 2, lat: -6.4912, lng: 106.8521, name: "Pembangunan Lab Uji DPUPR", kec: "Cibinong", val: "Rp 8,2 M", prog: "64%", type: "project" },
+      { id: 3, lat: -6.5891, lng: 106.9214, name: "Rehabilitasi Jembatan Cileungsi", kec: "Cileungsi", val: "Rp 5,6 M", prog: "42%", type: "project" },
+      { id: 4, lat: -6.5802, lng: 106.6251, name: "Drainase Lingkungan Leuwiliang", kec: "Leuwiliang", val: "Rp 3,1 M", prog: "91%", type: "project" },
+      { id: 5, lat: -6.6900, lng: 106.9300, name: "PT Bogor Megah Konstruksi (Kantor)", kec: "Cisarua (Puncak)", val: "BUJK Menengah", prog: "Aktif", type: "bujk" },
+      { id: 6, lat: -6.4500, lng: 106.7500, name: "CV Gunung Salak Mandiri (Kantor)", kec: "Kemang", val: "BUJK Kecil", prog: "Aktif", type: "bujk" }
+    ];
+
+    let markers = [];
+
+    function renderMarkers(filterType = "all") {
+      // Clear existing
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      projectsData.forEach(p => {
+        if (filterType === "projects" && p.type !== "project") return;
+        if (filterType === "bujk" && p.type !== "bujk") return;
+
+        const isProject = p.type === "project";
+        const color = isProject ? "#0F5132" : "#2563EB";
+        const iconSvg = isProject ? "🏗️" : "🏢";
+
+        const customIcon = L.divIcon({
+          className: 'custom-map-pin',
+          html: `<div style="background:${color};color:white;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 3px 8px rgba(0,0,0,0.3);cursor:pointer;">${iconSvg}</div>`,
+          iconSize: [34, 34],
+          iconAnchor: [17, 17]
+        });
+
+        const marker = L.marker([p.lat, p.lng], { icon: customIcon }).addTo(map);
+        marker.bindPopup(`
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;padding:4px;">
+            <strong style="font-size:13px;color:#0F172A;display:block;margin-bottom:4px;">${p.name}</strong>
+            <div style="font-size:11.5px;color:#64748B;">📍 Kec. ${p.kec}</div>
+            <div style="font-size:11.5px;color:#059669;font-weight:700;margin-top:2px;">${p.val} • Progres: ${p.prog}</div>
+          </div>
+        `);
+        markers.push(marker);
+      });
+    }
+
+    renderMarkers();
+
+    function filterMapLayer(val) {
+      renderMarkers(val);
+      showToast(`Filter peta diperbarui: Layer ${val}`);
+    }
+
+    function resetMapView() {
+      map.setView([-6.52, 106.82], 11);
+    }
+
+    function focusProject(lat, lng, name) {
+      map.setView([lat, lng], 14);
+      showToast(`Fokus ke: ${name}`);
+    }
+
+    // Chart.js: Kurva S Simulation
+    const ctx = document.getElementById('kurvaSChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['M-1', 'M-4', 'M-8', 'M-12', 'M-16', 'M-20', 'M-24 (Kini)', 'M-28', 'M-32'],
+        datasets: [
+          {
+            label: 'Rencana Target Kurva S (%)',
+            data: [2, 10, 25, 42, 58, 72, 85, 94, 100],
+            borderColor: '#94A3B8',
+            borderDash: [5, 5],
+            fill: false,
+            tension: 0.3
+          },
+          {
+            label: 'Realisasi Fisik Lapangan (%)',
+            data: [2, 12, 27, 40, 56, 74, 88.5, null, null],
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.3,
+            borderWidth: 3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11, family: 'Plus Jakarta Sans' } } }
+        },
+        scales: {
+          y: { min: 0, max: 100, ticks: { callback: v => v + '%' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+
+    // Side-by-Side Reviewer Modal Controls
+    function openReviewerModal() {
+      document.getElementById('reviewerModal').classList.add('open');
+    }
+    function closeReviewerModal() {
+      document.getElementById('reviewerModal').classList.remove('open');
+    }
+    function approveDoc() {
+      closeReviewerModal();
+      showToast('✅ Berkas BUJK Berhasil Disetujui & Terverifikasi Dinas!');
+    }
+    function rejectDoc() {
+      closeReviewerModal();
+      showToast('⚠️ Berkas BUJK Ditolak, Notifikasi Alasan Terkirim ke Pemohon.');
+    }
+
+    // Command Palette Controls
+    function openCmdPalette() {
+      document.getElementById('cmdPalette').classList.add('open');
+      document.getElementById('cmdInput').focus();
+    }
+    function closeCmdPalette(e) {
+      document.getElementById('cmdPalette').classList.remove('open');
+    }
+    function closeCmdPaletteDirect() {
+      document.getElementById('cmdPalette').classList.remove('open');
+    }
+
+    // Keyboard Shortcuts (Ctrl + K)
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        openCmdPalette();
+      }
+      if (e.key === 'Escape') {
+        closeCmdPaletteDirect();
+        closeReviewerModal();
+      }
+    });
+
+    // Toast Function
+    function showToast(msg) {
+      const toast = document.getElementById('toastBox');
+      const text = document.getElementById('toastMsg');
+      text.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
