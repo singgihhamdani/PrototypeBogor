@@ -133,7 +133,9 @@ export default function WebGISPage() {
             backgroundColor: "#FFFFFF",
             overflow: "hidden",
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
-            position: "relative"
+            position: "relative",
+            zIndex: 1,
+            isolation: "isolate"
           }}
         >
           <MapComponent
