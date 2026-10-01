@@ -108,9 +108,12 @@ Platform mendukung **6 role** dengan portal adaptif:
 ---
 
 ## 📚 Dokumentasi
-
+ 
 | Dokumen | Deskripsi |
 |:--------|:----------|
+| [CHANGELOG.md](./CHANGELOG.md) | 📋 Log rilis & riwayat pembaruan sistem |
+| [PANDUAN_KONTRIBUSI_DAN_PERUBAHAN.md](./docs/PANDUAN_KONTRIBUSI_DAN_PERUBAHAN.md) | 📖 Panduan rilis GitHub, PR template, & integrasi modul |
+| [SIPJAKI_INTEGRATION_SPECIFICATION.md](./docs/SIPJAKI_INTEGRATION_SPECIFICATION.md) | 🏛️ Spesifikasi 5 Pilar Pengawasan SIPJAKI Kementerian PUPR |
 | [AGENT.md](./docs/AGENT.md) | Panduan developer & AI agent |
 | [ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Blueprint arsitektur modular |
 | [METHODOLOGY.md](./docs/METHODOLOGY.md) | Sprint Scrum 90 hari, Git flow |
@@ -122,12 +125,14 @@ Platform mendukung **6 role** dengan portal adaptif:
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributing & Pull Requests
 
-1. Buat branch dari `main`: `git checkout -b feature/nama-fitur`
-2. Ikuti standar di [CODING_STANDARDS.md](./docs/CODING_STANDARDS.md)
-3. Commit dengan format: `feat(module): deskripsi singkat`
-4. Push dan buat Pull Request
+1. Pelajari panduan lengkap di [PANDUAN_KONTRIBUSI_DAN_PERUBAHAN.md](./docs/PANDUAN_KONTRIBUSI_DAN_PERUBAHAN.md).
+2. Buat branch dari `main`: `git checkout -b feature/nama-fitur`
+3. Ikuti standar di [CODING_STANDARDS.md](./docs/CODING_STANDARDS.md)
+4. Commit dengan format konvensional: `feat(module): deskripsi singkat`
+5. Jalankan `npx tsc --noEmit` untuk memastikan 0 error.
+6. Push dan buat Pull Request menggunakan template yang disediakan.
 
 ---
 
@@ -136,10 +141,12 @@ Platform mendukung **6 role** dengan portal adaptif:
 - [x] **Fase 0**: Perencanaan & PRD
 - [x] **Fase 1**: Prototype Frontend (6-role portal)
 - [x] **Fase 1**: Backend Foundation (NestJS + Prisma + RBAC)
-- [ ] **Fase 2**: Integrasi Full-Stack & Autentikasi
-- [ ] **Fase 3**: Modul Bisnis (BUJK, TKK, Pengawasan)
-- [ ] **Fase 4**: WebGIS & Reporting
-- [ ] **Fase 5**: Testing & Deployment
+- [x] **Integrasi SIPJAKI PUPR**: 5 Pilar Pengawasan Jakon & Data Master (Sprint 1 - 6)
+- [x] **Fitur Batch Upload**: Modul Import Batch Data (Excel / CSV)
+- [ ] **Fase 2**: Integrasi Full-Stack & Autentikasi API
+- [ ] **Fase 3**: Sinkronisasi Otomatis Database SIPJAKI Pusat
+- [ ] **Fase 4**: WebGIS & Reporting Lanjutan
+- [ ] **Fase 5**: Testing & Deployment Produksi
 
 ---
 

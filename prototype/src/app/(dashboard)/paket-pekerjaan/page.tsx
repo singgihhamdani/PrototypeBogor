@@ -1,16 +1,82 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Package, Search, Download, Plus, Eye, ChevronRight, TrendingUp, DollarSign, Calendar, CheckCircle2, Award } from "lucide-react";
-import { cn, formatCurrency } from "@/lib/utils";
+import { 
+  Package, Search, Download, Plus, Eye, TrendingUp, 
+  DollarSign, Calendar, CheckCircle2, Award, FileSpreadsheet,
+  UploadCloud, FileText, Check, AlertCircle
+} from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 import projectsData from "@/data/projects.json";
+import { 
+  StatusBadge, FileUploader, DataTableView, 
+  ModalForm, ColumnDef 
+} from "@/components/common";
+import BatchImportModal, { BatchColumnDef } from "@/components/common/batch-import-modal";
+
+const paketBatchColumns: BatchColumnDef[] = [
+  { key: "id", label: "ID Paket", required: true, example: "P005" },
+  { key: "name", label: "Nama Paket Pekerjaan", required: true, example: "Pembangunan Jembatan Gantung Desa Karang Asem" },
+  { key: "source", label: "Sumber Dana", required: true, example: "APBD" },
+  { key: "contractor", label: "Kontraktor Pelaksana", required: true, example: "PT. Graha Cipta Prima" },
+  { key: "contractValue", label: "Nilai Kontrak (Rp)", required: true, example: "2450000000" },
+  { key: "status", label: "Status Proyek", required: false, example: "Pelaksanaan" }
+];
+
+const sampleBatchPaket = [
+  { id: "P005", name: "Pembangunan Jembatan Gantung Desa Karang Asem", source: "APBD", contractor: "PT. Graha Cipta Prima", contractValue: "2450000000", status: "Pelaksanaan" },
+  { id: "P006", name: "Rehabilitasi Saluran Sekunder Cileungsi Hulu", source: "DAK", contractor: "CV. Tirta Mandiri Jaya", contractValue: "1250000000", status: "Pelaksanaan" }
+];
+
+export interface ProjectItem {
+  id: string;
+  name: string;
+  fiscalYear: number;
+  source: string;
+  owner: string;
+  contractor: string;
+  contractorId: string;
+  nib: string;
+  contractValue: number;
+  status: string;
+  contractType: string;
+  contractChar: string;
+  startDate: string;
+  endDate: string;
+  physProgress: number;
+  physMonth: string;
+  finProgress: number;
+  finMonth: string;
+  districtId: string;
+  lat: number;
+  lng: number;
+  planProgress: number[];
+  realProgress: number[];
+}
 
 export default function PaketPekerjaanPage() {
+  const [projects, setProjects] = useState<ProjectItem[]>(projectsData as ProjectItem[]);
   const [search, setSearch] = useState("");
   const [filterSource, setFilterSource] = useState("Semua");
   const [filterStatus, setFilterStatus] = useState("Semua");
 
-  const filtered = projectsData.filter((p) => {
+  // Modal Import Excel State
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  // Modal Tambah Paket State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formId, setFormId] = useState(`P00${projects.length + 1}`);
+  const [formName, setFormName] = useState("");
+  const [formSource, setFormSource] = useState("APBD");
+  const [formOwner, setFormOwner] = useState("DPU Kab. Bogor");
+  const [formContractor, setFormContractor] = useState("");
+  const [formNib, setFormNib] = useState("");
+  const [formValue, setFormValue] = useState("");
+  const [formStartDate, setFormStartDate] = useState("2026-04-01");
+  const [formEndDate, setFormEndDate] = useState("2026-11-30");
+
+  const filtered = projects.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
                         p.contractor.toLowerCase().includes(search.toLowerCase()) || 
                         p.id.toLowerCase().includes(search.toLowerCase());
@@ -19,8 +85,180 @@ export default function PaketPekerjaanPage() {
     return matchSearch && matchSource && matchStatus;
   });
 
-  const totalValue = projectsData.reduce((acc, curr) => acc + curr.contractValue, 0);
-  const avgProgress = Math.round(projectsData.reduce((acc, curr) => acc + curr.physProgress, 0) / projectsData.length);
+  const totalValue = projects.reduce((acc, curr) => acc + curr.contractValue, 0);
+  const avgProgress = projects.length > 0 
+    ? Math.round(projects.reduce((acc, curr) => acc + curr.physProgress, 0) / projects.length)
+    : 0;
+
+  const handleBatchCommit = (parsedData: Record<string, any>[]) => {
+    const newItems: ProjectItem[] = parsedData.map((d, i) => ({
+      id: d.id || `P00${projects.length + i + 1}`,
+      name: d.name || "Paket Baru",
+      fiscalYear: 2026,
+      source: d.source || "APBD",
+      owner: "DPU Kab. Bogor",
+      contractor: d.contractor || "PT Kontraktor Lokal",
+      contractorId: `B0${9 + i}`,
+      nib: "9876543210987",
+      contractValue: Number(String(d.contractValue).replace(/\D/g, "")) || 1000000000,
+      status: d.status || "Pelaksanaan",
+      contractType: "Konstruksi",
+      contractChar: "Harga Satuan",
+      startDate: "2026-04-15",
+      endDate: "2026-10-30",
+      physProgress: 15,
+      physMonth: "April",
+      finProgress: 20,
+      finMonth: "April",
+      districtId: "01",
+      lat: -6.48,
+      lng: 106.85,
+      planProgress: [0, 10, 25, 45, 65, 85, 100],
+      realProgress: [0, 15, 0, 0, 0, 0, 0]
+    }));
+
+    setProjects((prev) => [...newItems, ...prev]);
+    alert(`Berhasil mengimpor ${newItems.length} paket pekerjaan ke dalam sistem!`);
+  };
+
+  const handleAddProject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formName || !formContractor || !formValue) {
+      alert("Mohon lengkapi Nama Paket, Kontraktor, dan Nilai Kontrak!");
+      return;
+    }
+
+    const valNum = parseInt(formValue.replace(/\D/g, ""), 10);
+    if (isNaN(valNum) || valNum <= 0) {
+      alert("Nilai kontrak harus berupa angka valid!");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setTimeout(() => {
+      const newProj: ProjectItem = {
+        id: formId,
+        name: formName,
+        fiscalYear: 2026,
+        source: formSource,
+        owner: formOwner,
+        contractor: formContractor,
+        contractorId: `B${Date.now().toString().slice(-3)}`,
+        nib: formNib || "3201000000000",
+        contractValue: valNum,
+        status: "Pelaksanaan",
+        contractType: "Konstruksi",
+        contractChar: "Harga Satuan",
+        startDate: formStartDate,
+        endDate: formEndDate,
+        physProgress: 0,
+        physMonth: "Maret",
+        finProgress: 0,
+        finMonth: "Maret",
+        districtId: "01",
+        lat: -6.48,
+        lng: 106.85,
+        planProgress: [0, 15, 35, 60, 85, 100],
+        realProgress: [0, 0, 0, 0, 0, 0]
+      };
+
+      setProjects([newProj, ...projects]);
+      setIsSubmitting(false);
+      setShowAddModal(false);
+      setFormName("");
+      setFormContractor("");
+      setFormValue("");
+      alert(`Paket Pekerjaan "${formName}" berhasil ditambahkan!`);
+    }, 600);
+  };
+
+  const columns: ColumnDef<ProjectItem>[] = [
+    {
+      key: "id",
+      label: "KODE & NAMA PAKET",
+      sortable: true,
+      render: (row) => (
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ fontFamily: "monospace", fontSize: "10px", fontWeight: 800, backgroundColor: "#F1F5F9", color: "#475569", padding: "2px 6px", borderRadius: "4px" }}>
+              {row.id}
+            </span>
+            <Link href={`/paket-pekerjaan/${row.id}`} style={{ fontWeight: 800, color: "#0F2E5C", textDecoration: "none", fontSize: "13px" }}>
+              {row.name}
+            </Link>
+          </div>
+          <span style={{ fontSize: "11px", color: "#64748B" }}>
+            Jadwal: {row.startDate} s/d {row.endDate}
+          </span>
+        </div>
+      )
+    },
+    {
+      key: "source",
+      label: "SUMBER & OPD",
+      sortable: true,
+      render: (row) => (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", width: "fit-content" }}>
+            {row.source}
+          </span>
+          <span style={{ fontSize: "11px", color: "#64748B", marginTop: "2px" }}>{row.owner}</span>
+        </div>
+      )
+    },
+    {
+      key: "contractor",
+      label: "PENYEDIA JASA",
+      sortable: true,
+      render: (row) => (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontSize: "12px", fontWeight: 700, color: "#1E293B" }}>{row.contractor}</span>
+          <span style={{ fontSize: "10px", fontFamily: "monospace", color: "#64748B" }}>NIB: {row.nib}</span>
+        </div>
+      )
+    },
+    {
+      key: "contractValue",
+      label: "NILAI KONTRAK",
+      align: "right",
+      sortable: true,
+      render: (row) => (
+        <span style={{ fontFamily: "monospace", fontSize: "13px", fontWeight: 800, color: "#0F172A" }}>
+          {formatCurrency(row.contractValue)}
+        </span>
+      )
+    },
+    {
+      key: "physProgress",
+      label: "PROGRES FISIK",
+      align: "center",
+      sortable: true,
+      render: (row) => (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "90px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ fontWeight: 800, color: "#0F2E5C", fontSize: "12px" }}>{row.physProgress}%</span>
+          </div>
+          <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden", marginTop: "4px" }}>
+            <div 
+              style={{ 
+                width: `${row.physProgress}%`, 
+                height: "100%", 
+                backgroundColor: row.physProgress >= 100 ? "#059669" : row.physProgress > 50 ? "#0F2E5C" : "#D97706",
+                borderRadius: "9999px" 
+              }} 
+            />
+          </div>
+        </div>
+      )
+    },
+    {
+      key: "status",
+      label: "STATUS",
+      align: "center",
+      sortable: true,
+      render: (row) => <StatusBadge status={row.status} size="sm" showDot />
+    }
+  ];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -29,7 +267,7 @@ export default function PaketPekerjaanPage() {
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
             <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              Pilar 2: Tertib Penyelenggaraan
+              SIPJAKI Master Data • Pilar 2 Penyelenggaraan
             </span>
           </div>
           <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
@@ -41,8 +279,33 @@ export default function PaketPekerjaanPage() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Tombol Import Excel */}
           <button 
-            onClick={() => alert("Mengunduh Rekapitulasi Paket Pekerjaan (Format Template SIPJAKI .xlsx)...")}
+            type="button"
+            onClick={() => setShowImportModal(true)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#ECFDF5",
+              border: "1px solid #A7F3D0",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#065F46",
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+            }}
+          >
+            <FileSpreadsheet style={{ width: "16px", height: "16px", color: "#059669" }} />
+            <span>Import Excel</span>
+          </button>
+
+          {/* Tombol Export */}
+          <button 
+            type="button"
+            onClick={() => alert(`Mengekspor ${projects.length} paket pekerjaan ke template SIPJAKI (.xlsx)...`)}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -58,10 +321,14 @@ export default function PaketPekerjaanPage() {
               boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
             }}
           >
-            <Download style={{ width: "16px", height: "16px" }} /> Export SIPJAKI
+            <Download style={{ width: "16px", height: "16px" }} />
+            <span>Export SIPJAKI</span>
           </button>
+
+          {/* Tombol Tambah Paket */}
           <button 
-            onClick={() => alert("Membuka Formulir Tambah Paket Pekerjaan Baru...")}
+            type="button"
+            onClick={() => setShowAddModal(true)}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -78,349 +345,314 @@ export default function PaketPekerjaanPage() {
               boxShadow: "0 4px 10px rgba(15, 46, 92, 0.2)"
             }}
           >
-            <Plus style={{ width: "16px", height: "16px", color: "#FFC000" }} /> Tambah Paket
+            <Plus style={{ width: "16px", height: "16px", color: "#FFC000" }} />
+            <span>Tambah Paket</span>
           </button>
         </div>
       </div>
 
       {/* 4 Stats Cards */}
-      <div 
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "18px"
-        }}
-      >
-        <div 
-          style={{
-            borderRadius: "16px",
-            border: "1px solid #E2E8F0",
-            backgroundColor: "#FFFFFF",
-            padding: "20px 22px",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px"
-          }}
-        >
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "18px 20px", boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Total Paket Tercatat</span>
-            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#EBF2FA", color: "#0F2E5C", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Package style={{ width: "18px", height: "18px" }} />
-            </div>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Total Paket Proyek</span>
+            <Package style={{ width: "18px", height: "18px", color: "#0F2E5C" }} />
           </div>
-          <div>
-            <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>{projectsData.length}</p>
-            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Terdaftar pada sistem SIJAKON</p>
-          </div>
+          <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#0F2E5C", margin: "6px 0 2px 0" }}>
+            {projects.length} Paket
+          </h3>
+          <span style={{ fontSize: "11px", color: "#64748B" }}>Tahun Anggaran 2026</span>
         </div>
 
-        <div 
-          style={{
-            borderRadius: "16px",
-            border: "1px solid #E2E8F0",
-            backgroundColor: "#FFFFFF",
-            padding: "20px 22px",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px"
-          }}
-        >
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "18px 20px", boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Total Nilai Kontrak</span>
-            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#EFF6FF", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <DollarSign style={{ width: "18px", height: "18px" }} />
-            </div>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Total Nilai Kontrak</span>
+            <DollarSign style={{ width: "18px", height: "18px", color: "#059669" }} />
           </div>
-          <div>
-            <p style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1, fontFamily: "monospace" }}>{formatCurrency(totalValue)}</p>
-            <p style={{ fontSize: "11px", color: "#2563EB", margin: "4px 0 0 0", fontWeight: 600 }}>Pagu & Kontrak Berjalan</p>
-          </div>
+          <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#059669", margin: "6px 0 2px 0" }}>
+            {formatCurrency(totalValue)}
+          </h3>
+          <span style={{ fontSize: "11px", color: "#64748B" }}>APBD, DAK & APBN</span>
         </div>
 
-        <div 
-          style={{
-            borderRadius: "16px",
-            border: "1px solid #E2E8F0",
-            backgroundColor: "#FFFFFF",
-            padding: "20px 22px",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px"
-          }}
-        >
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "18px 20px", boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Rata-rata Progres Fisik</span>
-            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#ECFDF5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <TrendingUp style={{ width: "18px", height: "18px" }} />
-            </div>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Rata-rata Progres Fisik</span>
+            <TrendingUp style={{ width: "18px", height: "18px", color: "#2563EB" }} />
           </div>
-          <div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-              <p style={{ fontSize: "28px", fontWeight: 900, color: "#059669", margin: 0, lineHeight: 1.1 }}>{avgProgress}%</p>
-              <span style={{ fontSize: "11px", color: "#64748B" }}>Realisasi</span>
-            </div>
-            <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "9999px", marginTop: "8px", overflow: "hidden" }}>
-              <div style={{ width: `${avgProgress}%`, height: "100%", backgroundColor: "#059669", borderRadius: "9999px" }} />
-            </div>
-          </div>
+          <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#2563EB", margin: "6px 0 2px 0" }}>
+            {avgProgress}%
+          </h3>
+          <span style={{ fontSize: "11px", color: "#2563EB", fontWeight: 700 }}>Bulan Pelaporan: Agustus 2026</span>
         </div>
 
-        <div 
-          style={{
-            borderRadius: "16px",
-            border: "1px solid #E2E8F0",
-            backgroundColor: "#FFFFFF",
-            padding: "20px 22px",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px"
-          }}
-        >
+        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "18px 20px", boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Status Pekerjaan Selesai</span>
-            <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#FFFBEB", color: "#D97706", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <CheckCircle2 style={{ width: "18px", height: "18px" }} />
-            </div>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Sinkronisasi SIPJAKI</span>
+            <CheckCircle2 style={{ width: "18px", height: "18px", color: "#059669" }} />
           </div>
-          <div>
-            <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>
-              {projectsData.filter((p) => p.status === "Selesai").length} <span style={{ fontSize: "14px", fontWeight: 500, color: "#94A3B8" }}>/ {projectsData.length} Paket</span>
-            </p>
-            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Serah Terima Pertama (PHO)</p>
-          </div>
+          <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#059669", margin: "6px 0 2px 0" }}>
+            100% Valid
+          </h3>
+          <span style={{ fontSize: "11px", color: "#64748B" }}>Format RMPK / SMKK Terverifikasi</span>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div 
+      {/* Filter Quick Bar */}
+      <div
         style={{
           borderRadius: "16px",
           border: "1px solid #E2E8F0",
           backgroundColor: "#FFFFFF",
-          padding: "16px 20px",
+          padding: "14px 18px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           flexWrap: "wrap",
-          gap: "14px",
+          gap: "12px",
           boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)"
         }}
       >
-        <div style={{ position: "relative", flex: 1, minWidth: "260px" }}>
-          <Search style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94A3B8" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#F1F5F9", padding: "4px", borderRadius: "10px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", padding: "0 6px" }}>SUMBER:</span>
+            {["Semua", "APBD", "DAK", "APBN"].map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setFilterSource(s)}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "8px",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  border: "none",
+                  cursor: "pointer",
+                  backgroundColor: filterSource === s ? "#0F2E5C" : "transparent",
+                  color: filterSource === s ? "#FFFFFF" : "#475569",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#F1F5F9", padding: "4px", borderRadius: "10px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", padding: "0 6px" }}>STATUS:</span>
+            {["Semua", "Pelaksanaan", "Selesai"].map((st) => (
+              <button
+                key={st}
+                type="button"
+                onClick={() => setFilterStatus(st)}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "8px",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  border: "none",
+                  cursor: "pointer",
+                  backgroundColor: filterStatus === st ? "#0F2E5C" : "transparent",
+                  color: filterStatus === st ? "#FFFFFF" : "#475569",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                {st}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ width: "100%", maxWidth: "260px" }}>
           <input
-            type="text" 
-            value={search} 
+            type="text"
+            placeholder="Cari paket / kontraktor..."
+            value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari ID paket, nama pekerjaan, penyedia jasa..."
             style={{
               width: "100%",
-              height: "40px",
-              borderRadius: "10px",
+              height: "34px",
+              borderRadius: "8px",
               border: "1px solid #CBD5E1",
-              backgroundColor: "#F8FAFC",
-              paddingLeft: "40px",
-              paddingRight: "16px",
+              padding: "0 12px",
               fontSize: "12px",
-              color: "#0F172A",
               outline: "none"
             }}
           />
         </div>
-
-        {/* Source filter */}
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#F1F5F9", padding: "4px", borderRadius: "10px" }}>
-          <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", padding: "0 6px" }}>SUMBER:</span>
-          {["Semua", "APBD", "DAK", "APBN"].map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilterSource(s)}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "8px",
-                fontSize: "11px",
-                fontWeight: 800,
-                border: "none",
-                cursor: "pointer",
-                backgroundColor: filterSource === s ? "#0F2E5C" : "transparent",
-                color: filterSource === s ? "#FFFFFF" : "#475569",
-                transition: "all 0.15s ease"
-              }}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-
-        {/* Status filter */}
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#F1F5F9", padding: "4px", borderRadius: "10px" }}>
-          <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", padding: "0 6px" }}>STATUS:</span>
-          {["Semua", "Pelaksanaan", "Selesai"].map((st) => (
-            <button
-              key={st}
-              onClick={() => setFilterStatus(st)}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "8px",
-                fontSize: "11px",
-                fontWeight: 800,
-                border: "none",
-                cursor: "pointer",
-                backgroundColor: filterStatus === st ? "#0F2E5C" : "transparent",
-                color: filterStatus === st ? "#FFFFFF" : "#475569",
-                transition: "all 0.15s ease"
-              }}
-            >
-              {st}
-            </button>
-          ))}
-        </div>
       </div>
 
-      {/* Enterprise Data Table */}
-      <div 
-        style={{
-          borderRadius: "18px",
-          border: "1px solid #E2E8F0",
-          backgroundColor: "#FFFFFF",
-          overflow: "hidden",
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)"
-        }}
+      {/* DataTableView */}
+      <DataTableView<ProjectItem>
+        title={`Daftar Paket Pekerjaan Konstruksi (${filtered.length})`}
+        subtitle="Data paket proyek fisik APBD/DAK dengan status pelaporan progres Kurva-S"
+        data={filtered}
+        columns={columns}
+        defaultPageSize={10}
+        exportFileName="Paket_Pekerjaan_Bogor_2026"
+        actionsHeader="AKSI"
+        actionsRender={(row) => (
+          <Link
+            href={`/paket-pekerjaan/${row.id}`}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              borderRadius: "8px",
+              backgroundColor: "#EBF2FA",
+              color: "#0F2E5C",
+              padding: "6px 12px",
+              fontSize: "11px",
+              fontWeight: 800,
+              textDecoration: "none"
+            }}
+          >
+            <Eye style={{ width: "13px", height: "13px" }} />
+            <span>Detail / Kurva-S</span>
+          </Link>
+        )}
+      />
+
+      {/* Reusable Batch Import Modal */}
+      <BatchImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        title="Import Batch Paket Pekerjaan (Excel/CSV)"
+        subtitle="Unggah berkas rekapitulasi paket pekerjaan sesuai format standar SIPJAKI"
+        templateFileName="template_paket_pekerjaan_sipjaki.csv"
+        expectedColumns={paketBatchColumns}
+        sampleRows={sampleBatchPaket}
+        onCommit={handleBatchCommit}
+      />
+
+      {/* Modal Form Tambah Paket Baru */}
+      <ModalForm
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Tambah Paket Pekerjaan Baru"
+        subtitle="Input data kontrak proyek konstruksi TA 2026"
+        onSubmit={handleAddProject}
+        submitLabel="Simpan Paket Pekerjaan"
+        isLoading={isSubmitting}
+        size="lg"
       >
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
-            <thead>
-              <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "2px solid #E2E8F0", textAlign: "left" }}>
-                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>KODE & NAMA PAKET</th>
-                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>SUMBER / OPD</th>
-                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>PENYEDIA JASA</th>
-                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NILAI KONTRAK</th>
-                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>PROGRES FISIK</th>
-                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>PROGRES KEU</th>
-                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>STATUS</th>
-                <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px", textAlign: "center" }}>AKSI</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((p) => (
-                <tr 
-                  key={p.id} 
-                  style={{ borderBottom: "1px solid #F1F5F9", transition: "background-color 0.15s ease" }}
-                >
-                  <td style={{ padding: "16px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-                      <span style={{ fontFamily: "monospace", fontSize: "11px", fontWeight: 700, backgroundColor: "#F1F5F9", color: "#475569", padding: "2px 6px", borderRadius: "4px" }}>
-                        {p.id}
-                      </span>
-                      <div>
-                        <Link href={`/paket-pekerjaan/${p.id}`} style={{ fontWeight: 800, color: "#0F172A", textDecoration: "none", fontSize: "13px" }}>
-                          {p.name}
-                        </Link>
-                        <span style={{ display: "block", fontSize: "11px", color: "#64748B", marginTop: "2px" }}>
-                          {p.startDate} s/d {p.endDate}
-                        </span>
-                      </div>
-                    </div>
-                  </td>
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "12px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                ID Paket <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formId}
+                onChange={(e) => setFormId(e.target.value)}
+                style={{ width: "100%", height: "38px", borderRadius: "8px", border: "1px solid #CBD5E1", padding: "0 12px", fontSize: "12px", outline: "none" }}
+              />
+            </div>
 
-                  <td style={{ padding: "16px 18px" }}>
-                    <span style={{ fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "4px 8px", borderRadius: "6px", fontSize: "11px" }}>
-                      {p.source}
-                    </span>
-                    <p style={{ fontSize: "11px", color: "#64748B", margin: "4px 0 0 0" }}>{p.owner}</p>
-                  </td>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Nama Paket Pekerjaan <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Contoh: Peningkatan Jalan Ciawi - Megamendung"
+                value={formName}
+                onChange={(e) => setFormName(e.target.value)}
+                style={{ width: "100%", height: "38px", borderRadius: "8px", border: "1px solid #CBD5E1", padding: "0 12px", fontSize: "12px", outline: "none" }}
+              />
+            </div>
+          </div>
 
-                  <td style={{ padding: "16px 18px" }}>
-                    <p style={{ fontSize: "13px", fontWeight: 700, color: "#1E293B", margin: 0 }}>{p.contractor}</p>
-                    <p style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", margin: "2px 0 0 0" }}>NIB: {p.nib}</p>
-                  </td>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Nilai Kontrak (Rp) <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="number"
+                required
+                placeholder="Contoh: 3500000000"
+                value={formValue}
+                onChange={(e) => setFormValue(e.target.value)}
+                style={{ width: "100%", height: "38px", borderRadius: "8px", border: "1px solid #CBD5E1", padding: "0 12px", fontSize: "12px", outline: "none" }}
+              />
+            </div>
 
-                  <td style={{ padding: "16px 18px", fontFamily: "monospace", fontSize: "13px", fontWeight: 800, color: "#0F172A" }}>
-                    {formatCurrency(p.contractValue)}
-                  </td>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Sumber Pendanaan
+              </label>
+              <select
+                value={formSource}
+                onChange={(e) => setFormSource(e.target.value)}
+                style={{ width: "100%", height: "38px", borderRadius: "8px", border: "1px solid #CBD5E1", padding: "0 10px", fontSize: "12px", outline: "none", backgroundColor: "#FFFFFF" }}
+              >
+                <option value="APBD">APBD Kab. Bogor</option>
+                <option value="DAK">DAK Fisik</option>
+                <option value="APBN">APBN / Banprov</option>
+              </select>
+            </div>
+          </div>
 
-                  <td style={{ padding: "16px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <div style={{ width: "70px", height: "8px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
-                        <div 
-                          style={{ 
-                            width: `${p.physProgress}%`, 
-                            height: "100%", 
-                            backgroundColor: p.physProgress >= 100 ? "#059669" : p.physProgress > 50 ? "#0F2E5C" : "#D97706",
-                            borderRadius: "9999px" 
-                          }} 
-                        />
-                      </div>
-                      <span style={{ fontWeight: 800, color: "#0F172A", fontSize: "12px" }}>{p.physProgress}%</span>
-                    </div>
-                    <span style={{ fontSize: "10px", color: "#94A3B8" }}>Bulan: {p.physMonth}</span>
-                  </td>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Kontraktor Pelaksana (BUJK) <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="PT / CV Penyedia Jasa"
+                value={formContractor}
+                onChange={(e) => setFormContractor(e.target.value)}
+                style={{ width: "100%", height: "38px", borderRadius: "8px", border: "1px solid #CBD5E1", padding: "0 12px", fontSize: "12px", outline: "none" }}
+              />
+            </div>
 
-                  <td style={{ padding: "16px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <div style={{ width: "70px", height: "8px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
-                        <div 
-                          style={{ 
-                            width: `${p.finProgress}%`, 
-                            height: "100%", 
-                            backgroundColor: "#059669",
-                            borderRadius: "9999px" 
-                          }} 
-                        />
-                      </div>
-                      <span style={{ fontWeight: 800, color: "#059669", fontSize: "12px" }}>{p.finProgress}%</span>
-                    </div>
-                    <span style={{ fontSize: "10px", color: "#94A3B8" }}>Bulan: {p.finMonth}</span>
-                  </td>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Nomor Induk Berusaha (NIB)
+              </label>
+              <input
+                type="text"
+                placeholder="Contoh: 1234567890123"
+                value={formNib}
+                onChange={(e) => setFormNib(e.target.value)}
+                style={{ width: "100%", height: "38px", borderRadius: "8px", border: "1px solid #CBD5E1", padding: "0 12px", fontSize: "12px", outline: "none" }}
+              />
+            </div>
+          </div>
 
-                  <td style={{ padding: "16px 18px" }}>
-                    <span 
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        borderRadius: "9999px",
-                        padding: "4px 12px",
-                        fontSize: "11px",
-                        fontWeight: 800,
-                        backgroundColor: p.status === "Selesai" ? "#ECFDF5" : "#EFF6FF",
-                        color: p.status === "Selesai" ? "#059669" : "#2563EB"
-                      }}
-                    >
-                      <span style={{ height: "6px", width: "6px", borderRadius: "9999px", backgroundColor: p.status === "Selesai" ? "#059669" : "#2563EB" }} />
-                      {p.status}
-                    </span>
-                  </td>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Tanggal Mulai Kontrak
+              </label>
+              <input
+                type="date"
+                value={formStartDate}
+                onChange={(e) => setFormStartDate(e.target.value)}
+                style={{ width: "100%", height: "38px", borderRadius: "8px", border: "1px solid #CBD5E1", padding: "0 12px", fontSize: "12px", outline: "none" }}
+              />
+            </div>
 
-                  <td style={{ padding: "16px 18px", textAlign: "center" }}>
-                    <Link
-                      href={`/paket-pekerjaan/${p.id}`}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "4px",
-                        borderRadius: "8px",
-                        backgroundColor: "#F1F5F9",
-                        color: "#0F2E5C",
-                        padding: "6px 12px",
-                        fontSize: "11px",
-                        fontWeight: 800,
-                        textDecoration: "none"
-                      }}
-                    >
-                      <Eye style={{ width: "14px", height: "14px" }} /> Detail
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Tanggal Selesai Kontrak
+              </label>
+              <input
+                type="date"
+                value={formEndDate}
+                onChange={(e) => setFormEndDate(e.target.value)}
+                style={{ width: "100%", height: "38px", borderRadius: "8px", border: "1px solid #CBD5E1", padding: "0 12px", fontSize: "12px", outline: "none" }}
+              />
+            </div>
+          </div>
         </div>
-      </div>
+      </ModalForm>
     </div>
   );
 }

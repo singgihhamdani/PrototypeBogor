@@ -1,7 +1,13 @@
 "use client";
 import { useState } from "react";
-import { ClipboardCheck, CheckCircle2, XCircle, MinusCircle, RotateCw, Download, Send, ShieldCheck, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { 
+  ClipboardCheck, CheckCircle2, XCircle, MinusCircle, 
+  RotateCw, Download, Send, ShieldCheck, Sparkles, 
+  Briefcase, Cog, HeartHandshake, ArrowRight, ChevronRight,
+  Calendar, AlertTriangle, FileBarChart
+} from "lucide-react";
+import ModuleHeader from "@/components/layout/module-header";
 
 type Answer = "ya" | "tidak" | "na" | null;
 
@@ -70,63 +76,186 @@ export default function PengawasanPage() {
   const statusLabel = totalScore >= 80 ? "TERTIB (Sangat Baik)" : totalScore >= 60 ? "CUKUP TERTIB" : totalScore > 0 ? "KURANG TERTIB" : "BELUM DINILAI";
   const statusColor = totalScore >= 80 ? "#059669" : totalScore >= 60 ? "#D97706" : totalScore > 0 ? "#DC2626" : "#64748B";
 
+  const pilarCards = [
+    {
+      title: "1. Tertib Usaha Jasa Konstruksi",
+      slug: "tertib-usaha",
+      desc: "Legalitas izin usaha, kesesuaian SBU, SKK tenaga kerja, serta komitmen SMKK BUJK Kabupaten Bogor.",
+      icon: Briefcase,
+      color: "#2563EB",
+      bg: "#EBF2FA",
+      sublinks: [
+        { label: "Perencanaan", href: "/pengawasan/tertib-usaha/perencanaan" },
+        { label: "SIMAK 1", href: "/pengawasan/tertib-usaha/pelaksanaan" },
+        { label: "Rekomendasi", href: "/pengawasan/tertib-usaha/rekomendasi" },
+        { label: "Laporan", href: "/pengawasan/tertib-usaha/pelaporan" },
+      ]
+    },
+    {
+      title: "2. Tertib Penyelenggaraan Konstruksi",
+      slug: "tertib-penyelenggaraan",
+      desc: "Pengawasan pemilihan penyedia, kontrak kerja, penerapan SMKK & mutu konstruksi proyek fisik APBD/DAK.",
+      icon: Cog,
+      color: "#D97706",
+      bg: "#FEF3C7",
+      sublinks: [
+        { label: "Perencanaan", href: "/pengawasan/tertib-penyelenggaraan/perencanaan" },
+        { label: "SIMAK 2", href: "/pengawasan/tertib-penyelenggaraan/pelaksanaan" },
+        { label: "Rekomendasi", href: "/pengawasan/tertib-penyelenggaraan/rekomendasi" },
+        { label: "Laporan", href: "/pengawasan/tertib-penyelenggaraan/pelaporan" },
+      ]
+    },
+    {
+      title: "3. Tertib Pemanfaatan Jasa Konstruksi",
+      slug: "tertib-pemanfaatan",
+      desc: "Pengawasan pasca konstruksi (BAST), pemeliharaan berkala, pemanfaatan fungsi gedung, dan sertifikasi SLF.",
+      icon: HeartHandshake,
+      color: "#059669",
+      bg: "#D1FAE5",
+      sublinks: [
+        { label: "Perencanaan", href: "/pengawasan/tertib-pemanfaatan/perencanaan" },
+        { label: "SIMAK 3", href: "/pengawasan/tertib-pemanfaatan/pelaksanaan" },
+        { label: "Rekomendasi", href: "/pengawasan/tertib-pemanfaatan/rekomendasi" },
+        { label: "Laporan", href: "/pengawasan/tertib-pemanfaatan/pelaporan" },
+      ]
+    }
+  ];
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       {/* Header Bar */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-            <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              Instrumen SIMAK PUPR
-            </span>
-          </div>
-          <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
-            Audit & Pengawasan SIMAK Digital
-          </h1>
-          <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
-            Sistem Informasi Manajemen Pengawasan Konstruksi — Checklist Digital Permen PUPR No. 1/2023
+      <ModuleHeader
+        breadcrumbs={[{ label: "Pengawasan SIMAK Digital" }]}
+        badgeText="Pilar 1 - 3 Pengawasan"
+        badgeBg="#0F2E5C"
+        badgeColor="#FFC000"
+        title="Pusat Pengawasan SIMAK Digital Kabupaten Bogor"
+        description="Sistem Informasi Manajemen Pengawasan Konstruksi — Terintegrasi dengan 3 Pilar Tertib dan Gateway SIPJAKI Kementerian PUPR (Permen PUPR No. 1/2023)."
+        legalBasis="Permen PUPR No. 1/2023 jo. PP No. 14/2021"
+        actionButtons={[
+          {
+            label: "Reset Jawaban",
+            icon: RotateCw,
+            variant: "outline",
+            onClick: resetAll
+          },
+          {
+            label: "Simpan & Kirim SIPJAKI",
+            icon: Send,
+            variant: "primary",
+            onClick: () => alert(`Laporan Hasil Audit SIMAK (${totalScore}%) siap dikirimkan ke portal SIPJAKI Kementerian PUPR!`)
+          }
+        ]}
+      />
+
+      {/* 3 Pilar Quick Jump Module Cards */}
+      <div>
+        <div style={{ marginBottom: "12px" }}>
+          <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#1E293B", margin: 0 }}>
+            3 Pilar Pengawasan Jasa Konstruksi
+          </h2>
+          <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>
+            Akses langsung modul perencanaan, form SIMAK elektronik, rekomendasi verifikasi, dan pelaporan per pilar:
           </p>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <button 
-            onClick={resetAll}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              borderRadius: "12px",
-              backgroundColor: "#FFFFFF",
-              border: "1px solid #CBD5E1",
-              padding: "10px 16px",
-              fontSize: "12px",
-              fontWeight: 700,
-              color: "#475569",
-              cursor: "pointer"
-            }}
-          >
-            <RotateCw style={{ width: "15px", height: "15px" }} /> Reset Jawaban
-          </button>
-          <button 
-            onClick={() => alert(`Laporan Hasil Audit SIMAK (${totalScore}%) siap dikirimkan ke portal SIPJAKI Kementerian PUPR!`)}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              borderRadius: "12px",
-              backgroundColor: "#0F2E5C",
-              border: "none",
-              borderBottom: "3px solid #FFC000",
-              padding: "10px 20px",
-              fontSize: "12px",
-              fontWeight: 800,
-              color: "#FFFFFF",
-              cursor: "pointer",
-              boxShadow: "0 4px 10px rgba(15, 46, 92, 0.2)"
-            }}
-          >
-            <Send style={{ width: "15px", height: "15px", color: "#FFC000" }} /> Simpan & Kirim SIPJAKI
-          </button>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "18px" }}>
+          {pilarCards.map((pilar) => {
+            const Icon = pilar.icon;
+            return (
+              <div
+                key={pilar.slug}
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: "18px",
+                  padding: "20px",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0 4px 14px rgba(15, 46, 92, 0.03)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                  <div
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "14px",
+                      backgroundColor: pilar.bg,
+                      color: pilar.color,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0
+                    }}
+                  >
+                    <Icon style={{ width: "24px", height: "24px" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Link
+                      href={`/pengawasan/${pilar.slug}`}
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: 800,
+                        color: "#0F2E5C",
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                    >
+                      <span>{pilar.title}</span>
+                      <ChevronRight style={{ width: "14px", height: "14px", color: "#94A3B8" }} />
+                    </Link>
+                    <p style={{ fontSize: "12px", color: "#64748B", margin: "4px 0 0 0", lineHeight: 1.4 }}>
+                      {pilar.desc}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Sublink Buttons */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, 1fr)",
+                    gap: "6px",
+                    paddingTop: "10px",
+                    borderTop: "1px solid #F1F5F9"
+                  }}
+                >
+                  {pilar.sublinks.map((sub, sIdx) => (
+                    <Link
+                      key={sIdx}
+                      href={sub.href}
+                      style={{
+                        textAlign: "center",
+                        padding: "6px 4px",
+                        borderRadius: "8px",
+                        fontSize: "10px",
+                        fontWeight: 800,
+                        color: "#0F2E5C",
+                        backgroundColor: "#F8FAFC",
+                        border: "1px solid #E2E8F0",
+                        textDecoration: "none",
+                        transition: "all 0.15s ease"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#0F2E5C";
+                        e.currentTarget.style.color = "#FFFFFF";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#F8FAFC";
+                        e.currentTarget.style.color = "#0F2E5C";
+                      }}
+                    >
+                      {sub.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -163,7 +292,7 @@ export default function PengawasanPage() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", color: "#64748B" }}>
-              Status Kepatuhan Proyek
+              Status Kepatuhan Terpadu
             </span>
             <span style={{ fontSize: "16px", fontWeight: 900, color: statusColor }}>
               {statusLabel}
@@ -206,46 +335,64 @@ export default function PengawasanPage() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "2px solid #E2E8F0", paddingBottom: "2px" }}>
-        {Object.keys(checklist).map((tab) => {
-          const isSelected = activeTab === tab;
-          const score = calcScore(checklist[tab]);
-          return (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                padding: "10px 18px",
-                fontSize: "13px",
-                fontWeight: 800,
-                border: "none",
-                cursor: "pointer",
-                borderBottom: isSelected ? "3px solid #0F2E5C" : "3px solid transparent",
-                backgroundColor: "transparent",
-                color: isSelected ? "#0F2E5C" : "#64748B",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                transition: "all 0.15s ease"
-              }}
-            >
-              <span>{tab}</span>
-              <span 
+      {/* Tabs for Fast Audit */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", borderBottom: "2px solid #E2E8F0", paddingBottom: "2px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {Object.keys(checklist).map((tab) => {
+            const isSelected = activeTab === tab;
+            const score = calcScore(checklist[tab]);
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
                 style={{
-                  fontSize: "10px",
+                  padding: "10px 18px",
+                  fontSize: "13px",
                   fontWeight: 800,
-                  padding: "2px 8px",
-                  borderRadius: "9999px",
-                  backgroundColor: isSelected ? "#EBF2FA" : "#F1F5F9",
-                  color: isSelected ? "#0F2E5C" : "#64748B"
+                  border: "none",
+                  cursor: "pointer",
+                  borderBottom: isSelected ? "3px solid #0F2E5C" : "3px solid transparent",
+                  backgroundColor: "transparent",
+                  color: isSelected ? "#0F2E5C" : "#64748B",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  transition: "all 0.15s ease"
                 }}
               >
-                {score}%
-              </span>
-            </button>
-          );
-        })}
+                <span>{tab}</span>
+                <span 
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: 800,
+                    padding: "2px 8px",
+                    borderRadius: "9999px",
+                    backgroundColor: isSelected ? "#EBF2FA" : "#F1F5F9",
+                    color: isSelected ? "#0F2E5C" : "#64748B"
+                  }}
+                >
+                  {score}%
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <Link
+          href={`/pengawasan/${activeTab === "Tertib Usaha" ? "tertib-usaha" : activeTab === "Tertib Penyelenggaraan" ? "tertib-penyelenggaraan" : "tertib-pemanfaatan"}/pelaksanaan`}
+          style={{
+            fontSize: "11px",
+            fontWeight: 800,
+            color: "#2563EB",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px"
+          }}
+        >
+          <span>Buka Form SIMAK Lengkap untuk {activeTab}</span>
+          <ArrowRight style={{ width: "12px", height: "12px" }} />
+        </Link>
       </div>
 
       {/* Checklist Question Cards */}
@@ -261,7 +408,7 @@ export default function PengawasanPage() {
         <div style={{ display: "flex", flexDirection: "column" }}>
           {checklist[activeTab].map((item, idx) => (
             <div 
-              key={item.id}
+              key={item.id} 
               style={{
                 display: "flex",
                 alignItems: "center",
