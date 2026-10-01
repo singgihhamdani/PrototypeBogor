@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useAuth, DEMO_USERS } from "@/lib/mock-auth";
 import { 
   Building2, GraduationCap, ArrowRight, Key, Mail, Lock, 
-  Sparkles, CheckCircle2, ShieldCheck, Eye, EyeOff, UserPlus
+  Sparkles, CheckCircle2, ShieldCheck, Eye, EyeOff, UserPlus,
+  ArrowLeft, Home
 } from "lucide-react";
 import Logo, { BrandIcon } from "@/components/ui/logo";
 
@@ -77,8 +78,22 @@ export default function PortalLoginPage() {
             gap: "16px"
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <BrandIcon size={40} />
+          {/* Clickable Brand Logo to Homepage */}
+          <Link 
+            href="/"
+            title="Klik untuk kembali ke Beranda Utama SIJAKON"
+            style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "14px", 
+              textDecoration: "none",
+              cursor: "pointer",
+              transition: "transform 0.2s ease" 
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.01)"}
+            onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+          >
+            <BrandIcon size={38} bgBadge />
 
             <div style={{ display: "flex", flexDirection: "column" }}>
               <span 
@@ -104,9 +119,42 @@ export default function PortalLoginPage() {
                 Kabupaten Bogor • Portal Mandiri Penyedia Jasa & Tenaga Kerja
               </span>
             </div>
-          </div>
+          </Link>
 
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* Shortcut: Kembali ke Beranda */}
+            <Link
+              href="/"
+              title="Kembali ke Beranda Utama"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "12px",
+                fontWeight: 700,
+                color: "#FFFFFF",
+                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                padding: "6px 14px",
+                borderRadius: "9999px",
+                border: "1px solid rgba(255, 255, 255, 0.25)",
+                textDecoration: "none",
+                transition: "all 0.2s ease"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.25)";
+                e.currentTarget.style.borderColor = "#FFC000";
+                e.currentTarget.style.color = "#FFC000";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.12)";
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.25)";
+                e.currentTarget.style.color = "#FFFFFF";
+              }}
+            >
+              <Home style={{ width: "13px", height: "13px" }} />
+              <span>Beranda</span>
+            </Link>
+
             <Link
               href="/login"
               style={{
@@ -135,11 +183,66 @@ export default function PortalLoginPage() {
         style={{
           flex: 1,
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           padding: "24px 16px"
         }}
       >
+        {/* Navigation Breadcrumb / Top Bar Affordance */}
+        <div 
+          style={{
+            maxWidth: "960px",
+            width: "100%",
+            marginBottom: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "12px"
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 16px",
+              borderRadius: "12px",
+              backgroundColor: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              color: "#1E293B",
+              fontSize: "12px",
+              fontWeight: 700,
+              textDecoration: "none",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.04)",
+              transition: "all 0.2s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#F8FAFC";
+              e.currentTarget.style.borderColor = "#CBD5E1";
+              e.currentTarget.style.color = "#0A2540";
+              e.currentTarget.style.transform = "translateX(-3px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#FFFFFF";
+              e.currentTarget.style.borderColor = "#E2E8F0";
+              e.currentTarget.style.color = "#1E293B";
+              e.currentTarget.style.transform = "translateX(0)";
+            }}
+          >
+            <ArrowLeft style={{ width: "15px", height: "15px", color: "#0A2540" }} />
+            <span>Kembali ke Beranda Utama</span>
+          </Link>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", color: "#64748B", fontWeight: 600 }}>
+            <span>Portal Mitra BUJK & TKK</span>
+            <span>•</span>
+            <span>Pemerintah Kabupaten Bogor</span>
+          </div>
+        </div>
+
         <div 
           style={{
             maxWidth: "960px",
@@ -492,7 +595,12 @@ export default function PortalLoginPage() {
           color: "#64748B"
         }}
       >
-        <p style={{ margin: 0 }}>© 2026 Pemerintah Kabupaten Bogor • Layanan Mandiri Jasa Konstruksi</p>
+        <div style={{ maxWidth: "1140px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+          <p style={{ margin: 0 }}>© 2026 Pemerintah Kabupaten Bogor • Layanan Mandiri Jasa Konstruksi</p>
+          <Link href="/" style={{ color: "#0A2540", fontWeight: 700, textDecoration: "none" }}>
+            ← Kembali ke Beranda Publik
+          </Link>
+        </div>
       </footer>
     </div>
   );

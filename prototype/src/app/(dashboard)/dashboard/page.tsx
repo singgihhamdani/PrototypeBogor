@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useAuth, ROLE_CONFIGS } from "@/lib/mock-auth";
+import ExecutiveDashboardView from "@/components/dashboard/executive-dashboard-view";
 
 const pilarData = [
   { label: "Tertib Usaha", value: 72, icon: Building2, color: "#0F2E5C", desc: "Kesesuaian Izin, NIB & SBU", status: "Baik" },
@@ -65,9 +67,6 @@ const recentProjects = [
   { id: "P004", name: "Pembangunan Drainase Primer Kec. Parung", contractor: "CV Teknik Sejahtera", progress: 45, plan: 60, value: "Rp 950 Jt", status: "Behind", district: "Parung" },
   { id: "P005", name: "Rehabilitasi Jembatan Sungai Cikeas", contractor: "PT Infrastruktur Bogor Raya", progress: 58, plan: 60, value: "Rp 12,5 M", status: "On Track", district: "Ciawi" },
 ];
-
-import { useAuth, ROLE_CONFIGS } from "@/lib/mock-auth";
-import ExecutiveDashboardView from "@/components/dashboard/executive-dashboard-view";
 
 function GaugeCircle({ value, size = 80, strokeWidth = 8, color = "#0F2E5C" }: { value: number; size?: number; strokeWidth?: number; color?: string }) {
   const radius = (size - strokeWidth) / 2;
@@ -498,7 +497,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 4. Recent Projects Table (Spacious, Clear & Beautiful) */}
+      {/* 4. Recent Projects Table */}
       <div 
         style={{
           borderRadius: "18px",

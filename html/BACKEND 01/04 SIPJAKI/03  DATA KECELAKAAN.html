@@ -1,0 +1,3207 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>sipjaki</title>
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <meta name="csrf-token" content="Cxna3E5lbxBDebBT2hnFGa5s5qSFNQ0eWZkMuuRJ">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+        integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+        crossorigin="anonymous" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+        integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://sipjaki.pu.go.id//css/app.css" rel="stylesheet">
+
+        <!-- DataTable Bootstrap -->
+<link href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.bootstrap4.min.css">    <!-- DataTable Bootstrap -->
+<link href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.bootstrap4.min.css">
+        <style>
+        /* When sidebar is collapsed, show truncated labels with ellipsis */
+        .sidebar-mini.sidebar-collapse .nav-sidebar .nav-link p,
+        .sidebar-mini.sidebar-collapse .nav-sidebar .nav-link span {
+            display: inline-block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            margin-left: .5rem;
+            width: auto;
+        }
+
+        .sidebar-mini.sidebar-collapse .nav-sidebar .nav-item>.nav-link {
+            overflow: hidden;
+            /* overflow: visible; */
+        }
+
+        .sidebar-mini.sidebar-collapse .nav-sidebar .nav-link {
+            padding-right: .5rem;
+            width: 100%;
+        }
+
+        /* Keep DataTables header/body column widths in sync (especially with scrollX) */
+        table.dataTable {
+            width: 100% !important;
+        }
+
+        div.dataTables_scrollHeadInner>table {
+            margin-bottom: 0 !important;
+        }
+
+        /* Form detail datatable inside modal (id usually *-form):
+           hide cloned thead that DataTables keeps in scrollBody to avoid duplicate header */
+        .modal .dataTables_scrollBody table[id$="-form"] thead th,
+        .modal .dataTables_scrollBody table[id*="-form-"] thead th {
+            padding: 0 !important;
+            border: 0 !important;
+            height: 0 !important;
+            line-height: 0 !important;
+            background: transparent !important;
+            font-size: 0 !important;
+        }
+
+        /* Default width for action column (Aksi) to fit ~3 small buttons */
+        table.dataTable th.dt-col-aksi,
+        table.dataTable td.dt-col-aksi {
+            min-width: 140px !important;
+            width: 140px !important;
+            white-space: nowrap;
+        }
+
+        th[data-edit-info-added-col="1"],
+        td[data-edit-info-added-cell="1"] {
+            min-width: 240px !important;
+            width: 240px !important;
+            max-width: 280px;
+            vertical-align: top;
+        }
+
+        td[data-edit-info-added-cell="1"] .edit-status-info {
+            white-space: normal;
+            word-break: break-word;
+        }
+
+
+        /* Safe sortable header spacing (without extra pseudo icons) */
+        table.dataTable thead th.sorting,
+        table.dataTable thead th.sorting_asc,
+        table.dataTable thead th.sorting_desc {
+            cursor: pointer;
+            padding-right: 1.1rem !important;
+        }
+
+        .dt-sort-hint {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: .45rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+        }
+
+        .dt-sort-hint i {
+            color: #2563eb;
+            font-size: 11px;
+        }
+
+        .simak-status-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .simak-status-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 600;
+            background: transparent;
+        }
+
+        .simak-status-count {
+            min-width: 26px;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            color: #111827;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .simak-status-item.is-verified {
+            color: #065f46;
+        }
+
+        .simak-status-item.is-rejected {
+            color: #991b1b;
+        }
+
+        .simak-status-item.is-draft {
+            color: #92400e;
+        }
+
+        .simak-status-badge.is-loading {
+            background: #f3f4f6 !important;
+            color: #374151 !important;
+            border: 0 !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            font-weight: 600 !important;
+        }
+
+        /* Global clean badge style */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 28px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            border: 1px solid transparent;
+            box-shadow: none;
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: .7;
+        }
+
+        .badge.badge-success {
+            background: #e8f7ec;
+            color: #1f8f45;
+            border-color: #d2efd9;
+        }
+
+        .badge.badge-info {
+            background: #ebf2ff;
+            color: #3f72d9;
+            border-color: #d9e5ff;
+        }
+
+        .badge.badge-warning {
+            background: #fff3e5;
+            color: #c67a20;
+            border-color: #ffe5c7;
+        }
+
+        .badge.badge-danger {
+            background: #fdecec;
+            color: #cf3f3f;
+            border-color: #f9d5d5;
+        }
+
+        .badge.badge-secondary {
+            background: #f3f4f6;
+            color: #6b7280;
+            border-color: #e5e7eb;
+        }
+
+        .badge.badge-light {
+            background: #f8fafc;
+            color: #475569;
+            border-color: #e2e8f0;
+        }
+
+        .badge.badge-light::before {
+            display: none;
+        }
+
+        /* Verification popup (master data) */
+        .swal-verify-wrap {
+            text-align: left;
+        }
+
+        .swal-verify-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .swal-verify-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .swal-verify-option {
+            border: 1px solid #dbe2ef;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all .15s ease;
+            background: #fff;
+            margin: 0;
+        }
+
+        .swal-verify-option:hover {
+            border-color: #98b4ff;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, .08);
+        }
+
+        .swal-verify-option input {
+            margin-top: 0;
+        }
+
+        .swal-verify-option.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .swal-verify-note {
+            width: 100%;
+            min-height: 110px;
+            border: 1px solid #dbe2ef;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+        }
+
+        .swal-verify-note:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+        }
+
+        .fullscreen-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Custom User Menu Dropdown Styling */
+        .navbar-nav .user-menu .dropdown-menu {
+            border-radius: 16px !important;
+            box-shadow: 0 15px 35px rgba(27, 48, 97, 0.15) !important;
+            border: 1px solid rgba(27, 48, 97, 0.08) !important;
+            overflow: hidden;
+            padding: 0;
+            margin-top: 10px;
+            width: 280px;
+        }
+
+        .navbar-nav .user-menu .user-header {
+            background: linear-gradient(135deg, #1b3061, #2a4a91) !important;
+            height: auto !important;
+            padding: 25px 15px !important;
+            color: #ffffff;
+            border-bottom: 3px solid #f59e0b;
+        }
+
+        .navbar-nav .user-menu .user-header img {
+            border: 3px solid #ffffff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .user-menu .user-header:hover img {
+            transform: scale(1.05);
+            border-color: #f59e0b;
+        }
+
+        .navbar-nav .user-menu .user-header p {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-top: 12px;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-nav .user-menu .user-header p small {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.7);
+            display: block;
+            margin-top: 5px;
+            text-shadow: none;
+            font-weight: 500;
+        }
+
+        .navbar-nav .user-menu .user-footer {
+            background-color: #ffffff !important;
+            padding: 15px 10px !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-nav .user-menu .user-footer .btn-flat {
+            border-radius: 10px !important;
+            padding: 8px 18px !important;
+            font-weight: 700;
+            font-size: 0.85rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        /* Profile Button style */
+        .navbar-nav .user-menu .user-footer .btn-profile-custom {
+            background-color: #1b3061 !important;
+            color: #f59e0b !important;
+            margin-left: 8px !important;
+        }
+
+        .navbar-nav .user-menu .user-footer .btn-profile-custom:hover {
+            background-color: #122245 !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(27, 48, 97, 0.15);
+        }
+
+        /* Sign Out Button style */
+        .navbar-nav .user-menu .user-footer .btn-logout-custom {
+            background-color: #fff1f2 !important;
+            color: #e11d48 !important;
+            margin-left: auto !important;
+        }
+
+        .navbar-nav .user-menu .user-footer .btn-logout-custom:hover {
+            background-color: #f43f5e !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(244, 63, 94, 0.15);
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
+    <div class="wrapper">
+        <!-- Main Header -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
+                            class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown user-menu">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                        <img src="https://sipjaki.pu.go.id//img/user-default.png"
+                            class="user-image img-circle elevation-2" alt="User Image">
+                        <span class="d-none d-md-inline">Diciptabintar Kota Bandung</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <!-- User image -->
+                        <li class="user-header bg-primary">
+                            <img src="https://sipjaki.pu.go.id//img/user-default.png"
+                                class="img-circle elevation-2" alt="User Image">
+                            <p>
+                                Diciptabintar Kota Bandung
+                                <small>Member since Dec. 2025</small>
+                            </p>
+                        </li>
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                            <a href="https://sipjaki.pu.go.id/user/profile" class="btn btn-flat btn-profile-custom">Edit Profile</a>
+                            <a href="#" class="btn btn-flat btn-logout-custom"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Keluar
+                            </a>
+                            <form id="logout-form" action="https://sipjaki.pu.go.id/logout" method="POST" class="d-none">
+                                <input type="hidden" name="_token" value="Cxna3E5lbxBDebBT2hnFGa5s5qSFNQ0eWZkMuuRJ">                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="https://sipjaki.pu.go.id/home" class="brand-link">
+        <img src="https://sipjaki.pu.go.id//img/logopupr.jpg" alt="PUPR" class="brand-image  elevation-3">
+        <span class="brand-text font-weight-bold text-uppercase">
+            ADMIN sipjaki
+        </span>
+    </a>
+
+    <div class="sidebar">
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                data-accordion="false">
+                <li class="nav-item">
+    <a href="https://sipjaki.pu.go.id/home" class="nav-link " title="Beranda">
+        <i class="nav-icon fas fa-home"></i>
+        <p>Beranda</p>
+    </a>
+</li>
+
+
+<li
+    class="nav-item ">
+    <a href="#" class="nav-link" title="Tertib Usaha Jasa Konstruksi">
+        <i class="nav-icon fas fa-briefcase"></i>
+        <p>
+            Tertib Usaha Jasa Konstruksi
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/perencanaan-pengawasan" title="Perencanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Perencanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/simaktertibusahas" title="Pelaksanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaksanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/rekomendasitindaklanjuttertibusahas"
+                class="nav-link "
+                title="Rekomendasi dan Tindak Lanjut">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Rekomendasi dan Tindak Lanjut</p>
+            </a>
+        </li>
+                <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/pelaporan" class="nav-link "
+                title="Pelaporan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaporan</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+<li
+    class="nav-item ">
+    <a href="#" class="nav-link" title="Tertib Penyelenggaraan Jasa Konstruksi">
+        <i class="nav-icon fas fa-cogs"></i>
+        <p>
+            Tertib Penyelenggaraan Jasa Konstruksi
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/perencanaan-pengawasan" title="Perencanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Perencanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/simaktertibselenggaras" title="Pelaksanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaksanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/rekomendasitindaklanjuttertibselenggaras"
+                class="nav-link "
+                title="Rekomendasi dan Tindak Lanjut">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Rekomendasi dan Tindak Lanjut</p>
+            </a>
+        </li>
+                <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/pelaporan" class="nav-link "
+                title="Pelaporan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaporan</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+<li
+    class="nav-item ">
+    <a href="#" class="nav-link" title="Tertib Pemanfaatan Jasa Konstruksi">
+        <i class="nav-icon fas fa-hands-helping"></i>
+        <p>
+            Tertib Pemanfaatan Jasa Konstruksi
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/perencanaan-pengawasan" title="Perencanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Perencanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/simaktertibmanfaats" title="Pelaksanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaksanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/rekomendasitindaklanjuttertibmanfaats"
+                class="nav-link "
+                title="Rekomendasi dan Tindak Lanjut">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Rekomendasi dan Tindak Lanjut</p>
+            </a>
+        </li>
+                <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/pelaporan" class="nav-link "
+                title="Pelaporan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaporan</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+<li
+    class="nav-item menu-open">
+    <a href="#" class="nav-link" title="SIPJAKI">
+        <i class="nav-icon fas fa-laptop-code"></i>
+        <p>
+            SIPJAKI
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/opds" class="nav-link "
+                title="Profil OPD">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Profil OPD</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/datapaketpekerjaans" title="Data Paket Pekerjaan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Data Paket Pekerjaan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/kecelakaans" title="Kecelakaan"
+                class="nav-link active">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Kecelakaan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/beritas" class="nav-link "
+                titleP="Berita">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Berita</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/peraturans"
+                class="nav-link " title="Peraturan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Peraturan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/pelatihans"
+                class="nav-link " title="Pelatihan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelatihan dan/atau Sertifikasi</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+<li
+    class="nav-item ">
+    <a href="#" class="nav-link" title="Penyelenggaraan Pelatihan dan Fasilitasi Sertifikasi TKK">
+        <i class="nav-icon fas fa-certificate"></i>
+        <p>
+            Penyelenggaraan Pelatihan dan Fasilitasi Sertifikasi TKK
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/perencanaanpelatihans" title="Perencanaan Pelatihan dan/atau Sertifikasi"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Perencanaan Pelatihan dan/atau Sertifikasi</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/laporanpelatihans" title="Laporan Fasilitasi Sertifikasi TKK"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Laporan Fasilitasi Sertifikasi TKK</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/rekappelatihans"
+                class="nav-link "
+                title="Rekapitulasi TKK Pelatihan dan/atau Sertifikassi">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Rekapitulasi TKK Pelatihan dan/atau Sertifikassi</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+
+
+            </ul>
+        </nav>
+    </div>
+
+</aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+                <div class="container-fluid p-4">
+        <style>
+            :root {
+                --pu-blue: #1b3061;
+                --pu-yellow: #fcb814;
+                --pu-light-blue: #3db5e6;
+                --pu-orange: #f29d38;
+                --pu-bg: #f8fafc;
+                --glass-bg: rgba(255, 255, 255, 0.85);
+            }
+
+            .kec-wrapper {
+                background: var(--pu-bg);
+                min-height: calc(100vh - 100px);
+            }
+
+            /* Header Styling */
+            .page-header-box {
+                background: linear-gradient(135deg, var(--pu-blue) 0%, #2a4a91 100%);
+                border-radius: 24px;
+                padding: 2rem;
+                color: white;
+                margin-bottom: 2rem;
+                box-shadow: 0 10px 25px rgba(27, 48, 97, 0.15);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .page-header-box::after {
+                content: '';
+                position: absolute;
+                top: -50px;
+                right: -50px;
+                width: 200px;
+                height: 200px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 50%;
+            }
+
+            /* Card Stats Styling */
+            .stat-card {
+                background: white;
+                border: none;
+                border-radius: 20px;
+                padding: 1.5rem;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                height: 100%;
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+            }
+
+            .stat-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                flex-shrink: 0;
+            }
+
+            .stat-info .label {
+                color: #64748b;
+                font-size: 0.875rem;
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+                text-transform: uppercase;
+                letter-spacing: 0.025em;
+            }
+
+            .stat-info .value {
+                color: var(--pu-blue);
+                font-size: 1.5rem;
+                font-weight: 800;
+                line-height: 1;
+            }
+
+            /* Filter Section */
+            .filter-section {
+                background: white;
+                border-radius: 20px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            }
+
+            .filter-title {
+                font-weight: 700;
+                color: var(--pu-blue);
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            /* DataTable Standard Styling */
+            .table-premium-container {
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(10px);
+                border-radius: 24px;
+                padding: 1.5rem;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+                position: relative;
+                z-index: 1;
+            }
+
+            table.dataTable {
+                border-collapse: separate !important;
+                border-spacing: 0 8px !important;
+                margin-top: 0 !important;
+            }
+
+            table.dataTable thead th {
+                background: #f8fafc !important;
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                letter-spacing: 1px;
+                padding: 1rem !important;
+                border: 0 !important;
+                color: #64748b;
+                font-weight: 700;
+            }
+
+            table.dataTable tbody tr {
+                background-color: #fff !important;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+            }
+
+            table.dataTable tbody tr:hover {
+                background-color: #f8fafc !important;
+                transform: translateY(-2px) scale(1.005);
+                box-shadow: 0 12px 24px rgba(27, 48, 97, 0.08);
+                z-index: 2;
+            }
+
+            table.dataTable tbody tr::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 0;
+                background: #1b3061;
+                transition: width 0.2s ease;
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+            }
+
+            table.dataTable tbody tr:hover::after {
+                width: 4px;
+            }
+
+            table.dataTable tbody td {
+                padding: 1rem !important;
+                vertical-align: middle !important;
+                border: 0 !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                color: #334155;
+                font-size: 0.85rem;
+                transition: all 0.2s ease;
+            }
+
+            table.dataTable tbody tr:hover td {
+                color: #1b3061;
+            }
+
+            .btn-action {
+                border-radius: 12px;
+                padding: 0.6rem 1.2rem;
+                font-weight: 600;
+                transition: all 0.2s;
+            }
+
+            .btn-pu-main {
+                background: var(--pu-yellow);
+                color: var(--pu-blue);
+                border: none;
+            }
+
+            .btn-pu-main:hover {
+                background: #e5a712;
+                transform: scale(1.02);
+            }
+
+            .btn-import-excel {
+                background: #f0fdf4;
+                color: #166534;
+                border: 1px solid #bbf7d0;
+                border-radius: 12px !important;
+                padding: 0.6rem 1.25rem;
+                font-weight: 700;
+                font-size: 0.75rem;
+                height: 38px;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 6px -1px rgba(22, 101, 52, 0.05);
+            }
+
+            .btn-import-excel:hover {
+                background: #dcfce7;
+                color: #14532d;
+                border-color: #86efac;
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(22, 101, 52, 0.1);
+            }
+
+            .btn-import-excel i {
+                font-size: 1.1rem;
+            }
+
+            .kec-filter-select {
+                min-height: 42px;
+                height: 42px;
+                border-radius: 12px !important;
+                border: 1px solid #e2e8f0 !important;
+                font-weight: 500;
+                color: #334155;
+                background-color: #fff !important;
+                padding: 0.375rem 0.75rem;
+            }
+
+            .filter-label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-size: 0.7rem;
+                font-weight: 700;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .badge-kecelakaan {
+                padding: 6px 12px;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 0.75rem;
+            }
+
+            /* Custom TomSelect tweaks for premium feel */
+            .ts-wrapper .ts-control {
+                border-radius: 12px !important;
+                border: 1px solid #e2e8f0 !important;
+                padding: 0.5rem 0.75rem !important;
+                min-height: 42px !important;
+                background-color: #fff !important;
+            }
+        </style>
+
+        <div class="kec-wrapper">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="font-weight-bold mb-1" style="color:#1b3061;">Data Kecelakaan</h4>
+                    <p class="text-muted mb-0">Monitoring dan rekapitulasi kejadian kecelakaan konstruksi secara real-time
+                    </p>
+                </div>
+                <div class="header-actions d-flex align-items-center">
+                                            <a href="https://sipjaki.pu.go.id/kecelakaans-upload" class="btn btn-import-excel mr-2">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Import Excel</span>
+                        </a>
+                        <a href="https://sipjaki.pu.go.id/kecelakaans/create" class="btn btn-pu btn-action shadow-sm"
+                            style="height: 38px; display: inline-flex; align-items: center;">
+                            <i class="fa fa-plus-circle mr-2"></i> Tambah Data
+                        </a>
+                                    </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(61, 181, 230, 0.1); color: var(--pu-light-blue);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="label">Total Kejadian</div>
+                            <div class="value" id="statTotalKecelakaan">
+                                0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(242, 157, 56, 0.1); color: var(--pu-orange);">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="label">Kecelakaan Tahun Berjalan (2026)</div>
+                            <div class="value" id="statKecelakaanTahunBerjalan">
+                                0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="row align-items-end">
+                                        <div class="col-md-2 mb-3"  style="display:none;" >
+                        <label class="filter-label">Provinsi</label>
+                        <select id="kecFilterPropinsi" class="form-control tom-select">
+                            <option value="">Semua Provinsi</option>
+                                                            <option value="11" data-balai="1">ACEH</option>
+                                                            <option value="51" data-balai="4">BALI</option>
+                                                            <option value="36" data-balai="3">BANTEN</option>
+                                                            <option value="17" data-balai="2">BENGKULU</option>
+                                                            <option value="34" data-balai="4">DAERAH ISTIMEWA YOGYAKARTA</option>
+                                                            <option value="31" data-balai="3">DKI JAKARTA</option>
+                                                            <option value="75" data-balai="6">GORONTALO</option>
+                                                            <option value="15" data-balai="2">JAMBI</option>
+                                                            <option value="32" data-balai="3">JAWA BARAT</option>
+                                                            <option value="33" data-balai="4">JAWA TENGAH</option>
+                                                            <option value="35" data-balai="4">JAWA TIMUR</option>
+                                                            <option value="61" data-balai="5">KALIMANTAN BARAT</option>
+                                                            <option value="63" data-balai="5">KALIMANTAN SELATAN</option>
+                                                            <option value="62" data-balai="5">KALIMANTAN TENGAH</option>
+                                                            <option value="64" data-balai="5">KALIMANTAN TIMUR</option>
+                                                            <option value="65" data-balai="5">KALIMANTAN UTARA</option>
+                                                            <option value="19" data-balai="2">KEPULAUAN BANGKA BELITUNG</option>
+                                                            <option value="21" data-balai="1">KEPULAUAN RIAU</option>
+                                                            <option value="18" data-balai="2">LAMPUNG</option>
+                                                            <option value="81" data-balai="7">MALUKU</option>
+                                                            <option value="82" data-balai="7">MALUKU UTARA</option>
+                                                            <option value="52" data-balai="4">NUSA TENGGARA BARAT</option>
+                                                            <option value="53" data-balai="4">NUSA TENGGARA TIMUR</option>
+                                                            <option value="91" data-balai="7">PAPUA</option>
+                                                            <option value="92" data-balai="7">PAPUA BARAT</option>
+                                                            <option value="96" data-balai="7">PAPUA BARAT DAYA</option>
+                                                            <option value="95" data-balai="7">PAPUA PEGUNUNGAN</option>
+                                                            <option value="93" data-balai="7">PAPUA SELATAN</option>
+                                                            <option value="94" data-balai="7">PAPUA TENGAH</option>
+                                                            <option value="14" data-balai="1">RIAU</option>
+                                                            <option value="76" data-balai="6">SULAWESI BARAT</option>
+                                                            <option value="73" data-balai="6">SULAWESI SELATAN</option>
+                                                            <option value="72" data-balai="6">SULAWESI TENGAH</option>
+                                                            <option value="74" data-balai="6">SULAWESI TENGGARA</option>
+                                                            <option value="71" data-balai="6">SULAWESI UTARA</option>
+                                                            <option value="13" data-balai="1">SUMATERA BARAT</option>
+                                                            <option value="16" data-balai="2">SUMATERA SELATAN</option>
+                                                            <option value="12" data-balai="1">SUMATERA UTARA</option>
+                                                    </select>
+                    </div>
+                    <div class="col-md-2 mb-3"  style="display:none;" >
+                        <label class="filter-label">Kabupaten/Kota</label>
+                        <select id="kecFilterKota" class="form-control tom-select">
+                            <option value="">Semua Kab/Kota</option>
+                            <option value="-1">Provinsi</option>
+                                                            <option value="1105" data-propinsi="11">
+                                    KAB. ACEH BARAT</option>
+                                                            <option value="1112" data-propinsi="11">
+                                    KAB. ACEH BARAT DAYA</option>
+                                                            <option value="1106" data-propinsi="11">
+                                    KAB. ACEH BESAR</option>
+                                                            <option value="1114" data-propinsi="11">
+                                    KAB. ACEH JAYA</option>
+                                                            <option value="1101" data-propinsi="11">
+                                    KAB. ACEH SELATAN</option>
+                                                            <option value="1110" data-propinsi="11">
+                                    KAB. ACEH SINGKIL</option>
+                                                            <option value="1116" data-propinsi="11">
+                                    KAB. ACEH TAMIANG</option>
+                                                            <option value="1104" data-propinsi="11">
+                                    KAB. ACEH TENGAH</option>
+                                                            <option value="1102" data-propinsi="11">
+                                    KAB. ACEH TENGGARA</option>
+                                                            <option value="1103" data-propinsi="11">
+                                    KAB. ACEH TIMUR</option>
+                                                            <option value="1108" data-propinsi="11">
+                                    KAB. ACEH UTARA</option>
+                                                            <option value="3101" data-propinsi="31">
+                                    KAB. ADM. KEP. SERIBU</option>
+                                                            <option value="1306" data-propinsi="13">
+                                    KAB. AGAM</option>
+                                                            <option value="5305" data-propinsi="53">
+                                    KAB. ALOR</option>
+                                                            <option value="1209" data-propinsi="12">
+                                    KAB. ASAHAN</option>
+                                                            <option value="9304" data-propinsi="93">
+                                    KAB. ASMAT</option>
+                                                            <option value="5103" data-propinsi="51">
+                                    KAB. BADUNG</option>
+                                                            <option value="6311" data-propinsi="63">
+                                    KAB. BALANGAN</option>
+                                                            <option value="3204" data-propinsi="32">
+                                    KAB. BANDUNG</option>
+                                                            <option value="3217" data-propinsi="32">
+                                    KAB. BANDUNG BARAT</option>
+                                                            <option value="7201" data-propinsi="72">
+                                    KAB. BANGGAI</option>
+                                                            <option value="7207" data-propinsi="72">
+                                    KAB. BANGGAI KEPULAUAN</option>
+                                                            <option value="7211" data-propinsi="72">
+                                    KAB. BANGGAI LAUT</option>
+                                                            <option value="1901" data-propinsi="19">
+                                    KAB. BANGKA</option>
+                                                            <option value="1905" data-propinsi="19">
+                                    KAB. BANGKA BARAT</option>
+                                                            <option value="1903" data-propinsi="19">
+                                    KAB. BANGKA SELATAN</option>
+                                                            <option value="1904" data-propinsi="19">
+                                    KAB. BANGKA TENGAH</option>
+                                                            <option value="3526" data-propinsi="35">
+                                    KAB. BANGKALAN</option>
+                                                            <option value="5106" data-propinsi="51">
+                                    KAB. BANGLI</option>
+                                                            <option value="6303" data-propinsi="63">
+                                    KAB. BANJAR</option>
+                                                            <option value="3304" data-propinsi="33">
+                                    KAB. BANJARNEGARA</option>
+                                                            <option value="7303" data-propinsi="73">
+                                    KAB. BANTAENG</option>
+                                                            <option value="3402" data-propinsi="34">
+                                    KAB. BANTUL</option>
+                                                            <option value="1607" data-propinsi="16">
+                                    KAB. BANYUASIN</option>
+                                                            <option value="3302" data-propinsi="33">
+                                    KAB. BANYUMAS</option>
+                                                            <option value="3510" data-propinsi="35">
+                                    KAB. BANYUWANGI</option>
+                                                            <option value="6304" data-propinsi="63">
+                                    KAB. BARITO KUALA</option>
+                                                            <option value="6204" data-propinsi="62">
+                                    KAB. BARITO SELATAN</option>
+                                                            <option value="6213" data-propinsi="62">
+                                    KAB. BARITO TIMUR</option>
+                                                            <option value="6205" data-propinsi="62">
+                                    KAB. BARITO UTARA</option>
+                                                            <option value="7311" data-propinsi="73">
+                                    KAB. BARRU</option>
+                                                            <option value="3325" data-propinsi="33">
+                                    KAB. BATANG</option>
+                                                            <option value="1504" data-propinsi="15">
+                                    KAB. BATANGHARI</option>
+                                                            <option value="1219" data-propinsi="12">
+                                    KAB. BATU BARA</option>
+                                                            <option value="3216" data-propinsi="32">
+                                    KAB. BEKASI</option>
+                                                            <option value="1902" data-propinsi="19">
+                                    KAB. BELITUNG</option>
+                                                            <option value="1906" data-propinsi="19">
+                                    KAB. BELITUNG TIMUR</option>
+                                                            <option value="5304" data-propinsi="53">
+                                    KAB. BELU</option>
+                                                            <option value="1117" data-propinsi="11">
+                                    KAB. BENER MERIAH</option>
+                                                            <option value="1403" data-propinsi="14">
+                                    KAB. BENGKALIS</option>
+                                                            <option value="6107" data-propinsi="61">
+                                    KAB. BENGKAYANG</option>
+                                                            <option value="1701" data-propinsi="17">
+                                    KAB. BENGKULU SELATAN</option>
+                                                            <option value="1709" data-propinsi="17">
+                                    KAB. BENGKULU TENGAH</option>
+                                                            <option value="1703" data-propinsi="17">
+                                    KAB. BENGKULU UTARA</option>
+                                                            <option value="6403" data-propinsi="64">
+                                    KAB. BERAU</option>
+                                                            <option value="9106" data-propinsi="91">
+                                    KAB. BIAK NUMFOR</option>
+                                                            <option value="5206" data-propinsi="52">
+                                    KAB. BIMA</option>
+                                                            <option value="2101" data-propinsi="21">
+                                    KAB. BINTAN</option>
+                                                            <option value="1111" data-propinsi="11">
+                                    KAB. BIREUEN</option>
+                                                            <option value="3505" data-propinsi="35">
+                                    KAB. BLITAR</option>
+                                                            <option value="3316" data-propinsi="33">
+                                    KAB. BLORA</option>
+                                                            <option value="7502" data-propinsi="75">
+                                    KAB. BOALEMO</option>
+                                                            <option value="3201" data-propinsi="32">
+                                    KAB. BOGOR</option>
+                                                            <option value="3522" data-propinsi="35">
+                                    KAB. BOJONEGORO</option>
+                                                            <option value="7101" data-propinsi="71">
+                                    KAB. BOLAANG MONGONDOW</option>
+                                                            <option value="7111" data-propinsi="71">
+                                    KAB. BOLAANG MONGONDOW SELATAN</option>
+                                                            <option value="7110" data-propinsi="71">
+                                    KAB. BOLAANG MONGONDOW TIMUR</option>
+                                                            <option value="7108" data-propinsi="71">
+                                    KAB. BOLAANG MONGONDOW UTARA</option>
+                                                            <option value="7406" data-propinsi="74">
+                                    KAB. BOMBANA</option>
+                                                            <option value="3511" data-propinsi="35">
+                                    KAB. BONDOWOSO</option>
+                                                            <option value="7308" data-propinsi="73">
+                                    KAB. BONE</option>
+                                                            <option value="7503" data-propinsi="75">
+                                    KAB. BONE BOLANGO</option>
+                                                            <option value="9302" data-propinsi="93">
+                                    KAB. BOVEN DIGOEL</option>
+                                                            <option value="3309" data-propinsi="33">
+                                    KAB. BOYOLALI</option>
+                                                            <option value="3329" data-propinsi="33">
+                                    KAB. BREBES</option>
+                                                            <option value="5108" data-propinsi="51">
+                                    KAB. BULELENG</option>
+                                                            <option value="7302" data-propinsi="73">
+                                    KAB. BULUKUMBA</option>
+                                                            <option value="6501" data-propinsi="65">
+                                    KAB. BULUNGAN</option>
+                                                            <option value="1508" data-propinsi="15">
+                                    KAB. BUNGO</option>
+                                                            <option value="7205" data-propinsi="72">
+                                    KAB. BUOL</option>
+                                                            <option value="8104" data-propinsi="81">
+                                    KAB. BURU</option>
+                                                            <option value="8109" data-propinsi="81">
+                                    KAB. BURU SELATAN</option>
+                                                            <option value="7404" data-propinsi="74">
+                                    KAB. BUTON</option>
+                                                            <option value="7415" data-propinsi="74">
+                                    KAB. BUTON SELATAN</option>
+                                                            <option value="7414" data-propinsi="74">
+                                    KAB. BUTON TENGAH</option>
+                                                            <option value="7410" data-propinsi="74">
+                                    KAB. BUTON UTARA</option>
+                                                            <option value="3207" data-propinsi="32">
+                                    KAB. CIAMIS</option>
+                                                            <option value="3203" data-propinsi="32">
+                                    KAB. CIANJUR</option>
+                                                            <option value="3301" data-propinsi="33">
+                                    KAB. CILACAP</option>
+                                                            <option value="3209" data-propinsi="32">
+                                    KAB. CIREBON</option>
+                                                            <option value="1211" data-propinsi="12">
+                                    KAB. DAIRI</option>
+                                                            <option value="9408" data-propinsi="94">
+                                    KAB. DEIYAI</option>
+                                                            <option value="1207" data-propinsi="12">
+                                    KAB. DELI SERDANG</option>
+                                                            <option value="3321" data-propinsi="33">
+                                    KAB. DEMAK</option>
+                                                            <option value="1310" data-propinsi="13">
+                                    KAB. DHARMASRAYA</option>
+                                                            <option value="9406" data-propinsi="94">
+                                    KAB. DOGIYAI</option>
+                                                            <option value="5205" data-propinsi="52">
+                                    KAB. DOMPU</option>
+                                                            <option value="7203" data-propinsi="72">
+                                    KAB. DONGGALA</option>
+                                                            <option value="1611" data-propinsi="16">
+                                    KAB. EMPAT LAWANG</option>
+                                                            <option value="5308" data-propinsi="53">
+                                    KAB. ENDE</option>
+                                                            <option value="7316" data-propinsi="73">
+                                    KAB. ENREKANG</option>
+                                                            <option value="9203" data-propinsi="92">
+                                    KAB. FAK FAK</option>
+                                                            <option value="5306" data-propinsi="53">
+                                    KAB. FLORES TIMUR</option>
+                                                            <option value="3205" data-propinsi="32">
+                                    KAB. GARUT</option>
+                                                            <option value="1113" data-propinsi="11">
+                                    KAB. GAYO LUES</option>
+                                                            <option value="5104" data-propinsi="51">
+                                    KAB. GIANYAR</option>
+                                                            <option value="7501" data-propinsi="75">
+                                    KAB. GORONTALO</option>
+                                                            <option value="7505" data-propinsi="75">
+                                    KAB. GORONTALO UTARA</option>
+                                                            <option value="7306" data-propinsi="73">
+                                    KAB. GOWA</option>
+                                                            <option value="3525" data-propinsi="35">
+                                    KAB. GRESIK</option>
+                                                            <option value="3315" data-propinsi="33">
+                                    KAB. GROBOGAN</option>
+                                                            <option value="6210" data-propinsi="62">
+                                    KAB. GUNUNG MAS</option>
+                                                            <option value="3403" data-propinsi="34">
+                                    KAB. GUNUNGKIDUL</option>
+                                                            <option value="8201" data-propinsi="82">
+                                    KAB. HALMAHERA BARAT</option>
+                                                            <option value="8204" data-propinsi="82">
+                                    KAB. HALMAHERA SELATAN</option>
+                                                            <option value="8202" data-propinsi="82">
+                                    KAB. HALMAHERA TENGAH</option>
+                                                            <option value="8206" data-propinsi="82">
+                                    KAB. HALMAHERA TIMUR</option>
+                                                            <option value="8203" data-propinsi="82">
+                                    KAB. HALMAHERA UTARA</option>
+                                                            <option value="6306" data-propinsi="63">
+                                    KAB. HULU SUNGAI SELATAN</option>
+                                                            <option value="6307" data-propinsi="63">
+                                    KAB. HULU SUNGAI TENGAH</option>
+                                                            <option value="6308" data-propinsi="63">
+                                    KAB. HULU SUNGAI UTARA</option>
+                                                            <option value="1216" data-propinsi="12">
+                                    KAB. HUMBANG HASUNDUTAN</option>
+                                                            <option value="1404" data-propinsi="14">
+                                    KAB. INDRAGIRI HILIR</option>
+                                                            <option value="1402" data-propinsi="14">
+                                    KAB. INDRAGIRI HULU</option>
+                                                            <option value="3212" data-propinsi="32">
+                                    KAB. INDRAMAYU</option>
+                                                            <option value="9407" data-propinsi="94">
+                                    KAB. INTAN JAYA</option>
+                                                            <option value="9103" data-propinsi="91">
+                                    KAB. JAYAPURA</option>
+                                                            <option value="9501" data-propinsi="95">
+                                    KAB. JAYAWIJAYA</option>
+                                                            <option value="3509" data-propinsi="35">
+                                    KAB. JEMBER</option>
+                                                            <option value="5101" data-propinsi="51">
+                                    KAB. JEMBRANA</option>
+                                                            <option value="7304" data-propinsi="73">
+                                    KAB. JENEPONTO</option>
+                                                            <option value="3320" data-propinsi="33">
+                                    KAB. JEPARA</option>
+                                                            <option value="3517" data-propinsi="35">
+                                    KAB. JOMBANG</option>
+                                                            <option value="9208" data-propinsi="92">
+                                    KAB. KAIMANA</option>
+                                                            <option value="1401" data-propinsi="14">
+                                    KAB. KAMPAR</option>
+                                                            <option value="6203" data-propinsi="62">
+                                    KAB. KAPUAS</option>
+                                                            <option value="6106" data-propinsi="61">
+                                    KAB. KAPUAS HULU</option>
+                                                            <option value="3313" data-propinsi="33">
+                                    KAB. KARANGANYAR</option>
+                                                            <option value="5107" data-propinsi="51">
+                                    KAB. KARANGASEM</option>
+                                                            <option value="3215" data-propinsi="32">
+                                    KAB. KARAWANG</option>
+                                                            <option value="2102" data-propinsi="21">
+                                    KAB. KARIMUN</option>
+                                                            <option value="1206" data-propinsi="12">
+                                    KAB. KARO</option>
+                                                            <option value="6206" data-propinsi="62">
+                                    KAB. KATINGAN</option>
+                                                            <option value="1704" data-propinsi="17">
+                                    KAB. KAUR</option>
+                                                            <option value="6111" data-propinsi="61">
+                                    KAB. KAYONG UTARA</option>
+                                                            <option value="3305" data-propinsi="33">
+                                    KAB. KEBUMEN</option>
+                                                            <option value="3506" data-propinsi="35">
+                                    KAB. KEDIRI</option>
+                                                            <option value="9111" data-propinsi="91">
+                                    KAB. KEEROM</option>
+                                                            <option value="3324" data-propinsi="33">
+                                    KAB. KENDAL</option>
+                                                            <option value="7109" data-propinsi="71">
+                                    KAB. KEP. SIAU TAGULANDANG BIARO</option>
+                                                            <option value="1708" data-propinsi="17">
+                                    KAB. KEPAHIANG</option>
+                                                            <option value="2105" data-propinsi="21">
+                                    KAB. KEPULAUAN ANAMBAS</option>
+                                                            <option value="8107" data-propinsi="81">
+                                    KAB. KEPULAUAN ARU</option>
+                                                            <option value="1309" data-propinsi="13">
+                                    KAB. KEPULAUAN MENTAWAI</option>
+                                                            <option value="1410" data-propinsi="14">
+                                    KAB. KEPULAUAN MERANTI</option>
+                                                            <option value="7103" data-propinsi="71">
+                                    KAB. KEPULAUAN SANGIHE</option>
+                                                            <option value="7301" data-propinsi="73">
+                                    KAB. KEPULAUAN SELAYAR</option>
+                                                            <option value="8205" data-propinsi="82">
+                                    KAB. KEPULAUAN SULA</option>
+                                                            <option value="7104" data-propinsi="71">
+                                    KAB. KEPULAUAN TALAUD</option>
+                                                            <option value="8103" data-propinsi="81">
+                                    KAB. KEPULAUAN TANIMBAR</option>
+                                                            <option value="9105" data-propinsi="91">
+                                    KAB. KEPULAUAN YAPEN</option>
+                                                            <option value="1501" data-propinsi="15">
+                                    KAB. KERINCI</option>
+                                                            <option value="6104" data-propinsi="61">
+                                    KAB. KETAPANG</option>
+                                                            <option value="3310" data-propinsi="33">
+                                    KAB. KLATEN</option>
+                                                            <option value="5105" data-propinsi="51">
+                                    KAB. KLUNGKUNG</option>
+                                                            <option value="7401" data-propinsi="74">
+                                    KAB. KOLAKA</option>
+                                                            <option value="7411" data-propinsi="74">
+                                    KAB. KOLAKA TIMUR</option>
+                                                            <option value="7408" data-propinsi="74">
+                                    KAB. KOLAKA UTARA</option>
+                                                            <option value="7402" data-propinsi="74">
+                                    KAB. KONAWE</option>
+                                                            <option value="7412" data-propinsi="74">
+                                    KAB. KONAWE KEPULAUAN</option>
+                                                            <option value="7405" data-propinsi="74">
+                                    KAB. KONAWE SELATAN</option>
+                                                            <option value="7409" data-propinsi="74">
+                                    KAB. KONAWE UTARA</option>
+                                                            <option value="6302" data-propinsi="63">
+                                    KAB. KOTABARU</option>
+                                                            <option value="6201" data-propinsi="62">
+                                    KAB. KOTAWARINGIN BARAT</option>
+                                                            <option value="6202" data-propinsi="62">
+                                    KAB. KOTAWARINGIN TIMUR</option>
+                                                            <option value="1409" data-propinsi="14">
+                                    KAB. KUANTAN SINGINGI</option>
+                                                            <option value="6112" data-propinsi="61">
+                                    KAB. KUBU RAYA</option>
+                                                            <option value="3319" data-propinsi="33">
+                                    KAB. KUDUS</option>
+                                                            <option value="3401" data-propinsi="34">
+                                    KAB. KULON PROGO</option>
+                                                            <option value="3208" data-propinsi="32">
+                                    KAB. KUNINGAN</option>
+                                                            <option value="5301" data-propinsi="53">
+                                    KAB. KUPANG</option>
+                                                            <option value="6407" data-propinsi="64">
+                                    KAB. KUTAI BARAT</option>
+                                                            <option value="6402" data-propinsi="64">
+                                    KAB. KUTAI KARTANEGARA</option>
+                                                            <option value="6408" data-propinsi="64">
+                                    KAB. KUTAI TIMUR</option>
+                                                            <option value="1210" data-propinsi="12">
+                                    KAB. LABUHANBATU</option>
+                                                            <option value="1222" data-propinsi="12">
+                                    KAB. LABUHANBATU SELATAN</option>
+                                                            <option value="1223" data-propinsi="12">
+                                    KAB. LABUHANBATU UTARA</option>
+                                                            <option value="1604" data-propinsi="16">
+                                    KAB. LAHAT</option>
+                                                            <option value="6209" data-propinsi="62">
+                                    KAB. LAMANDAU</option>
+                                                            <option value="3524" data-propinsi="35">
+                                    KAB. LAMONGAN</option>
+                                                            <option value="1804" data-propinsi="18">
+                                    KAB. LAMPUNG BARAT</option>
+                                                            <option value="1801" data-propinsi="18">
+                                    KAB. LAMPUNG SELATAN</option>
+                                                            <option value="1802" data-propinsi="18">
+                                    KAB. LAMPUNG TENGAH</option>
+                                                            <option value="1807" data-propinsi="18">
+                                    KAB. LAMPUNG TIMUR</option>
+                                                            <option value="1803" data-propinsi="18">
+                                    KAB. LAMPUNG UTARA</option>
+                                                            <option value="6108" data-propinsi="61">
+                                    KAB. LANDAK</option>
+                                                            <option value="1205" data-propinsi="12">
+                                    KAB. LANGKAT</option>
+                                                            <option value="9507" data-propinsi="95">
+                                    KAB. LANNY JAYA</option>
+                                                            <option value="3602" data-propinsi="36">
+                                    KAB. LEBAK</option>
+                                                            <option value="1707" data-propinsi="17">
+                                    KAB. LEBONG</option>
+                                                            <option value="5313" data-propinsi="53">
+                                    KAB. LEMBATA</option>
+                                                            <option value="1307" data-propinsi="13">
+                                    KAB. LIMA PULUH KOTA</option>
+                                                            <option value="2104" data-propinsi="21">
+                                    KAB. LINGGA</option>
+                                                            <option value="5201" data-propinsi="52">
+                                    KAB. LOMBOK BARAT</option>
+                                                            <option value="5202" data-propinsi="52">
+                                    KAB. LOMBOK TENGAH</option>
+                                                            <option value="5203" data-propinsi="52">
+                                    KAB. LOMBOK TIMUR</option>
+                                                            <option value="5208" data-propinsi="52">
+                                    KAB. LOMBOK UTARA</option>
+                                                            <option value="3508" data-propinsi="35">
+                                    KAB. LUMAJANG</option>
+                                                            <option value="7317" data-propinsi="73">
+                                    KAB. LUWU</option>
+                                                            <option value="7324" data-propinsi="73">
+                                    KAB. LUWU TIMUR</option>
+                                                            <option value="7322" data-propinsi="73">
+                                    KAB. LUWU UTARA</option>
+                                                            <option value="3519" data-propinsi="35">
+                                    KAB. MADIUN</option>
+                                                            <option value="3308" data-propinsi="33">
+                                    KAB. MAGELANG</option>
+                                                            <option value="3520" data-propinsi="35">
+                                    KAB. MAGETAN</option>
+                                                            <option value="6411" data-propinsi="64">
+                                    KAB. MAHAKAM ULU</option>
+                                                            <option value="3210" data-propinsi="32">
+                                    KAB. MAJALENGKA</option>
+                                                            <option value="7605" data-propinsi="76">
+                                    KAB. MAJENE</option>
+                                                            <option value="5321" data-propinsi="53">
+                                    KAB. MALAKA</option>
+                                                            <option value="3507" data-propinsi="35">
+                                    KAB. MALANG</option>
+                                                            <option value="6502" data-propinsi="65">
+                                    KAB. MALINAU</option>
+                                                            <option value="8108" data-propinsi="81">
+                                    KAB. MALUKU BARAT DAYA</option>
+                                                            <option value="8101" data-propinsi="81">
+                                    KAB. MALUKU TENGAH</option>
+                                                            <option value="8102" data-propinsi="81">
+                                    KAB. MALUKU TENGGARA</option>
+                                                            <option value="7603" data-propinsi="76">
+                                    KAB. MAMASA</option>
+                                                            <option value="9120" data-propinsi="91">
+                                    KAB. MAMBERAMO RAYA</option>
+                                                            <option value="9505" data-propinsi="95">
+                                    KAB. MAMBERAMO TENGAH</option>
+                                                            <option value="7602" data-propinsi="76">
+                                    KAB. MAMUJU</option>
+                                                            <option value="7606" data-propinsi="76">
+                                    KAB. MAMUJU TENGAH</option>
+                                                            <option value="1213" data-propinsi="12">
+                                    KAB. MANDAILING NATAL</option>
+                                                            <option value="5310" data-propinsi="53">
+                                    KAB. MANGGARAI</option>
+                                                            <option value="5315" data-propinsi="53">
+                                    KAB. MANGGARAI BARAT</option>
+                                                            <option value="5319" data-propinsi="53">
+                                    KAB. MANGGARAI TIMUR</option>
+                                                            <option value="9202" data-propinsi="92">
+                                    KAB. MANOKWARI</option>
+                                                            <option value="9211" data-propinsi="92">
+                                    KAB. MANOKWARI SELATAN</option>
+                                                            <option value="9303" data-propinsi="93">
+                                    KAB. MAPPI</option>
+                                                            <option value="7309" data-propinsi="73">
+                                    KAB. MAROS</option>
+                                                            <option value="9605" data-propinsi="96">
+                                    KAB. MAYBRAT</option>
+                                                            <option value="6110" data-propinsi="61">
+                                    KAB. MELAWI</option>
+                                                            <option value="6102" data-propinsi="61">
+                                    KAB. MEMPAWAH</option>
+                                                            <option value="1502" data-propinsi="15">
+                                    KAB. MERANGIN</option>
+                                                            <option value="9301" data-propinsi="93">
+                                    KAB. MERAUKE</option>
+                                                            <option value="1811" data-propinsi="18">
+                                    KAB. MESUJI</option>
+                                                            <option value="9404" data-propinsi="94">
+                                    KAB. MIMIKA</option>
+                                                            <option value="7102" data-propinsi="71">
+                                    KAB. MINAHASA</option>
+                                                            <option value="7105" data-propinsi="71">
+                                    KAB. MINAHASA SELATAN</option>
+                                                            <option value="7107" data-propinsi="71">
+                                    KAB. MINAHASA TENGGARA</option>
+                                                            <option value="7106" data-propinsi="71">
+                                    KAB. MINAHASA UTARA</option>
+                                                            <option value="3516" data-propinsi="35">
+                                    KAB. MOJOKERTO</option>
+                                                            <option value="7206" data-propinsi="72">
+                                    KAB. MOROWALI</option>
+                                                            <option value="7212" data-propinsi="72">
+                                    KAB. MOROWALI UTARA</option>
+                                                            <option value="1603" data-propinsi="16">
+                                    KAB. MUARA ENIM</option>
+                                                            <option value="1505" data-propinsi="15">
+                                    KAB. MUARO JAMBI</option>
+                                                            <option value="1706" data-propinsi="17">
+                                    KAB. MUKO MUKO</option>
+                                                            <option value="7403" data-propinsi="74">
+                                    KAB. MUNA</option>
+                                                            <option value="7413" data-propinsi="74">
+                                    KAB. MUNA BARAT</option>
+                                                            <option value="6212" data-propinsi="62">
+                                    KAB. MURUNG RAYA</option>
+                                                            <option value="1606" data-propinsi="16">
+                                    KAB. MUSI BANYUASIN</option>
+                                                            <option value="1605" data-propinsi="16">
+                                    KAB. MUSI RAWAS</option>
+                                                            <option value="1613" data-propinsi="16">
+                                    KAB. MUSI RAWAS UTARA</option>
+                                                            <option value="9401" data-propinsi="94">
+                                    KAB. NABIRE</option>
+                                                            <option value="1115" data-propinsi="11">
+                                    KAB. NAGAN RAYA</option>
+                                                            <option value="5316" data-propinsi="53">
+                                    KAB. NAGEKEO</option>
+                                                            <option value="2103" data-propinsi="21">
+                                    KAB. NATUNA</option>
+                                                            <option value="9508" data-propinsi="95">
+                                    KAB. NDUGA</option>
+                                                            <option value="5309" data-propinsi="53">
+                                    KAB. NGADA</option>
+                                                            <option value="3518" data-propinsi="35">
+                                    KAB. NGANJUK</option>
+                                                            <option value="3521" data-propinsi="35">
+                                    KAB. NGAWI</option>
+                                                            <option value="1204" data-propinsi="12">
+                                    KAB. NIAS</option>
+                                                            <option value="1225" data-propinsi="12">
+                                    KAB. NIAS BARAT</option>
+                                                            <option value="1214" data-propinsi="12">
+                                    KAB. NIAS SELATAN</option>
+                                                            <option value="1224" data-propinsi="12">
+                                    KAB. NIAS UTARA</option>
+                                                            <option value="6503" data-propinsi="65">
+                                    KAB. NUNUKAN</option>
+                                                            <option value="1610" data-propinsi="16">
+                                    KAB. OGAN ILIR</option>
+                                                            <option value="1602" data-propinsi="16">
+                                    KAB. OGAN KOMERING ILIR</option>
+                                                            <option value="1601" data-propinsi="16">
+                                    KAB. OGAN KOMERING ULU</option>
+                                                            <option value="1609" data-propinsi="16">
+                                    KAB. OGAN KOMERING ULU SELATAN</option>
+                                                            <option value="1608" data-propinsi="16">
+                                    KAB. OGAN KOMERING ULU TIMUR</option>
+                                                            <option value="3501" data-propinsi="35">
+                                    KAB. PACITAN</option>
+                                                            <option value="1221" data-propinsi="12">
+                                    KAB. PADANG LAWAS</option>
+                                                            <option value="1220" data-propinsi="12">
+                                    KAB. PADANG LAWAS UTARA</option>
+                                                            <option value="1305" data-propinsi="13">
+                                    KAB. PADANG PARIAMAN</option>
+                                                            <option value="1215" data-propinsi="12">
+                                    KAB. PAKPAK BHARAT</option>
+                                                            <option value="3528" data-propinsi="35">
+                                    KAB. PAMEKASAN</option>
+                                                            <option value="3601" data-propinsi="36">
+                                    KAB. PANDEGLANG</option>
+                                                            <option value="3218" data-propinsi="32">
+                                    KAB. PANGANDARAN</option>
+                                                            <option value="7310" data-propinsi="73">
+                                    KAB. PANGKAJENE DAN KEPULAUAN</option>
+                                                            <option value="9403" data-propinsi="94">
+                                    KAB. PANIAI</option>
+                                                            <option value="7208" data-propinsi="72">
+                                    KAB. PARIGI MOUTONG</option>
+                                                            <option value="1308" data-propinsi="13">
+                                    KAB. PASAMAN</option>
+                                                            <option value="1312" data-propinsi="13">
+                                    KAB. PASAMAN BARAT</option>
+                                                            <option value="7601" data-propinsi="76">
+                                    KAB. PASANGKAYU</option>
+                                                            <option value="6401" data-propinsi="64">
+                                    KAB. PASER</option>
+                                                            <option value="3514" data-propinsi="35">
+                                    KAB. PASURUAN</option>
+                                                            <option value="3318" data-propinsi="33">
+                                    KAB. PATI</option>
+                                                            <option value="9212" data-propinsi="92">
+                                    KAB. PEGUNUNGAN ARFAK</option>
+                                                            <option value="9502" data-propinsi="95">
+                                    KAB. PEGUNUNGAN BINTANG</option>
+                                                            <option value="3326" data-propinsi="33">
+                                    KAB. PEKALONGAN</option>
+                                                            <option value="1405" data-propinsi="14">
+                                    KAB. PELALAWAN</option>
+                                                            <option value="3327" data-propinsi="33">
+                                    KAB. PEMALANG</option>
+                                                            <option value="6409" data-propinsi="64">
+                                    KAB. PENAJAM PASER UTARA</option>
+                                                            <option value="1612" data-propinsi="16">
+                                    KAB. PENUKAL ABAB LEMATANG ILIR</option>
+                                                            <option value="1809" data-propinsi="18">
+                                    KAB. PESAWARAN</option>
+                                                            <option value="1813" data-propinsi="18">
+                                    KAB. PESISIR BARAT</option>
+                                                            <option value="1301" data-propinsi="13">
+                                    KAB. PESISIR SELATAN</option>
+                                                            <option value="1107" data-propinsi="11">
+                                    KAB. PIDIE</option>
+                                                            <option value="1118" data-propinsi="11">
+                                    KAB. PIDIE JAYA</option>
+                                                            <option value="7315" data-propinsi="73">
+                                    KAB. PINRANG</option>
+                                                            <option value="7504" data-propinsi="75">
+                                    KAB. POHUWATO</option>
+                                                            <option value="7604" data-propinsi="76">
+                                    KAB. POLEWALI MANDAR</option>
+                                                            <option value="3502" data-propinsi="35">
+                                    KAB. PONOROGO</option>
+                                                            <option value="7202" data-propinsi="72">
+                                    KAB. POSO</option>
+                                                            <option value="1810" data-propinsi="18">
+                                    KAB. PRINGSEWU</option>
+                                                            <option value="3513" data-propinsi="35">
+                                    KAB. PROBOLINGGO</option>
+                                                            <option value="6211" data-propinsi="62">
+                                    KAB. PULANG PISAU</option>
+                                                            <option value="8207" data-propinsi="82">
+                                    KAB. PULAU MOROTAI</option>
+                                                            <option value="8208" data-propinsi="82">
+                                    KAB. PULAU TALIABU</option>
+                                                            <option value="9405" data-propinsi="94">
+                                    KAB. PUNCAK</option>
+                                                            <option value="9402" data-propinsi="94">
+                                    KAB. PUNCAK JAYA</option>
+                                                            <option value="3303" data-propinsi="33">
+                                    KAB. PURBALINGGA</option>
+                                                            <option value="3214" data-propinsi="32">
+                                    KAB. PURWAKARTA</option>
+                                                            <option value="3306" data-propinsi="33">
+                                    KAB. PURWOREJO</option>
+                                                            <option value="9603" data-propinsi="96">
+                                    KAB. RAJA AMPAT</option>
+                                                            <option value="1702" data-propinsi="17">
+                                    KAB. REJANG LEBONG</option>
+                                                            <option value="3317" data-propinsi="33">
+                                    KAB. REMBANG</option>
+                                                            <option value="1407" data-propinsi="14">
+                                    KAB. ROKAN HILIR</option>
+                                                            <option value="1406" data-propinsi="14">
+                                    KAB. ROKAN HULU</option>
+                                                            <option value="5314" data-propinsi="53">
+                                    KAB. ROTE NDAO</option>
+                                                            <option value="5320" data-propinsi="53">
+                                    KAB. SABU RAIJUA</option>
+                                                            <option value="6101" data-propinsi="61">
+                                    KAB. SAMBAS</option>
+                                                            <option value="1217" data-propinsi="12">
+                                    KAB. SAMOSIR</option>
+                                                            <option value="3527" data-propinsi="35">
+                                    KAB. SAMPANG</option>
+                                                            <option value="6103" data-propinsi="61">
+                                    KAB. SANGGAU</option>
+                                                            <option value="9110" data-propinsi="91">
+                                    KAB. SARMI</option>
+                                                            <option value="1503" data-propinsi="15">
+                                    KAB. SAROLANGUN</option>
+                                                            <option value="6109" data-propinsi="61">
+                                    KAB. SEKADAU</option>
+                                                            <option value="1705" data-propinsi="17">
+                                    KAB. SELUMA</option>
+                                                            <option value="3322" data-propinsi="33">
+                                    KAB. SEMARANG</option>
+                                                            <option value="8106" data-propinsi="81">
+                                    KAB. SERAM BAGIAN BARAT</option>
+                                                            <option value="8105" data-propinsi="81">
+                                    KAB. SERAM BAGIAN TIMUR</option>
+                                                            <option value="3604" data-propinsi="36">
+                                    KAB. SERANG</option>
+                                                            <option value="1218" data-propinsi="12">
+                                    KAB. SERDANG BEDAGAI</option>
+                                                            <option value="6207" data-propinsi="62">
+                                    KAB. SERUYAN</option>
+                                                            <option value="1408" data-propinsi="14">
+                                    KAB. SIAK</option>
+                                                            <option value="7314" data-propinsi="73">
+                                    KAB. SIDENRENG RAPPANG</option>
+                                                            <option value="3515" data-propinsi="35">
+                                    KAB. SIDOARJO</option>
+                                                            <option value="7210" data-propinsi="72">
+                                    KAB. SIGI</option>
+                                                            <option value="1303" data-propinsi="13">
+                                    KAB. SIJUNJUNG</option>
+                                                            <option value="5307" data-propinsi="53">
+                                    KAB. SIKKA</option>
+                                                            <option value="1208" data-propinsi="12">
+                                    KAB. SIMALUNGUN</option>
+                                                            <option value="1109" data-propinsi="11">
+                                    KAB. SIMEULUE</option>
+                                                            <option value="7307" data-propinsi="73">
+                                    KAB. SINJAI</option>
+                                                            <option value="6105" data-propinsi="61">
+                                    KAB. SINTANG</option>
+                                                            <option value="3512" data-propinsi="35">
+                                    KAB. SITUBONDO</option>
+                                                            <option value="3404" data-propinsi="34">
+                                    KAB. SLEMAN</option>
+                                                            <option value="1302" data-propinsi="13">
+                                    KAB. SOLOK</option>
+                                                            <option value="1311" data-propinsi="13">
+                                    KAB. SOLOK SELATAN</option>
+                                                            <option value="7312" data-propinsi="73">
+                                    KAB. SOPPENG</option>
+                                                            <option value="9601" data-propinsi="96">
+                                    KAB. SORONG</option>
+                                                            <option value="9602" data-propinsi="96">
+                                    KAB. SORONG SELATAN</option>
+                                                            <option value="3314" data-propinsi="33">
+                                    KAB. SRAGEN</option>
+                                                            <option value="3213" data-propinsi="32">
+                                    KAB. SUBANG</option>
+                                                            <option value="3202" data-propinsi="32">
+                                    KAB. SUKABUMI</option>
+                                                            <option value="6208" data-propinsi="62">
+                                    KAB. SUKAMARA</option>
+                                                            <option value="3311" data-propinsi="33">
+                                    KAB. SUKOHARJO</option>
+                                                            <option value="5312" data-propinsi="53">
+                                    KAB. SUMBA BARAT</option>
+                                                            <option value="5318" data-propinsi="53">
+                                    KAB. SUMBA BARAT DAYA</option>
+                                                            <option value="5317" data-propinsi="53">
+                                    KAB. SUMBA TENGAH</option>
+                                                            <option value="5311" data-propinsi="53">
+                                    KAB. SUMBA TIMUR</option>
+                                                            <option value="5204" data-propinsi="52">
+                                    KAB. SUMBAWA</option>
+                                                            <option value="5207" data-propinsi="52">
+                                    KAB. SUMBAWA BARAT</option>
+                                                            <option value="3211" data-propinsi="32">
+                                    KAB. SUMEDANG</option>
+                                                            <option value="3529" data-propinsi="35">
+                                    KAB. SUMENEP</option>
+                                                            <option value="9119" data-propinsi="91">
+                                    KAB. SUPIORI</option>
+                                                            <option value="6309" data-propinsi="63">
+                                    KAB. TABALONG</option>
+                                                            <option value="5102" data-propinsi="51">
+                                    KAB. TABANAN</option>
+                                                            <option value="7305" data-propinsi="73">
+                                    KAB. TAKALAR</option>
+                                                            <option value="9604" data-propinsi="96">
+                                    KAB. TAMBRAUW</option>
+                                                            <option value="6504" data-propinsi="65">
+                                    KAB. TANA TIDUNG</option>
+                                                            <option value="7318" data-propinsi="73">
+                                    KAB. TANA TORAJA</option>
+                                                            <option value="6310" data-propinsi="63">
+                                    KAB. TANAH BUMBU</option>
+                                                            <option value="1304" data-propinsi="13">
+                                    KAB. TANAH DATAR</option>
+                                                            <option value="6301" data-propinsi="63">
+                                    KAB. TANAH LAUT</option>
+                                                            <option value="3603" data-propinsi="36">
+                                    KAB. TANGERANG</option>
+                                                            <option value="1806" data-propinsi="18">
+                                    KAB. TANGGAMUS</option>
+                                                            <option value="1506" data-propinsi="15">
+                                    KAB. TANJUNG JABUNG BARAT</option>
+                                                            <option value="1507" data-propinsi="15">
+                                    KAB. TANJUNG JABUNG TIMUR</option>
+                                                            <option value="1203" data-propinsi="12">
+                                    KAB. TAPANULI SELATAN</option>
+                                                            <option value="1201" data-propinsi="12">
+                                    KAB. TAPANULI TENGAH</option>
+                                                            <option value="1202" data-propinsi="12">
+                                    KAB. TAPANULI UTARA</option>
+                                                            <option value="6305" data-propinsi="63">
+                                    KAB. TAPIN</option>
+                                                            <option value="3206" data-propinsi="32">
+                                    KAB. TASIKMALAYA</option>
+                                                            <option value="1509" data-propinsi="15">
+                                    KAB. TEBO</option>
+                                                            <option value="3328" data-propinsi="33">
+                                    KAB. TEGAL</option>
+                                                            <option value="9206" data-propinsi="92">
+                                    KAB. TELUK BINTUNI</option>
+                                                            <option value="9207" data-propinsi="92">
+                                    KAB. TELUK WONDAMA</option>
+                                                            <option value="3323" data-propinsi="33">
+                                    KAB. TEMANGGUNG</option>
+                                                            <option value="5302" data-propinsi="53">
+                                    KAB. TIMOR TENGAH SELATAN</option>
+                                                            <option value="5303" data-propinsi="53">
+                                    KAB. TIMOR TENGAH UTARA</option>
+                                                            <option value="1212" data-propinsi="12">
+                                    KAB. TOBA</option>
+                                                            <option value="7209" data-propinsi="72">
+                                    KAB. TOJO UNA UNA</option>
+                                                            <option value="7204" data-propinsi="72">
+                                    KAB. TOLI TOLI</option>
+                                                            <option value="9504" data-propinsi="95">
+                                    KAB. TOLIKARA</option>
+                                                            <option value="7326" data-propinsi="73">
+                                    KAB. TORAJA UTARA</option>
+                                                            <option value="3503" data-propinsi="35">
+                                    KAB. TRENGGALEK</option>
+                                                            <option value="3523" data-propinsi="35">
+                                    KAB. TUBAN</option>
+                                                            <option value="1805" data-propinsi="18">
+                                    KAB. TULANG BAWANG</option>
+                                                            <option value="1812" data-propinsi="18">
+                                    KAB. TULANG BAWANG BARAT</option>
+                                                            <option value="3504" data-propinsi="35">
+                                    KAB. TULUNGAGUNG</option>
+                                                            <option value="7313" data-propinsi="73">
+                                    KAB. WAJO</option>
+                                                            <option value="7407" data-propinsi="74">
+                                    KAB. WAKATOBI</option>
+                                                            <option value="9115" data-propinsi="91">
+                                    KAB. WAROPEN</option>
+                                                            <option value="1808" data-propinsi="18">
+                                    KAB. WAY KANAN</option>
+                                                            <option value="3312" data-propinsi="33">
+                                    KAB. WONOGIRI</option>
+                                                            <option value="3307" data-propinsi="33">
+                                    KAB. WONOSOBO</option>
+                                                            <option value="9503" data-propinsi="95">
+                                    KAB. YAHUKIMO</option>
+                                                            <option value="9506" data-propinsi="95">
+                                    KAB. YALIMO</option>
+                                                            <option value="3173" data-propinsi="31">
+                                    KOTA ADM. JAKARTA BARAT</option>
+                                                            <option value="3171" data-propinsi="31">
+                                    KOTA ADM. JAKARTA PUSAT</option>
+                                                            <option value="3174" data-propinsi="31">
+                                    KOTA ADM. JAKARTA SELATAN</option>
+                                                            <option value="3175" data-propinsi="31">
+                                    KOTA ADM. JAKARTA TIMUR</option>
+                                                            <option value="3172" data-propinsi="31">
+                                    KOTA ADM. JAKARTA UTARA</option>
+                                                            <option value="8171" data-propinsi="81">
+                                    KOTA AMBON</option>
+                                                            <option value="6471" data-propinsi="64">
+                                    KOTA BALIKPAPAN</option>
+                                                            <option value="1171" data-propinsi="11">
+                                    KOTA BANDA ACEH</option>
+                                                            <option value="1871" data-propinsi="18">
+                                    KOTA BANDAR LAMPUNG</option>
+                                                            <option value="3273" data-propinsi="32">
+                                    KOTA BANDUNG</option>
+                                                            <option value="3279" data-propinsi="32">
+                                    KOTA BANJAR</option>
+                                                            <option value="6372" data-propinsi="63">
+                                    KOTA BANJARBARU</option>
+                                                            <option value="6371" data-propinsi="63">
+                                    KOTA BANJARMASIN</option>
+                                                            <option value="2171" data-propinsi="21">
+                                    KOTA BATAM</option>
+                                                            <option value="3579" data-propinsi="35">
+                                    KOTA BATU</option>
+                                                            <option value="7472" data-propinsi="74">
+                                    KOTA BAU BAU</option>
+                                                            <option value="3275" data-propinsi="32">
+                                    KOTA BEKASI</option>
+                                                            <option value="1771" data-propinsi="17">
+                                    KOTA BENGKULU</option>
+                                                            <option value="5272" data-propinsi="52">
+                                    KOTA BIMA</option>
+                                                            <option value="1275" data-propinsi="12">
+                                    KOTA BINJAI</option>
+                                                            <option value="7172" data-propinsi="71">
+                                    KOTA BITUNG</option>
+                                                            <option value="3572" data-propinsi="35">
+                                    KOTA BLITAR</option>
+                                                            <option value="3271" data-propinsi="32">
+                                    KOTA BOGOR</option>
+                                                            <option value="6474" data-propinsi="64">
+                                    KOTA BONTANG</option>
+                                                            <option value="1375" data-propinsi="13">
+                                    KOTA BUKITTINGGI</option>
+                                                            <option value="3672" data-propinsi="36">
+                                    KOTA CILEGON</option>
+                                                            <option value="3277" data-propinsi="32">
+                                    KOTA CIMAHI</option>
+                                                            <option value="3274" data-propinsi="32">
+                                    KOTA CIREBON</option>
+                                                            <option value="5171" data-propinsi="51">
+                                    KOTA DENPASAR</option>
+                                                            <option value="3276" data-propinsi="32">
+                                    KOTA DEPOK</option>
+                                                            <option value="1472" data-propinsi="14">
+                                    KOTA DUMAI</option>
+                                                            <option value="7571" data-propinsi="75">
+                                    KOTA GORONTALO</option>
+                                                            <option value="1278" data-propinsi="12">
+                                    KOTA GUNUNGSITOLI</option>
+                                                            <option value="1571" data-propinsi="15">
+                                    KOTA JAMBI</option>
+                                                            <option value="9171" data-propinsi="91">
+                                    KOTA JAYAPURA</option>
+                                                            <option value="3571" data-propinsi="35">
+                                    KOTA KEDIRI</option>
+                                                            <option value="7471" data-propinsi="74">
+                                    KOTA KENDARI</option>
+                                                            <option value="7174" data-propinsi="71">
+                                    KOTA KOTAMOBAGU</option>
+                                                            <option value="5371" data-propinsi="53">
+                                    KOTA KUPANG</option>
+                                                            <option value="1174" data-propinsi="11">
+                                    KOTA LANGSA</option>
+                                                            <option value="1173" data-propinsi="11">
+                                    KOTA LHOKSEUMAWE</option>
+                                                            <option value="1673" data-propinsi="16">
+                                    KOTA LUBUK LINGGAU</option>
+                                                            <option value="3577" data-propinsi="35">
+                                    KOTA MADIUN</option>
+                                                            <option value="3371" data-propinsi="33">
+                                    KOTA MAGELANG</option>
+                                                            <option value="7371" data-propinsi="73">
+                                    KOTA MAKASSAR</option>
+                                                            <option value="3573" data-propinsi="35">
+                                    KOTA MALANG</option>
+                                                            <option value="7171" data-propinsi="71">
+                                    KOTA MANADO</option>
+                                                            <option value="5271" data-propinsi="52">
+                                    KOTA MATARAM</option>
+                                                            <option value="1271" data-propinsi="12">
+                                    KOTA MEDAN</option>
+                                                            <option value="1872" data-propinsi="18">
+                                    KOTA METRO</option>
+                                                            <option value="3576" data-propinsi="35">
+                                    KOTA MOJOKERTO</option>
+                                                            <option value="1371" data-propinsi="13">
+                                    KOTA PADANG</option>
+                                                            <option value="1374" data-propinsi="13">
+                                    KOTA PADANG PANJANG</option>
+                                                            <option value="1277" data-propinsi="12">
+                                    KOTA PADANG SIDEMPUAN</option>
+                                                            <option value="1672" data-propinsi="16">
+                                    KOTA PAGAR ALAM</option>
+                                                            <option value="6271" data-propinsi="62">
+                                    KOTA PALANGKARAYA</option>
+                                                            <option value="1671" data-propinsi="16">
+                                    KOTA PALEMBANG</option>
+                                                            <option value="7373" data-propinsi="73">
+                                    KOTA PALOPO</option>
+                                                            <option value="7271" data-propinsi="72">
+                                    KOTA PALU</option>
+                                                            <option value="1971" data-propinsi="19">
+                                    KOTA PANGKAL PINANG</option>
+                                                            <option value="7372" data-propinsi="73">
+                                    KOTA PAREPARE</option>
+                                                            <option value="1377" data-propinsi="13">
+                                    KOTA PARIAMAN</option>
+                                                            <option value="3575" data-propinsi="35">
+                                    KOTA PASURUAN</option>
+                                                            <option value="1376" data-propinsi="13">
+                                    KOTA PAYAKUMBUH</option>
+                                                            <option value="3375" data-propinsi="33">
+                                    KOTA PEKALONGAN</option>
+                                                            <option value="1471" data-propinsi="14">
+                                    KOTA PEKANBARU</option>
+                                                            <option value="1272" data-propinsi="12">
+                                    KOTA PEMATANGSIANTAR</option>
+                                                            <option value="6171" data-propinsi="61">
+                                    KOTA PONTIANAK</option>
+                                                            <option value="1674" data-propinsi="16">
+                                    KOTA PRABUMULIH</option>
+                                                            <option value="3574" data-propinsi="35">
+                                    KOTA PROBOLINGGO</option>
+                                                            <option value="1172" data-propinsi="11">
+                                    KOTA SABANG</option>
+                                                            <option value="3373" data-propinsi="33">
+                                    KOTA SALATIGA</option>
+                                                            <option value="6472" data-propinsi="64">
+                                    KOTA SAMARINDA</option>
+                                                            <option value="1373" data-propinsi="13">
+                                    KOTA SAWAHLUNTO</option>
+                                                            <option value="3374" data-propinsi="33">
+                                    KOTA SEMARANG</option>
+                                                            <option value="3673" data-propinsi="36">
+                                    KOTA SERANG</option>
+                                                            <option value="1273" data-propinsi="12">
+                                    KOTA SIBOLGA</option>
+                                                            <option value="6172" data-propinsi="61">
+                                    KOTA SINGKAWANG</option>
+                                                            <option value="1372" data-propinsi="13">
+                                    KOTA SOLOK</option>
+                                                            <option value="9671" data-propinsi="96">
+                                    KOTA SORONG</option>
+                                                            <option value="1175" data-propinsi="11">
+                                    KOTA SUBULUSSALAM</option>
+                                                            <option value="3272" data-propinsi="32">
+                                    KOTA SUKABUMI</option>
+                                                            <option value="1572" data-propinsi="15">
+                                    KOTA SUNGAI PENUH</option>
+                                                            <option value="3578" data-propinsi="35">
+                                    KOTA SURABAYA</option>
+                                                            <option value="3372" data-propinsi="33">
+                                    KOTA SURAKARTA</option>
+                                                            <option value="3671" data-propinsi="36">
+                                    KOTA TANGERANG</option>
+                                                            <option value="3674" data-propinsi="36">
+                                    KOTA TANGERANG SELATAN</option>
+                                                            <option value="1274" data-propinsi="12">
+                                    KOTA TANJUNG BALAI</option>
+                                                            <option value="2172" data-propinsi="21">
+                                    KOTA TANJUNG PINANG</option>
+                                                            <option value="6571" data-propinsi="65">
+                                    KOTA TARAKAN</option>
+                                                            <option value="3278" data-propinsi="32">
+                                    KOTA TASIKMALAYA</option>
+                                                            <option value="1276" data-propinsi="12">
+                                    KOTA TEBING TINGGI</option>
+                                                            <option value="3376" data-propinsi="33">
+                                    KOTA TEGAL</option>
+                                                            <option value="8271" data-propinsi="82">
+                                    KOTA TERNATE</option>
+                                                            <option value="8272" data-propinsi="82">
+                                    KOTA TIDORE KEPULAUAN</option>
+                                                            <option value="7173" data-propinsi="71">
+                                    KOTA TOMOHON</option>
+                                                            <option value="8172" data-propinsi="81">
+                                    KOTA TUAL</option>
+                                                            <option value="3471" data-propinsi="34">
+                                    KOTA YOGYAKARTA</option>
+                                                            <option value="-1" data-propinsi="-1">
+                                    PROPINSI</option>
+                                                    </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="filter-label">Tahun</label>
+                        <select id="kecFilterTahun" class="form-control tom-select">
+                            <option value="">Semua Tahun</option>
+                                                            <option value="2026">2026</option>
+                                                            <option value="2025">2025</option>
+                                                            <option value="2024">2024</option>
+                                                            <option value="2023">2023</option>
+                                                            <option value="2022">2022</option>
+                                                            <option value="2021">2021</option>
+                                                            <option value="2020">2020</option>
+                                                    </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="filter-label">Sumber Dana</label>
+                        <select id="kecFilterSumberDana" class="form-control tom-select">
+                            <option value="">Semua Sumber Dana</option>
+                                                            <option value="APBD KAB/KOTA">
+                                    APBD KAB/KOTA</option>
+                                                            <option value="APBD KAB/KOTA kerjasama dengan asosiasi">
+                                    APBD KAB/KOTA kerjasama dengan asosiasi</option>
+                                                            <option value="APBD KAB/KOTA kerjasama dengan lainnya">
+                                    APBD KAB/KOTA kerjasama dengan lainnya</option>
+                                                            <option value="APBD Prov">
+                                    APBD Prov</option>
+                                                            <option value="APBD provinsi kerjasama dengan asosiasi">
+                                    APBD provinsi kerjasama dengan asosiasi</option>
+                                                            <option value="APBD provinsi kerjasama dengan lainnya">
+                                    APBD provinsi kerjasama dengan lainnya</option>
+                                                            <option value="APBN">
+                                    APBN</option>
+                                                            <option value="Asosiasi">
+                                    Asosiasi</option>
+                                                            <option value="DAU">
+                                    DAU</option>
+                                                            <option value="DBHP">
+                                    DBHP</option>
+                                                            <option value="Perguruan Tinggi">
+                                    Perguruan Tinggi</option>
+                                                    </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <button type="button" id="kecResetFilter" class="btn btn-outline-secondary w-100 font-weight-bold"
+                            style="height: 42px; border-radius: 12px;">
+                            <i class="fas fa-undo mr-2"></i> RESET
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="table-premium-container">
+                                <div class="table-responsive">
+                    <table class="table mb-0" id="table-kecelakaan" width="100%"><thead><tr><th title="Pekerjaan">Pekerjaan</th><th title="Perusahaan">Perusahaan</th><th title="Lokasi">Lokasi</th><th title="Waktu">Waktu</th><th title="Deskripsi">Deskripsi</th><th title="Kerugian">Kerugian</th><th title="Masalah">Masalah</th><th title="Kota">Kota</th><th title="Provinsi">Provinsi</th><th title="Sumber Dana">Sumber Dana</th><th title="Aksi">Aksi</th></tr></thead></table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+
+        <!-- Main Footer -->
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-block">
+                <b>Version</b> 3.0.1
+            </div>
+            <strong>Copyright &copy; 2015-2022 djbk.</strong> All rights
+            reserved.
+        </footer>
+    </div>
+    <div id="fullscreen-loader-global" class="fullscreen-loader d-none">
+    <div class="loader-content text-center">
+        <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+        <div class="text-light font-weight-bold" style="letter-spacing: 1px; font-size: 1.1rem;">SEDANG MEMUAT...</div>
+    </div>
+</div>
+                
+    <script src="https://sipjaki.pu.go.id//js/app.js"></script>
+    <script>
+        // Global DataTable Loading & Defaults
+        if (typeof jQuery !== 'undefined') {
+            $(function() {
+                if ($.fn.dataTable) {
+                    $.extend(true, $.fn.dataTable.defaults, {
+                        processing: false // Matikan indikator "Processing..." bawaan
+                    });
+                }
+
+                // Hook global untuk menampilkan/menyembunyikan loader
+                $(document).on('preXhr.dt', function() {
+                    if (typeof showLoader === 'function') showLoader();
+                });
+                $(document).on('draw.dt xhr.dt', function() {
+                    if (typeof hideLoader === 'function') hideLoader();
+                });
+
+                // Paksa matikan indikator processing bawaan untuk semua tabel (termasuk yang diset lokal)
+                $(document).on('preInit.dt', function(e, settings) {
+                    if (settings && settings.oFeatures) {
+                        settings.oFeatures.bProcessing = false;
+                    }
+                });
+            });
+        }
+    </script>
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
+
+        <!-- Datatables -->
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.colVis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>
+<script src="https://sipjaki.pu.go.id//vendor/datatables/buttons.server-side.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript">$(function(){window.LaravelDataTables=window.LaravelDataTables||{};window.LaravelDataTables["table-kecelakaan"]=$("#table-kecelakaan").DataTable({"serverSide":true,"processing":true,"ajax":{"url":"https:\/\/sipjaki.pu.go.id\/kecelakaans","type":"GET","data":function(data) {
+            for (var i = 0, len = data.columns.length; i < len; i++) {
+                if (!data.columns[i].search.value) delete data.columns[i].search;
+                if (data.columns[i].searchable === true) delete data.columns[i].searchable;
+                if (data.columns[i].orderable === true) delete data.columns[i].orderable;
+                if (data.columns[i].data === data.columns[i].name) delete data.columns[i].name;
+            }
+            delete data.search.regex;}},"columns":[{"name":"pekerjaan","data":"pekerjaan","title":"Pekerjaan","orderable":true,"searchable":true},{"name":"perusahaan","data":"perusahaan","title":"Perusahaan","orderable":true,"searchable":true},{"name":"lokasi","data":"lokasi","title":"Lokasi","orderable":true,"searchable":true},{"name":"waktu","data":"waktu","title":"Waktu","orderable":true,"searchable":true},{"name":"deskripsi","data":"deskripsi","title":"Deskripsi","orderable":true,"searchable":true},{"name":"kerugian","data":"kerugian","title":"Kerugian","orderable":true,"searchable":true},{"name":"masalah","data":"masalah","title":"Masalah","orderable":true,"searchable":true},{"name":"kota","data":"kota","title":"Kota","orderable":true,"searchable":true},{"title":"Provinsi","name":"propinsi","data":"propinsi","orderable":true,"searchable":true},{"name":"sumber_dana","data":"sumber_dana","title":"Sumber Dana","orderable":true,"searchable":true},{"data":"action","name":"action","title":"Aksi","orderable":false,"searchable":false,"className":"text-nowrap"}],"scrollX":true,"dom":"lfrtip","stateSave":true,"order":[[0,"desc"]],"autoWidth":false});});</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+        integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        (function() {
+            if (!window.TomSelect) return;
+
+            const OriginalTomSelect = window.TomSelect;
+
+            function hardenTomSelectInput(instance) {
+                if (!instance || !instance.control_input) return;
+                instance.control_input.setAttribute('autocomplete', 'new-password');
+                instance.control_input.setAttribute('autocorrect', 'off');
+                instance.control_input.setAttribute('autocapitalize', 'off');
+                instance.control_input.setAttribute('spellcheck', 'false');
+            }
+
+            function closeOtherTomSelects(currentInstance) {
+                document.querySelectorAll('select.tom-select').forEach(function(el) {
+                    if (!el.tomselect || el.tomselect === currentInstance) return;
+                    if (typeof el.tomselect.close === 'function') {
+                        el.tomselect.close();
+                    }
+                });
+            }
+
+            window.TomSelect = function(input, settings) {
+                const mergedSettings = Object.assign({
+                    maxOptions: 200
+                }, settings || {});
+
+                const originalOnFocus = mergedSettings.onFocus;
+                mergedSettings.onFocus = function() {
+                    closeOtherTomSelects(this);
+                    if (typeof originalOnFocus === 'function') {
+                        originalOnFocus.apply(this, arguments);
+                    }
+                };
+
+                const instance = new OriginalTomSelect(input, mergedSettings);
+                hardenTomSelectInput(instance);
+
+                // Apply nilai yang sudah diset sebelum TomSelect diinisialisasi
+                const preset = input && input.getAttribute ? input.getAttribute('data-preselect-value') : null;
+                if (preset !== null) {
+                    if (preset !== '' && !instance.options[String(preset)]) {
+                        instance.addOption({
+                            value: String(preset),
+                            text: String(preset)
+                        });
+                    }
+                    instance.setValue(preset, true);
+                }
+                return instance;
+            };
+
+            window.TomSelect.prototype = OriginalTomSelect.prototype;
+            Object.keys(OriginalTomSelect).forEach(function(key) {
+                window.TomSelect[key] = OriginalTomSelect[key];
+            });
+
+            document.addEventListener('focusin', function(e) {
+                if (!e.target || !e.target.closest) return;
+                if (!e.target.closest('.ts-wrapper')) return;
+
+                document.querySelectorAll('select.tom-select').forEach(function(el) {
+                    if (!el.tomselect) return;
+                    hardenTomSelectInput(el.tomselect);
+                });
+            });
+        })();
+    </script>
+        <!-- Datatables -->
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.colVis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>
+<script src="https://sipjaki.pu.go.id//vendor/datatables/buttons.server-side.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(function() {
+            const sharedWilayahFilterKey = 'simak_shared_wilayah_filter';
+            let isSyncingWilayahFilter = false;
+
+            const isBalaiRole = false;
+            const isPropRole = false;
+            const isGlobalRole = false;
+            const showWilayahFilter = false;
+            const userPropinsi = 32;
+            const $balai = $('#kecFilterBalai');
+            const $propinsi = $('#kecFilterPropinsi');
+            const $kota = $('#kecFilterKota');
+            const $tahun = $('#kecFilterTahun');
+            const $sumberDana = $('#kecFilterSumberDana');
+
+            const allPropinsiOptions = $propinsi.find('option').clone();
+            const allKotaOptions = $kota.find('option').clone();
+
+            const loadSharedFilter = function() {
+                try {
+                    const raw = localStorage.getItem(sharedWilayahFilterKey);
+                    return raw ? JSON.parse(raw) : {
+                        balai: '',
+                        propinsi: '',
+                        kota: ''
+                    };
+                } catch (e) {
+                    return {
+                        balai: '',
+                        propinsi: '',
+                        kota: ''
+                    };
+                }
+            };
+
+            const sharedFilter = loadSharedFilter();
+            let queryBalai = (sharedFilter.balai || '').toString();
+            let queryPropinsi = (sharedFilter.propinsi || '').toString();
+            let queryKota = (sharedFilter.kota || '').toString();
+
+            function applyPropinsiHierarchy() {
+                if (!$balai.length || !$propinsi.length) return;
+                const selectedBalai = String($balai.val() || '');
+                const currentProp = String($propinsi.val() || '');
+                $propinsi.empty();
+                $propinsi.append('<option value="">Semua Provinsi</option>');
+
+                allPropinsiOptions.each(function() {
+                    const $opt = $(this);
+                    const val = String($opt.val() || '');
+                    const optBalai = String($opt.data('balai') || '');
+                    if (val !== '' && (selectedBalai === '' || optBalai === selectedBalai)) {
+                        $propinsi.append($opt.clone());
+                    }
+                });
+
+                $propinsi.val($propinsi.find(`option[value="${currentProp}"]`).length ? currentProp : '');
+
+                if ($propinsi[0] && $propinsi[0].tomselect) {
+                    $propinsi[0].tomselect.clearOptions();
+                    $propinsi.find('option').each(function() {
+                        $propinsi[0].tomselect.addOption({
+                            value: $(this).val(),
+                            text: $(this).text()
+                        });
+                    });
+                    $propinsi[0].tomselect.setValue($propinsi.val(), true);
+                }
+            }
+
+            function applyKotaHierarchy() {
+                const selectedPropinsi = String($propinsi.val() || '');
+                const currentKota = String($kota.val() || '');
+                $kota.empty();
+
+                $kota.append('<option value="">Semua Kab/Kota</option>');
+                $kota.append('<option value="-1">Provinsi</option>');
+
+                allKotaOptions.each(function() {
+                    const $opt = $(this);
+                    const val = String($opt.val() || '');
+                    const optProp = String($opt.data('propinsi') || '');
+                    if (val !== '' && val !== '-1' && (selectedPropinsi === '' || optProp ===
+                            selectedPropinsi)) {
+                        $kota.append($opt.clone());
+                    }
+                });
+
+                const fallbackKota = (selectedPropinsi && $kota.find('option[value="-1"]').length) ? '-1' : '';
+                $kota.val($kota.find(`option[value="${currentKota}"]`).length ? currentKota : fallbackKota);
+
+                if ($kota[0] && $kota[0].tomselect) {
+                    $kota[0].tomselect.clearOptions();
+                    $kota.find('option').each(function() {
+                        $kota[0].tomselect.addOption({
+                            value: $(this).val(),
+                            text: $(this).text()
+                        });
+                    });
+                    $kota[0].tomselect.setValue($kota.val(), true);
+                }
+            }
+
+            function syncSharedFilter() {
+                if (isSyncingWilayahFilter) return;
+                try {
+                    localStorage.setItem(sharedWilayahFilterKey, JSON.stringify({
+                        balai: $balai.val() || '',
+                        propinsi: $propinsi.val() || '',
+                        kota: $kota.val() || ''
+                    }));
+                } catch (e) {}
+            }
+
+            function reloadTable() {
+                const table = $('#table-kecelakaan').DataTable();
+                const url = new URL(table.ajax.url(), window.location.origin);
+
+                url.searchParams.set('balai_filter', $balai.val() || '');
+                url.searchParams.set('propinsi_filter', $propinsi.val() || '');
+                url.searchParams.set('kota_filter', $kota.val() || '');
+                url.searchParams.set('tahun_filter', $tahun.val() || '');
+                url.searchParams.set('sumber_dana_filter', $sumberDana.val() || '');
+
+                table.ajax.url(url.toString()).load();
+                updateSummary();
+                syncSharedFilter();
+            }
+
+            function updateSummary() {
+                $.ajax({
+                    url: "https://sipjaki.pu.go.id/kecelakaans-summary",
+                    data: {
+                        balai_filter: $balai.val() || '',
+                        propinsi_filter: $propinsi.val() || '',
+                        kota_filter: $kota.val() || '',
+                        tahun_filter: $tahun.val() || '',
+                        sumber_dana_filter: $sumberDana.val() || ''
+                    },
+                    success: function(resp) {
+                        if (resp.status) {
+                            $('#statTotalKecelakaan').text(resp.data.total_kecelakaan.toLocaleString(
+                                'id-ID'));
+                            $('#statKecelakaanTahunBerjalan').text(resp.data
+                                .total_kecelakaan_tahun_berjalan.toLocaleString('id-ID'));
+                        }
+                    }
+                });
+            }
+
+            if (showWilayahFilter) {
+                if (queryBalai && $balai.length && !$balai.prop('disabled')) {
+                    $balai.val(queryBalai);
+                    if ($balai[0] && $balai[0].tomselect) $balai[0].tomselect.setValue(queryBalai, true);
+                }
+                applyPropinsiHierarchy();
+
+                if (queryPropinsi) {
+                    $propinsi.val(queryPropinsi);
+                    if ($propinsi[0] && $propinsi[0].tomselect) $propinsi[0].tomselect.setValue(queryPropinsi, true);
+                }
+                applyKotaHierarchy();
+
+                if (queryKota) {
+                    $kota.val(queryKota);
+                    if ($kota[0] && $kota[0].tomselect) $kota[0].tomselect.setValue(queryKota, true);
+                }
+
+                $balai.on('change', function() {
+                    applyPropinsiHierarchy();
+                    applyKotaHierarchy();
+                    reloadTable();
+                });
+                $propinsi.on('change', function() {
+                    applyKotaHierarchy();
+                    reloadTable();
+                });
+                $kota.on('change', reloadTable);
+            }
+
+            $tahun.on('change', reloadTable);
+            $sumberDana.on('change', reloadTable);
+
+            // Initial load
+            reloadTable();
+
+            $('#kecResetFilter').on('click', function() {
+                if ($balai.length && !$balai.prop('disabled')) {
+                    $balai.val('');
+                    if ($balai[0] && $balai[0].tomselect) $balai[0].tomselect.setValue('', true);
+                }
+                applyPropinsiHierarchy();
+
+                [$propinsi, $kota, $tahun, $sumberDana].forEach($el => {
+                    if ($el.length) {
+                        $el.val('');
+                        if ($el[0].tomselect) $el[0].tomselect.setValue('', true);
+                    }
+                });
+                if (showWilayahFilter) applyKotaHierarchy();
+                reloadTable();
+            });
+                reloadTable();
+            });
+
+            // SweetAlert Delete
+            $(document).on('click', '.btn-delete-kecelakaan', function(e) {
+                e.preventDefault();
+                const url = $(this).data('url');
+                const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                Swal.fire({
+                    title: 'Apakah anda yakin ingin menghapus data kecelakaan?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'BATAL',
+                    buttonsStyling: false,
+                    customClass: {
+                        confirmButton: 'btn btn-danger mx-2',
+                        cancelButton: 'btn btn-secondary'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showLoader();
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {
+                                _method: 'DELETE',
+                                _token: csrfToken
+                            },
+                            success: function(resp) {
+                                hideLoader();
+                                if (resp.status) {
+                                    Swal.fire('Berhasil', resp.message, 'success').then(
+                                        () => {
+                                            const table = $('#table-kecelakaan')
+                                                .DataTable();
+                                            table.ajax.reload(null, false);
+                                            updateSummary();
+                                        });
+                                } else {
+                                    Swal.fire('Gagal', resp.message ||
+                                        'Gagal menghapus data', 'error');
+                                }
+                            },
+                            error: function(xhr) {
+                                hideLoader();
+                                const msg = xhr.responseJSON?.message ||
+                                    'Terjadi kesalahan sistem';
+                                Swal.fire('Error', msg, 'error');
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        })
+    </script>
+    <script>
+        function showLoader() {
+            document.getElementById('fullscreen-loader-global')?.classList.remove('d-none');
+            document.body.classList.add('loading');
+        }
+
+        function hideLoader() {
+            document.getElementById('fullscreen-loader-global')?.classList.add('d-none');
+            document.body.classList.remove('loading');
+        }
+
+        function docUrl(path) {
+            if (!path) return '';
+            return path.startsWith('http') ? path : '/' + path;
+        }
+
+        function setTom(name, value) {
+            const el = document.querySelector(`select[name="${name}"]`);
+            if (!el) return;
+
+            const normalized = value ?? '';
+
+            // Simpan nilai target jika TomSelect belum terpasang (akan diaplikasikan saat init)
+            el.setAttribute('data-preselect-value', String(normalized));
+
+            // Fallback native select agar nilai tidak hilang saat modal dibuka
+            el.value = normalized;
+
+            if (el.tomselect) {
+                if (normalized !== '' && !el.tomselect.options[String(normalized)]) {
+                    el.tomselect.addOption({
+                        value: String(normalized),
+                        text: String(normalized)
+                    });
+                }
+                el.tomselect.setValue(normalized, true);
+            }
+        }
+    </script>
+    <script>
+        (function() {
+            function syncScrollHeadBodyWidths() {
+                if (!window.jQuery) return;
+
+                $('.dataTables_wrapper').each(function() {
+                    try {
+                        const $wrapper = $(this);
+                        const $scrollHeadInner = $wrapper.find('.dataTables_scrollHeadInner');
+                        const $scrollHeadTable = $wrapper.find('.dataTables_scrollHeadInner > table');
+                        const $scrollBodyTable = $wrapper.find('.dataTables_scrollBody > table');
+                        const tableId = String($scrollBodyTable.attr('id') || '');
+
+                        // Form-detail tables are manipulated dynamically inside modal; skip hard width sync to avoid DT internal width errors.
+                        if (/-form$/i.test(tableId)) return;
+
+                        if (!$scrollHeadInner.length || !$scrollHeadTable.length || !$scrollBodyTable.length) return;
+
+                        const bodyWidth = Math.ceil($scrollBodyTable.outerWidth() || 0);
+                        if (!bodyWidth) return;
+
+                        $scrollHeadInner.css('width', `${bodyWidth}px`);
+                        $scrollHeadTable.css('width', `${bodyWidth}px`);
+
+                        // Mirror body colgroup widths to header colgroup to keep columns perfectly aligned
+                        const $headCols = $scrollHeadTable.find('colgroup col');
+                        const $bodyCols = $scrollBodyTable.find('colgroup col');
+                        if ($headCols.length && $headCols.length === $bodyCols.length) {
+                            $headCols.each(function(i) {
+                                const bodyCol = $bodyCols.get(i);
+                                const bodyColWidth = $(bodyCol).outerWidth();
+                                const bodyColStyle = bodyCol ? bodyCol.style.width : '';
+                                if (bodyColStyle) {
+                                    this.style.width = bodyColStyle;
+                                } else if (bodyColWidth) {
+                                    this.style.width = `${Math.ceil(bodyColWidth)}px`;
+                                }
+                            });
+                        }
+                    } catch (_e) {
+                        // no-op: keep page functional even when a single DT wrapper is in transient state
+                    }
+                });
+            }
+
+            function markAksiColumns() {
+                if (!window.jQuery) return;
+                $('table.dataTable').each(function() {
+                    const $table = $(this);
+                    const $headers = $table.find('thead th');
+                    if (!$headers.length) return;
+
+                    $headers.each(function(index) {
+                        const text = ($(this).text() || '').trim().toLowerCase();
+                        if (text === 'aksi') {
+                            $(this).addClass('dt-col-aksi');
+                            $table.find('tbody tr').each(function() {
+                                $(this).children().eq(index).addClass('dt-col-aksi');
+                            });
+                        }
+                    });
+                });
+            }
+
+            function applySortHints() {
+                if (!window.jQuery) return;
+
+                $('.dataTables_wrapper').each(function() {
+                    const $wrapper = $(this);
+                    if (!$wrapper.prev().hasClass('dt-sort-hint')) {
+                        $wrapper.before(
+                            '<div class="dt-sort-hint"><i class="fas fa-sort"></i><span>Klik judul kolom untuk mengurutkan data.</span></div>'
+                        );
+                    }
+
+                    $wrapper.find('thead th.sorting, thead th.sorting_asc, thead th.sorting_desc')
+                        .attr('title', 'Klik untuk urutkan');
+                });
+            }
+
+            function adjustAllDataTables() {
+                if (!window.jQuery || !$.fn.dataTable) return;
+                markAksiColumns();
+                applySortHints();
+                const tableNodes = $.fn.dataTable.tables({
+                    visible: true
+                });
+                if (!tableNodes || !tableNodes.length) return;
+                $.each(tableNodes, function(_idx, node) {
+                    try {
+                        const tableId = String((node && node.id) || '');
+                        if (/-form$/i.test(tableId)) return;
+                        if (!$.fn.dataTable.isDataTable(node)) return;
+                        $(node).DataTable().columns.adjust();
+                    } catch (_e) {
+                        // no-op
+                    }
+                });
+                syncScrollHeadBodyWidths();
+                setTimeout(markAksiColumns, 0);
+                setTimeout(applySortHints, 0);
+                setTimeout(syncScrollHeadBodyWidths, 0);
+            }
+
+            function scheduleAdjustBurst() {
+                const ticks = [0, 80, 180, 320, 520];
+                ticks.forEach(function(ms) {
+                    setTimeout(adjustAllDataTables, ms);
+                });
+            }
+
+            function attachDtMutationObservers() {
+                if (!window.MutationObserver || !window.jQuery) return;
+                $('.dataTables_wrapper .dataTables_scrollBody tbody').each(function() {
+                    const tbody = this;
+                    if (!tbody || tbody.__dtObserved) return;
+                    tbody.__dtObserved = true;
+
+                    const observer = new MutationObserver(function() {
+                        scheduleAdjustBurst();
+                    });
+
+                    observer.observe(tbody, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true
+                    });
+                });
+            }
+
+            window.adjustAllDataTables = adjustAllDataTables;
+
+            $(document).on('init.dt xhr.dt draw.dt', function() {
+                setTimeout(adjustAllDataTables, 0);
+                setTimeout(attachDtMutationObservers, 0);
+            });
+
+            $(document).on('shown.bs.tab shown.bs.modal', function() {
+                scheduleAdjustBurst();
+                setTimeout(attachDtMutationObservers, 0);
+            });
+
+            let dtResizeTimer = null;
+            $(window).on('resize', function() {
+                clearTimeout(dtResizeTimer);
+                dtResizeTimer = setTimeout(adjustAllDataTables, 150);
+            });
+
+            setTimeout(adjustAllDataTables, 150);
+            setTimeout(attachDtMutationObservers, 180);
+        })();
+    </script>
+                
+            <script>
+            (function() {
+                const readonlyState = {
+                    pendingEditMeta: null
+                };
+
+                function isSimakPath() {
+                    return window.location.pathname.includes('/simaktertibusahas') ||
+                        window.location.pathname.includes('/simaktertibselenggaras') ||
+                        window.location.pathname.includes('/simaktertibmanfaats');
+                }
+
+                function getShowUrl(type, id) {
+                    if (String(type) === '3') return `https://sipjaki.pu.go.id/simak3/${id}`;
+                    return `https://sipjaki.pu.go.id/simak${type}/${id}`;
+                }
+
+                function parseSimakShowMetaFromUrl(rawUrl) {
+                    if (!rawUrl) return null;
+                    let path = String(rawUrl);
+                    try {
+                        const parsed = new URL(path, window.location.origin);
+                        path = parsed.pathname || path;
+                    } catch (e) {
+                        path = path.split('?')[0];
+                    }
+                    const match = path.match(/\/simak(1a[1-6]|1b1|1b2|1c|1d|1e|1f|2a|2b|2c|2d|3)\/(\d+)$/i);
+                    if (!match) return null;
+                    return {
+                        type: String(match[1]).toLowerCase(),
+                        id: Number(match[2])
+                    };
+                }
+
+                function sourceFromRow($row) {
+                    const names = $row.find('input[name], select[name], textarea[name]').map(function() {
+                        return this.name || '';
+                    }).get().join('|');
+                    if (names.includes('[pj_badan_usaha]')) return 'pj_badan_usaha';
+                    if (names.includes('[pj_teknik]')) return 'pj_teknik';
+                    if (names.includes('[pj_subklasifikasi]')) return 'pj_sub_klasifikasi';
+                    return 'details';
+                }
+
+                function extractHiddenValue($row, pattern) {
+                    const $el = $row.find('input[type="hidden"][name]').filter(function() {
+                        return pattern.test(this.name || '');
+                    }).first();
+                    return $el.length ? String($el.val() || '').trim() : '';
+                }
+
+                function buildDetailMaps(data) {
+                    const groups = [];
+                    const pushGroup = (label, source, items) => {
+                        if (!Array.isArray(items) || !items.length) return;
+                        groups.push({ label, source, items });
+                    };
+                    pushGroup('Detail', 'details', data.details);
+                    pushGroup('PJ Badan Usaha', 'pj_badan_usaha', data.pj_badan_usaha || data.pjBadanUsaha);
+                    pushGroup('PJ Teknik', 'pj_teknik', data.pj_teknik || data.pjTeknik);
+                    pushGroup('PJ Subklasifikasi', 'pj_sub_klasifikasi', data.pj_sub_klasifikasi || data.pjSubKlasifikasi);
+
+                    const maps = {};
+                    groups.forEach(function(group) {
+                        const byId = {};
+                        const byIndikator = {};
+                        (group.items || []).forEach(function(item) {
+                            if (item && item.id != null) byId[String(item.id)] = item;
+                            const indikatorId = item && (
+                                item.simak_1a1_detail_id || item.simak_1a2_detail_id || item.simak_1a3_detail_id ||
+                                item.simak_1a4_detail_id || item.simak_1a5_detail_id || item.simak_1a6_detail_id ||
+                                item.simak_1b1_detail_id || item.simak_1b2_detail_id || item.simak_1c_detail_id ||
+                                item.simak_1e_detail_id || item.simak_1f_sub_indikator_id ||
+                                item.simak_2a_indikator_id || item.simak_2b_indikator_id || item.simak_2c_indikator_id ||
+                                item.simak_2d_indikator_id || item.simak_3_indikator_id
+                            );
+                            if (indikatorId != null) byIndikator[String(indikatorId)] = item;
+                        });
+                        maps[group.source] = {
+                            byId,
+                            byIndikator,
+                            items: Array.isArray(group.items) ? group.items : []
+                        };
+                    });
+                    return maps;
+                }
+
+                function resolveDetailFromRow($row, source, detailMaps) {
+                    const detailId = extractHiddenValue($row, /\[id\]$/);
+                    const indikatorId = extractHiddenValue($row, /_indikator_id\]$/);
+                    const sourceMap = detailMaps[source] || { byId: {}, byIndikator: {} };
+
+                    let item = null;
+                    if (detailId && sourceMap.byId[detailId]) item = sourceMap.byId[detailId];
+                    if (!item && indikatorId && sourceMap.byIndikator[indikatorId]) item = sourceMap.byIndikator[indikatorId];
+                    return item;
+                }
+
+                function humanizeVerifyStatus(status) {
+                    const s = String(status || 'draft').toLowerCase();
+                    if (s === 'verified') return 'Sesuai';
+                    if (s === 'rejected') return 'Tidak Sesuai';
+                    return 'Menunggu Verifikasi';
+                }
+
+                function applyReadonlyVerificationInfo($modal, data) {
+                    if (!$modal || !$modal.length || !data) return;
+                    if (String($modal.attr('data-verify-mode')) === '1') return;
+
+                    const detailMaps = buildDetailMaps(data);
+                    $modal.find('.edit-status-info').remove();
+                    $modal.find('th[data-edit-info-added-col="1"]').remove();
+                    $modal.find('td[data-edit-info-added-cell="1"]').remove();
+
+                    $modal.find('table').each(function() {
+                        let $table = $(this);
+                        const isDtManaged = window.jQuery && $.fn.dataTable && $.fn.dataTable.isDataTable($table[0]);
+                        let $headerTable = $table;
+
+                        if (isDtManaged) {
+                            const $wrapper = $table.closest('.dataTables_wrapper');
+                            const $bodyTable = $wrapper.find('.dataTables_scrollBody > table').first();
+                            const $headTable = $wrapper.find('.dataTables_scrollHead > div > table').first();
+                            if (!$bodyTable.length || !$table.is($bodyTable)) return;
+                            $table = $bodyTable;
+                            if ($headTable.length) $headerTable = $headTable;
+                        }
+
+                        const $bodyRows = $table.find('tbody tr');
+                        if (!$bodyRows.length) return;
+
+                        let hasDraftOrReject = false;
+                        $bodyRows.each(function(rowIndex) {
+                            const $tr = $(this);
+                            const source = sourceFromRow($tr);
+                            const mapped = resolveDetailFromRow($tr, source, detailMaps);
+                            const item = mapped || (detailMaps[source] && detailMaps[source].items && detailMaps[source].items[rowIndex]) || null;
+                            const rowStatus = String((item && item.status) || '').toLowerCase();
+                            if (rowStatus === 'draft' || rowStatus === 'rejected' || rowStatus === '') {
+                                hasDraftOrReject = true;
+                                return false;
+                            }
+                        });
+                        if (!hasDraftOrReject) return;
+
+                        const rowSpan = Math.max(1, $headerTable.find('thead tr').length || 1);
+                        const $headFirstRow = $headerTable.find('thead tr').first();
+                        if ($headFirstRow.length && !$headFirstRow.find('th[data-edit-info-added-col="1"]').length) {
+                            $headFirstRow.append(`<th data-edit-info-added-col="1" rowspan="${rowSpan}" style="min-width:220px;">Informasi Verifikasi</th>`);
+                        }
+                        const $bodyHeadFirstRow = $table.find('thead tr').first();
+                        if ($bodyHeadFirstRow.length &&
+                            !$bodyHeadFirstRow.is($headFirstRow) &&
+                            !$bodyHeadFirstRow.find('th[data-edit-info-added-col="1"]').length) {
+                            $bodyHeadFirstRow.append(`<th data-edit-info-added-col="1" rowspan="${rowSpan}" style="min-width:220px;">Informasi Verifikasi</th>`);
+                        }
+
+                        $table.find('tbody tr').each(function(rowIndex) {
+                            const $tr = $(this);
+                            const source = sourceFromRow($tr);
+                            let item = resolveDetailFromRow($tr, source, detailMaps);
+                            if (!item && detailMaps[source] && detailMaps[source].items && detailMaps[source].items[rowIndex]) {
+                                // fallback by row index for dynamic/multi-header forms
+                                const fallbackItem = detailMaps[source].items[rowIndex];
+                                if (fallbackItem && fallbackItem.id) {
+                                    item = fallbackItem;
+                                }
+                            }
+                            if (!item || !item.id) return;
+
+                            const statusVal = String((item && item.status) || '').toLowerCase();
+                            const shouldShow = statusVal === 'draft' || statusVal === 'rejected' || statusVal === '';
+                            const statusText = humanizeVerifyStatus(statusVal || 'draft');
+                            const noteText = String(item.keterangan || '').trim() || '-';
+                            const html = shouldShow ? `
+                                <div class="edit-status-info p-2 border rounded bg-light">
+                                    <p class="mb-1"><strong>Status:</strong> ${statusText}</p>
+                                    <p class="mb-0"><strong>Keterangan:</strong> ${noteText}</p>
+                                </div>
+                            ` : '';
+
+                            let $infoCell = $('<td data-edit-info-added-cell="1"></td>');
+                            $infoCell.html(html);
+                            $tr.append($infoCell);
+
+                            const rowStatus = statusVal;
+                            if (rowStatus === 'verified') {
+                                $tr.addClass('verify-row-locked');
+                                $tr.find('input:not([type="hidden"]):not([type="file"]), textarea').prop('readonly', true);
+                                $tr.find('select').each(function() {
+                                    const $el = $(this);
+                                    if (typeof $el.attr('data-lock-init') === 'undefined') {
+                                        $el.attr('data-lock-init', String($el.val() || ''));
+                                    }
+                                    $el.addClass('verify-locked-select');
+                                });
+                                $tr.find('input[type="file"], .btn-danger, .btn-delete-row, .btn-remove-row, .btn-remove').prop('disabled', true).addClass('disabled').hide();
+                            }
+                        });
+                    });
+                }
+
+                if (!isSimakPath()) return;
+
+                $(document).on('click', '.btn-group .btn[class*="btn-edit-"]', function() {
+                    const $btn = $(this);
+                    const id = $btn.data('id');
+                    if (!id) return;
+
+                    const className = ($btn.attr('class') || '');
+                    const match = className.match(/btn-edit-([a-z0-9]+)/i);
+                    const type = match ? match[1] : null;
+                    if (!type) return;
+                    if (!/^(1a[1-6]|1b1|1b2|1c|1d|1e|1f|2a|2b|2c|2d|3)$/i.test(String(type))) return;
+                    readonlyState.pendingEditMeta = {
+                        type: String(type).toLowerCase(),
+                        id: Number(id)
+                    };
+                });
+
+                $(document).on('ajaxSuccess.simakReadonlyInfo', function(_event, xhr, settings) {
+                    const method = String((settings && settings.type) || 'GET').toUpperCase();
+                    if (method !== 'GET') return;
+
+                    const meta = parseSimakShowMetaFromUrl(settings && settings.url);
+                    if (!meta) return;
+
+                    const pending = readonlyState.pendingEditMeta;
+                    if (!pending || pending.type !== meta.type || Number(pending.id) !== Number(meta.id)) {
+                        return;
+                    }
+
+                    let res = xhr && xhr.responseJSON ? xhr.responseJSON : null;
+                    if (!res) {
+                        try {
+                            res = JSON.parse((xhr && xhr.responseText) || '{}');
+                        } catch (e) {
+                            res = null;
+                        }
+                    }
+                    if (!res || !res.status || !res.data) return;
+
+                    const applyAfterShow = function() {
+                        const $modal = $('.modal.show').last();
+                        if (!$modal.length || String($modal.attr('data-verify-mode')) === '1') return;
+                        applyReadonlyVerificationInfo($modal, res.data);
+                    };
+                    setTimeout(applyAfterShow, 250);
+                    setTimeout(applyAfterShow, 700);
+                    setTimeout(applyAfterShow, 1200);
+
+                    readonlyState.pendingEditMeta = null;
+                });
+
+                $(document).on('hidden.bs.modal', '.modal', function() {
+                    const $modal = $(this);
+                    if (String($modal.attr('data-verify-mode')) === '1') return;
+                    $modal.find('.edit-status-info').remove();
+                    $modal.find('th[data-edit-info-added-col="1"]').remove();
+                    $modal.find('td[data-edit-info-added-cell="1"]').remove();
+                    $modal.find('.verify-locked-select').removeClass('verify-locked-select').removeAttr('data-lock-init');
+                    $modal.find('.verify-row-locked').removeClass('verify-row-locked');
+                });
+
+                $(document).off('change.verifyLockedSelect').on('change.verifyLockedSelect', '.verify-locked-select', function() {
+                    const init = String($(this).attr('data-lock-init') || '');
+                    $(this).val(init);
+                });
+                $(document).off('mousedown.verifyLockedSelect keydown.verifyLockedSelect').on('mousedown.verifyLockedSelect keydown.verifyLockedSelect', '.verify-locked-select', function(e) {
+                    e.preventDefault();
+                    this.blur();
+                });
+            })();
+        </script>
+        <script>
+            $(function() {
+                $('.nav-sidebar .nav-link').on('click', function(e) {
+                    var href = $(this).attr('href');
+                    var target = $(this).attr('target');
+                    var hasTreeview = $(this).siblings('.nav-treeview').length > 0 || $(this).parent().hasClass('has-treeview');
+                    
+                    if (href && href !== '#' && !href.startsWith('javascript') && target !== '_blank' && !hasTreeview) {
+                        $('#fullscreen-loader-global').removeClass('d-none');
+                        
+                        setTimeout(() => {
+                            $('#fullscreen-loader-global').addClass('d-none');
+                        }, 10000);
+                    }
+                });
+            });
+        
+        
+        <script>
+            window.isSementaraUser = false;
+            $(document).ready(function() {
+                if (window.isSementaraUser) {
+                    
+                    // Use capturing phase to intercept before any other script (e.g. loading buttons)
+                    document.addEventListener('submit', function(e) {
+                        var form = e.target;
+                        if (form && form.tagName === 'FORM') {
+                            var action = form.getAttribute('action') || '';
+                            var isAllowed = action.includes('user/profile') || action.includes('user/password') || action.includes('logout') || action.includes('login');
+                            
+                            if (!isAllowed) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                e.stopImmediatePropagation();
+                                
+                                if (typeof Swal !== 'undefined') {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Akses Ditolak',
+                                        text: 'Akun sementara tidak memiliki izin untuk menyimpan, mengubah, atau menghapus data. Harap perbarui Profil dan SK Anda terlebih dahulu.',
+                                        confirmButtonText: 'Mengerti',
+                                        confirmButtonColor: '#1b3061'
+                                    });
+                                } else {
+                                    alert('Akun sementara tidak memiliki izin untuk menyimpan, mengubah, atau menghapus data.');
+                                }
+                            }
+                        }
+                    }, true);
+
+                    // Use capturing phase for clicks on delete/action buttons
+                    document.addEventListener('click', function(e) {
+                        var target = e.target;
+                        var btn = target.closest('.btn-delete, .delete-btn, .btn-danger, [data-method="delete"]');
+                        if (btn) {
+                            var form = btn.closest('form');
+                            if (form) {
+                                var action = form.getAttribute('action') || '';
+                                if (action.includes('user/profile') || action.includes('user/password') || action.includes('logout') || action.includes('login')) {
+                                    return; // let it pass
+                                }
+                            }
+                            
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Akses Ditolak',
+                                    text: 'Akun sementara tidak memiliki izin untuk menyimpan, mengubah, atau menghapus data.',
+                                    confirmButtonText: 'Mengerti',
+                                    confirmButtonColor: '#1b3061'
+                                });
+                            }
+                        }
+                    }, true);
+                    
+                    // Block global ajax POST/PUT/DELETE
+                    $.ajaxSetup({
+                        beforeSend: function(jqXHR, settings) {
+                            if (settings.type !== 'GET' && settings.type !== 'HEAD') {
+                                var url = settings.url || '';
+                                var isAllowed = url.includes('user/profile') || url.includes('user/password') || url.includes('logout');
+                                if (!isAllowed) {
+                                    if (typeof Swal !== 'undefined') {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Akses Ditolak',
+                                            text: 'Akun sementara tidak memiliki izin untuk menyimpan, mengubah, atau menghapus data.',
+                                            confirmButtonText: 'Mengerti',
+                                            confirmButtonColor: '#1b3061'
+                                        });
+                                    }
+                                    return false; // Cancel ajax request
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
+    
+    <script>
+        function formatRupiahHelper(angka) {
+            var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
+            split   = number_string.split(','),
+            sisa    = split[0].length % 3,
+            rupiah  = split[0].substr(0, sisa),
+            ribuan  = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if(ribuan){
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return rupiah;
+        }
+
+        $(document).ready(function() {
+            function applyRupiahFormat() {
+                $('.input-rupiah').each(function() {
+                    var val = $(this).val();
+                    if (val) {
+                        var clean = parseFloat(val);
+                        if (!isNaN(clean)) {
+                            $(this).val(formatRupiahHelper(Math.round(clean)));
+                        }
+                    }
+                });
+            }
+            
+            applyRupiahFormat();
+
+            $(document).on('keyup', '.input-rupiah', function(e) {
+                $(this).val(formatRupiahHelper($(this).val()));
+            });
+
+            $('form').on('submit', function() {
+                $(this).find('.input-rupiah').each(function() {
+                    var clean = $(this).val().replace(/\./g, '');
+                    $(this).val(clean);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

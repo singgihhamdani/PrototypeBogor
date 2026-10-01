@@ -23,7 +23,7 @@ interface NavMenuItem {
 const allMenuItems: NavMenuItem[] = [
   { 
     label: "Dashboard", 
-    href: "/", 
+    href: "/dashboard", 
     icon: LayoutDashboard,
     allowedRoles: ["SUPER_ADMIN", "ADMIN_BIDANG", "EKSEKUTIF"]
   },
@@ -159,12 +159,12 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         }}
       >
         {!collapsed ? (
-          <Link href="/" style={{ display: "inline-flex", textDecoration: "none" }}>
+          <Link href="/dashboard" style={{ display: "inline-flex", textDecoration: "none" }}>
             <Logo size={38} theme="dark" subtitle="DPU KAB. BOGOR" />
           </Link>
         ) : (
-          <Link href="/" style={{ display: "inline-flex", textDecoration: "none" }}>
-            <BrandIcon size={38} />
+          <Link href="/dashboard" style={{ display: "inline-flex", textDecoration: "none" }}>
+            <BrandIcon size={34} bgBadge />
           </Link>
         )}
       </div>
@@ -332,6 +332,32 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           );
         })}
       </nav>
+
+      {/* Link to Public Homepage */}
+      <div style={{ padding: "0 12px 10px 12px" }}>
+        <Link
+          href="/"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            borderRadius: "10px",
+            padding: collapsed ? "8px 0" : "8px 12px",
+            justifyContent: collapsed ? "center" : "flex-start",
+            fontSize: "12px",
+            fontWeight: 700,
+            color: "#0F2E5C",
+            backgroundColor: "#F1F5F9",
+            border: "1px solid #E2E8F0",
+            textDecoration: "none",
+            transition: "all 0.2s"
+          }}
+          title="Buka Beranda Publik"
+        >
+          <ArrowUpRight style={{ width: "16px", height: "16px", color: "#2563EB", flexShrink: 0 }} />
+          {!collapsed && <span>Portal Beranda Publik</span>}
+        </Link>
+      </div>
 
       {/* SIPJAKI Sync Status Indicator */}
       {!collapsed && (

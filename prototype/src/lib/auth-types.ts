@@ -46,7 +46,7 @@ export const ROLE_CONFIGS: Record<RoleCode, RoleMeta> = {
     badgeBg: '#0F2E5C',
     badgeText: '#FFC000',
     portalType: 'internal',
-    defaultRoute: '/',
+    defaultRoute: '/dashboard',
   },
   ADMIN_BIDANG: {
     code: 'ADMIN_BIDANG',
@@ -55,7 +55,7 @@ export const ROLE_CONFIGS: Record<RoleCode, RoleMeta> = {
     badgeBg: '#1E40AF',
     badgeText: '#DBEAFE',
     portalType: 'internal',
-    defaultRoute: '/',
+    defaultRoute: '/dashboard',
   },
   EKSEKUTIF: {
     code: 'EKSEKUTIF',
@@ -64,7 +64,7 @@ export const ROLE_CONFIGS: Record<RoleCode, RoleMeta> = {
     badgeBg: '#065F46',
     badgeText: '#A7F3D0',
     portalType: 'internal',
-    defaultRoute: '/',
+    defaultRoute: '/dashboard',
   },
   OPERATOR_BUJK: {
     code: 'OPERATOR_BUJK',

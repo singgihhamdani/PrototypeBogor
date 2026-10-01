@@ -1,0 +1,2363 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>sipjaki</title>
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <meta name="csrf-token" content="Cxna3E5lbxBDebBT2hnFGa5s5qSFNQ0eWZkMuuRJ">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+        integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+        crossorigin="anonymous" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+        integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://sipjaki.pu.go.id//css/app.css" rel="stylesheet">
+
+        <!-- DataTable Bootstrap -->
+<link href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.bootstrap4.min.css">
+        <style>
+        /* When sidebar is collapsed, show truncated labels with ellipsis */
+        .sidebar-mini.sidebar-collapse .nav-sidebar .nav-link p,
+        .sidebar-mini.sidebar-collapse .nav-sidebar .nav-link span {
+            display: inline-block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            margin-left: .5rem;
+            width: auto;
+        }
+
+        .sidebar-mini.sidebar-collapse .nav-sidebar .nav-item>.nav-link {
+            overflow: hidden;
+            /* overflow: visible; */
+        }
+
+        .sidebar-mini.sidebar-collapse .nav-sidebar .nav-link {
+            padding-right: .5rem;
+            width: 100%;
+        }
+
+        /* Keep DataTables header/body column widths in sync (especially with scrollX) */
+        table.dataTable {
+            width: 100% !important;
+        }
+
+        div.dataTables_scrollHeadInner>table {
+            margin-bottom: 0 !important;
+        }
+
+        /* Form detail datatable inside modal (id usually *-form):
+           hide cloned thead that DataTables keeps in scrollBody to avoid duplicate header */
+        .modal .dataTables_scrollBody table[id$="-form"] thead th,
+        .modal .dataTables_scrollBody table[id*="-form-"] thead th {
+            padding: 0 !important;
+            border: 0 !important;
+            height: 0 !important;
+            line-height: 0 !important;
+            background: transparent !important;
+            font-size: 0 !important;
+        }
+
+        /* Default width for action column (Aksi) to fit ~3 small buttons */
+        table.dataTable th.dt-col-aksi,
+        table.dataTable td.dt-col-aksi {
+            min-width: 140px !important;
+            width: 140px !important;
+            white-space: nowrap;
+        }
+
+        th[data-edit-info-added-col="1"],
+        td[data-edit-info-added-cell="1"] {
+            min-width: 240px !important;
+            width: 240px !important;
+            max-width: 280px;
+            vertical-align: top;
+        }
+
+        td[data-edit-info-added-cell="1"] .edit-status-info {
+            white-space: normal;
+            word-break: break-word;
+        }
+
+
+        /* Safe sortable header spacing (without extra pseudo icons) */
+        table.dataTable thead th.sorting,
+        table.dataTable thead th.sorting_asc,
+        table.dataTable thead th.sorting_desc {
+            cursor: pointer;
+            padding-right: 1.1rem !important;
+        }
+
+        .dt-sort-hint {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: .45rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+        }
+
+        .dt-sort-hint i {
+            color: #2563eb;
+            font-size: 11px;
+        }
+
+        .simak-status-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .simak-status-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 600;
+            background: transparent;
+        }
+
+        .simak-status-count {
+            min-width: 26px;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            color: #111827;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .simak-status-item.is-verified {
+            color: #065f46;
+        }
+
+        .simak-status-item.is-rejected {
+            color: #991b1b;
+        }
+
+        .simak-status-item.is-draft {
+            color: #92400e;
+        }
+
+        .simak-status-badge.is-loading {
+            background: #f3f4f6 !important;
+            color: #374151 !important;
+            border: 0 !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            font-weight: 600 !important;
+        }
+
+        /* Global clean badge style */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 28px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            border: 1px solid transparent;
+            box-shadow: none;
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: .7;
+        }
+
+        .badge.badge-success {
+            background: #e8f7ec;
+            color: #1f8f45;
+            border-color: #d2efd9;
+        }
+
+        .badge.badge-info {
+            background: #ebf2ff;
+            color: #3f72d9;
+            border-color: #d9e5ff;
+        }
+
+        .badge.badge-warning {
+            background: #fff3e5;
+            color: #c67a20;
+            border-color: #ffe5c7;
+        }
+
+        .badge.badge-danger {
+            background: #fdecec;
+            color: #cf3f3f;
+            border-color: #f9d5d5;
+        }
+
+        .badge.badge-secondary {
+            background: #f3f4f6;
+            color: #6b7280;
+            border-color: #e5e7eb;
+        }
+
+        .badge.badge-light {
+            background: #f8fafc;
+            color: #475569;
+            border-color: #e2e8f0;
+        }
+
+        .badge.badge-light::before {
+            display: none;
+        }
+
+        /* Verification popup (master data) */
+        .swal-verify-wrap {
+            text-align: left;
+        }
+
+        .swal-verify-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .swal-verify-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .swal-verify-option {
+            border: 1px solid #dbe2ef;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all .15s ease;
+            background: #fff;
+            margin: 0;
+        }
+
+        .swal-verify-option:hover {
+            border-color: #98b4ff;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, .08);
+        }
+
+        .swal-verify-option input {
+            margin-top: 0;
+        }
+
+        .swal-verify-option.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .swal-verify-note {
+            width: 100%;
+            min-height: 110px;
+            border: 1px solid #dbe2ef;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+        }
+
+        .swal-verify-note:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+        }
+
+        .fullscreen-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Custom User Menu Dropdown Styling */
+        .navbar-nav .user-menu .dropdown-menu {
+            border-radius: 16px !important;
+            box-shadow: 0 15px 35px rgba(27, 48, 97, 0.15) !important;
+            border: 1px solid rgba(27, 48, 97, 0.08) !important;
+            overflow: hidden;
+            padding: 0;
+            margin-top: 10px;
+            width: 280px;
+        }
+
+        .navbar-nav .user-menu .user-header {
+            background: linear-gradient(135deg, #1b3061, #2a4a91) !important;
+            height: auto !important;
+            padding: 25px 15px !important;
+            color: #ffffff;
+            border-bottom: 3px solid #f59e0b;
+        }
+
+        .navbar-nav .user-menu .user-header img {
+            border: 3px solid #ffffff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .user-menu .user-header:hover img {
+            transform: scale(1.05);
+            border-color: #f59e0b;
+        }
+
+        .navbar-nav .user-menu .user-header p {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-top: 12px;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-nav .user-menu .user-header p small {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.7);
+            display: block;
+            margin-top: 5px;
+            text-shadow: none;
+            font-weight: 500;
+        }
+
+        .navbar-nav .user-menu .user-footer {
+            background-color: #ffffff !important;
+            padding: 15px 10px !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-nav .user-menu .user-footer .btn-flat {
+            border-radius: 10px !important;
+            padding: 8px 18px !important;
+            font-weight: 700;
+            font-size: 0.85rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        /* Profile Button style */
+        .navbar-nav .user-menu .user-footer .btn-profile-custom {
+            background-color: #1b3061 !important;
+            color: #f59e0b !important;
+            margin-left: 8px !important;
+        }
+
+        .navbar-nav .user-menu .user-footer .btn-profile-custom:hover {
+            background-color: #122245 !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(27, 48, 97, 0.15);
+        }
+
+        /* Sign Out Button style */
+        .navbar-nav .user-menu .user-footer .btn-logout-custom {
+            background-color: #fff1f2 !important;
+            color: #e11d48 !important;
+            margin-left: auto !important;
+        }
+
+        .navbar-nav .user-menu .user-footer .btn-logout-custom:hover {
+            background-color: #f43f5e !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(244, 63, 94, 0.15);
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
+    <div class="wrapper">
+        <!-- Main Header -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
+                            class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown user-menu">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                        <img src="https://sipjaki.pu.go.id//img/user-default.png"
+                            class="user-image img-circle elevation-2" alt="User Image">
+                        <span class="d-none d-md-inline">Diciptabintar Kota Bandung</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <!-- User image -->
+                        <li class="user-header bg-primary">
+                            <img src="https://sipjaki.pu.go.id//img/user-default.png"
+                                class="img-circle elevation-2" alt="User Image">
+                            <p>
+                                Diciptabintar Kota Bandung
+                                <small>Member since Dec. 2025</small>
+                            </p>
+                        </li>
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                            <a href="https://sipjaki.pu.go.id/user/profile" class="btn btn-flat btn-profile-custom">Edit Profile</a>
+                            <a href="#" class="btn btn-flat btn-logout-custom"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Keluar
+                            </a>
+                            <form id="logout-form" action="https://sipjaki.pu.go.id/logout" method="POST" class="d-none">
+                                <input type="hidden" name="_token" value="Cxna3E5lbxBDebBT2hnFGa5s5qSFNQ0eWZkMuuRJ">                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="https://sipjaki.pu.go.id/home" class="brand-link">
+        <img src="https://sipjaki.pu.go.id//img/logopupr.jpg" alt="PUPR" class="brand-image  elevation-3">
+        <span class="brand-text font-weight-bold text-uppercase">
+            ADMIN sipjaki
+        </span>
+    </a>
+
+    <div class="sidebar">
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                data-accordion="false">
+                <li class="nav-item">
+    <a href="https://sipjaki.pu.go.id/home" class="nav-link " title="Beranda">
+        <i class="nav-icon fas fa-home"></i>
+        <p>Beranda</p>
+    </a>
+</li>
+
+
+<li
+    class="nav-item ">
+    <a href="#" class="nav-link" title="Tertib Usaha Jasa Konstruksi">
+        <i class="nav-icon fas fa-briefcase"></i>
+        <p>
+            Tertib Usaha Jasa Konstruksi
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/perencanaan-pengawasan" title="Perencanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Perencanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/simaktertibusahas" title="Pelaksanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaksanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/rekomendasitindaklanjuttertibusahas"
+                class="nav-link "
+                title="Rekomendasi dan Tindak Lanjut">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Rekomendasi dan Tindak Lanjut</p>
+            </a>
+        </li>
+                <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/pelaporan" class="nav-link "
+                title="Pelaporan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaporan</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+<li
+    class="nav-item ">
+    <a href="#" class="nav-link" title="Tertib Penyelenggaraan Jasa Konstruksi">
+        <i class="nav-icon fas fa-cogs"></i>
+        <p>
+            Tertib Penyelenggaraan Jasa Konstruksi
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/perencanaan-pengawasan" title="Perencanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Perencanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/simaktertibselenggaras" title="Pelaksanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaksanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/rekomendasitindaklanjuttertibselenggaras"
+                class="nav-link "
+                title="Rekomendasi dan Tindak Lanjut">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Rekomendasi dan Tindak Lanjut</p>
+            </a>
+        </li>
+                <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/pelaporan" class="nav-link "
+                title="Pelaporan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaporan</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+<li
+    class="nav-item ">
+    <a href="#" class="nav-link" title="Tertib Pemanfaatan Jasa Konstruksi">
+        <i class="nav-icon fas fa-hands-helping"></i>
+        <p>
+            Tertib Pemanfaatan Jasa Konstruksi
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/perencanaan-pengawasan" title="Perencanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Perencanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/simaktertibmanfaats" title="Pelaksanaan Pengawasan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaksanaan Pengawasan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/rekomendasitindaklanjuttertibmanfaats"
+                class="nav-link "
+                title="Rekomendasi dan Tindak Lanjut">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Rekomendasi dan Tindak Lanjut</p>
+            </a>
+        </li>
+                <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/pelaporan" class="nav-link "
+                title="Pelaporan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelaporan</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+<li
+    class="nav-item ">
+    <a href="#" class="nav-link" title="SIPJAKI">
+        <i class="nav-icon fas fa-laptop-code"></i>
+        <p>
+            SIPJAKI
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/opds" class="nav-link "
+                title="Profil OPD">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Profil OPD</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/datapaketpekerjaans" title="Data Paket Pekerjaan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Data Paket Pekerjaan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/kecelakaans" title="Kecelakaan"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Kecelakaan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/beritas" class="nav-link "
+                titleP="Berita">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Berita</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/peraturans"
+                class="nav-link " title="Peraturan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Peraturan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/pelatihans"
+                class="nav-link active" title="Pelatihan">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pelatihan dan/atau Sertifikasi</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+<li
+    class="nav-item ">
+    <a href="#" class="nav-link" title="Penyelenggaraan Pelatihan dan Fasilitasi Sertifikasi TKK">
+        <i class="nav-icon fas fa-certificate"></i>
+        <p>
+            Penyelenggaraan Pelatihan dan Fasilitasi Sertifikasi TKK
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/perencanaanpelatihans" title="Perencanaan Pelatihan dan/atau Sertifikasi"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Perencanaan Pelatihan dan/atau Sertifikasi</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/laporanpelatihans" title="Laporan Fasilitasi Sertifikasi TKK"
+                class="nav-link ">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Laporan Fasilitasi Sertifikasi TKK</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="https://sipjaki.pu.go.id/rekappelatihans"
+                class="nav-link "
+                title="Rekapitulasi TKK Pelatihan dan/atau Sertifikassi">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Rekapitulasi TKK Pelatihan dan/atau Sertifikassi</p>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+
+
+            </ul>
+        </nav>
+    </div>
+
+</aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+                    <div class="container-fluid p-4">
+        <style>
+            :root {
+                --pu-blue: #1b3061;
+                --pu-yellow: #fcb814;
+                --pu-light-blue: #3db5e6;
+                --pu-orange: #f29d38;
+                --pu-bg: #f8fafc;
+            }
+
+            .pelatihan-wrapper {
+                background: var(--pu-bg);
+                min-height: calc(100vh - 100px);
+            }
+
+            /* Card Stats Styling */
+            .stat-card {
+                background: white;
+                border: none;
+                border-radius: 20px;
+                padding: 1.5rem;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                height: 100%;
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+            }
+
+            .stat-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                flex-shrink: 0;
+            }
+
+            .stat-info .label {
+                color: #64748b;
+                font-size: 0.875rem;
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+                text-transform: uppercase;
+                letter-spacing: 0.025em;
+            }
+
+            .stat-info .value {
+                color: var(--pu-blue);
+                font-size: 1.5rem;
+                font-weight: 800;
+                line-height: 1;
+            }
+
+            /* Filter Section */
+            .filter-section {
+                background: white;
+                border-radius: 24px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            }
+
+            .filter-label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-size: 0.7rem;
+                font-weight: 700;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            /* DataTable Premium Styling */
+            .table-premium-container {
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(10px);
+                border-radius: 24px;
+                padding: 1.5rem;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            }
+
+            table.dataTable {
+                border-collapse: separate !important;
+                border-spacing: 0 8px !important;
+                margin-top: 0 !important;
+            }
+
+            table.dataTable thead th {
+                background: #f8fafc !important;
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                letter-spacing: 1px;
+                padding: 1rem !important;
+                border: 0 !important;
+                color: #64748b;
+                font-weight: 700;
+                vertical-align: middle !important;
+            }
+
+            table.dataTable tbody tr {
+                background-color: #fff !important;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                cursor: pointer;
+            }
+
+            table.dataTable tbody tr:hover {
+                background-color: #f8fafc !important;
+                transform: translateY(-2px) scale(1.005);
+                box-shadow: 0 12px 24px rgba(27, 48, 97, 0.08);
+                z-index: 2;
+            }
+
+            table.dataTable tbody tr.table-active {
+                background-color: #f0f7ff !important;
+            }
+
+            table.dataTable tbody tr.table-active td:first-child {
+                border-left: 4px solid var(--pu-blue) !important;
+            }
+
+            table.dataTable tbody td {
+                padding: 1rem !important;
+                vertical-align: middle !important;
+                border: 0 !important;
+                border-top: 1px solid #f1f5f9 !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                color: #334155;
+                font-size: 0.85rem;
+            }
+
+            table.dataTable tbody td:first-child {
+                border-left: 1px solid #f1f5f9 !important;
+                border-radius: 12px 0 0 12px;
+            }
+
+            table.dataTable tbody td:last-child {
+                border-right: 1px solid #f1f5f9 !important;
+                border-radius: 0 12px 12px 0;
+            }
+
+            /* Custom Styling for DT Buttons */
+            .dt-buttons {
+                margin-bottom: 1.5rem !important;
+                display: flex !important;
+                gap: 0.75rem !important;
+                float: left !important;
+            }
+
+            .dt-buttons .btn {
+                border-radius: 12px !important;
+                font-size: 0.75rem !important;
+                font-weight: 700 !important;
+                padding: 0.5rem 1.25rem !important;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                transition: all 0.2s;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .dt-buttons .btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            /* Search Box Styling */
+            .dataTables_filter {
+                margin-bottom: 1.5rem !important;
+                float: right !important;
+            }
+
+            .dataTables_length {
+                margin-bottom: 1.5rem !important;
+                float: left !important;
+                margin-left: 1rem !important;
+            }
+
+            .dataTables_length select {
+                border-radius: 12px !important;
+                border: 1px solid #e2e8f0 !important;
+                padding: 0.4rem 0.75rem !important;
+                background-color: #f8fafc !important;
+                transition: all 0.3s;
+                font-weight: 600;
+                color: var(--pu-blue);
+                outline: none !important;
+            }
+
+            .dataTables_length select:focus {
+                border-color: var(--pu-blue) !important;
+                background-color: #fff !important;
+                box-shadow: 0 0 0 3px rgba(27, 48, 97, 0.1) !important;
+            }
+
+            .dataTables_filter input {
+                border-radius: 12px !important;
+                border: 1px solid #e2e8f0 !important;
+                padding: 0.5rem 1rem !important;
+                width: 250px !important;
+                transition: all 0.3s;
+                background: #f8fafc;
+            }
+
+            .dataTables_filter input:focus {
+                width: 300px !important;
+                background: white;
+                box-shadow: 0 0 0 3px rgba(27, 48, 97, 0.1);
+                border-color: var(--pu-blue) !important;
+                outline: none;
+            }
+
+            /* TomSelect Tweaks */
+            .ts-wrapper .ts-control {
+                border-radius: 12px !important;
+                border: 1px solid #e2e8f0 !important;
+                padding: 0.5rem 0.75rem !important;
+                min-height: 42px !important;
+                background-color: #fff !important;
+            }
+
+            .btn-action {
+                border-radius: 12px;
+                padding: 0.6rem 1.2rem;
+                font-weight: 600;
+                transition: all 0.2s;
+            }
+
+            .btn-import-excel {
+                background: #f0fdf4;
+                color: #166534;
+                border: 1px solid #bbf7d0;
+                border-radius: 12px !important;
+                padding: 0.6rem 1.25rem;
+                font-weight: 700;
+                font-size: 0.75rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                height: 38px;
+            }
+
+            /* Peserta Detail Card */
+            .peserta-detail-card {
+                background: white;
+                border-radius: 24px;
+                padding: 1.5rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                position: sticky;
+                top: 20px;
+                height: fit-content;
+                max-height: calc(100vh - 140px);
+                overflow-y: auto;
+            }
+        </style>
+
+        <div class="pelatihan-wrapper">
+            <!-- Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="font-weight-bold mb-1" style="color:#1b3061;">Dashboard Pelatihan</h4>
+                    <p class="text-muted mb-0">Pemantauan kegiatan pelatihan dan sertifikasi tenaga kerja konstruksi</p>
+                </div>
+                <div class="header-actions d-flex align-items-center">
+                                            <a href="https://sipjaki.pu.go.id/pelatihans-upload" class="btn btn-import-excel mr-2">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Import Pelatihan</span>
+                        </a>
+                        <a href="https://sipjaki.pu.go.id/pelatihans/create" class="btn btn-pu btn-action shadow-sm"
+                            style="height: 38px; display: inline-flex; align-items: center;">
+                            <i class="fa fa-plus-circle mr-2"></i> Tambah Pelatihan
+                        </a>
+                                    </div>
+            </div>
+
+            
+            <!-- Stats Section -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(61, 181, 230, 0.1); color: var(--pu-light-blue);">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="label">Total Kegiatan Pelatihan</div>
+                            <div class="value" id="pelTotalCount">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(242, 157, 56, 0.1); color: var(--pu-orange);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="label">Total Peserta Terdaftar</div>
+                            <div class="value" id="pesertaTotalCount">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- Filter Section -->
+            <div class="filter-section shadow-sm mb-4">
+                <div class="row align-items-end">
+                                                            <div class="col-md-2 mb-3">
+                        <label class="filter-label">Tahun Anggaran</label>
+                        <select id="pelFilterTahun" class="form-control tom-select">
+                            <option value="">Semua Tahun</option>
+                                                            <option value="7">2026</option>
+                                                            <option value="6">2025</option>
+                                                            <option value="5">2024</option>
+                                                            <option value="4">2023</option>
+                                                            <option value="3">2022</option>
+                                                            <option value="2">2021</option>
+                                                            <option value="1">2020</option>
+                                                    </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="filter-label">Metode</label>
+                        <select id="pelFilterMetode" class="form-control tom-select">
+                            <option value="">Semua Metode</option>
+                                                            <option value="4">Distance Learning</option>
+                                                            <option value="7">Hybrid</option>
+                                                            <option value="5">Infrastruktur Berbasis Masyarakat (IBM)</option>
+                                                            <option value="6">Lembaga Pemasyarakatan</option>
+                                                            <option value="3">Mobile Training Unit (MTU)</option>
+                                                            <option value="2">On The Job Training</option>
+                                                            <option value="1">Reguler</option>
+                                                    </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <button type="button" id="pelResetFilter" class="btn btn-outline-secondary w-100 font-weight-bold"
+                            style="height: 42px; border-radius: 12px;">
+                            <i class="fas fa-undo mr-2"></i> RESET
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="table-premium-container">
+                        <div class="table-responsive">
+                            <table class="table mb-0" id="table-pelatihan" width="100%"><thead><tr><th title="#" width="30px">#</th><th title="TAHUN" width="80px" class="text-center">TAHUN</th><th title="NAMA KEGIATAN PELATIHAN" class="font-weight-bold">NAMA KEGIATAN PELATIHAN</th><th title="METODE" width="100px" class="text-center">METODE</th><th title="LOKASI">LOKASI</th><th title="L" width="30px" class="text-center">L</th><th title="P" width="30px" class="text-center">P</th><th title="KABUPATEN/KOTA" width="120px">KABUPATEN/KOTA</th><th title="PROVINSI" width="120px">PROVINSI</th><th title="AKSI" width="120px" class="text-center">AKSI</th></tr></thead></table>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="peserta-detail-card">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <h5 class="font-weight-bold mb-1" style="color: var(--pu-blue);">Detail Peserta</h5>
+                                <p class="text-muted small mb-0" id="pesertaDetailSubtitle">Pilih pelatihan untuk melihat
+                                    daftar peserta</p>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-light btn-sm" type="button" id="btnExportPeserta"
+                                    data-toggle="dropdown" disabled title="Export Peserta">
+                                    <i class="fas fa-download text-primary"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right shadow border-0">
+                                    <a class="dropdown-item peserta-export-link py-2" data-format="xlsx" href="#"><i
+                                            class="far fa-file-excel mr-2 text-success"></i> Excel</a>
+                                    <a class="dropdown-item peserta-export-link py-2" data-format="pdf" href="#"><i
+                                            class="far fa-file-pdf mr-2 text-danger"></i> PDF</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="pesertaListContainer">
+                            <div class="text-center py-5" id="pesertaEmptyState">
+                                <i class="fas fa-users fa-3x text-light mb-3"></i>
+                                <p class="text-muted">Klik salah satu baris pelatihan untuk menampilkan daftar peserta
+                                    secara instan.</p>
+                            </div>
+
+                            <div id="pesertaTableWrapper" style="display: none;">
+                                <div class="table-responsive">
+                                    <table id="table-peserta" class="table table-sm w-100">
+                                        <thead>
+                                            <tr>
+                                                <th>Nama Peserta</th>
+                                                <th>Jabatan</th>
+                                                <th>JK</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+
+        <!-- Main Footer -->
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-block">
+                <b>Version</b> 3.0.1
+            </div>
+            <strong>Copyright &copy; 2015-2022 djbk.</strong> All rights
+            reserved.
+        </footer>
+    </div>
+    <div id="fullscreen-loader-global" class="fullscreen-loader d-none">
+    <div class="loader-content text-center">
+        <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+        <div class="text-light font-weight-bold" style="letter-spacing: 1px; font-size: 1.1rem;">SEDANG MEMUAT...</div>
+    </div>
+</div>
+                
+    <script src="https://sipjaki.pu.go.id//js/app.js"></script>
+    <script>
+        // Global DataTable Loading & Defaults
+        if (typeof jQuery !== 'undefined') {
+            $(function() {
+                if ($.fn.dataTable) {
+                    $.extend(true, $.fn.dataTable.defaults, {
+                        processing: false // Matikan indikator "Processing..." bawaan
+                    });
+                }
+
+                // Hook global untuk menampilkan/menyembunyikan loader
+                $(document).on('preXhr.dt', function() {
+                    if (typeof showLoader === 'function') showLoader();
+                });
+                $(document).on('draw.dt xhr.dt', function() {
+                    if (typeof hideLoader === 'function') hideLoader();
+                });
+
+                // Paksa matikan indikator processing bawaan untuk semua tabel (termasuk yang diset lokal)
+                $(document).on('preInit.dt', function(e, settings) {
+                    if (settings && settings.oFeatures) {
+                        settings.oFeatures.bProcessing = false;
+                    }
+                });
+            });
+        }
+    </script>
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
+
+        <!-- Datatables -->
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.colVis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>
+<script src="https://sipjaki.pu.go.id//vendor/datatables/buttons.server-side.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript">$(function(){window.LaravelDataTables=window.LaravelDataTables||{};window.LaravelDataTables["table-pelatihan"]=$("#table-pelatihan").DataTable({"serverSide":true,"processing":false,"ajax":{"url":"https:\/\/sipjaki.pu.go.id\/pelatihans","type":"GET","data":function(data) {
+            for (var i = 0, len = data.columns.length; i < len; i++) {
+                if (!data.columns[i].search.value) delete data.columns[i].search;
+                if (data.columns[i].searchable === true) delete data.columns[i].searchable;
+                if (data.columns[i].orderable === true) delete data.columns[i].orderable;
+                if (data.columns[i].data === data.columns[i].name) delete data.columns[i].name;
+            }
+            delete data.search.regex;}},"columns":[{"title":"#","width":"30px","orderable":false,"searchable":false,"name":"select","data":"select"},{"title":"TAHUN","width":"80px","class":"text-center","name":"tahun_anggaran","data":"tahun_anggaran","orderable":true,"searchable":true},{"title":"NAMA KEGIATAN PELATIHAN","class":"font-weight-bold","name":"nama","data":"nama","orderable":true,"searchable":true},{"title":"METODE","width":"100px","class":"text-center","name":"metode_pelatihan","data":"metode_pelatihan","orderable":true,"searchable":true},{"title":"LOKASI","name":"lokasi","data":"lokasi","orderable":true,"searchable":true},{"title":"L","width":"30px","class":"text-center","name":"l","data":"l","orderable":true,"searchable":true},{"title":"P","width":"30px","class":"text-center","name":"p","data":"p","orderable":true,"searchable":true},{"title":"KABUPATEN\/KOTA","width":"120px","name":"kota","data":"kota","orderable":true,"searchable":true},{"title":"PROVINSI","width":"120px","name":"propinsi","data":"propinsi","orderable":true,"searchable":true},{"defaultContent":"","data":"action","name":"action","title":"AKSI","render":null,"orderable":false,"searchable":false,"width":"120px","class":"text-center"}],"dom":"Blfrtip","stateSave":true,"order":[[1,"desc"]],"buttons":[{"extend":"export","className":"btn btn-outline-primary btn-sm no-corner","text":"<i class=\"fa fa-download\"><\/i> Export"},{"extend":"print","className":"btn btn-outline-info btn-sm no-corner","text":"<i class=\"fa fa-print\"><\/i> Print"},{"text":"<i class=\"fa fa-trash\"><\/i> Hapus Terpilih","className":"btn btn-outline-danger btn-sm no-corner btn-deleteAll"}],"language":{"search":"","searchPlaceholder":"Cari pelatihan..."},"drawCallback":function() { 
+                    $('[data-toggle="tooltip"]').tooltip();
+                    if (typeof hideLoader === "function") hideLoader();
+                }});});</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+        integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        (function() {
+            if (!window.TomSelect) return;
+
+            const OriginalTomSelect = window.TomSelect;
+
+            function hardenTomSelectInput(instance) {
+                if (!instance || !instance.control_input) return;
+                instance.control_input.setAttribute('autocomplete', 'new-password');
+                instance.control_input.setAttribute('autocorrect', 'off');
+                instance.control_input.setAttribute('autocapitalize', 'off');
+                instance.control_input.setAttribute('spellcheck', 'false');
+            }
+
+            function closeOtherTomSelects(currentInstance) {
+                document.querySelectorAll('select.tom-select').forEach(function(el) {
+                    if (!el.tomselect || el.tomselect === currentInstance) return;
+                    if (typeof el.tomselect.close === 'function') {
+                        el.tomselect.close();
+                    }
+                });
+            }
+
+            window.TomSelect = function(input, settings) {
+                const mergedSettings = Object.assign({
+                    maxOptions: 200
+                }, settings || {});
+
+                const originalOnFocus = mergedSettings.onFocus;
+                mergedSettings.onFocus = function() {
+                    closeOtherTomSelects(this);
+                    if (typeof originalOnFocus === 'function') {
+                        originalOnFocus.apply(this, arguments);
+                    }
+                };
+
+                const instance = new OriginalTomSelect(input, mergedSettings);
+                hardenTomSelectInput(instance);
+
+                // Apply nilai yang sudah diset sebelum TomSelect diinisialisasi
+                const preset = input && input.getAttribute ? input.getAttribute('data-preselect-value') : null;
+                if (preset !== null) {
+                    if (preset !== '' && !instance.options[String(preset)]) {
+                        instance.addOption({
+                            value: String(preset),
+                            text: String(preset)
+                        });
+                    }
+                    instance.setValue(preset, true);
+                }
+                return instance;
+            };
+
+            window.TomSelect.prototype = OriginalTomSelect.prototype;
+            Object.keys(OriginalTomSelect).forEach(function(key) {
+                window.TomSelect[key] = OriginalTomSelect[key];
+            });
+
+            document.addEventListener('focusin', function(e) {
+                if (!e.target || !e.target.closest) return;
+                if (!e.target.closest('.ts-wrapper')) return;
+
+                document.querySelectorAll('select.tom-select').forEach(function(el) {
+                    if (!el.tomselect) return;
+                    hardenTomSelectInput(el.tomselect);
+                });
+            });
+        })();
+    </script>
+        <script>
+        $(function() {
+            const sharedWilayahFilterKey = 'simak_shared_wilayah_filter';
+            let isSyncingWilayahFilter = false;
+            let activePelatihanId = null;
+            let pesertaTable = null;
+            const isBalaiRole = false;
+            const isGlobalRole = false;
+            const showWilayahFilter = false;
+            const userPropinsi = 32;
+
+            // Selectors
+            const $balai = $('#pelFilterBalai');
+            const $propinsi = $('#pelFilterPropinsi');
+            const $kota = $('#pelFilterKota');
+            const $tahun = $('#pelFilterTahun');
+            const $metode = $('#pelFilterMetode');
+            const allPropinsiOptions = $propinsi.length ? $propinsi.find('option').clone() : $();
+            const allKotaOptions = $kota.length ? $kota.find('option').clone() : $();
+
+            const loadSharedFilter = function() {
+                try {
+                    const raw = localStorage.getItem(sharedWilayahFilterKey);
+                    return raw ? JSON.parse(raw) : { balai: '', propinsi: '', kota: '' };
+                } catch (e) {
+                    return { balai: '', propinsi: '', kota: '' };
+                }
+            };
+
+            const sharedFilter = loadSharedFilter();
+            let queryBalai = (sharedFilter.balai || '').toString();
+            let queryPropinsi = (sharedFilter.propinsi || '').toString();
+            let queryKota = (sharedFilter.kota || '').toString();
+
+            function getTableInstance() {
+                return window.LaravelDataTables ? window.LaravelDataTables['table-pelatihan'] : $(
+                    '#table-pelatihan').DataTable();
+            }
+
+            function syncSharedFilter() {
+                if (isSyncingWilayahFilter) return;
+                try {
+                    localStorage.setItem(sharedWilayahFilterKey, JSON.stringify({
+                        balai: $balai.val() || '',
+                        propinsi: $propinsi.val() || '',
+                        kota: $kota.val() || ''
+                    }));
+                } catch (e) {}
+            }
+
+            function reloadTable() {
+                const table = getTableInstance();
+                if (!table) return;
+
+                const url = new URL(table.ajax.url() || window.location.href, window.location.origin);
+
+                const filters = {
+                    balai_filter: $balai.length ? ($balai.val() || '') : '',
+                    propinsi_filter: $propinsi.val() || '',
+                    kota_filter: $kota.val() || '',
+                    tahun_anggaran_filter: $tahun.val() || '',
+                    metode_filter: $metode.val() || ''
+                };
+
+                Object.keys(filters).forEach(key => {
+                    if (filters[key]) url.searchParams.set(key, filters[key]);
+                    else url.searchParams.delete(key);
+                });
+
+                syncSharedFilter();
+                table.ajax.url(url.toString()).load();
+                updateSummary(filters);
+            }
+
+            function updateSummary(filters) {
+                $.get("https://sipjaki.pu.go.id/pelatihans-summary", filters).done(function(resp) {
+                    if (resp.status) {
+                        $('#pelTotalCount').text(Number(resp.data.total_pelatihan).toLocaleString('id-ID'));
+                        $('#pesertaTotalCount').text(Number(resp.data.total_peserta).toLocaleString(
+                            'id-ID'));
+                    }
+                });
+            }
+
+            function applyPropinsiHierarchy() {
+                if (!$balai.length || !$propinsi.length) return;
+                const selectedBalai = String($balai.val() || '');
+                const currentProp = String($propinsi.val() || '');
+                $propinsi.empty();
+                $propinsi.append('<option value="">Semua Provinsi</option>');
+
+                allPropinsiOptions.each(function() {
+                    const $opt = $(this);
+                    const val = String($opt.val() || '');
+                    const optBalai = String($opt.data('balai') || '');
+                    if (val !== '' && (selectedBalai === '' || optBalai === selectedBalai)) {
+                        $propinsi.append($opt.clone());
+                    }
+                });
+
+                $propinsi.val($propinsi.find(`option[value="${currentProp}"]`).length ? currentProp : '');
+
+                if ($propinsi[0] && $propinsi[0].tomselect) {
+                    const ts = $propinsi[0].tomselect;
+                    ts.clearOptions();
+                    $propinsi.find('option').each(function() {
+                        ts.addOption({
+                            value: $(this).val(),
+                            text: $(this).text()
+                        });
+                    });
+                    ts.setValue($propinsi.val(), true);
+                }
+            }
+
+            function applyKotaHierarchy() {
+                const canFilter = isGlobalRole || isBalaiRole;
+                if (!canFilter || !$kota.length) return;
+
+                const selectedPropinsi = String($propinsi.val() || '');
+                const currentKota = String($kota.val() || '');
+
+                $kota.empty();
+
+                if (selectedPropinsi === '') {
+                    $kota.append('<option value="">Pilih provinsi dahulu</option>');
+                    $kota.prop('disabled', true);
+                } else {
+                    $kota.append('<option value="">Semua Kab/Kota</option>');
+                    $kota.prop('disabled', false);
+
+                    allKotaOptions.each(function() {
+                        const $opt = $(this);
+                        const val = String($opt.val() || '');
+                        const optProp = String($opt.data('propinsi') || '');
+                        if (val !== '' && optProp === selectedPropinsi) {
+                            $kota.append($opt.clone());
+                        }
+                    });
+                }
+
+                if ($kota.find(`option[value="${currentKota}"]`).length) {
+                    $kota.val(currentKota);
+                } else {
+                    $kota.val('');
+                }
+
+                if ($kota[0] && $kota[0].tomselect) {
+                    const ts = $kota[0].tomselect;
+                    ts.clearOptions();
+                    $kota.find('option').each(function() {
+                        ts.addOption({
+                            value: $(this).val(),
+                            text: $(this).text()
+                        });
+                    });
+                    ts.setValue($kota.val(), true);
+                    if (selectedPropinsi === '') ts.disable();
+                    else ts.enable();
+                }
+            }
+
+            // Filters Events
+            if (isGlobalRole || isBalaiRole) {
+                if (queryBalai && $balai.length && $balai.find(`option[value="${queryBalai}"]`).length) {
+                    $balai.val(queryBalai);
+                    if ($balai[0] && $balai[0].tomselect) {
+                        $balai[0].tomselect.setValue(queryBalai, true);
+                    }
+                }
+                applyPropinsiHierarchy();
+
+                if (queryPropinsi && $propinsi.find(`option[value="${queryPropinsi}"]`).length) {
+                    $propinsi.val(queryPropinsi);
+                }
+                applyKotaHierarchy();
+
+                if (queryKota && $kota.find(`option[value="${queryKota}"]`).length) {
+                    $kota.val(queryKota);
+                }
+
+                if ($balai[0] && $balai[0].tomselect) $balai[0].tomselect.setValue($balai.val(), true);
+                if ($propinsi[0] && $propinsi[0].tomselect) $propinsi[0].tomselect.setValue($propinsi.val(), true);
+                if ($kota[0] && $kota[0].tomselect) $kota[0].tomselect.setValue($kota.val(), true);
+
+                $balai.on('change', function() {
+                    applyPropinsiHierarchy();
+                    applyKotaHierarchy();
+                    reloadTable();
+                });
+
+                $propinsi.on('change', function() {
+                    applyKotaHierarchy();
+                    reloadTable();
+                });
+            }
+            $kota.on('change', reloadTable);
+            $tahun.on('change', reloadTable);
+            $metode.on('change', reloadTable);
+
+            window.addEventListener('storage', function(e) {
+                if (e.key === sharedWilayahFilterKey && e.newValue) {
+                    try {
+                        const parsed = JSON.parse(e.newValue);
+                        isSyncingWilayahFilter = true;
+                        if ($balai.length && parsed.balai !== undefined && !$balai.is(':disabled')) {
+                            $balai.val(parsed.balai || '');
+                            if ($balai[0] && $balai[0].tomselect) {
+                                $balai[0].tomselect.setValue(parsed.balai || '', true);
+                            }
+                            applyPropinsiHierarchy();
+                        }
+                        if ($propinsi.length && parsed.propinsi !== undefined) {
+                            $propinsi.val(parsed.propinsi || '');
+                            if ($propinsi[0] && $propinsi[0].tomselect) {
+                                $propinsi[0].tomselect.setValue(parsed.propinsi || '', true);
+                            }
+                            applyKotaHierarchy();
+                        }
+                        if ($kota.length && parsed.kota !== undefined) {
+                            $kota.val(parsed.kota || '');
+                            if ($kota[0] && $kota[0].tomselect) {
+                                $kota[0].tomselect.setValue(parsed.kota || '', true);
+                            }
+                        }
+                        isSyncingWilayahFilter = false;
+                        reloadTable();
+                    } catch (err) {}
+                }
+            });
+
+            $('#pelResetFilter').on('click', function() {
+                if ($balai.length && !$balai.is(':disabled')) {
+                    $balai.val('');
+                    if ($balai[0] && $balai[0].tomselect) $balai[0].tomselect.setValue('', true);
+                }
+                [$propinsi, $kota, $tahun, $metode].forEach($el => {
+                    if ($el.length) {
+                        $el.val('');
+                        if ($el[0] && $el[0].tomselect) $el[0].tomselect.setValue('', true);
+                    }
+                });
+                if (showWilayahFilter) {
+                    applyPropinsiHierarchy();
+                    applyKotaHierarchy();
+                }
+                reloadTable();
+            });
+
+            // Handle Selection Logic
+            $(document).on('click', '#table-pelatihan tbody tr', function(e) {
+                // If clicked on checkbox or action button, don't trigger row click for detail
+                if ($(e.target).closest('a, button, .dropdown, .custom-checkbox').length) return;
+
+                const table = getTableInstance();
+                const data = table.row(this).data();
+                if (!data) return;
+
+                // Robust ID selection: try 'id' field first, then 'DT_RowId'
+                const recordId = data.id || data.DT_RowId;
+                if (!recordId) {
+                    console.error("Record ID not found in row data:", data);
+                    return;
+                }
+
+                $('#table-pelatihan tbody tr').removeClass('table-active');
+                $(this).addClass('table-active');
+
+                activePelatihanId = recordId;
+                // Get raw name if it's rendered as HTML
+                const rawName = $('<div>').html(data.nama).text();
+                $('#pesertaDetailSubtitle').html(`Pelatihan: <strong>${rawName}</strong>`);
+                $('#pesertaEmptyState').hide();
+                $('#pesertaTableWrapper').show();
+                $('#btnExportPeserta').prop('disabled', false).removeClass('btn-light').addClass(
+                    'btn-outline-primary');
+
+                const url = "https://sipjaki.pu.go.id/pelatihans/__ID__/peserta-datatable".replace(
+                    '__ID__', recordId);
+                loadPesertaTable(url);
+                syncPesertaExportLinks();
+            });
+
+            // Select All Header Logic
+            $(document).on('change', '#selectAll', function() {
+                const isChecked = $(this).is(':checked');
+                $('.select-item').prop('checked', isChecked);
+            });
+
+            function loadPesertaTable(url) {
+                if (pesertaTable) {
+                    pesertaTable.ajax.url(url).load();
+                } else {
+                    pesertaTable = $('#table-peserta').DataTable({
+                        processing: false,
+                        serverSide: true,
+                        ajax: url,
+                        pageLength: 5,
+                        lengthChange: false,
+                        searching: false,
+                        columns: [{
+                                data: 'nama',
+                                name: 'nama',
+                                render: data =>
+                                    `<div class="font-weight-bold" style="font-size: 0.8rem;">${data}</div>`
+                            },
+                            {
+                                data: 'jabatan',
+                                name: 'jabatan',
+                                render: data => `<small class="text-muted">${data || '-'}</small>`
+                            },
+                            {
+                                data: 'jeniskelamin',
+                                name: 'jeniskelamin',
+                                render: data =>
+                                    `<span class="badge badge-light border">${data || '-'}</span>`
+                            }
+                        ],
+                        language: {
+                            emptyTable: "Tidak ada peserta"
+                        }
+                    });
+                }
+            }
+
+            function syncPesertaExportLinks() {
+                $('.peserta-export-link').each(function() {
+                    const format = $(this).data('format');
+                    const url =
+                        "https://sipjaki.pu.go.id/pelatihans/__ID__/peserta-export/__FORMAT__"
+                        .replace('__ID__', activePelatihanId)
+                        .replace('__FORMAT__', format);
+                    $(this).attr('href', url);
+                });
+            }
+
+            // SweetAlert Delete for Pelatihan
+            $(document).on('click', '.btn-delete-pelatihan', function(e) {
+                e.preventDefault();
+                const url = $(this).data('url');
+                const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                Swal.fire({
+                    title: 'Hapus data pelatihan?',
+                    text: "Seluruh data peserta dalam pelatihan ini juga akan terhapus!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'btn btn-danger mx-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showLoader();
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {
+                                _method: 'DELETE',
+                                _token: csrfToken
+                            },
+                            success: function(resp) {
+                                hideLoader();
+                                if (resp.status) {
+                                    Swal.fire('Berhasil', resp.message, 'success').then(
+                                        () => {
+                                            getTableInstance().ajax.reload(null,
+                                                false);
+                                            updateSummary();
+                                        });
+                                } else {
+                                    Swal.fire('Gagal', resp.message ||
+                                        'Gagal menghapus data', 'error');
+                                }
+                            },
+                            error: function(xhr) {
+                                hideLoader();
+                                Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Hapus Terpilih (Bulk Delete)
+            $(document).on('click', '.btn-deleteAll', function(e) {
+                e.preventDefault();
+                const selectedIds = [];
+                $('.select-item:checked').each(function() {
+                    selectedIds.push($(this).val());
+                });
+
+                if (selectedIds.length === 0) {
+                    Swal.fire('Info', 'Pilih minimal satu data untuk dihapus.', 'info');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Hapus data terpilih?',
+                    text: `Anda akan menghapus ${selectedIds.length} data pelatihan sekaligus beserta data pesertanya!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus Semua',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'btn btn-danger mx-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showLoader();
+                        $.ajax({
+                            url: "https://sipjaki.pu.go.id/pelatihans/delete-selected",
+                            type: 'POST',
+                            data: {
+                                ids: selectedIds,
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(resp) {
+                                hideLoader();
+                                if (resp.status) {
+                                    Swal.fire('Berhasil', resp.message, 'success').then(
+                                        () => {
+                                            getTableInstance().ajax.reload(null,
+                                                false);
+                                            $('#selectAll').prop('checked', false);
+                                            updateSummary();
+                                        });
+                                } else {
+                                    Swal.fire('Gagal', resp.message, 'error');
+                                }
+                            },
+                            error: function(xhr) {
+                                hideLoader();
+                                Swal.fire('Error', 'Gagal menghapus data: ' + (xhr
+                                    .responseJSON?.message || 'Kesalahan sistem'
+                                    ), 'error');
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Initial hierarchy & summary
+            if (isGlobalRole) applyKotaHierarchy();
+            updateSummary();
+
+            // Sync Header for Select All
+            setTimeout(function() {
+                const table = getTableInstance();
+                if (table) {
+                    const header = $(table.table().header()).find('th').first();
+                    header.html(`
+                        <div class="custom-control custom-checkbox text-center">
+                            <input type="checkbox" class="custom-control-input" id="selectAll">
+                            <label class="custom-control-label" for="selectAll"></label>
+                        </div>
+                    `);
+                    reloadTable();
+                }
+                if (typeof hideLoader === "function") hideLoader();
+            }, 800);
+        });
+    </script>
+    <script>
+        $(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        })
+    </script>
+    <script>
+        function showLoader() {
+            document.getElementById('fullscreen-loader-global')?.classList.remove('d-none');
+            document.body.classList.add('loading');
+        }
+
+        function hideLoader() {
+            document.getElementById('fullscreen-loader-global')?.classList.add('d-none');
+            document.body.classList.remove('loading');
+        }
+
+        function docUrl(path) {
+            if (!path) return '';
+            return path.startsWith('http') ? path : '/' + path;
+        }
+
+        function setTom(name, value) {
+            const el = document.querySelector(`select[name="${name}"]`);
+            if (!el) return;
+
+            const normalized = value ?? '';
+
+            // Simpan nilai target jika TomSelect belum terpasang (akan diaplikasikan saat init)
+            el.setAttribute('data-preselect-value', String(normalized));
+
+            // Fallback native select agar nilai tidak hilang saat modal dibuka
+            el.value = normalized;
+
+            if (el.tomselect) {
+                if (normalized !== '' && !el.tomselect.options[String(normalized)]) {
+                    el.tomselect.addOption({
+                        value: String(normalized),
+                        text: String(normalized)
+                    });
+                }
+                el.tomselect.setValue(normalized, true);
+            }
+        }
+    </script>
+    <script>
+        (function() {
+            function syncScrollHeadBodyWidths() {
+                if (!window.jQuery) return;
+
+                $('.dataTables_wrapper').each(function() {
+                    try {
+                        const $wrapper = $(this);
+                        const $scrollHeadInner = $wrapper.find('.dataTables_scrollHeadInner');
+                        const $scrollHeadTable = $wrapper.find('.dataTables_scrollHeadInner > table');
+                        const $scrollBodyTable = $wrapper.find('.dataTables_scrollBody > table');
+                        const tableId = String($scrollBodyTable.attr('id') || '');
+
+                        // Form-detail tables are manipulated dynamically inside modal; skip hard width sync to avoid DT internal width errors.
+                        if (/-form$/i.test(tableId)) return;
+
+                        if (!$scrollHeadInner.length || !$scrollHeadTable.length || !$scrollBodyTable.length) return;
+
+                        const bodyWidth = Math.ceil($scrollBodyTable.outerWidth() || 0);
+                        if (!bodyWidth) return;
+
+                        $scrollHeadInner.css('width', `${bodyWidth}px`);
+                        $scrollHeadTable.css('width', `${bodyWidth}px`);
+
+                        // Mirror body colgroup widths to header colgroup to keep columns perfectly aligned
+                        const $headCols = $scrollHeadTable.find('colgroup col');
+                        const $bodyCols = $scrollBodyTable.find('colgroup col');
+                        if ($headCols.length && $headCols.length === $bodyCols.length) {
+                            $headCols.each(function(i) {
+                                const bodyCol = $bodyCols.get(i);
+                                const bodyColWidth = $(bodyCol).outerWidth();
+                                const bodyColStyle = bodyCol ? bodyCol.style.width : '';
+                                if (bodyColStyle) {
+                                    this.style.width = bodyColStyle;
+                                } else if (bodyColWidth) {
+                                    this.style.width = `${Math.ceil(bodyColWidth)}px`;
+                                }
+                            });
+                        }
+                    } catch (_e) {
+                        // no-op: keep page functional even when a single DT wrapper is in transient state
+                    }
+                });
+            }
+
+            function markAksiColumns() {
+                if (!window.jQuery) return;
+                $('table.dataTable').each(function() {
+                    const $table = $(this);
+                    const $headers = $table.find('thead th');
+                    if (!$headers.length) return;
+
+                    $headers.each(function(index) {
+                        const text = ($(this).text() || '').trim().toLowerCase();
+                        if (text === 'aksi') {
+                            $(this).addClass('dt-col-aksi');
+                            $table.find('tbody tr').each(function() {
+                                $(this).children().eq(index).addClass('dt-col-aksi');
+                            });
+                        }
+                    });
+                });
+            }
+
+            function applySortHints() {
+                if (!window.jQuery) return;
+
+                $('.dataTables_wrapper').each(function() {
+                    const $wrapper = $(this);
+                    if (!$wrapper.prev().hasClass('dt-sort-hint')) {
+                        $wrapper.before(
+                            '<div class="dt-sort-hint"><i class="fas fa-sort"></i><span>Klik judul kolom untuk mengurutkan data.</span></div>'
+                        );
+                    }
+
+                    $wrapper.find('thead th.sorting, thead th.sorting_asc, thead th.sorting_desc')
+                        .attr('title', 'Klik untuk urutkan');
+                });
+            }
+
+            function adjustAllDataTables() {
+                if (!window.jQuery || !$.fn.dataTable) return;
+                markAksiColumns();
+                applySortHints();
+                const tableNodes = $.fn.dataTable.tables({
+                    visible: true
+                });
+                if (!tableNodes || !tableNodes.length) return;
+                $.each(tableNodes, function(_idx, node) {
+                    try {
+                        const tableId = String((node && node.id) || '');
+                        if (/-form$/i.test(tableId)) return;
+                        if (!$.fn.dataTable.isDataTable(node)) return;
+                        $(node).DataTable().columns.adjust();
+                    } catch (_e) {
+                        // no-op
+                    }
+                });
+                syncScrollHeadBodyWidths();
+                setTimeout(markAksiColumns, 0);
+                setTimeout(applySortHints, 0);
+                setTimeout(syncScrollHeadBodyWidths, 0);
+            }
+
+            function scheduleAdjustBurst() {
+                const ticks = [0, 80, 180, 320, 520];
+                ticks.forEach(function(ms) {
+                    setTimeout(adjustAllDataTables, ms);
+                });
+            }
+
+            function attachDtMutationObservers() {
+                if (!window.MutationObserver || !window.jQuery) return;
+                $('.dataTables_wrapper .dataTables_scrollBody tbody').each(function() {
+                    const tbody = this;
+                    if (!tbody || tbody.__dtObserved) return;
+                    tbody.__dtObserved = true;
+
+                    const observer = new MutationObserver(function() {
+                        scheduleAdjustBurst();
+                    });
+
+                    observer.observe(tbody, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true
+                    });
+                });
+            }
+
+            window.adjustAllDataTables = adjustAllDataTables;
+
+            $(document).on('init.dt xhr.dt draw.dt', function() {
+                setTimeout(adjustAllDataTables, 0);
+                setTimeout(attachDtMutationObservers, 0);
+            });
+
+            $(document).on('shown.bs.tab shown.bs.modal', function() {
+                scheduleAdjustBurst();
+                setTimeout(attachDtMutationObservers, 0);
+            });
+
+            let dtResizeTimer = null;
+            $(window).on('resize', function() {
+                clearTimeout(dtResizeTimer);
+                dtResizeTimer = setTimeout(adjustAllDataTables, 150);
+            });
+
+            setTimeout(adjustAllDataTables, 150);
+            setTimeout(attachDtMutationObservers, 180);
+        })();
+    </script>
+                
+            <script>
+            (function() {
+                const readonlyState = {
+                    pendingEditMeta: null
+                };
+
+                function isSimakPath() {
+                    return window.location.pathname.includes('/simaktertibusahas') ||
+                        window.location.pathname.includes('/simaktertibselenggaras') ||
+                        window.location.pathname.includes('/simaktertibmanfaats');
+                }
+
+                function getShowUrl(type, id) {
+                    if (String(type) === '3') return `https://sipjaki.pu.go.id/simak3/${id}`;
+                    return `https://sipjaki.pu.go.id/simak${type}/${id}`;
+                }
+
+                function parseSimakShowMetaFromUrl(rawUrl) {
+                    if (!rawUrl) return null;
+                    let path = String(rawUrl);
+                    try {
+                        const parsed = new URL(path, window.location.origin);
+                        path = parsed.pathname || path;
+                    } catch (e) {
+                        path = path.split('?')[0];
+                    }
+                    const match = path.match(/\/simak(1a[1-6]|1b1|1b2|1c|1d|1e|1f|2a|2b|2c|2d|3)\/(\d+)$/i);
+                    if (!match) return null;
+                    return {
+                        type: String(match[1]).toLowerCase(),
+                        id: Number(match[2])
+                    };
+                }
+
+                function sourceFromRow($row) {
+                    const names = $row.find('input[name], select[name], textarea[name]').map(function() {
+                        return this.name || '';
+                    }).get().join('|');
+                    if (names.includes('[pj_badan_usaha]')) return 'pj_badan_usaha';
+                    if (names.includes('[pj_teknik]')) return 'pj_teknik';
+                    if (names.includes('[pj_subklasifikasi]')) return 'pj_sub_klasifikasi';
+                    return 'details';
+                }
+
+                function extractHiddenValue($row, pattern) {
+                    const $el = $row.find('input[type="hidden"][name]').filter(function() {
+                        return pattern.test(this.name || '');
+                    }).first();
+                    return $el.length ? String($el.val() || '').trim() : '';
+                }
+
+                function buildDetailMaps(data) {
+                    const groups = [];
+                    const pushGroup = (label, source, items) => {
+                        if (!Array.isArray(items) || !items.length) return;
+                        groups.push({ label, source, items });
+                    };
+                    pushGroup('Detail', 'details', data.details);
+                    pushGroup('PJ Badan Usaha', 'pj_badan_usaha', data.pj_badan_usaha || data.pjBadanUsaha);
+                    pushGroup('PJ Teknik', 'pj_teknik', data.pj_teknik || data.pjTeknik);
+                    pushGroup('PJ Subklasifikasi', 'pj_sub_klasifikasi', data.pj_sub_klasifikasi || data.pjSubKlasifikasi);
+
+                    const maps = {};
+                    groups.forEach(function(group) {
+                        const byId = {};
+                        const byIndikator = {};
+                        (group.items || []).forEach(function(item) {
+                            if (item && item.id != null) byId[String(item.id)] = item;
+                            const indikatorId = item && (
+                                item.simak_1a1_detail_id || item.simak_1a2_detail_id || item.simak_1a3_detail_id ||
+                                item.simak_1a4_detail_id || item.simak_1a5_detail_id || item.simak_1a6_detail_id ||
+                                item.simak_1b1_detail_id || item.simak_1b2_detail_id || item.simak_1c_detail_id ||
+                                item.simak_1e_detail_id || item.simak_1f_sub_indikator_id ||
+                                item.simak_2a_indikator_id || item.simak_2b_indikator_id || item.simak_2c_indikator_id ||
+                                item.simak_2d_indikator_id || item.simak_3_indikator_id
+                            );
+                            if (indikatorId != null) byIndikator[String(indikatorId)] = item;
+                        });
+                        maps[group.source] = {
+                            byId,
+                            byIndikator,
+                            items: Array.isArray(group.items) ? group.items : []
+                        };
+                    });
+                    return maps;
+                }
+
+                function resolveDetailFromRow($row, source, detailMaps) {
+                    const detailId = extractHiddenValue($row, /\[id\]$/);
+                    const indikatorId = extractHiddenValue($row, /_indikator_id\]$/);
+                    const sourceMap = detailMaps[source] || { byId: {}, byIndikator: {} };
+
+                    let item = null;
+                    if (detailId && sourceMap.byId[detailId]) item = sourceMap.byId[detailId];
+                    if (!item && indikatorId && sourceMap.byIndikator[indikatorId]) item = sourceMap.byIndikator[indikatorId];
+                    return item;
+                }
+
+                function humanizeVerifyStatus(status) {
+                    const s = String(status || 'draft').toLowerCase();
+                    if (s === 'verified') return 'Sesuai';
+                    if (s === 'rejected') return 'Tidak Sesuai';
+                    return 'Menunggu Verifikasi';
+                }
+
+                function applyReadonlyVerificationInfo($modal, data) {
+                    if (!$modal || !$modal.length || !data) return;
+                    if (String($modal.attr('data-verify-mode')) === '1') return;
+
+                    const detailMaps = buildDetailMaps(data);
+                    $modal.find('.edit-status-info').remove();
+                    $modal.find('th[data-edit-info-added-col="1"]').remove();
+                    $modal.find('td[data-edit-info-added-cell="1"]').remove();
+
+                    $modal.find('table').each(function() {
+                        let $table = $(this);
+                        const isDtManaged = window.jQuery && $.fn.dataTable && $.fn.dataTable.isDataTable($table[0]);
+                        let $headerTable = $table;
+
+                        if (isDtManaged) {
+                            const $wrapper = $table.closest('.dataTables_wrapper');
+                            const $bodyTable = $wrapper.find('.dataTables_scrollBody > table').first();
+                            const $headTable = $wrapper.find('.dataTables_scrollHead > div > table').first();
+                            if (!$bodyTable.length || !$table.is($bodyTable)) return;
+                            $table = $bodyTable;
+                            if ($headTable.length) $headerTable = $headTable;
+                        }
+
+                        const $bodyRows = $table.find('tbody tr');
+                        if (!$bodyRows.length) return;
+
+                        let hasDraftOrReject = false;
+                        $bodyRows.each(function(rowIndex) {
+                            const $tr = $(this);
+                            const source = sourceFromRow($tr);
+                            const mapped = resolveDetailFromRow($tr, source, detailMaps);
+                            const item = mapped || (detailMaps[source] && detailMaps[source].items && detailMaps[source].items[rowIndex]) || null;
+                            const rowStatus = String((item && item.status) || '').toLowerCase();
+                            if (rowStatus === 'draft' || rowStatus === 'rejected' || rowStatus === '') {
+                                hasDraftOrReject = true;
+                                return false;
+                            }
+                        });
+                        if (!hasDraftOrReject) return;
+
+                        const rowSpan = Math.max(1, $headerTable.find('thead tr').length || 1);
+                        const $headFirstRow = $headerTable.find('thead tr').first();
+                        if ($headFirstRow.length && !$headFirstRow.find('th[data-edit-info-added-col="1"]').length) {
+                            $headFirstRow.append(`<th data-edit-info-added-col="1" rowspan="${rowSpan}" style="min-width:220px;">Informasi Verifikasi</th>`);
+                        }
+                        const $bodyHeadFirstRow = $table.find('thead tr').first();
+                        if ($bodyHeadFirstRow.length &&
+                            !$bodyHeadFirstRow.is($headFirstRow) &&
+                            !$bodyHeadFirstRow.find('th[data-edit-info-added-col="1"]').length) {
+                            $bodyHeadFirstRow.append(`<th data-edit-info-added-col="1" rowspan="${rowSpan}" style="min-width:220px;">Informasi Verifikasi</th>`);
+                        }
+
+                        $table.find('tbody tr').each(function(rowIndex) {
+                            const $tr = $(this);
+                            const source = sourceFromRow($tr);
+                            let item = resolveDetailFromRow($tr, source, detailMaps);
+                            if (!item && detailMaps[source] && detailMaps[source].items && detailMaps[source].items[rowIndex]) {
+                                // fallback by row index for dynamic/multi-header forms
+                                const fallbackItem = detailMaps[source].items[rowIndex];
+                                if (fallbackItem && fallbackItem.id) {
+                                    item = fallbackItem;
+                                }
+                            }
+                            if (!item || !item.id) return;
+
+                            const statusVal = String((item && item.status) || '').toLowerCase();
+                            const shouldShow = statusVal === 'draft' || statusVal === 'rejected' || statusVal === '';
+                            const statusText = humanizeVerifyStatus(statusVal || 'draft');
+                            const noteText = String(item.keterangan || '').trim() || '-';
+                            const html = shouldShow ? `
+                                <div class="edit-status-info p-2 border rounded bg-light">
+                                    <p class="mb-1"><strong>Status:</strong> ${statusText}</p>
+                                    <p class="mb-0"><strong>Keterangan:</strong> ${noteText}</p>
+                                </div>
+                            ` : '';
+
+                            let $infoCell = $('<td data-edit-info-added-cell="1"></td>');
+                            $infoCell.html(html);
+                            $tr.append($infoCell);
+
+                            const rowStatus = statusVal;
+                            if (rowStatus === 'verified') {
+                                $tr.addClass('verify-row-locked');
+                                $tr.find('input:not([type="hidden"]):not([type="file"]), textarea').prop('readonly', true);
+                                $tr.find('select').each(function() {
+                                    const $el = $(this);
+                                    if (typeof $el.attr('data-lock-init') === 'undefined') {
+                                        $el.attr('data-lock-init', String($el.val() || ''));
+                                    }
+                                    $el.addClass('verify-locked-select');
+                                });
+                                $tr.find('input[type="file"], .btn-danger, .btn-delete-row, .btn-remove-row, .btn-remove').prop('disabled', true).addClass('disabled').hide();
+                            }
+                        });
+                    });
+                }
+
+                if (!isSimakPath()) return;
+
+                $(document).on('click', '.btn-group .btn[class*="btn-edit-"]', function() {
+                    const $btn = $(this);
+                    const id = $btn.data('id');
+                    if (!id) return;
+
+                    const className = ($btn.attr('class') || '');
+                    const match = className.match(/btn-edit-([a-z0-9]+)/i);
+                    const type = match ? match[1] : null;
+                    if (!type) return;
+                    if (!/^(1a[1-6]|1b1|1b2|1c|1d|1e|1f|2a|2b|2c|2d|3)$/i.test(String(type))) return;
+                    readonlyState.pendingEditMeta = {
+                        type: String(type).toLowerCase(),
+                        id: Number(id)
+                    };
+                });
+
+                $(document).on('ajaxSuccess.simakReadonlyInfo', function(_event, xhr, settings) {
+                    const method = String((settings && settings.type) || 'GET').toUpperCase();
+                    if (method !== 'GET') return;
+
+                    const meta = parseSimakShowMetaFromUrl(settings && settings.url);
+                    if (!meta) return;
+
+                    const pending = readonlyState.pendingEditMeta;
+                    if (!pending || pending.type !== meta.type || Number(pending.id) !== Number(meta.id)) {
+                        return;
+                    }
+
+                    let res = xhr && xhr.responseJSON ? xhr.responseJSON : null;
+                    if (!res) {
+                        try {
+                            res = JSON.parse((xhr && xhr.responseText) || '{}');
+                        } catch (e) {
+                            res = null;
+                        }
+                    }
+                    if (!res || !res.status || !res.data) return;
+
+                    const applyAfterShow = function() {
+                        const $modal = $('.modal.show').last();
+                        if (!$modal.length || String($modal.attr('data-verify-mode')) === '1') return;
+                        applyReadonlyVerificationInfo($modal, res.data);
+                    };
+                    setTimeout(applyAfterShow, 250);
+                    setTimeout(applyAfterShow, 700);
+                    setTimeout(applyAfterShow, 1200);
+
+                    readonlyState.pendingEditMeta = null;
+                });
+
+                $(document).on('hidden.bs.modal', '.modal', function() {
+                    const $modal = $(this);
+                    if (String($modal.attr('data-verify-mode')) === '1') return;
+                    $modal.find('.edit-status-info').remove();
+                    $modal.find('th[data-edit-info-added-col="1"]').remove();
+                    $modal.find('td[data-edit-info-added-cell="1"]').remove();
+                    $modal.find('.verify-locked-select').removeClass('verify-locked-select').removeAttr('data-lock-init');
+                    $modal.find('.verify-row-locked').removeClass('verify-row-locked');
+                });
+
+                $(document).off('change.verifyLockedSelect').on('change.verifyLockedSelect', '.verify-locked-select', function() {
+                    const init = String($(this).attr('data-lock-init') || '');
+                    $(this).val(init);
+                });
+                $(document).off('mousedown.verifyLockedSelect keydown.verifyLockedSelect').on('mousedown.verifyLockedSelect keydown.verifyLockedSelect', '.verify-locked-select', function(e) {
+                    e.preventDefault();
+                    this.blur();
+                });
+            })();
+        </script>
+        <script>
+            $(function() {
+                $('.nav-sidebar .nav-link').on('click', function(e) {
+                    var href = $(this).attr('href');
+                    var target = $(this).attr('target');
+                    var hasTreeview = $(this).siblings('.nav-treeview').length > 0 || $(this).parent().hasClass('has-treeview');
+                    
+                    if (href && href !== '#' && !href.startsWith('javascript') && target !== '_blank' && !hasTreeview) {
+                        $('#fullscreen-loader-global').removeClass('d-none');
+                        
+                        setTimeout(() => {
+                            $('#fullscreen-loader-global').addClass('d-none');
+                        }, 10000);
+                    }
+                });
+            });
+        
+        
+        <script>
+            window.isSementaraUser = false;
+            $(document).ready(function() {
+                if (window.isSementaraUser) {
+                    
+                    // Use capturing phase to intercept before any other script (e.g. loading buttons)
+                    document.addEventListener('submit', function(e) {
+                        var form = e.target;
+                        if (form && form.tagName === 'FORM') {
+                            var action = form.getAttribute('action') || '';
+                            var isAllowed = action.includes('user/profile') || action.includes('user/password') || action.includes('logout') || action.includes('login');
+                            
+                            if (!isAllowed) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                e.stopImmediatePropagation();
+                                
+                                if (typeof Swal !== 'undefined') {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Akses Ditolak',
+                                        text: 'Akun sementara tidak memiliki izin untuk menyimpan, mengubah, atau menghapus data. Harap perbarui Profil dan SK Anda terlebih dahulu.',
+                                        confirmButtonText: 'Mengerti',
+                                        confirmButtonColor: '#1b3061'
+                                    });
+                                } else {
+                                    alert('Akun sementara tidak memiliki izin untuk menyimpan, mengubah, atau menghapus data.');
+                                }
+                            }
+                        }
+                    }, true);
+
+                    // Use capturing phase for clicks on delete/action buttons
+                    document.addEventListener('click', function(e) {
+                        var target = e.target;
+                        var btn = target.closest('.btn-delete, .delete-btn, .btn-danger, [data-method="delete"]');
+                        if (btn) {
+                            var form = btn.closest('form');
+                            if (form) {
+                                var action = form.getAttribute('action') || '';
+                                if (action.includes('user/profile') || action.includes('user/password') || action.includes('logout') || action.includes('login')) {
+                                    return; // let it pass
+                                }
+                            }
+                            
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Akses Ditolak',
+                                    text: 'Akun sementara tidak memiliki izin untuk menyimpan, mengubah, atau menghapus data.',
+                                    confirmButtonText: 'Mengerti',
+                                    confirmButtonColor: '#1b3061'
+                                });
+                            }
+                        }
+                    }, true);
+                    
+                    // Block global ajax POST/PUT/DELETE
+                    $.ajaxSetup({
+                        beforeSend: function(jqXHR, settings) {
+                            if (settings.type !== 'GET' && settings.type !== 'HEAD') {
+                                var url = settings.url || '';
+                                var isAllowed = url.includes('user/profile') || url.includes('user/password') || url.includes('logout');
+                                if (!isAllowed) {
+                                    if (typeof Swal !== 'undefined') {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Akses Ditolak',
+                                            text: 'Akun sementara tidak memiliki izin untuk menyimpan, mengubah, atau menghapus data.',
+                                            confirmButtonText: 'Mengerti',
+                                            confirmButtonColor: '#1b3061'
+                                        });
+                                    }
+                                    return false; // Cancel ajax request
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
+    
+    <script>
+        function formatRupiahHelper(angka) {
+            var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
+            split   = number_string.split(','),
+            sisa    = split[0].length % 3,
+            rupiah  = split[0].substr(0, sisa),
+            ribuan  = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if(ribuan){
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return rupiah;
+        }
+
+        $(document).ready(function() {
+            function applyRupiahFormat() {
+                $('.input-rupiah').each(function() {
+                    var val = $(this).val();
+                    if (val) {
+                        var clean = parseFloat(val);
+                        if (!isNaN(clean)) {
+                            $(this).val(formatRupiahHelper(Math.round(clean)));
+                        }
+                    }
+                });
+            }
+            
+            applyRupiahFormat();
+
+            $(document).on('keyup', '.input-rupiah', function(e) {
+                $(this).val(formatRupiahHelper($(this).val()));
+            });
+
+            $('form').on('submit', function() {
+                $(this).find('.input-rupiah').each(function() {
+                    var clean = $(this).val().replace(/\./g, '');
+                    $(this).val(clean);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

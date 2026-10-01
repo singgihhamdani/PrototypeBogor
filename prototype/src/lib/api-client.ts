@@ -44,7 +44,7 @@ class ApiClient {
     };
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout for snappy UX
+    const timeoutId = setTimeout(() => controller.abort(), 600); // Snappy timeout for responsive fallback
 
     try {
       const response = await fetch(url, {
