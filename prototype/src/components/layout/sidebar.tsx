@@ -218,7 +218,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       section.items.forEach((item) => {
         if (item.children) {
           const isChildActive = item.children.some(
-            (c) => pathname === c.href || (c.href !== "/" && pathname.startsWith(c.href))
+            (c) => pathname === c.href || (c.href !== "/" && (pathname.startsWith(`${c.href}/`) || pathname.startsWith(c.href)))
           );
           if (isChildActive) {
             setOpenGroups((prev) => ({ ...prev, [item.id]: true }));
@@ -364,8 +364,19 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 const hasChildren = item.children && item.children.length > 0;
                 const isGroupOpen = !!openGroups[item.id];
 
-                const isDirectActive = item.href ? (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href) && !item.href.includes("/pengawasan/tertib"))) : false;
-                const isChildActive = hasChildren && item.children?.some((c) => pathname === c.href || pathname.startsWith(c.href));
+                // Direct active hanya aktif jika exact match atau subpath yang benar-benar miliknya (bukan overlap /pengawasan dengan /pengawasan/tertib-*)
+                const isDirectActive = item.href 
+                  ? (item.href === "/pengawasan" 
+                      ? pathname === "/pengawasan" 
+                      : pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`)))
+                  : false;
+
+                const isChildActive = Boolean(
+                  hasChildren &&
+                  item.children?.some(
+                    (c) => pathname === c.href || (c.href !== "/" && (pathname.startsWith(`${c.href}/`) || pathname.startsWith(c.href)))
+                  )
+                );
                 const isActive = isDirectActive || isChildActive;
 
                 if (!hasChildren) {
@@ -523,7 +534,15 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                         }}
                       >
                         {item.children?.map((child, cIdx) => {
-                          const isChildCurrent = pathname === child.href;
+                          const isChildCurrent =
+                            pathname === child.href ||
+                            (pathname.startsWith(`${child.href}/`) &&
+                              !item.children?.some(
+                                (other) =>
+                                  other.href !== child.href &&
+                                  other.href.startsWith(`${child.href}/`) &&
+                                  (pathname === other.href || pathname.startsWith(`${other.href}/`))
+                              ));
 
                           return (
                             <Link
