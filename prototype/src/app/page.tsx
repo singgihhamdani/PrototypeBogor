@@ -383,51 +383,20 @@ export default function HomePage() {
               </div>
             </nav>
 
-            {/* Action Group: Status Badge + Login Button */}
-            <div style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
-              {/* Status Sistem Badge */}
-              <div
-                className="homepage-status-badge"
-                title="Sistem Beroperasi Penuh — Terhubung ke SIPJAKI Kementerian PUPR"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 7,
-                  padding: "6px 14px",
-                  borderRadius: 99,
-                  background: scrolled ? "rgba(255,255,255,0.12)" : "rgba(16, 185, 129, 0.08)",
-                  border: scrolled ? "1px solid rgba(255,255,255,0.2)" : "1px solid rgba(16, 185, 129, 0.2)",
-                  color: scrolled ? "#FFFFFF" : "#059669",
-                  fontSize: "0.74rem",
-                  fontWeight: 800,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <span style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: "50%",
-                  background: "#10B981",
-                  boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.3)",
-                  animation: "statusPulse 2s infinite",
-                  display: "inline-block",
-                }} />
-                <span>SIPJAKI Sync: Normal</span>
-              </div>
-
-              {/* Login / Dashboard Button */}
+            {/* Action Group: Login / Dashboard Button */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
               <Link
                 href={user ? targetRoute : "/login"}
                 style={{
                   background: scrolled ? "#FFC000" : "#1B3061",
                   color: scrolled ? "#1B3061" : "#FFC000",
-                  padding: "9px 22px",
+                  padding: "10px 24px",
                   borderRadius: 10,
                   fontWeight: 800,
-                  fontSize: "0.84rem",
+                  fontSize: "0.85rem",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 7,
+                  gap: 8,
                   transition: "all 0.2s ease",
                   textDecoration: "none",
                   whiteSpace: "nowrap",
@@ -1257,12 +1226,6 @@ export default function HomePage() {
           }
           .homepage-mobile-toggle {
             display: block !important;
-          }
-        }
-
-        @media (max-width: 900px) {
-          .homepage-status-badge {
-            display: none !important;
           }
         }
 
