@@ -245,153 +245,259 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
       {/* Subtab Navigation */}
       <PerencanaanSubtabNav tertibType={tertibType} activeSubtab="anggaran" />
 
-      {/* 4 Financial Stat Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: "16px" }}>
+      {/* 4 Financial Stat Cards (Modern UI/UX Revamped) */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "16px" }}>
+        {/* Card 1: Total Pagu DPA */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #2563EB",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between",
+            transition: "transform 0.15s ease, box-shadow 0.15s ease"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#EBF2FA",
-              color: "#0F2E5C",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <Wallet style={{ width: "22px", height: "22px" }} />
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Total Pagu DPA
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
+                Alokasi Pengawasan
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EFF6FF",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Wallet style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
-              Total Pagu DPA
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "nowrap" }}>
+            <span style={{ fontSize: "13px", fontWeight: 800, color: "#64748B" }}>Rp</span>
+            <span style={{ fontSize: "22px", fontWeight: 900, color: "#0F2E5C", letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {totalPagu.toLocaleString('id-ID')}
             </span>
-            <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#0F2E5C", margin: "2px 0 0 0" }}>
-              Rp {totalPagu.toLocaleString('id-ID')}
-            </h3>
-            <span style={{ fontSize: "11px", color: "#64748B" }}>Tahun Anggaran 2026</span>
+          </div>
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+            <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 600 }}>Tahun Anggaran 2026</span>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "9999px" }}>
+              DPA Terbit
+            </span>
           </div>
         </div>
 
+        {/* Card 2: Realisasi Berjalan */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #10B981",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between",
+            transition: "transform 0.15s ease, box-shadow 0.15s ease"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#DCFCE7",
-              color: "#166534",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <TrendingUp style={{ width: "22px", height: "22px" }} />
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Realisasi Berjalan
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
+                SP2D Terbit Riil
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#ECFDF5",
+                color: "#059669",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <TrendingUp style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
-              Realisasi Berjalan
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "nowrap" }}>
+            <span style={{ fontSize: "13px", fontWeight: 800, color: "#059669" }}>Rp</span>
+            <span style={{ fontSize: "22px", fontWeight: 900, color: "#059669", letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {totalRealisasi.toLocaleString('id-ID')}
             </span>
-            <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#10B981", margin: "2px 0 0 0" }}>
-              Rp {totalRealisasi.toLocaleString('id-ID')}
-            </h3>
-            <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>Serapan: {percentSerapan}%</span>
+          </div>
+
+          <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B" }}>Tingkat Serapan</span>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: percentSerapan >= 60 ? "#059669" : "#D97706" }}>
+                {percentSerapan}%
+              </span>
+            </div>
+            <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
+              <div
+                style={{
+                  width: `${Math.min(percentSerapan, 100)}%`,
+                  height: "100%",
+                  backgroundColor: percentSerapan >= 60 ? "#10B981" : "#F59E0B",
+                  borderRadius: "9999px",
+                  transition: "width 0.4s ease"
+                }}
+              />
+            </div>
           </div>
         </div>
 
+        {/* Card 3: Sisa Anggaran */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #F59E0B",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between",
+            transition: "transform 0.15s ease, box-shadow 0.15s ease"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#FEF3C7",
-              color: "#92400E",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <Coins style={{ width: "22px", height: "22px" }} />
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Sisa Anggaran
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
+                Sisa Pagu Belum SP2D
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Coins style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
-              Sisa Anggaran
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "nowrap" }}>
+            <span style={{ fontSize: "13px", fontWeight: 800, color: "#D97706" }}>Rp</span>
+            <span style={{ fontSize: "22px", fontWeight: 900, color: "#92400E", letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {sisaAnggaran.toLocaleString('id-ID')}
             </span>
-            <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#92400E", margin: "2px 0 0 0" }}>
-              Rp {sisaAnggaran.toLocaleString('id-ID')}
-            </h3>
-            <span style={{ fontSize: "11px", color: "#64748B" }}>Sisa alokasi pagu TA 2026</span>
+          </div>
+
+          <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B" }}>Sisa Alokasi</span>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#92400E" }}>
+                {100 - percentSerapan}%
+              </span>
+            </div>
+            <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
+              <div
+                style={{
+                  width: `${Math.max(100 - percentSerapan, 0)}%`,
+                  height: "100%",
+                  backgroundColor: "#F59E0B",
+                  borderRadius: "9999px",
+                  transition: "width 0.4s ease"
+                }}
+              />
+            </div>
           </div>
         </div>
 
+        {/* Card 4: Sumber Pendanaan */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #6366F1",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between",
+            transition: "transform 0.15s ease, box-shadow 0.15s ease"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#F1F5F9",
-              color: "#2563EB",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <PieChart style={{ width: "22px", height: "22px" }} />
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Sumber Pendanaan
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
+                Kanal Alokasi Fiskal
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EEF2FF",
+                color: "#4F46E5",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <PieChart style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
-              Sumber Pendanaan
-            </span>
-            <h3 style={{ fontSize: "17px", fontWeight: 900, color: "#2563EB", margin: "2px 0 0 0" }}>
+
+          <div style={{ marginTop: "14px" }}>
+            <h3 style={{ fontSize: "19px", fontWeight: 900, color: "#1E1B4B", margin: 0, whiteSpace: "nowrap", letterSpacing: "-0.4px" }}>
               APBD & Bantuan
             </h3>
-            <span style={{ fontSize: "11px", color: "#64748B" }}>Bidang Bina Konstruksi</span>
+            <span style={{ fontSize: "11px", color: "#64748B", marginTop: "4px", display: "block" }}>
+              Bidang Jasa Konstruksi DPU
+            </span>
+          </div>
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "2px 8px", borderRadius: "6px" }}>
+              APBD Kab. Bogor
+            </span>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: "#065F46", backgroundColor: "#ECFDF5", padding: "2px 8px", borderRadius: "6px" }}>
+              DAK Fisik
+            </span>
           </div>
         </div>
       </div>
