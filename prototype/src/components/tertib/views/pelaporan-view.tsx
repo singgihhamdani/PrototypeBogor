@@ -12,6 +12,7 @@ import DataTableView, { ColumnDef } from "@/components/common/data-table-view";
 import ModalForm from "@/components/common/modal-form";
 import FileUploader from "@/components/common/file-uploader";
 import StatusBadge from "@/components/common/status-badge";
+import { exportToSpreadsheet } from "@/lib/export-utils";
 
 interface PelaporanViewProps {
   tertibType: TertibType;
@@ -524,7 +525,23 @@ export default function PelaporanView({ tertibType }: PelaporanViewProps) {
             <button
               type="button"
               title="Unduh Rekapitulasi (Excel)"
-              onClick={() => alert(`Mengunduh berkas spreadsheet ${row.fileExcel}...`)}
+              onClick={() => exportToSpreadsheet({
+                fileName: row.fileExcel ? row.fileExcel.replace(/\.xlsx$/, "") : `Rekap_Pelaporan_${row.periode}_${tertibType}`,
+                sheetName: "REKAPITULASI PELAPORAN",
+                columns: [
+                  { key: "periode", label: "Periode Pelaporan" },
+                  { key: "tahun", label: "Tahun Anggaran" },
+                  { key: "judulLaporan", label: "Judul Laporan" },
+                  { key: "totalObjekDiawasi", label: "Total Objek Diawasi" },
+                  { key: "statusTertib", label: "Objek Tertib" },
+                  { key: "statusBelumTertib", label: "Objek Belum Tertib" },
+                  { key: "tingkatKepatuhan", label: "Tingkat Kepatuhan (%)", transform: (v) => `${v}%` },
+                  { key: "nomorSuratPengantar", label: "Nomor Surat Pengantar" },
+                  { key: "statusVerifikasiKementerian", label: "Status Verifikasi Kementerian" }
+                ],
+                data: [row],
+                includeDataDictionary: true
+              })}
               style={{
                 padding: "6px",
                 borderRadius: "6px",
@@ -742,7 +759,23 @@ export default function PelaporanView({ tertibType }: PelaporanViewProps) {
 
               <button
                 type="button"
-                onClick={() => alert(`Mengunduh ${selectedReportDetail.fileExcel}...`)}
+                onClick={() => exportToSpreadsheet({
+                  fileName: selectedReportDetail.fileExcel ? selectedReportDetail.fileExcel.replace(/\.xlsx$/, "") : `Rekap_Pelaporan_${selectedReportDetail.periode}_${tertibType}`,
+                  sheetName: "REKAPITULASI PELAPORAN",
+                  columns: [
+                    { key: "periode", label: "Periode Pelaporan" },
+                    { key: "tahun", label: "Tahun Anggaran" },
+                    { key: "judulLaporan", label: "Judul Laporan" },
+                    { key: "totalObjekDiawasi", label: "Total Objek Diawasi" },
+                    { key: "statusTertib", label: "Objek Tertib" },
+                    { key: "statusBelumTertib", label: "Objek Belum Tertib" },
+                    { key: "tingkatKepatuhan", label: "Tingkat Kepatuhan (%)", transform: (v) => `${v}%` },
+                    { key: "nomorSuratPengantar", label: "Nomor Surat Pengantar" },
+                    { key: "statusVerifikasiKementerian", label: "Status Verifikasi Kementerian" }
+                  ],
+                  data: [selectedReportDetail],
+                  includeDataDictionary: true
+                })}
                 style={{
                   flex: 1,
                   display: "flex",

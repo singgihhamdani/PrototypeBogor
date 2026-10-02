@@ -12,8 +12,10 @@ import FileUploader from "@/components/common/file-uploader";
 import { 
   AlertTriangle, Plus, Download, ShieldCheck, CheckCircle2, 
   Clock, AlertCircle, FileText, Printer, Trash2, Eye, 
-  Calendar, Building2, Send, Scale
+  Calendar, Building2, Send, Scale 
 } from "lucide-react";
+import { exportToSpreadsheet } from "@/lib/export-utils";
+import { TEMPLATE_REKOMENDASI } from "@/lib/sipjaki-templates";
 
 interface RekomendasiViewProps {
   tertibType: TertibType;
@@ -226,9 +228,17 @@ export default function RekomendasiView({ tertibType }: RekomendasiViewProps) {
             onClick: () => setIsCreateModalOpen(true)
           },
           {
-            label: "Unduh Rekap Sanksi (PDF)",
+            label: "Export SIPJAKI (XLSX)",
             icon: Download,
-            onClick: () => alert(`Mengunduh Rekapitulasi Surat Peringatan & Sanksi Administratif (${config.shortTitle})...`)
+            onClick: () => exportToSpreadsheet({
+              fileName: `${TEMPLATE_REKOMENDASI.exportFileName}_${tertibType}`,
+              sheetName: TEMPLATE_REKOMENDASI.sheetName,
+              columns: TEMPLATE_REKOMENDASI.columns,
+              data: filteredData,
+              sipjakiMode: true,
+              includeDataDictionary: true,
+              dictionaryItems: TEMPLATE_REKOMENDASI.dictionaryItems
+            })
           }
         ]}
       />
@@ -560,6 +570,8 @@ export default function RekomendasiView({ tertibType }: RekomendasiViewProps) {
         columns={columns}
         defaultPageSize={10}
         exportFileName={`Rekomendasi_${tertibType}`}
+        sipjakiTemplate={TEMPLATE_REKOMENDASI}
+        exportColumns={TEMPLATE_REKOMENDASI.columns}
         actionsHeader="AKSI REKOMENDASI"
         actionsRender={(row) => (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>

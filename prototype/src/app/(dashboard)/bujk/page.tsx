@@ -1,14 +1,19 @@
 "use client";
 import { useState } from "react";
-import { Building2, Search, Plus, Download, Eye, ChevronRight, Award, ShieldCheck, Filter } from "lucide-react";
+import { Building2, Search, Plus, Download, Eye, ChevronRight, Award, ShieldCheck, Filter, FileSpreadsheet } from "lucide-react";
 import bujkData from "@/data/bujk.json";
 import Link from "next/link";
+import { exportToSpreadsheet } from "@/lib/export-utils";
+import { TEMPLATE_BUJK } from "@/lib/sipjaki-templates";
+import BatchImportModal from "@/components/common/batch-import-modal";
 
 export default function BUJKPage() {
+  const [bujkList, setBujkList] = useState(bujkData);
   const [search, setSearch] = useState("");
   const [filterQual, setFilterQual] = useState("Semua");
+  const [showImportModal, setShowImportModal] = useState(false);
 
-  const filtered = bujkData.filter((b) => {
+  const filtered = bujkList.filter((b) => {
     const matchSearch = b.name.toLowerCase().includes(search.toLowerCase()) || 
                         b.nib.includes(search) || 
                         b.district.toLowerCase().includes(search.toLowerCase()) ||
@@ -18,11 +23,34 @@ export default function BUJKPage() {
   });
 
   const stats = [
-    { label: "Total BUJK Terdaftar", value: bujkData.length, sub: "Tervalidasi OSS & LPJK", color: "#0F2E5C", bg: "#EBF2FA", icon: Building2 },
-    { label: "Kualifikasi Besar", value: bujkData.filter((b) => b.qualification === "Besar").length, sub: "Kualifikasi B1 & B2", color: "#1E40AF", bg: "#EFF6FF", icon: Award },
-    { label: "Kualifikasi Menengah", value: bujkData.filter((b) => b.qualification === "Menengah").length, sub: "Kualifikasi M1 & M2", color: "#D97706", bg: "#FFFBEB", icon: ShieldCheck },
-    { label: "Kualifikasi Kecil", value: bujkData.filter((b) => b.qualification === "Kecil").length, sub: "Kualifikasi K1, K2 & K3", color: "#059669", bg: "#ECFDF5", icon: Building2 },
+    { label: "Total BUJK Terdaftar", value: bujkList.length, sub: "Tervalidasi OSS & LPJK", color: "#0F2E5C", bg: "#EBF2FA", icon: Building2 },
+    { label: "Kualifikasi Besar", value: bujkList.filter((b) => b.qualification === "Besar").length, sub: "Kualifikasi B1 & B2", color: "#1E40AF", bg: "#EFF6FF", icon: Award },
+    { label: "Kualifikasi Menengah", value: bujkList.filter((b) => b.qualification === "Menengah").length, sub: "Kualifikasi M1 & M2", color: "#D97706", bg: "#FFFBEB", icon: ShieldCheck },
+    { label: "Kualifikasi Kecil", value: bujkList.filter((b) => b.qualification === "Kecil").length, sub: "Kualifikasi K1, K2 & K3", color: "#059669", bg: "#ECFDF5", icon: Building2 },
   ];
+
+  const handleBatchCommit = (parsedData: Record<string, any>[]) => {
+    const newItems = parsedData.map((d, i) => ({
+      id: `B0${bujkList.length + i + 1}`,
+      name: d.name || "BUJK Baru",
+      type: d.type || "PT",
+      nib: d.nib || "1234567890123",
+      npwp: d.npwp || "01.234.567.8-000.000",
+      leader: d.leader || "Pimpinan Perusahaan",
+      qualification: d.qualification || "Kecil",
+      district: d.district || "Cibinong",
+      districtId: "01",
+      sbuCount: Number(d.sbuCount) || 1,
+      status: d.status || "Aktif",
+      phone: d.phone || "081234567890",
+      email: d.email || "info@bujk.co.id",
+      address: d.address || "Kabupaten Bogor",
+      sbuExpiry: d.sbuExpiry || "2027-12-31",
+      projectsActive: 0
+    }));
+
+    setBujkList((prev) => [...newItems, ...prev]);
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -43,8 +71,41 @@ export default function BUJKPage() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Tombol Import Excel */}
           <button 
-            onClick={() => alert("Mengunduh Rekapitulasi Data BUJK Kab. Bogor (.xlsx)...")}
+            type="button"
+            onClick={() => setShowImportModal(true)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#ECFDF5",
+              border: "1px solid #A7F3D0",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#065F46",
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+            }}
+          >
+            <FileSpreadsheet style={{ width: "16px", height: "16px", color: "#059669" }} />
+            <span>Import Excel</span>
+          </button>
+
+          {/* Tombol Export */}
+          <button 
+            type="button"
+            onClick={() => exportToSpreadsheet({
+              fileName: TEMPLATE_BUJK.exportFileName,
+              sheetName: TEMPLATE_BUJK.sheetName,
+              columns: TEMPLATE_BUJK.columns,
+              data: bujkList,
+              sipjakiMode: true,
+              includeDataDictionary: true,
+              dictionaryItems: TEMPLATE_BUJK.dictionaryItems
+            })}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -60,8 +121,10 @@ export default function BUJKPage() {
               boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
             }}
           >
-            <Download style={{ width: "16px", height: "16px" }} /> Export Excel
+            <Download style={{ width: "16px", height: "16px" }} />
+            <span>Export SIPJAKI</span>
           </button>
+
           <button 
             onClick={() => alert("Membuka Formulir Pendaftaran BUJK Baru...")}
             style={{
@@ -335,6 +398,19 @@ export default function BUJKPage() {
           </table>
         </div>
       </div>
+
+      {/* Batch Import Modal BUJK */}
+      <BatchImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        title="Impor Database BUJK (SIPJAKI)"
+        subtitle="Unggah berkas Excel (.xlsx) atau CSV data Badan Usaha Jasa Konstruksi Kabupaten Bogor"
+        templateFileName={TEMPLATE_BUJK.exportFileName}
+        expectedColumns={TEMPLATE_BUJK.importColumns}
+        sampleRows={TEMPLATE_BUJK.sampleRows}
+        template={TEMPLATE_BUJK}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }

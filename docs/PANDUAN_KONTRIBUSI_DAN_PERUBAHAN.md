@@ -87,32 +87,35 @@ git push -u origin feature/sipjaki-integration-batch-import
 
 ## 3. Arsitektur Komponen Baru
 
-### Diagram Alur `BatchImportModal`
+### Diagram Alur `BatchImportModal` (v2 — SheetJS XLSX)
 ```text
 [ Tombol Action di Header / Toolbar ]
                 │
                 ▼ Klik
 ┌────────────────────────────────────────────────────────┐
-│               Modal: BatchImportModal                  │
+│            Modal: BatchImportModal (v2)                 │
 │                                                        │
-│  1. [ Unduh Template CSV Baku ] ──► (File .csv + UTF-8)│
+│  1. [ Unduh Template XLSX ] ──► (.xlsx 3 sheet:        │
+│       Data Contoh + Petunjuk + Kamus Data)             │
 │                                                        │
-│  2. [ Drag & Drop Berkas .csv / .xlsx ]                │
+│  2. [ Drag & Drop Berkas .xlsx / .xls / .csv ]         │
 │       │                                                │
 │       ▼                                                │
-│  3. [ Smart CSV Parser Engine ]                        │
-│       ├─ Mendeteksi pemisah (koma / titik-koma)        │
-│       ├─ Menangani kutip bersarang ("...")             │
-│       └─ Memvalidasi kolom wajib vs opsional           │
+│  3. [ SheetJS Native Parser Engine ]                   │
+│       ├─ XLSX.read() — native binary parsing           │
+│       ├─ Auto-detect format (.xlsx / .xls / .csv)      │
+│       ├─ Validasi kolom wajib vs opsional              │
+│       └─ Error cell highlighting (sel merah invalid)   │
 │       │                                                │
 │       ▼                                                │
-│  4. [ Live Preview Table ]                             │
-│       └─ Tampilkan baris valid, error badge, paginasi │
+│  4. [ Live Preview Table + Validation Summary ]        │
+│       ├─ Baris valid (hijau) / invalid (merah)         │
+│       └─ Summary: N valid, M invalid, paginasi        │
 │                                                        │
-│  5. [ Tombol: Proses & Simpan Semua Data ]             │
+│  5. [ Partial Commit: Simpan Baris Valid Saja ]        │
 └───────────────────────┬────────────────────────────────┘
                         │
-                        ▼ Callback onCommit(parsedRows)
+                        ▼ Callback onCommit(validRows)
       [ Update State / Kirim ke Database Backend ]
 ```
 
@@ -193,6 +196,16 @@ const handleBatchCommit = (importedItems: Record<string, any>[]) => {
 | 11 | Tertib Penyelenggaraan | `/pengawasan/tertib-penyelenggaraan/*` | `prototype/src/app/(dashboard)/pengawasan/tertib-penyelenggaraan/*` |
 | 12 | Tertib Pemanfaatan | `/pengawasan/tertib-pemanfaatan/*` | `prototype/src/app/(dashboard)/pengawasan/tertib-pemanfaatan/*` |
 | 13 | Paket Pekerjaan | `/paket-pekerjaan` | `prototype/src/app/(dashboard)/paket-pekerjaan/page.tsx` |
+| 14 | Riwayat Audit Trail | `/pengaturan/riwayat-data` | `prototype/src/app/(dashboard)/pengaturan/riwayat-data/page.tsx` |
+
+### Library & Utilitas Baru
+
+| No | File | Deskripsi |
+|---|---|---|
+| 1 | `src/lib/export-utils.ts` | Engine ekspor XLSX/CSV native (SheetJS) dengan formatter Rupiah & tanggal |
+| 2 | `src/lib/sipjaki-templates.ts` | Definisi 6 template resmi SIPJAKI (kolom, enum, sample, kamus data) |
+| 3 | `src/lib/import-validators.ts` | Validator NIB 13-digit, tanggal ISO, enum case-sensitive, numerik murni |
+| 4 | `src/lib/audit-log.ts` | Modul audit trail localStorage untuk riwayat ekspor/impor |
 
 ---
 
@@ -202,4 +215,6 @@ Sebelum melakukan *merge* Pull Request ke branch utama:
 - [x] Jalankan `npx tsc --noEmit` di dalam folder `prototype/` dan pastikan hasil keluar dengan kode 0 (bebas error kompilasi).
 - [x] Pastikan dev server dapat berjalan normal tanpa crash via `npm run dev`.
 - [x] Pastikan seluruh action button di `ModuleHeader` memiliki aksi yang terdefinisi (buka modal, navigasi rute, atau unduh).
-- [x] Uji pengunduhan berkas template CSV di setiap modal dan buka di Microsoft Excel untuk memverifikasi pemisahan kolom.
+- [x] Uji pengunduhan berkas template XLSX di setiap modal dan buka di Microsoft Excel untuk memverifikasi struktur 3 sheet (Data, Petunjuk, Kamus).
+- [x] Uji tombol ekspor "Format SIPJAKI" di halaman data modul (Paket Pekerjaan, BUJK, Kecelakaan K3, dll.).
+- [x] Uji halaman Audit Trail (`/pengaturan/riwayat-data`) menampilkan riwayat operasi ekspor/impor.

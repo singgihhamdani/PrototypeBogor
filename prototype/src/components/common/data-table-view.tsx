@@ -3,8 +3,10 @@ import React, { useState, useMemo } from "react";
 import { 
   ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, 
   ChevronRight, Download, FileSpreadsheet, FileText, 
-  Printer, Database, Search, Filter 
+  Printer, Database, Search, Filter, Landmark
 } from "lucide-react";
+import { exportToSpreadsheet, exportToCSV, ExportColumn } from "@/lib/export-utils";
+import { SipjakiTemplate } from "@/lib/sipjaki-templates";
 
 export interface ColumnDef<T> {
   key: string;
@@ -27,6 +29,9 @@ export interface DataTableViewProps<T> {
   actionsHeader?: string;
   actionsRender?: (row: T, index: number) => React.ReactNode;
   emptyMessage?: string;
+  exportColumns?: ExportColumn[];
+  sipjakiTemplate?: SipjakiTemplate;
+  hideExport?: boolean;
 }
 
 export default function DataTableView<T extends object>({
@@ -40,7 +45,10 @@ export default function DataTableView<T extends object>({
   onRowClick,
   actionsHeader,
   actionsRender,
-  emptyMessage = "Tidak ada data yang sesuai dengan kriteria filter."
+  emptyMessage = "Tidak ada data yang sesuai dengan kriteria filter.",
+  exportColumns,
+  sipjakiTemplate,
+  hideExport = false
 }: DataTableViewProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultPageSize);
@@ -85,8 +93,49 @@ export default function DataTableView<T extends object>({
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedData = sortedData.slice(startIndex, startIndex + pageSize);
 
-  const handleExport = (format: "xlsx" | "pdf" | "csv") => {
-    alert(`Mengekspor ${sortedData.length} baris data ke format .${format} (${exportFileName}.${format})...`);
+  const getMappedExportColumns = (): ExportColumn[] => {
+    if (exportColumns && exportColumns.length > 0) return exportColumns;
+    return columns.map((c) => ({
+      key: c.key,
+      label: c.label
+    }));
+  };
+
+  const handleExport = (format: "xlsx" | "csv" | "pdf") => {
+    if (format === "pdf") {
+      window.print();
+      return;
+    }
+    const cols = getMappedExportColumns();
+    const cleanData = sortedData as Record<string, any>[];
+
+    if (format === "csv") {
+      exportToCSV({
+        fileName: exportFileName,
+        columns: cols,
+        data: cleanData
+      });
+    } else {
+      exportToSpreadsheet({
+        fileName: exportFileName,
+        sheetName: title ? title.substring(0, 30) : "DATA",
+        columns: cols,
+        data: cleanData
+      });
+    }
+  };
+
+  const handleExportSipjaki = () => {
+    if (!sipjakiTemplate) return;
+    exportToSpreadsheet({
+      fileName: sipjakiTemplate.exportFileName,
+      sheetName: sipjakiTemplate.sheetName,
+      columns: sipjakiTemplate.columns,
+      data: sortedData as Record<string, any>[],
+      sipjakiMode: true,
+      includeDataDictionary: true,
+      dictionaryItems: sipjakiTemplate.dictionaryItems
+    });
   };
 
   const handlePrint = () => {
@@ -132,76 +181,128 @@ export default function DataTableView<T extends object>({
         </div>
 
         {/* Export & Actions Toolbar */}
-        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", marginRight: "4px" }}>
-            Ekspor:
-          </span>
-          <button
-            type="button"
-            onClick={() => handleExport("xlsx")}
-            title="Ekspor ke Microsoft Excel (SIPJAKI)"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "4px",
-              padding: "6px 12px",
-              borderRadius: "8px",
-              backgroundColor: "#DCFCE7",
-              color: "#166534",
-              border: "1px solid #BBF7D0",
-              fontSize: "11px",
-              fontWeight: 800,
-              cursor: "pointer"
-            }}
-          >
-            <FileSpreadsheet style={{ width: "13px", height: "13px" }} />
-            <span>Excel</span>
-          </button>
+        {!hideExport && (
+          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", marginRight: "4px" }}>
+              Ekspor:
+            </span>
 
-          <button
-            type="button"
-            onClick={() => handleExport("pdf")}
-            title="Ekspor Laporan PDF"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "4px",
-              padding: "6px 12px",
-              borderRadius: "8px",
-              backgroundColor: "#FEE2E2",
-              color: "#991B1B",
-              border: "1px solid #FECACA",
-              fontSize: "11px",
-              fontWeight: 800,
-              cursor: "pointer"
-            }}
-          >
-            <FileText style={{ width: "13px", height: "13px" }} />
-            <span>PDF</span>
-          </button>
+            {/* Tombol SIPJAKI Khusus jika ada template */}
+            {sipjakiTemplate && (
+              <button
+                type="button"
+                onClick={handleExportSipjaki}
+                title="Ekspor berkas format SIPJAKI Kementerian PUPR (.xlsx + Kamus Data)"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  backgroundColor: "#0F2E5C",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderBottom: "2px solid #FFC000",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 6px rgba(15, 46, 92, 0.2)"
+                }}
+              >
+                <Landmark style={{ width: "13px", height: "13px", color: "#FFC000" }} />
+                <span>Format SIPJAKI</span>
+              </button>
+            )}
 
-          <button
-            type="button"
-            onClick={handlePrint}
-            title="Cetak Tabel"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "4px",
-              padding: "6px 10px",
-              borderRadius: "8px",
-              backgroundColor: "#F8FAFC",
-              color: "#475569",
-              border: "1px solid #E2E8F0",
-              fontSize: "11px",
-              fontWeight: 700,
-              cursor: "pointer"
-            }}
-          >
-            <Printer style={{ width: "13px", height: "13px" }} />
-            <span>Cetak</span>
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => handleExport("xlsx")}
+              title="Ekspor tabel aktif ke Microsoft Excel (.xlsx)"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                padding: "6px 12px",
+                borderRadius: "8px",
+                backgroundColor: "#DCFCE7",
+                color: "#166534",
+                border: "1px solid #BBF7D0",
+                fontSize: "11px",
+                fontWeight: 800,
+                cursor: "pointer"
+              }}
+            >
+              <FileSpreadsheet style={{ width: "13px", height: "13px" }} />
+              <span>Excel</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleExport("csv")}
+              title="Ekspor ke berkas CSV (UTF-8)"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                padding: "6px 10px",
+                borderRadius: "8px",
+                backgroundColor: "#F1F5F9",
+                color: "#334155",
+                border: "1px solid #CBD5E1",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
+            >
+              <Download style={{ width: "13px", height: "13px" }} />
+              <span>CSV</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleExport("pdf")}
+              title="Cetak atau Simpan PDF Laporan"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                padding: "6px 12px",
+                borderRadius: "8px",
+                backgroundColor: "#FEE2E2",
+                color: "#991B1B",
+                border: "1px solid #FECACA",
+                fontSize: "11px",
+                fontWeight: 800,
+                cursor: "pointer"
+              }}
+            >
+              <FileText style={{ width: "13px", height: "13px" }} />
+              <span>PDF</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handlePrint}
+              title="Cetak Tabel"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                padding: "6px 10px",
+                borderRadius: "8px",
+                backgroundColor: "#F8FAFC",
+                color: "#475569",
+                border: "1px solid #E2E8F0",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
+            >
+              <Printer style={{ width: "13px", height: "13px" }} />
+              <span>Cetak</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Main Table */}

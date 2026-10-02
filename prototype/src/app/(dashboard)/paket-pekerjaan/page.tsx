@@ -13,6 +13,8 @@ import {
   ModalForm, ColumnDef 
 } from "@/components/common";
 import BatchImportModal, { BatchColumnDef } from "@/components/common/batch-import-modal";
+import { exportToSpreadsheet } from "@/lib/export-utils";
+import { TEMPLATE_PAKET_PEKERJAAN } from "@/lib/sipjaki-templates";
 
 const paketBatchColumns: BatchColumnDef[] = [
   { key: "id", label: "ID Paket", required: true, example: "P005" },
@@ -305,7 +307,15 @@ export default function PaketPekerjaanPage() {
           {/* Tombol Export */}
           <button 
             type="button"
-            onClick={() => alert(`Mengekspor ${projects.length} paket pekerjaan ke template SIPJAKI (.xlsx)...`)}
+            onClick={() => exportToSpreadsheet({
+              fileName: TEMPLATE_PAKET_PEKERJAAN.exportFileName,
+              sheetName: TEMPLATE_PAKET_PEKERJAAN.sheetName,
+              columns: TEMPLATE_PAKET_PEKERJAAN.columns,
+              data: projects,
+              sipjakiMode: true,
+              includeDataDictionary: true,
+              dictionaryItems: TEMPLATE_PAKET_PEKERJAAN.dictionaryItems
+            })}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -635,6 +645,8 @@ export default function PaketPekerjaanPage() {
         columns={columns}
         defaultPageSize={10}
         exportFileName="Paket_Pekerjaan_Bogor_2026"
+        sipjakiTemplate={TEMPLATE_PAKET_PEKERJAAN}
+        exportColumns={TEMPLATE_PAKET_PEKERJAAN.columns}
         actionsHeader="AKSI"
         actionsRender={(row) => (
           <Link
@@ -798,6 +810,19 @@ export default function PaketPekerjaanPage() {
           </div>
         </div>
       </ModalForm>
+
+      {/* Batch Import Modal (SIPJAKI Validator) */}
+      <BatchImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        title="Impor Paket Pekerjaan Konstruksi (SIPJAKI)"
+        subtitle="Unggah berkas Excel (.xlsx) atau CSV sesuai spesifikasi data paket pekerjaan Kementerian PUPR"
+        templateFileName={TEMPLATE_PAKET_PEKERJAAN.exportFileName}
+        expectedColumns={TEMPLATE_PAKET_PEKERJAAN.importColumns}
+        sampleRows={TEMPLATE_PAKET_PEKERJAAN.sampleRows}
+        template={TEMPLATE_PAKET_PEKERJAAN}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }

@@ -15,6 +15,8 @@ import ModalForm from "@/components/common/modal-form";
 import FileUploader from "@/components/common/file-uploader";
 import VerificationDialog from "@/components/common/verification-dialog";
 import StatusBadge from "@/components/common/status-badge";
+import { exportToSpreadsheet } from "@/lib/export-utils";
+import { TEMPLATE_PELAKSANAAN } from "@/lib/sipjaki-templates";
 
 interface PelaksanaanViewProps {
   tertibType: TertibType;
@@ -335,9 +337,17 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
             onClick: () => setIsAuditModalOpen(true)
           },
           {
-            label: "Unduh Rekap BAP (XLSX)",
+            label: "Export SIPJAKI (XLSX)",
             icon: Download,
-            onClick: () => alert(`Mengunduh Rekapitulasi Berita Acara Pemeriksaan format SIPJAKI (${config.shortTitle})...`)
+            onClick: () => exportToSpreadsheet({
+              fileName: `${TEMPLATE_PELAKSANAAN.exportFileName}_${tertibType}`,
+              sheetName: TEMPLATE_PELAKSANAAN.sheetName,
+              columns: TEMPLATE_PELAKSANAAN.columns,
+              data: filteredData,
+              sipjakiMode: true,
+              includeDataDictionary: true,
+              dictionaryItems: TEMPLATE_PELAKSANAAN.dictionaryItems
+            })
           }
         ]}
       />
@@ -722,6 +732,8 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
         data={filteredData}
         columns={tableColumns}
         exportFileName={`audit-simak-${tertibType}-bogor`}
+        sipjakiTemplate={TEMPLATE_PELAKSANAAN}
+        exportColumns={TEMPLATE_PELAKSANAAN.columns}
         actionsHeader="AKSI AUDIT"
         actionsRender={(row) => (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>

@@ -4,7 +4,84 @@ Semua perubahan penting pada proyek **SIJAKON (Sistem Informasi Jasa Konstruksi)
 
 ---
 
-## [Unreleased] / [v1.5.0-rc] — 2026-10-02
+## [Unreleased] / [v1.6.0-rc] — 2026-10-02
+
+### 🚀 Fitur Baru Utama
+
+#### 1. Engine Ekspor/Impor SIPJAKI Native (SheetJS XLSX)
+- **`src/lib/export-utils.ts`**: Engine ekspor spreadsheet native menggunakan SheetJS (`xlsx`). Mendukung:
+  - `exportToSpreadsheet()`: Ekspor data ke file `.xlsx` multi-sheet (Data + Kamus Data) dengan auto-width kolom.
+  - `exportToCSV()`: Ekspor data ke `.csv` ber-UTF-8 BOM agar kompatibel dengan Microsoft Excel Windows.
+  - `downloadExcelTemplate()`: Generator template formulir impor `.xlsx` kosong dengan 3 sheet (Data Contoh, Petunjuk Pengisian, Kamus Data).
+  - Formatter bawaan: `formatRupiah()`, `formatTanggalIndo()`.
+- **`src/lib/sipjaki-templates.ts`**: Definisi 6 template resmi SIPJAKI Kementerian PUPR:
+  1. `TEMPLATE_PAKET_PEKERJAAN` — Data proyek fisik, pagu/HPS, sumber dana, progres (17 kolom).
+  2. `TEMPLATE_BUJK` — Badan Usaha Jasa Konstruksi, NIB 13-digit, kualifikasi SBU (11 kolom).
+  3. `TEMPLATE_PELATIHAN` — Sertifikasi TKK, jenjang KKNI, jabatan kerja SKK (11 kolom).
+  4. `TEMPLATE_KECELAKAAN` — Insiden K3, keparahan, investigasi penyebab (14 kolom).
+  5. `TEMPLATE_PELAKSANAAN` — Checklist pengawasan SIMAK, skor audit (11 kolom).
+  6. `TEMPLATE_REKOMENDASI` — Tindak lanjut dan sanksi administratif (10 kolom).
+  - Setiap template berisi: kolom dengan `sipjakiLabel`, `enumValidation`, `sampleRows`, `dictionaryItems`, dan `instructions`.
+- **`src/lib/import-validators.ts`**: Validator skema impor data SIPJAKI:
+  - `validateNIB()`: Validasi NIB 13-digit numerik (standar OSS RBA).
+  - `validateISODate()`: Validasi format tanggal `YYYY-MM-DD` / `DD/MM/YYYY`.
+  - `validateEnum()`: Validasi kesesuaian nilai pilihan (case-sensitive).
+  - `validateIntegerCurrency()`: Validasi angka murni tanpa simbol Rp/pemisah.
+  - `validateProgressPercentage()`: Validasi persentase 0.00–100.00.
+- **`src/lib/audit-log.ts`**: Modul pencatatan riwayat operasi ekspor/impor data di localStorage dengan seed data.
+
+#### 2. Halaman Riwayat Audit Trail Ekspor/Impor
+- **`src/app/(dashboard)/pengaturan/riwayat-data/page.tsx`**: Halaman riwayat log audit operasi ekspor dan impor data SIPJAKI. Menampilkan tabel kronologis: tanggal, modul, operator, jenis operasi, jumlah baris, dan status.
+
+#### 3. Tab "Standar & Template Integrasi SIPJAKI" (Menggantikan API Fiktif)
+- Tab "Integrasi API SIPJAKI" di halaman Pengaturan **dihapus** karena Kementerian PUPR tidak menyediakan public REST API untuk pemda.
+- Digantikan oleh tab **"Standar & Template Integrasi SIPJAKI"** yang berisi:
+  - Header informasi mekanisme pertukaran data file-based (Spreadsheet XLSX).
+  - 6 kartu unduh template resmi dengan tombol "Unduh Template (.xlsx)".
+  - 4 ketentuan validasi skema data SIPJAKI (NIB, Tanggal ISO, Numerik Murni, Enum).
+  - Diagram alur kerja integrasi 4 langkah.
+  - Tautan langsung ke halaman Audit Trail.
+
+### 🛠️ Perubahan & Penyempurnaan (Improvements)
+
+- **`src/components/common/batch-import-modal.tsx`**: Upgrade dari CSV regex parser ke **SheetJS native XLSX/XLS parser**. Fitur baru:
+  - Parsing langsung file `.xlsx`, `.xls`, dan `.csv` melalui `XLSX.read()`.
+  - Validasi kolom otomatis dengan error cell highlighting (sel merah untuk data invalid).
+  - Summary bar: jumlah baris valid vs invalid sebelum commit.
+  - Partial commit: hanya baris yang lolos validasi yang di-commit.
+- **`src/components/common/data-table-view.tsx`**: Upgrade dengan:
+  - Tombol ekspor **"Ekspor XLSX"** dan **"Ekspor CSV"** menggunakan `exportToSpreadsheet()` / `exportToCSV()`.
+  - Tombol **"Format SIPJAKI"** dedicated yang menghasilkan berkas dengan header kolom sesuai label resmi Kementerian PUPR (`sipjakiLabel`).
+- **Integrasi ekspor/impor SIPJAKI di 7 halaman modul**:
+  - `paket-pekerjaan/page.tsx` — Ekspor/impor data paket pekerjaan konstruksi.
+  - `bujk/page.tsx` — Ekspor/impor master BUJK.
+  - `kecelakaan/page.tsx` — Ekspor/impor laporan insiden K3.
+  - `pelaksanaan-view.tsx` — Ekspor/impor checklist pengawasan SIMAK.
+  - `rekomendasi-view.tsx` — Ekspor/impor rekomendasi tindak lanjut.
+  - `pelaporan-view.tsx` — Ekspor/impor laporan auditor.
+  - `sipjaki/pelatihan/page.tsx` — Ekspor/impor data sertifikasi TKK.
+
+### 📁 Struktur Berkas Baru Ditambahkan
+
+```text
+prototype/
+├── src/app/(dashboard)/
+│   └── pengaturan/
+│       └── riwayat-data/page.tsx          # Halaman audit trail ekspor/impor
+└── src/lib/
+    ├── export-utils.ts                    # Engine ekspor XLSX/CSV (SheetJS)
+    ├── sipjaki-templates.ts               # 6 template resmi SIPJAKI PUPR
+    ├── import-validators.ts               # Validator NIB, tanggal, enum, numerik
+    └── audit-log.ts                       # Modul audit trail localStorage
+```
+
+### 🧪 Verifikasi & Kualitas Kode
+- **TypeScript**: `npx tsc --noEmit` lolos **0 error** (100% type-safe).
+- **Browser Testing**: Seluruh tombol unduh template XLSX, ekspor SIPJAKI, dan impor batch terverifikasi fungsional.
+
+---
+
+## [v1.5.0-rc] — 2026-10-02
 
 ### 🚀 Fitur Baru Utama
 

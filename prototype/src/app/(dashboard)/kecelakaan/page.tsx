@@ -11,6 +11,10 @@ import {
   StatusBadge, DataTableView, VerificationDialog, 
   FileUploader, ColumnDef, VerificationTargetInfo 
 } from "@/components/common";
+import BatchImportModal from "@/components/common/batch-import-modal";
+import { exportToSpreadsheet } from "@/lib/export-utils";
+import { TEMPLATE_KECELAKAAN } from "@/lib/sipjaki-templates";
+import { FileSpreadsheet } from "lucide-react";
 
 export interface IncidentItem {
   id: string;
@@ -39,6 +43,32 @@ export default function KecelakaanPage() {
   const [search, setSearch] = useState("");
   const [filterSeverity, setFilterSeverity] = useState("Semua");
   const [selectedIncident, setSelectedIncident] = useState<IncidentItem | null>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  const handleBatchCommit = (parsedData: Record<string, any>[]) => {
+    const newItems: IncidentItem[] = parsedData.map((d, i) => ({
+      id: `K3-2026-00${incidents.length + i + 1}`,
+      projectId: d.projectId || "P001",
+      projectName: d.projectName || "Proyek Konstruksi",
+      contractor: d.contractor || "Kontraktor Pelaksana",
+      date: d.date || new Date().toISOString().split("T")[0],
+      time: d.time || "10:00",
+      district: d.district || "Cibinong",
+      locationDetail: d.locationDetail || "Lokasi Proyek",
+      incidentType: d.incidentType || "Kecelakaan Kerja",
+      severity: d.severity || "Luka Ringan",
+      victimName: d.victimName || "-",
+      victimRole: d.victimRole || "Pekerja",
+      injuryDetail: d.injuryDetail || "-",
+      chronology: d.chronology || "-",
+      correctiveAction: d.correctiveAction || "-",
+      status: "Menunggu Verifikasi",
+      reportedToSipjaki: true,
+      sipjakiRef: `SIPJAKI-K3-2026-0${Math.floor(100 + Math.random() * 900)}`
+    }));
+
+    setIncidents((prev) => [...newItems, ...prev]);
+  };
 
   // Verification Dialog State
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
@@ -234,6 +264,60 @@ export default function KecelakaanPage() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Tombol Import Excel */}
+          <button 
+            type="button"
+            onClick={() => setShowImportModal(true)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#ECFDF5",
+              border: "1px solid #A7F3D0",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#065F46",
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+            }}
+          >
+            <FileSpreadsheet style={{ width: "16px", height: "16px", color: "#059669" }} />
+            <span>Import Excel</span>
+          </button>
+
+          {/* Tombol Export */}
+          <button 
+            type="button"
+            onClick={() => exportToSpreadsheet({
+              fileName: TEMPLATE_KECELAKAAN.exportFileName,
+              sheetName: TEMPLATE_KECELAKAAN.sheetName,
+              columns: TEMPLATE_KECELAKAAN.columns,
+              data: incidents,
+              sipjakiMode: true,
+              includeDataDictionary: true,
+              dictionaryItems: TEMPLATE_KECELAKAAN.dictionaryItems
+            })}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#FFFFFF",
+              border: "1px solid #CBD5E1",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#334155",
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+            }}
+          >
+            <Download style={{ width: "16px", height: "16px" }} />
+            <span>Export SIPJAKI</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab("list")}
@@ -515,6 +599,8 @@ export default function KecelakaanPage() {
             columns={columns}
             defaultPageSize={5}
             exportFileName="Laporan_Kecelakaan_K3_Bogor"
+            sipjakiTemplate={TEMPLATE_KECELAKAAN}
+            exportColumns={TEMPLATE_KECELAKAAN.columns}
             actionsHeader="AKSI"
             actionsRender={(row) => (
               <div style={{ display: "inline-flex", gap: "6px" }}>
@@ -877,6 +963,19 @@ export default function KecelakaanPage() {
           </div>
         </div>
       )}
+
+      {/* Batch Import Modal Kecelakaan K3 */}
+      <BatchImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        title="Impor Laporan Kecelakaan K3 Konstruksi (SIPJAKI)"
+        subtitle="Unggah berkas Excel (.xlsx) atau CSV data pelaporan insiden K3 sesuai standar Kementerian PUPR"
+        templateFileName={TEMPLATE_KECELAKAAN.exportFileName}
+        expectedColumns={TEMPLATE_KECELAKAAN.importColumns}
+        sampleRows={TEMPLATE_KECELAKAAN.sampleRows}
+        template={TEMPLATE_KECELAKAAN}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }

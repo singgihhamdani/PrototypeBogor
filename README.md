@@ -97,7 +97,7 @@ Platform mendukung **6 role** dengan portal adaptif:
 
 | Layer | Teknologi |
 |:------|:----------|
-| **Frontend** | Next.js 15, React 19, Tailwind CSS, Shadcn UI, Framer Motion |
+| **Frontend** | Next.js 15, React 19, Tailwind CSS, Shadcn UI, Framer Motion, SheetJS (xlsx) |
 | **Backend** | NestJS, TypeScript, Prisma ORM 5, Zod Validation |
 | **Database** | PostgreSQL 16 + PostGIS 3.4 |
 | **Cache** | Redis 7 + BullMQ |
@@ -143,8 +143,11 @@ Platform mendukung **6 role** dengan portal adaptif:
 - [x] **Fase 1**: Backend Foundation (NestJS + Prisma + RBAC)
 - [x] **Integrasi SIPJAKI PUPR**: 5 Pilar Pengawasan Jakon & Data Master (Sprint 1 - 6)
 - [x] **Fitur Batch Upload**: Modul Import Batch Data (Excel / CSV)
+- [x] **Fitur Ekspor/Impor SIPJAKI**: Engine XLSX/CSV native (SheetJS) + 6 template resmi Kementerian PUPR
+- [x] **Audit Trail**: Riwayat ekspor/impor data SIPJAKI (`/pengaturan/riwayat-data`)
+- [x] **Standar & Template Integrasi**: Tab SIPJAKI file-based (menggantikan API fiktif)
 - [ ] **Fase 2**: Integrasi Full-Stack & Autentikasi API
-- [ ] **Fase 3**: Sinkronisasi Otomatis Database SIPJAKI Pusat
+- [ ] **Fase 3**: Sinkronisasi Otomatis Database SIPJAKI Pusat (menunggu pembukaan API PUPR)
 - [ ] **Fase 4**: WebGIS & Reporting Lanjutan
 - [ ] **Fase 5**: Testing & Deployment Produksi
 

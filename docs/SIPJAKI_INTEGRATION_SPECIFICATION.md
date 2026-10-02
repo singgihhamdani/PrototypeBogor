@@ -150,12 +150,27 @@ Karena SIPJAKI saat ini menyediakan modul import data via Excel (`/datapaketpeke
 - **Export Laporan Kecelakaan (Format SIPJAKI)**: Menghasilkan berkas Excel insiden siap unggah.
 - **Export Rekapitulasi TKK (Format SIPJAKI)**: Format rekap nama, NIK, jabatan kerja, dan jenjang pelatihan.
 
-### Lapis 2: RESTful API Integration Engine (Machine-to-Machine)
-SIJAKON menyiapkan endpoint OpenAPI 3.1 untuk integrasi masa depan:
-- `POST /api/v1/integrasi/sipjaki/sync-paket`: Sinkronisasi otomatis status progres paket pekerjaan.
-- `POST /api/v1/integrasi/sipjaki/sync-pengawasan`: Pengiriman skor dan ringkasan audit SIMAK.
-- `POST /api/v1/integrasi/sipjaki/sync-tkk`: Pengiriman data kelulusan pelatihan TKK daerah.
+### Lapis 2: Kesiapan Infrastruktur API Internal SIJAKON (Masa Depan)
+
+> **⚠️ Catatan Penting (Diperbarui Oktober 2026):**
+> Berdasarkan verifikasi langsung, Kementerian PUPR **tidak menyediakan** public REST API terbuka untuk integrasi *machine-to-machine* oleh aplikasi pemerintah daerah. Seluruh pertukaran data SIPJAKI nasional saat ini dilakukan melalui **mekanisme unggah berkas spreadsheet** (`.xlsx`) pada portal `sipjaki.pu.go.id`.
+>
+> Oleh karena itu, strategi **Lapis 1 (1-Click Export Template Excel)** merupakan satu-satunya jalur integrasi yang aktif dan realistis saat ini.
+
+Meskipun demikian, SIJAKON tetap menyiapkan infrastruktur internal untuk mengantisipasi kemungkinan pembukaan API di masa depan:
+
+- **Internal API SIJAKON** (`/api/v1/integrasi/sipjaki/*`): Endpoint siap pakai apabila Kementerian PUPR membuka gateway integrasi daerah. Saat ini endpoint belum dihubungkan ke server eksternal.
+- **Standar format pertukaran data**: Skema JSON internal SIJAKON sudah mengikuti nomenklatur field SIPJAKI (`tahun_anggaran`, `nama_pekerjaan`, `nib_penyedia`, dll.) sehingga mapping ke API nasional dapat dilakukan dengan modifikasi minimal.
+- **Webhook Listener**: SIJAKON sudah menyediakan pola webhook receiver yang dapat diaktifkan jika PUPR menyediakan notifikasi push status sinkronisasi.
+
+### Lapis 3: Validasi Skema & Audit Trail (Aktif)
+
+SIJAKON menyediakan lapisan validasi dan pencatatan riwayat untuk menjaga integritas data:
+
+- **Validator Skema Impor** (`src/lib/import-validators.ts`): Validasi NIB 13-digit, format tanggal ISO, enum resmi, dan angka murni sebelum data masuk ke database.
+- **Audit Trail** (`/pengaturan/riwayat-data`): Seluruh operasi ekspor dan impor data SIPJAKI dicatat secara kronologis (operator, modul, tanggal, jumlah baris, status).
 
 ---
 
-*Dokumen spesifikasi ini telah diverifikasi langsung berdasarkan struktur navigasi, model data, dan alur kerja SIPJAKI Kementerian PUPR TA 2026.*
+*Dokumen spesifikasi ini telah diverifikasi langsung berdasarkan struktur navigasi, model data, dan alur kerja SIPJAKI Kementerian PUPR TA 2026. Terakhir diperbarui: Oktober 2026.*
+

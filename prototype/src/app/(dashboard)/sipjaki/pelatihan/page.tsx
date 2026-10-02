@@ -9,6 +9,8 @@ import {
 import DataTableView, { ColumnDef } from "@/components/common/data-table-view";
 import ModalForm from "@/components/common/modal-form";
 import FileUploader from "@/components/common/file-uploader";
+import { exportToSpreadsheet } from "@/lib/export-utils";
+import { TEMPLATE_PELATIHAN } from "@/lib/sipjaki-templates";
 
 export interface TrainingEvent {
   id: string;
@@ -644,6 +646,8 @@ export default function SipjakiPelatihanPage() {
             data={trainingList}
             columns={tableColumns}
             exportFileName="data-pelatihan-sipjaki-bogor"
+            sipjakiTemplate={TEMPLATE_PELATIHAN}
+            exportColumns={TEMPLATE_PELATIHAN.columns}
             onRowClick={(row) => setSelectedEvent(row)}
             actionsHeader="AKSI"
             actionsRender={(row) => (
@@ -757,7 +761,23 @@ export default function SipjakiPelatihanPage() {
 
           <button
             type="button"
-            onClick={() => alert(`Mengunduh seluruh berkas nominatif peserta untuk: ${selectedEvent.namaKegiatan} (Format XLSX)...`)}
+            onClick={() => exportToSpreadsheet({
+              fileName: `Daftar_Nominatif_${selectedEvent.namaKegiatan.replace(/[^a-zA-Z0-9]/g, "_")}`,
+              sheetName: "NOMINATIF PESERTA",
+              columns: [
+                { key: "nama", label: "Nama Lengkap Peserta" },
+                { key: "nik", label: "Nomor Induk Kependudukan (NIK)" },
+                { key: "jabatan", label: "Jabatan Kerja / Kualifikasi" },
+                { key: "nilai", label: "Hasil Asesmen / Status SKK" }
+              ],
+              data: [
+                { nama: "Ahmad Fauzi, S.T.", nik: "3201012304890002", jabatan: "Pelaksana Madya", nilai: "88 (Lulus SKK)" },
+                { nama: "Rian Hidayat", nik: "3201021405920005", jabatan: "Juru Ukur Jalan", nilai: "84 (Lulus SKK)" },
+                { nama: "Siti Rahmawati, A.Md.", nik: "3201035508950001", jabatan: "Petugas K3 Lapangan", nilai: "92 (Lulus SKK)" },
+                { nama: "Deden Kurniawan", nik: "3201041902910008", jabatan: "Mandor Pembesian", nilai: "80 (Lulus SKK)" }
+              ],
+              includeDataDictionary: true
+            })}
             style={{
               marginTop: "8px",
               display: "flex",
