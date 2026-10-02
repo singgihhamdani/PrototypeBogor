@@ -269,7 +269,7 @@ Sebuah user story / fitur dianggap **DONE** jika memenuhi semua kriteria berikut
 | :--- | :--- | :--- | :--- |
 | **Daily Standup** | Setiap hari kerja (09:00) | 15 menit | Seluruh tim development |
 | **Sprint Planning** | Setiap 2 minggu (Senin) | 2 jam | Tim + Product Owner |
-| **Sprint Review** | Setiap 2 minggu (Jumat) | 1 jam | Tim + PPK/DPUPR |
+| **Sprint Review** | Setiap 2 minggu (Jumat) | 1 jam | Tim + PPK/DPU |
 | **Sprint Retro** | Setiap 2 minggu (Jumat) | 45 menit | Tim internal |
 | **Weekly Sync PPK** | Setiap Senin (14:00) | 30 menit | PM + PPK |
 

@@ -9,7 +9,7 @@
 | :--- | :--- |
 | **Nama Produk** | **SIJAKON BOGOR** (Sistem Informasi Pembinaan & Pengawasan Jasa Konstruksi Kabupaten Bogor) |
 | **Versi Dokumen** | 2.0.0 (Rekomendasi Arsitektur Baru) |
-| **Pengguna Jasa** | Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor |
+| **Pengguna Jasa** | Dinas Pekerjaan Umum (DPU) Kabupaten Bogor |
 | **Sumber Dana** | APBD Kabupaten Bogor Tahun Anggaran 2026 |
 | **Waktu Pelaksanaan** | 90 Hari Kalender |
 | **Dasar Acuan** | [KAK APLIKASI JAKON BOGOR 2026.docx](file:///u:/Project/ciptabintar/KAK%20APLIKASI%20JAKON%20BOGOR%202026.docx) & Analisis Sistem SIBIJAK |
@@ -164,7 +164,7 @@ Prioritas fitur menggunakan standar **MoSCoW**:
 | **FR-GIS-01** | Peta Interaktif Sebaran Proyek | Menampilkan peta digital berbasis GPU-accelerated (**MapLibre GL JS / Leaflet**) dengan layer sebaran lokasi paket pekerjaan konstruksi di seluruh 40 Kecamatan Kab. Bogor. | **M** |
 | **FR-GIS-02** | Layer Tematik Multi-Kategori | Pengguna dapat mengaktifkan filter layer: (1) Sebaran Proyek APBD/APBN, (2) Sebaran Kantor BUJK (Kecil/Menengah/Besar), (3) Sebaran TKK tersertifikasi. | **M** |
 | **FR-GIS-03** | Geocoding & Input Koordinat | Form input proyek dilengkapi peta picker untuk memilih titik koordinat (Latitude/Longitude) atau menggambar poligon area proyek via **Mapbox Draw / Leaflet Geoman**. | **M** |
-| **FR-GIS-04** | Import & Export File `.SHP` | Sistem mendukung unggah (*upload*) dan unduh (*download*) data spasial dalam format **Shapefile (.SHP zipped)** dan **GeoJSON** via engine **shpjs + @turf/turf** untuk integrasi dengan GIS DPUPR / Bappedalitbang. | **M** |
+| **FR-GIS-04** | Import & Export File `.SHP` | Sistem mendukung unggah (*upload*) dan unduh (*download*) data spasial dalam format **Shapefile (.SHP zipped)** dan **GeoJSON** via engine **shpjs + @turf/turf** untuk integrasi dengan GIS DPU / Bappedalitbang. | **M** |
 | **FR-GIS-05** | Info-Window Pop-up Proyek | Mengklik marker peta akan memunculkan pop-up ringkasan: Nama Paket, Nilai Kontrak, Pelaksana, Progres Fisik (%), dan foto kondisi proyek. | **M** |
 
 ---
@@ -363,7 +363,7 @@ Sesuai ketentuan KAK Bogor TA 2026, berikut matriks tahapan eksekusi:
 ```text
 +-----------------------------------------------------------------------------------------------+
 | FASE 1: PERSIAPAN & ANALISIS KEBUTUHAN (Hari 1 - 15)                                          |
-| • Kick-off meeting dengan DPUPR Kab. Bogor, inventarisasi data, dan penyusunan metodologi.    |
+| • Kick-off meeting dengan DPU Kab. Bogor, inventarisasi data, dan penyusunan metodologi.    |
 | • Analisis proses bisnis Permen PUPR 1/2023, data spasial 40 Kecamatan, dan skema database.   |
 +-----------------------------------------------------------------------------------------------+
                                                |
@@ -406,7 +406,7 @@ Sesuai ketentuan KAK Bogor TA 2026, berikut matriks tahapan eksekusi:
 
 | No | Posisi / Peran | Kualifikasi KAK | Tanggung Jawab Utama |
 | :---: | :--- | :--- | :--- |
-| 1 | **Project Manager (Ahli Informatika)** | S1 Sarjana Informatika (Pengalaman min. 3 Tahun) | Memimpin koordinasi tim, manajemen jadwal 90 hari, quality control, dan komunikasi dengan PPK/DPUPR Kab. Bogor. |
+| 1 | **Project Manager (Ahli Informatika)** | S1 Sarjana Informatika (Pengalaman min. 3 Tahun) | Memimpin koordinasi tim, manajemen jadwal 90 hari, quality control, dan komunikasi dengan PPK/DPU Kab. Bogor. |
 | 2 | **Web Developer** | S1 Sarjana Informatika / TI / DKV (Pengalaman min. 3 Tahun) | Merancang arsitektur backend, REST API, konfigurasi server/deployment, RBAC, dan antarmuka UI/UX responsif. |
 | 3 | **GIS Specialist** | S1 Sarjana Geodesi / PWK (Pengalaman min. 3 Tahun) | Mengembangkan modul WebGIS, layer peta tematik 40 kecamatan, parser format `.SHP`, dan integrasi data spasial. |
 | 4 | **Admin Kantor** | SMK / SMA (Pengalaman min. 1 Tahun) | Administrasi dokumen kerja, input data awal, penyusunan laporan kemajuan, dan penyiapan Manual Book. |

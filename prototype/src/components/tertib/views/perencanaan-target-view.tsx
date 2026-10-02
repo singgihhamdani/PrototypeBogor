@@ -173,7 +173,7 @@ export default function PerencanaanTargetView({ tertibType }: PerencanaanTargetV
         badgeBg={config.badgeBg}
         badgeColor={config.badgeColor}
         title={`Target & Sasaran Kinerja — ${config.shortTitle}`}
-        description="Penetapan target kuantitatif tahunan pengawasan tertib konstruksi yang selaras dengan Indikator Kinerja Utama (IKU) DPUPR Kabupaten Bogor."
+        description="Penetapan target kuantitatif tahunan pengawasan tertib konstruksi yang selaras dengan Indikator Kinerja Utama (IKU) DPU Kabupaten Bogor."
         legalBasis={config.legalBasis}
         actionButtons={[
           {

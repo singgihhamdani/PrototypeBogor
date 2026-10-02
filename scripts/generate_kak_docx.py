@@ -53,7 +53,7 @@ def create_revised_kak_docx(output_path):
         footer = section.footer
         fp = footer.paragraphs[0]
         fp.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        frun = fp.add_run("Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor")
+        frun = fp.add_run("Dinas Pekerjaan Umum (DPU) Kabupaten Bogor")
         frun.font.name = "Arial"
         frun.font.size = Pt(8.5)
         frun.font.color.rgb = RGBColor(100, 116, 139)
@@ -208,7 +208,7 @@ def create_revised_kak_docx(output_path):
 
     # --- 3. NAMA PENGGUNA JASA ---
     add_heading_1("3. NAMA PENGGUNA JASA")
-    add_p("Pengguna Jasa adalah: Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor.")
+    add_p("Pengguna Jasa adalah: Dinas Pekerjaan Umum (DPU) Kabupaten Bogor.")
 
     # --- 4. DASAR HUKUM ---
     add_heading_1("4. DASAR HUKUM")
@@ -224,7 +224,7 @@ def create_revised_kak_docx(output_path):
     add_p("Lingkup kegiatan pada Penyusunan Sistem Informasi Jasa Konstruksi meliputi tahapan terstruktur sebagai berikut:")
     
     add_heading_2("A. Tahap Perencanaan & Persiapan")
-    add_bullet("Kick-Off Meeting dan penyelarasan pemahaman teknis dengan DPUPR Kab. Bogor.")
+    add_bullet("Kick-Off Meeting dan penyelarasan pemahaman teknis dengan DPU Kab. Bogor.")
     add_bullet("Penyusunan rencana kerja, jadwal pelaksanaan 90 hari, dan metodologi pengembangan.")
     add_bullet("Inventarisasi data eksisting, studi regulasi, dan identifikasi kebutuhan stakeholder.")
 
@@ -267,7 +267,7 @@ def create_revised_kak_docx(output_path):
     # Table Personil
     headers_sdm = ["No", "Posisi / Peran", "Kualifikasi Pendidikan & Pengalaman", "Tanggung Jawab Utama"]
     data_sdm = [
-        ["1", "Project Manager (Ahli Informatika)", "S1 Sarjana Informatika\nPengalaman min. 3 Tahun", "Memimpin manajemen proyek, quality control, koordinasi tim, dan komunikasi berkala dengan PPK/DPUPR."],
+        ["1", "Project Manager (Ahli Informatika)", "S1 Sarjana Informatika\nPengalaman min. 3 Tahun", "Memimpin manajemen proyek, quality control, koordinasi tim, dan komunikasi berkala dengan PPK/DPU."],
         ["2", "Web Developer", "S1 Sarjana Informatika / TI / DKV\nPengalaman min. 3 Tahun", "Merancang arsitektur backend/frontend, REST API, konfigurasi server/deployment, RBAC, dan UI/UX responsif."],
         ["3", "GIS Specialist", "S1 Sarjana Geodesi / PWK\nPengalaman min. 3 Tahun", "Mengembangkan modul WebGIS, layer peta tematik 40 kecamatan, integrasi Shapefile (.SHP), dan analisis spasial."],
         ["4", "Admin Kantor", "SMK / SMA Sederajat\nPengalaman min. 1 Tahun", "Administrasi persuratan, input data awal, dokumentasi laporan kemajuan, dan penyiapan berkas serah terima."]
@@ -317,7 +317,7 @@ def create_revised_kak_docx(output_path):
     add_heading_2("9.2 Basis Data & Sistem Informasi Geografis (SIG)")
     add_bullet("Sistem menggunakan Database Management System PostgreSQL 16 dengan ekstensi spasial PostGIS 3.4 (EPSG:4326) untuk menyimpan data tabular dan geometri spasial (Point, MultiPolygon).")
     add_bullet("WebGIS terintegrasi penuh untuk menampilkan sebaran lokasi paket proyek konstruksi dan kantor BUJK di 40 Kecamatan Kabupaten Bogor.")
-    add_bullet("Sistem mendukung fitur import dan export data spasial dalam format Shapefile (.SHP zipped) dan GeoJSON untuk interoperabilitas dengan GIS DPUPR / Bappedalitbang.")
+    add_bullet("Sistem mendukung fitur import dan export data spasial dalam format Shapefile (.SHP zipped) dan GeoJSON untuk interoperabilitas dengan GIS DPU / Bappedalitbang.")
 
     add_heading_2("9.3 Modul Pengawasan Tertib Jasa Konstruksi (Permen PUPR 1/2023)")
     add_bullet("Menyediakan lembar checklist audit digital untuk 3 lingkup: (1) Tertib Usaha, (2) Tertib Penyelenggaraan, dan (3) Tertib Pemanfaatan Produk Konstruksi.")
@@ -425,7 +425,7 @@ def create_revised_kak_docx(output_path):
     
     p_s = c_right.paragraphs[0]
     p_s.paragraph_format.line_spacing = 1.15
-    r_s1 = p_s.add_run("Cibinong, Agustus 2026\nPejabat Pembuat Komitmen (PPK)\nDPUPR Kabupaten Bogor\n\n\n\n\n")
+    r_s1 = p_s.add_run("Cibinong, Agustus 2026\nPejabat Pembuat Komitmen (PPK)\nDPU Kabupaten Bogor\n\n\n\n\n")
     r_s1.font.name = "Calibri"
     r_s1.font.size = Pt(11)
     

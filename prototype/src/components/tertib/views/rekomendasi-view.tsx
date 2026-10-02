@@ -72,7 +72,7 @@ export default function RekomendasiView({ tertibType }: RekomendasiViewProps) {
     }
 
     const newId = `REK-${tertibType === "tertib-usaha" ? "TU" : tertibType === "tertib-penyelenggaraan" ? "TP" : "TM"}-${String(data.length + 1).padStart(3, "0")}`;
-    const nomorSuratBaru = `600.1.2/${String(Math.floor(100 + Math.random() * 900))}/DPUPR-JAKON/2026`;
+    const nomorSuratBaru = `600.1.2/${String(Math.floor(100 + Math.random() * 900))}/DPU-JAKON/2026`;
 
     const newRecord: RekomendasiRecord = {
       id: newId,
@@ -778,7 +778,7 @@ export default function RekomendasiView({ tertibType }: RekomendasiViewProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <div style={{ borderBottom: "2px solid #0F2E5C", paddingBottom: "12px", textAlign: "center" }}>
               <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase" }}>
-                Dinas Pekerjaan Umum dan Penataan Ruang Kabupaten Bogor
+                Dinas Pekerjaan Umum Kabupaten Bogor
               </span>
               <h3 style={{ fontSize: "16px", fontWeight: 900, color: "#0F2E5C", margin: "4px 0" }}>
                 SURAT REKOMENDASI DAN TINDAK LANJUT PENGAWASAN JASA KONSTRUKSI

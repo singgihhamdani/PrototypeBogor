@@ -986,7 +986,7 @@ export const TEMPLATE_REKOMENDASI: SipjakiTemplate = {
     }
   ],
   importColumns: [
-    { key: "nomorSurat", label: "Nomor Surat", required: true, example: "600.1.2/142/DPUPR-JAKON/2026" },
+    { key: "nomorSurat", label: "Nomor Surat", required: true, example: "600.1.2/142/DPU-JAKON/2026" },
     { key: "badanUsahaAtauObjek", label: "Badan Usaha / Objek", required: true, example: "CV. Baraya Cipta Mandiri" },
     { key: "temuanUtama", label: "Uraian Temuan", required: true, example: "4 orang tukang belum memiliki SKK." },
     { key: "butirRekomendasi", label: "Instruksi Perbaikan", required: true, example: "Ikutkan tenaga kerja dalam sertifikasi SKK." },
@@ -997,7 +997,7 @@ export const TEMPLATE_REKOMENDASI: SipjakiTemplate = {
   ],
   sampleRows: [
     {
-      nomorSurat: "600.1.2/142/DPUPR-JAKON/2026",
+      nomorSurat: "600.1.2/142/DPU-JAKON/2026",
       badanUsahaAtauObjek: "CV. Baraya Cipta Mandiri",
       temuanUtama: "4 orang tukang pasang bata dan juru ukur belum memiliki sertifikat SKK aktif.",
       butirRekomendasi: "Wajib mengikutsertakan tenaga kerja dalam program fasilitasi sertifikasi TKK DPU Kab. Bogor TA 2026.",

@@ -18,7 +18,7 @@ export const mockMasterOpdList: MasterOpdRecord[] = [
   {
     id: "OPD-3201",
     kodeOpd: "1.03.01.01",
-    namaOpd: "Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR)",
+    namaOpd: "Dinas Pekerjaan Umum (DPU)",
     tingkat: "Kabupaten/Kota",
     provinsi: "Jawa Barat",
     kabupatenKota: "Kab. Bogor",

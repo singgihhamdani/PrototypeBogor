@@ -61,6 +61,9 @@ Semua perubahan penting pada proyek **SIJAKON (Sistem Informasi Jasa Konstruksi)
   - `pelaporan-view.tsx` — Ekspor/impor laporan auditor.
   - `sipjaki/pelatihan/page.tsx` — Ekspor/impor data sertifikasi TKK.
 
+#### 5. Standardisasi Nomenklatur Perangkat Daerah (DPU)
+- Penyelarasan seluruh nomenklatur dinas dari **DPUPR** menjadi **DPU (Dinas Pekerjaan Umum Kabupaten Bogor)** pada antarmuka aplikasi (sidebar subtitle, kop surat BAP & surat rekomendasi pengawasan, profil OPD, pelatihan), mock data, backend, serta seluruh berkas dokumentasi (`METODOLOGI_PERENCANAAN_SISTEM.md`, `DEPLOYMENT_GUIDE.md`, `METHODOLOGY.md`, `API_SPECIFICATION.md`, dan dokumen referensi KAK/PRD).
+
 ### 📁 Struktur Berkas Baru Ditambahkan
 
 ```text

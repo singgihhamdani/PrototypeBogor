@@ -164,7 +164,7 @@ def build_architecture_table(doc):
 def build_timeline_table(doc):
     headers = ["Fase Pelaksanaan", "Alokasi Waktu", "Rincian Aktivitas & Output Deliverable"]
     data = [
-        ["Fase 1: Persiapan & Analisis", "Hari 1 - 15 (2 Minggu)", "• Kick-off meeting teknis dengan DPUPR Kab. Bogor & inventarisasi data awal.\n• Analisis proses bisnis Permen PUPR 1/2023, data spasial 40 Kecamatan, dan skema database."],
+        ["Fase 1: Persiapan & Analisis", "Hari 1 - 15 (2 Minggu)", "• Kick-off meeting teknis dengan DPU Kab. Bogor & inventarisasi data awal.\n• Analisis proses bisnis Permen PUPR 1/2023, data spasial 40 Kecamatan, dan skema database."],
         ["Fase 2: Perancangan & Core System", "Hari 16 - 35 (3 Minggu)", "• Perancangan UI/UX Design System & Prototipe Interaktif Dashboard.\n• Pengembangan Autentikasi, Granular RBAC, Audit Trail, dan Pendaftaran BUJK/TKK.\n• Pembangunan Master BUJK, SBU, Portofolio Pengalaman, dan Kurva S."],
         ["Fase 3: WebGIS & Pelatihan TKK", "Hari 36 - 55 (3 Minggu)", "• Integrasi WebGIS sebaran proyek & kantor BUJK di 40 Kecamatan.\n• Pengembangan modul parser & converter format spasial Shapefile (.SHP) dan GeoJSON.\n• Pembangunan modul Pelatihan TKK, seleksi pendaftar, dan e-Certificate ber-QR Code."],
         ["Fase 4: Pengawasan & Pelaporan", "Hari 56 - 75 (3 Minggu)", "• Implementasi checklist audit digital (Tertib Usaha, Penyelenggaraan, Pemanfaatan).\n• Fasilitas upload SIMAK, scoring otomatis, dan modul Pelaporan Eksekutif.\n• Pembuatan generator rekapitulasi data periodik dan import data massal Excel."],
@@ -228,7 +228,7 @@ def generate_full_prd_docx(input_md_path, output_docx_path):
         footer = section.footer
         fp = footer.paragraphs[0]
         fp.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        frun = fp.add_run("Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor | Dokumen Perencanaan Teknis")
+        frun = fp.add_run("Dinas Pekerjaan Umum (DPU) Kabupaten Bogor | Dokumen Perencanaan Teknis")
         frun.font.name = "Arial"
         frun.font.size = Pt(8.5)
         frun.font.color.rgb = RGBColor(100, 116, 139)

@@ -8,7 +8,7 @@
 
 Penyelenggaraan jasa konstruksi di tingkat daerah memegang peranan strategis dalam mewujudkan infrastruktur yang berkualitas, tertib, aman, dan berkelanjutan. Berdasarkan Undang-Undang Nomor 2 Tahun 2017 tentang Jasa Konstruksi sebagaimana telah diubah dengan Undang-Undang Nomor 6 Tahun 2023, serta Peraturan Menteri PUPR Nomor 1 Tahun 2023 tentang Pedoman Pengawasan Penyelenggaraan Jasa Konstruksi oleh Pemerintah Daerah, Pemerintah Kabupaten Bogor memiliki kewenangan dan tanggung jawab pembinaan, pelatihan tenaga kerja konstruksi (TKK), pendataan badan usaha (BUJK), dan pengawasan tertib konstruksi di seluruh 40 Kecamatan.
 
-Seiring dengan tingginya volume pekerjaan konstruksi di Kabupaten Bogor, pengelolaan data dan instrumen pengawasan saat ini masih menghadapi tantangan fragmentasi data, pencatatan manual, dan ketiadaan pemetaan spasial sebaran proyek yang terintegrasi. Untuk menjawab tantangan tersebut, Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor memandang perlu adanya **kegiatan perencanaan teknis yang matang sebelum tahap implementasi/pembangunan perangkat lunak dilaksanakan**.
+Seiring dengan tingginya volume pekerjaan konstruksi di Kabupaten Bogor, pengelolaan data dan instrumen pengawasan saat ini masih menghadapi tantangan fragmentasi data, pencatatan manual, dan ketiadaan pemetaan spasial sebaran proyek yang terintegrasi. Untuk menjawab tantangan tersebut, Dinas Pekerjaan Umum (DPU) Kabupaten Bogor memandang perlu adanya **kegiatan perencanaan teknis yang matang sebelum tahap implementasi/pembangunan perangkat lunak dilaksanakan**.
 
 Perencanaan yang komprehensif diperlukan agar sistem informasi yang dibangun pada tahap selanjutnya memiliki landasan arsitektur teknologi yang kokoh, proses bisnis yang selaras dengan regulasi nasional dan daerah (Perda Jabar No. 6/2024), model data spasial yang presisi, serta desain antarmuka (UI/UX) yang ramah pengguna. 
 
@@ -41,8 +41,8 @@ Sasaran yang ingin dicapai melalui kegiatan perencanaan ini adalah:
 ## 3. NAMA ORGANISASI PENGGUNA JASA
 
 * **Instansi Pengguna Jasa**: Pemerintah Kabupaten Bogor
-* **Satuan Kerja**: Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor
-* **Pejabat Pembuat Komitmen (PPK)**: Bidang Jasa Konstruksi / Tim Teknis DPUPR Kabupaten Bogor
+* **Satuan Kerja**: Dinas Pekerjaan Umum (DPU) Kabupaten Bogor
+* **Pejabat Pembuat Komitmen (PPK)**: Bidang Jasa Konstruksi / Tim Teknis DPU Kabupaten Bogor
 
 ---
 
@@ -66,7 +66,7 @@ Lingkup pekerjaan Jasa Konsultansi Perencanaan ini **murni berfokus pada tahapan
 * Pelaksanaan Kick-Off Meeting dan penyusunan metodologi perencanaan.
 * Kajian regulasi jasa konstruksi nasional, provinsi, dan peraturan bupati terkait.
 * Analisis inventarisasi data eksisting (profil BUJK, data proyek konstruksi APBD, riwayat sertifikasi TKK).
-* Wawancara mendalam (*in-depth interview*) dan Focus Group Discussion (FGD) bersama stakeholder internal DPUPR, verifikator, asosiasi badan usaha, dan dinas teknis terkait.
+* Wawancara mendalam (*in-depth interview*) dan Focus Group Discussion (FGD) bersama stakeholder internal DPU, verifikator, asosiasi badan usaha, dan dinas teknis terkait.
 * Penyusunan Dokumen Analisis Kebutuhan Pengguna (*User Requirement Analysis*).
 
 ### Tahap 2: Perancangan Arsitektur Sistem & Proses Bisnis
@@ -84,13 +84,13 @@ Lingkup pekerjaan Jasa Konsultansi Perencanaan ini **murni berfokus pada tahapan
 * Pembuatan sketsa wireframe (Low-Fidelity) seluruh tata letak modul aplikasi.
 * Pembuatan Prototipe Antarmuka Interaktif (*Interactive Prototype*) untuk simulasi alur klik dan visualisasi navigasi pengguna.
 * Perancangan tata letak fitur khusus: *Side-by-Side Document Reviewer Modal*, *Multi-Step Stepper Wizard*, dan *WebGIS Split-View*.
-* Pelaksanaan Uji Keterpakaian Prototipe (*Usability Review / Prototype Walkthrough*) bersama tim teknis DPUPR.
+* Pelaksanaan Uji Keterpakaian Prototipe (*Usability Review / Prototype Walkthrough*) bersama tim teknis DPU.
 
 ---
 
 ## 6. LOKASI DAN SUMBER PENDANAAN
 
-* **Lokasi Pekerjaan**: Wilayah Kabupaten Bogor, dengan koordinasi utama di Dinas Pekerjaan Umum dan Penataan Ruang Kabupaten Bogor.
+* **Lokasi Pekerjaan**: Wilayah Kabupaten Bogor, dengan koordinasi utama di Dinas Pekerjaan Umum Kabupaten Bogor.
 * **Sumber Pendanaan**: APBD Kabupaten Bogor Tahun Anggaran 2026.
 * **Pagu Anggaran**: Disesuaikan dengan Standar Biaya Masukan (SBM) Jasa Konsultansi Non-Konstruksi / Telematika Kabupaten Bogor TA 2026.
 
@@ -113,7 +113,7 @@ Penyedia Jasa Konsultansi Perencanaan wajib menyediakan tim tenaga ahli profesio
 | No | Posisi / Peran | Kualifikasi Pendidikan & Keahlian | Jumlah | Tanggung Jawab Utama |
 | :---: | :--- | :--- | :---: | :--- |
 | **A** | **TENAGA AHLI** | | | |
-| 1 | **Team Leader / Ahli Sistem Informasi** | S1 Sarjana Informatika / Sistem Informasi / Ilmu Komputer (Pengalaman min. 4 Tahun di bidang perencanaan software) | 1 Org | Memimpin pelaksanaan studi perencanaan, koordinasi tim ahli, penyusunan arsitektur sistem, quality assurance dokumen DED, dan presentasi laporan ke DPUPR. |
+| 1 | **Team Leader / Ahli Sistem Informasi** | S1 Sarjana Informatika / Sistem Informasi / Ilmu Komputer (Pengalaman min. 4 Tahun di bidang perencanaan software) | 1 Org | Memimpin pelaksanaan studi perencanaan, koordinasi tim ahli, penyusunan arsitektur sistem, quality assurance dokumen DED, dan presentasi laporan ke DPU. |
 | 2 | **System & Business Analyst** | S1 Sarjana Informatika / Teknik Industri / Sistem Informasi (Pengalaman min. 3 Tahun) | 1 Org | Menganalisis proses bisnis jasa konstruksi, studi regulasi Permen PUPR 1/2023, menyusun modul pengawasan, SRS/PRD, dan kamus data sistem. |
 | 3 | **UI/UX Prototyper / Ahli Desain Antarmuka** | S1 Sarjana Informatika / DKV / Multimedia (Pengalaman min. 3 Tahun) | 1 Org | Merancang sketsa wireframe dan membuat Prototipe Antarmuka Interaktif (Prototype) untuk simulasi navigasi dan fungsionalitas modul sistem. |
 | 4 | **GIS & Spatial Data Specialist** | S1 Sarjana Geodesi / Geomatika / Perencanaan Wilayah & Kota (PWK) (Pengalaman min. 3 Tahun) | 1 Org | Merancang skema spasial PostGIS 40 kecamatan, layer tematik proyek APBD/BUJK, dan spesifikasi konversi format Shapefile (.SHP). |

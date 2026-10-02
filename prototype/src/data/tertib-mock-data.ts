@@ -454,11 +454,11 @@ export const mockPelaksanaanRecords: PelaksanaanRecord[] = [
 export const mockRekomendasiRecords: RekomendasiRecord[] = [
   {
     id: "REK-TU-001",
-    nomorSurat: "600.1.2/142/DPUPR-JAKON/2026",
+    nomorSurat: "600.1.2/142/DPU-JAKON/2026",
     tertibType: "tertib-usaha",
     badanUsahaAtauObjek: "CV. Baraya Cipta Mandiri",
     temuanUtama: "4 orang tukang pasang bata dan juru ukur belum memiliki sertifikat SKK aktif.",
-    rekomendasiTindakan: "Mendaftarkan TKK terkait pada Program Fasilitasi Uji Kompetensi TKK DPUPR Kab. Bogor.",
+    rekomendasiTindakan: "Mendaftarkan TKK terkait pada Program Fasilitasi Uji Kompetensi TKK DPU Kab. Bogor.",
     tenggatWaktu: "2026-04-30",
     statusTindakLanjut: "Dalam Proses",
     statusVerifikasi: "Draft",
@@ -466,7 +466,7 @@ export const mockRekomendasiRecords: RekomendasiRecord[] = [
   },
   {
     id: "REK-TU-002",
-    nomorSurat: "600.1.2/098/DPUPR-JAKON/2026",
+    nomorSurat: "600.1.2/098/DPU-JAKON/2026",
     tertibType: "tertib-usaha",
     badanUsahaAtauObjek: "PT. Mega Karya Mandiri",
     temuanUtama: "Alamat kantor cabang pada NIB belum disesuaikan dengan domisili faktual Cibinong.",
@@ -478,7 +478,7 @@ export const mockRekomendasiRecords: RekomendasiRecord[] = [
   },
   {
     id: "REK-TP-001",
-    nomorSurat: "600.1.2/189/DPUPR-JAKON/2026",
+    nomorSurat: "600.1.2/189/DPU-JAKON/2026",
     tertibType: "tertib-penyelenggaraan",
     badanUsahaAtauObjek: "PT. Samudra Beton Persada (Paket Jl. Bomang)",
     temuanUtama: "Pekerja di zona galian tidak mengenakan helm rompi reflektif secara konsisten.",
@@ -490,7 +490,7 @@ export const mockRekomendasiRecords: RekomendasiRecord[] = [
   },
   {
     id: "REK-TM-001",
-    nomorSurat: "600.1.2/210/DPUPR-JAKON/2026",
+    nomorSurat: "600.1.2/210/DPU-JAKON/2026",
     tertibType: "tertib-pemanfaatan",
     badanUsahaAtauObjek: "Gedung Kantor Camat Gunung Putri",
     temuanUtama: "Dokumen SOP Pemeliharaan Berkala Instalasi Mekanikal/Elektrikal belum terdokumentasi.",

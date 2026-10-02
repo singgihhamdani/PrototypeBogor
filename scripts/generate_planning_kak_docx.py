@@ -54,7 +54,7 @@ def generate_planning_kak_docx(input_md_path, output_docx_path):
         footer = section.footer
         fp = footer.paragraphs[0]
         fp.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        frun = fp.add_run("Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor | Dokumen Pengadaan Perencanaan")
+        frun = fp.add_run("Dinas Pekerjaan Umum (DPU) Kabupaten Bogor | Dokumen Pengadaan Perencanaan")
         frun.font.name = "Arial"
         frun.font.size = Pt(8.5)
         frun.font.color.rgb = RGBColor(100, 116, 139)

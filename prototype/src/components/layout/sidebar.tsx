@@ -281,7 +281,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       >
         {!collapsed ? (
           <Link href="/dashboard" style={{ display: "inline-flex", textDecoration: "none" }}>
-            <Logo size={36} theme="dark" subtitle="DPUPR KAB. BOGOR" />
+            <Logo size={36} theme="dark" subtitle="DPU KAB. BOGOR" />
           </Link>
         ) : (
           <Link href="/dashboard" style={{ display: "inline-flex", textDecoration: "none" }}>

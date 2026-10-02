@@ -53,7 +53,7 @@ def create_audit_docx(output_path):
         footer = section.footer
         fp = footer.paragraphs[0]
         fp.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        frun = fp.add_run("Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor | Hasil Evaluasi Dokumen Usulan Teknis")
+        frun = fp.add_run("Dinas Pekerjaan Umum (DPU) Kabupaten Bogor | Hasil Evaluasi Dokumen Usulan Teknis")
         frun.font.name = "Arial"
         frun.font.size = Pt(8.5)
         frun.font.color.rgb = RGBColor(100, 116, 139)
@@ -288,7 +288,7 @@ def create_audit_docx(output_path):
     # Title & Metadata Block
     add_doc_title("LAPORAN AUDIT & EVALUASI TEKNIS")
     add_doc_subtitle("DOKUMEN USULAN TEKNIS JASA KONSULTANSI PERENCANAAN SISTEM INFORMASI JASA KONSTRUKSI (SIJAKON)")
-    add_meta("Pemerintah Kabupaten Bogor — Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) TA 2026")
+    add_meta("Pemerintah Kabupaten Bogor — Dinas Pekerjaan Umum (DPU) TA 2026")
     add_meta("Ref. Dokumen Diuji: DOKUMEN USULAN TEKNIS FIX.pdf (42 Halaman) vs KAK Perencanaan SIJAKON 2026")
     add_divider()
 
@@ -310,7 +310,7 @@ def create_audit_docx(output_path):
     meta_table_headers = ["Parameter Evaluasi", "Rincian / Data Lapangan"]
     meta_table_data = [
         [("Nama Paket Pekerjaan", True, None), "Jasa Konsultansi Perencanaan Sistem Informasi Jasa Konstruksi (SIJAKON)"],
-        [("Pengguna Jasa", True, None), "Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor"],
+        [("Pengguna Jasa", True, None), "Dinas Pekerjaan Umum (DPU) Kabupaten Bogor"],
         [("Tahun Anggaran", True, None), "2026"],
         [("Dokumen yang Diuji", True, None), "DOKUMEN USULAN TEKNIS FIX.pdf (Ukuran 1,67 MB, 42 Halaman)"],
         [("Dokumen Acuan Evaluasi", True, None), "KAK Perencanaan Sistem Informasi Jasa Konstruksi Bogor 2026 & Perpres No. 16/2018 jo No. 12/2021"],
@@ -589,7 +589,7 @@ def create_audit_docx(output_path):
             "1",
             ("Team Leader / Ahli Sistem Informasi", True, None),
             "S1 Teknik Informatika / Ilmu Komputer / Sistem Informasi. Pengalaman kerja min. 5 tahun di bidang SI/TI.",
-            "Memimpin seluruh pelaksanaan kegiatan perencanaan, mengoordinasikan tim ahli, mengendalikan mutu laporan, memfasilitasi FGD/asistensi dengan DPUPR, dan menyusun Blueprint Arsitektur Sistem.",
+            "Memimpin seluruh pelaksanaan kegiatan perencanaan, mengoordinasikan tim ahli, mengendalikan mutu laporan, memfasilitasi FGD/asistensi dengan DPU, dan menyusun Blueprint Arsitektur Sistem.",
             "2 Bulan (2 OB)"
         ],
         [
@@ -630,9 +630,9 @@ def create_audit_docx(output_path):
     add_callout(
         "REDAKSIONAL SIAP PAKAI: SUBBAB 2.5.1 STRUKTUR ORGANISASI PELAKSANAAN KEGIATAN",
         "Untuk menjamin kelancaran, efektivitas, dan ketepatan waktu dalam pelaksanaan pekerjaan Perencanaan Sistem Informasi Jasa Konstruksi (SIJAKON) Kabupaten Bogor Tahun Anggaran 2026, dibentuk suatu struktur organisasi tim pelaksana yang terintegrasi secara profesional.\n\n"
-        "Struktur organisasi ini menghubungkan secara hierarkis dan koordinatif antara Pengguna Jasa (Dinas PUPR Kabupaten Bogor melalui PPK dan PPTK), Tim Teknis Pembina Jasa Konstruksi, dengan Tim Konsultan Perencana yang dipimpin oleh Team Leader.\n\n"
+        "Struktur organisasi ini menghubungkan secara hierarkis dan koordinatif antara Pengguna Jasa (Dinas Pekerjaan Umum Kabupaten Bogor melalui PPK dan PPTK), Tim Teknis Pembina Jasa Konstruksi, dengan Tim Konsultan Perencana yang dipimpin oleh Team Leader.\n\n"
         "Hubungan Kerja dan Koordinasi:\n"
-        "1. Pejabat Pembuat Komitmen (PPK) / PPTK DPUPR: Bertindak sebagai pengarah kebijakan, pengendali kontrak, dan penanggung jawab program kegiatan.\n"
+        "1. Pejabat Pembuat Komitmen (PPK) / PPTK DPU: Bertindak sebagai pengarah kebijakan, pengendali kontrak, dan penanggung jawab program kegiatan.\n"
         "2. Tim Leader (Ahli Sistem Informasi): Bertanggung jawab penuh kepada PPK atas seluruh mutu manajerial dan substansi teknis perencanaan, serta mengoordinasikan seluruh Tenaga Ahli.\n"
         "3. System & Business Analyst: Berkoordinasi intensif dengan bidang pembinaan jasa konstruksi untuk perumusan kebutuhan fungsional dan tata kelola regulasi.\n"
         "4. UI/UX Prototyper: Menerjemahkan rumusan kebutuhan analis ke dalam antarmuka interaktif dan berkoordinasi dengan pengguna akhir untuk usability testing.\n"

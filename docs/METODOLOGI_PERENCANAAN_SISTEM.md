@@ -27,7 +27,7 @@ Dokumen ini bertujuan untuk:
 1. Memberikan kerangka kerja (*framework*) yang jelas dan terstruktur bagi seluruh tim konsultan perencana dalam melaksanakan setiap tahapan pekerjaan;
 2. Menetapkan pendekatan, teknik, dan alat bantu yang akan digunakan pada setiap fase perencanaan;
 3. Menjamin konsistensi dan kualitas seluruh dokumen keluaran (*deliverables*);
-4. Memberikan acuan kepada Tim Teknis DPUPR Kabupaten Bogor untuk mengawasi dan mengevaluasi kemajuan pekerjaan.
+4. Memberikan acuan kepada Tim Teknis DPU Kabupaten Bogor untuk mengawasi dan mengevaluasi kemajuan pekerjaan.
 
 ### 1.3 Ruang Lingkup Metodologi
 
@@ -51,7 +51,7 @@ Metodologi ini mencakup **seluruh tahapan perencanaan** sesuai Kerangka Acuan Ke
 
 Perencanaan SIJAKON Kabupaten Bogor mengadopsi pendekatan **Design Thinking yang dimodifikasi** dan dikombinasikan dengan **Structured Systems Analysis and Design Method (SSADM)** untuk konteks proyek pemerintah. Kombinasi ini dipilih karena:
 
-- **Design Thinking** menekankan empati terhadap pengguna akhir (stakeholder DPUPR, Operator BUJK, Tim Pengawas) sehingga menghasilkan rancangan yang *user-centric*;
+- **Design Thinking** menekankan empati terhadap pengguna akhir (stakeholder DPU, Operator BUJK, Tim Pengawas) sehingga menghasilkan rancangan yang *user-centric*;
 - **SSADM** memberikan struktur formal dan dokumentasi yang ketat, sesuai dengan standar dokumentasi proyek pemerintah.
 
 ```mermaid
@@ -141,8 +141,8 @@ graph TB
 
 | Aspek | Detail |
 | :--- | :--- |
-| **Tujuan** | Menyamakan persepsi antara Tim Konsultan dan Tim Teknis DPUPR mengenai lingkup, timeline, ekspektasi, dan mekanisme koordinasi |
-| **Peserta** | Team Leader, seluruh tenaga ahli, PPK, Tim Teknis DPUPR, perwakilan bidang terkait |
+| **Tujuan** | Menyamakan persepsi antara Tim Konsultan dan Tim Teknis DPU mengenai lingkup, timeline, ekspektasi, dan mekanisme koordinasi |
+| **Peserta** | Team Leader, seluruh tenaga ahli, PPK, Tim Teknis DPU, perwakilan bidang terkait |
 | **Output** | Berita Acara Kick-Off, Rencana Kerja Detil, Dokumen Metodologi (dokumen ini) |
 | **Teknik** | Presentasi, diskusi terstruktur, penetapan *contact person* & jalur komunikasi |
 
@@ -182,18 +182,18 @@ graph LR
 
 #### 3.2.3 Inventarisasi Data Eksisting
 
-**Tujuan**: Mengidentifikasi dan mengukur kesiapan data yang tersedia di DPUPR dan instansi terkait.
+**Tujuan**: Mengidentifikasi dan mengukur kesiapan data yang tersedia di DPU dan instansi terkait.
 
 **Metode Pelaksanaan:**
 
 | Jenis Data | Sumber | Teknik Pengumpulan | Format yang Diharapkan |
 | :--- | :--- | :--- | :--- |
-| Profil BUJK terdaftar | Bidang Jakon DPUPR | Permintaan data resmi, observasi arsip | Excel / Database |
+| Profil BUJK terdaftar | Bidang Jakon DPU | Permintaan data resmi, observasi arsip | Excel / Database |
 | Data proyek konstruksi APBD | Bidang Jakon / PPK | Permintaan data, wawancara | Excel / Manual |
 | Riwayat sertifikasi TKK | LPJK Kab. Bogor | Koordinasi & permintaan data | Excel / SIPJAKI |
 | Data spasial kecamatan | Bappedalitbang / BIG | Permintaan data shapefile | SHP / GeoJSON |
-| Regulasi & SOP internal | Bagian Hukum DPUPR | Studi dokumen | PDF / Hardcopy |
-| Sistem informasi eksisting | IT DPUPR / OPD terkait | Observasi & demo sistem | Akses langsung |
+| Regulasi & SOP internal | Bagian Hukum DPU | Studi dokumen | PDF / Hardcopy |
+| Sistem informasi eksisting | IT DPU / OPD terkait | Observasi & demo sistem | Akses langsung |
 
 **Instrumen Pengumpulan Data:**
 - Formulir inventarisasi data terstruktur
@@ -231,11 +231,11 @@ graph LR
 
 | Aspek | Detail |
 | :--- | :--- |
-| **Peserta** | 8–12 orang: perwakilan Bidang Jakon, Verifikator, Tim Pengawas, IT DPUPR, perwakilan BUJK |
+| **Peserta** | 8–12 orang: perwakilan Bidang Jakon, Verifikator, Tim Pengawas, IT DPU, perwakilan BUJK |
 | **Fasilitator** | System & Business Analyst |
 | **Notulen** | Tenaga Administrasi |
 | **Durasi** | 3–4 jam |
-| **Lokasi** | Ruang rapat DPUPR Kabupaten Bogor |
+| **Lokasi** | Ruang rapat DPU Kabupaten Bogor |
 
 **Alur Pelaksanaan FGD I:**
 
@@ -646,7 +646,7 @@ prototype/
 
 ```text
 Task 1: "Anda adalah operator BUJK baru. Daftarkan perusahaan Anda melalui form pendaftaran."
-Task 2: "Anda adalah admin DPUPR. Verifikasi satu berkas SBU yang masuk."
+Task 2: "Anda adalah admin DPU. Verifikasi satu berkas SBU yang masuk."
 Task 3: "Anda ingin melihat sebaran proyek APBD di Kecamatan Cibinong pada peta."
 Task 4: "Anda adalah pengawas. Lakukan audit tertib usaha pada satu BUJK."
 Task 5: "Download laporan rekapitulasi BUJK per kecamatan dalam format Excel."
@@ -771,7 +771,7 @@ graph TD
 | :--- | :--- | :--- | :--- |
 | **Rapat Internal Tim** | 2× per minggu (Senin & Kamis) | Seluruh tim konsultan | Sinkronisasi progress, pembahasan kendala |
 | **Koordinasi dengan PPK** | 1× per minggu (Rabu) | Team Leader + PPK | Update progress, eskalasi kendala |
-| **Presentasi Milestone** | Sesuai jadwal milestone | Seluruh tim + Tim Teknis DPUPR | Presentasi deliverable, persetujuan |
+| **Presentasi Milestone** | Sesuai jadwal milestone | Seluruh tim + Tim Teknis DPU | Presentasi deliverable, persetujuan |
 | **FGD Formal** | 2× selama proyek (FGD I & II) | Multi-stakeholder | Validasi kebutuhan & review prototipe |
 
 ### 6.2 Mekanisme Pelaporan
@@ -828,7 +828,7 @@ Setiap deliverable melalui **3 tahap validasi** sebelum diserahkan ke PPK:
 graph LR
     A["📝 Penyusunan<br/>oleh PIC"] --> B["🔍 Peer Review<br/>oleh Tim Internal"]
     B --> C["✅ Quality Check<br/>oleh Team Leader"]
-    C --> D["📊 Presentasi &<br/>Validasi PPK/DPUPR"]
+    C --> D["📊 Presentasi &<br/>Validasi PPK/DPU"]
     D --> E["📄 Revisi (jika ada)<br/>& Finalisasi"]
 ```
 
@@ -872,9 +872,9 @@ graph LR
 
 ## 10. PENUTUP
 
-Dokumen Metodologi Perencanaan ini disusun sebagai panduan komprehensif bagi seluruh tim konsultan perencana dan stakeholder DPUPR Kabupaten Bogor dalam melaksanakan kegiatan Penyusunan Rancangan dan DED Sistem Informasi Jasa Konstruksi (SIJAKON).
+Dokumen Metodologi Perencanaan ini disusun sebagai panduan komprehensif bagi seluruh tim konsultan perencana dan stakeholder DPU Kabupaten Bogor dalam melaksanakan kegiatan Penyusunan Rancangan dan DED Sistem Informasi Jasa Konstruksi (SIJAKON).
 
-Metodologi ini bersifat **hidup (*living document*)** dan dapat diperbaharui sesuai kebutuhan dengan persetujuan bersama antara Tim Konsultan dan PPK DPUPR Kabupaten Bogor, dengan tetap menjaga keselarasan terhadap lingkup pekerjaan yang tercantum dalam Kerangka Acuan Kerja (KAK).
+Metodologi ini bersifat **hidup (*living document*)** dan dapat diperbaharui sesuai kebutuhan dengan persetujuan bersama antara Tim Konsultan dan PPK DPU Kabupaten Bogor, dengan tetap menjaga keselarasan terhadap lingkup pekerjaan yang tercantum dalam Kerangka Acuan Kerja (KAK).
 
 ---
 

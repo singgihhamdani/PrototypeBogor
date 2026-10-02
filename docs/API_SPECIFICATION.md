@@ -270,13 +270,13 @@
     "success": true,
     "isValid": true,
     "certificate": {
-      "certNumber": "600.1.2/1042/JAKON-DPUPR/2026",
+      "certNumber": "600.1.2/1042/JAKON-DPU/2026",
       "recipientName": "Ahmad Fauzi",
       "trainingTitle": "Bimbingan Teknis Petugas Keselamatan Konstruksi (SMKK)",
       "kkniLevel": 5,
       "trainingHours": 40,
       "issuedAt": "2026-06-15",
-      "organizer": "Dinas PUPR Kabupaten Bogor",
+      "organizer": "Dinas Pekerjaan Umum Kabupaten Bogor",
       "pdfUrl": "https://sijakon.bogorkab.go.id/storage/certs/cert_1042.pdf"
     }
   }

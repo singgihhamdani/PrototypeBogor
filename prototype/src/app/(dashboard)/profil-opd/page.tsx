@@ -343,7 +343,7 @@ export default function ProfilOpdPage() {
           }}
         >
           <Landmark style={{ width: "14px", height: "14px" }} />
-          <span>Profil OPD DPUPR Kab. Bogor</span>
+          <span>Profil OPD DPU Kab. Bogor</span>
         </button>
 
         <button
@@ -1026,7 +1026,7 @@ export default function ProfilOpdPage() {
                 <input
                   type="text"
                   required
-                  placeholder="Contoh: Dinas Pekerjaan Umum dan Penataan Ruang"
+                  placeholder="Contoh: Dinas Pekerjaan Umum"
                   value={formNama}
                   onChange={(e) => setFormNama(e.target.value)}
                   style={{

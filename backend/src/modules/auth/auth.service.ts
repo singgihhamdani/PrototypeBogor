@@ -83,7 +83,7 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>(
         'REFRESH_TOKEN_SECRET',
-        'sijakon_refresh_secret_key_ta_2026_dpupr',
+        'sijakon_refresh_secret_key_ta_2026_dpu',
       ),
       expiresIn: '7d',
     });
@@ -133,7 +133,7 @@ export class AuthService {
       const payload: JwtPayload = this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>(
           'REFRESH_TOKEN_SECRET',
-          'sijakon_refresh_secret_key_ta_2026_dpupr',
+          'sijakon_refresh_secret_key_ta_2026_dpu',
         ),
       });
 

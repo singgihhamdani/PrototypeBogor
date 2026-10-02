@@ -211,7 +211,7 @@ DEMO USERS (6 — satu per role):
 ├── superadmin     / Super Admin             / SUPER_ADMIN
 ├── op_binkon      / Operator Bina Konstruksi / ADMIN_BIDANG (varian Bina Konstruksi)
 ├── op_pengawas    / Tim Pengawas Lapangan    / ADMIN_BIDANG (varian Pengawas)
-├── eksekutif      / Kepala Dinas DPUPR       / EKSEKUTIF
+├── eksekutif      / Kepala Dinas DPU         / EKSEKUTIF
 ├── bujk_demo      / PT Maju Bersama         / OPERATOR_BUJK (bujk_id linked)
 └── peserta_demo   / Ahmad Fauzi             / PESERTA_TKK
 ```
@@ -340,7 +340,7 @@ common/
 
    ```text
    /login           → Login internal (Super Admin, Admin Bidang, Eksekutif)
-                       Design: tema formal DPUPR dengan badge "Portal Dinas"
+                       Design: tema formal DPU dengan badge "Portal Dinas"
 
    /portal/login    → Login eksternal (Operator BUJK, Peserta TKK)
                        Design: tema yang lebih friendly dengan badge "Portal Mitra"

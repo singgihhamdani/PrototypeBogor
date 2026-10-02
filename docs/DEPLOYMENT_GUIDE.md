@@ -7,7 +7,7 @@
 
 ## 1. Spesifikasi Infrastruktur Server
 
-Sesuai standar operasional Pusat Data / Server Diskominfo & DPUPR Kabupaten Bogor:
+Sesuai standar operasional Pusat Data / Server Diskominfo & DPU Kabupaten Bogor:
 
 | Komponen | Spesifikasi Minimum (Staging) | Spesifikasi Rekomendasi (Production) |
 | :--- | :--- | :--- |

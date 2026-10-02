@@ -57,7 +57,7 @@ def create_metodologi_docx(output_path):
         footer = section.footer
         fp = footer.paragraphs[0]
         fp.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        frun = fp.add_run("Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor")
+        frun = fp.add_run("Dinas Pekerjaan Umum (DPU) Kabupaten Bogor")
         frun.font.name = "Arial"
         frun.font.size = Pt(8.5)
         frun.font.color.rgb = RGBColor(100, 116, 139)
@@ -300,7 +300,7 @@ def create_metodologi_docx(output_path):
     add_num("Memberikan kerangka kerja (framework) yang jelas dan terstruktur bagi seluruh tim konsultan perencana dalam melaksanakan setiap tahapan pekerjaan;")
     add_num("Menetapkan pendekatan, teknik, dan alat bantu yang akan digunakan pada setiap fase perencanaan;")
     add_num("Menjamin konsistensi dan kualitas seluruh dokumen keluaran (deliverables);")
-    add_num("Memberikan acuan kepada Tim Teknis DPUPR Kabupaten Bogor untuk mengawasi dan mengevaluasi kemajuan pekerjaan.")
+    add_num("Memberikan acuan kepada Tim Teknis DPU Kabupaten Bogor untuk mengawasi dan mengevaluasi kemajuan pekerjaan.")
 
     add_heading_2("1.3 Ruang Lingkup Metodologi")
     add_p("Metodologi ini mencakup seluruh tahapan perencanaan sesuai Kerangka Acuan Kerja (KAK), yang meliputi:")
@@ -323,7 +323,7 @@ def create_metodologi_docx(output_path):
 
     add_heading_2("2.1 Pendekatan Umum")
     add_p("Perencanaan SIJAKON Kabupaten Bogor mengadopsi pendekatan Design Thinking yang dimodifikasi dan dikombinasikan dengan Structured Systems Analysis and Design Method (SSADM) untuk konteks proyek pemerintah. Kombinasi ini dipilih karena:")
-    add_bullet("Design Thinking menekankan empati terhadap pengguna akhir (stakeholder DPUPR, Operator BUJK, Tim Pengawas) sehingga menghasilkan rancangan yang user-centric;")
+    add_bullet("Design Thinking menekankan empati terhadap pengguna akhir (stakeholder DPU, Operator BUJK, Tim Pengawas) sehingga menghasilkan rancangan yang user-centric;")
     add_bullet("SSADM memberikan struktur formal dan dokumentasi yang ketat, sesuai dengan standar dokumentasi proyek pemerintah.")
 
     add_p("Tahapan Design Thinking yang diadopsi:")
@@ -360,8 +360,8 @@ def create_metodologi_docx(output_path):
     add_p("System & Business Analyst + Team Leader", bold_prefix="Penanggung Jawab Utama: ")
 
     add_heading_3("3.1.1 Kick-Off Meeting & Penyusunan Metodologi")
-    add_p("Menyamakan persepsi antara Tim Konsultan dan Tim Teknis DPUPR mengenai lingkup, timeline, ekspektasi, dan mekanisme koordinasi.", bold_prefix="Tujuan: ")
-    add_p("Team Leader, seluruh tenaga ahli, PPK, Tim Teknis DPUPR, perwakilan bidang terkait.", bold_prefix="Peserta: ")
+    add_p("Menyamakan persepsi antara Tim Konsultan dan Tim Teknis DPU mengenai lingkup, timeline, ekspektasi, dan mekanisme koordinasi.", bold_prefix="Tujuan: ")
+    add_p("Team Leader, seluruh tenaga ahli, PPK, Tim Teknis DPU, perwakilan bidang terkait.", bold_prefix="Peserta: ")
     add_p("Berita Acara Kick-Off, Rencana Kerja Detil, Dokumen Metodologi (dokumen ini).", bold_prefix="Output: ")
 
     add_p("Agenda Kick-Off Meeting:")
@@ -392,16 +392,16 @@ def create_metodologi_docx(output_path):
     add_p("Matriks Kepatuhan Regulasi (Regulatory Compliance Matrix) — tabel pemetaan pasal regulasi ke fitur/modul sistem.", bold_prefix="Output: ")
 
     add_heading_3("3.1.3 Inventarisasi Data Eksisting")
-    add_p("Mengidentifikasi dan mengukur kesiapan data yang tersedia di DPUPR dan instansi terkait.", bold_prefix="Tujuan: ")
+    add_p("Mengidentifikasi dan mengukur kesiapan data yang tersedia di DPU dan instansi terkait.", bold_prefix="Tujuan: ")
     add_table(
         ["Jenis Data", "Sumber", "Teknik Pengumpulan", "Format"],
         [
-            ["Profil BUJK terdaftar", "Bidang Jakon DPUPR", "Permintaan data resmi, observasi arsip", "Excel / Database"],
+            ["Profil BUJK terdaftar", "Bidang Jakon DPU", "Permintaan data resmi, observasi arsip", "Excel / Database"],
             ["Data proyek konstruksi APBD", "Bidang Jakon / PPK", "Permintaan data, wawancara", "Excel / Manual"],
             ["Riwayat sertifikasi TKK", "LPJK Kab. Bogor", "Koordinasi & permintaan data", "Excel / SIPJAKI"],
             ["Data spasial kecamatan", "Bappedalitbang / BIG", "Permintaan data shapefile", "SHP / GeoJSON"],
-            ["Regulasi & SOP internal", "Bagian Hukum DPUPR", "Studi dokumen", "PDF / Hardcopy"],
-            ["Sistem informasi eksisting", "IT DPUPR / OPD terkait", "Observasi & demo sistem", "Akses langsung"],
+            ["Regulasi & SOP internal", "Bagian Hukum DPU", "Studi dokumen", "PDF / Hardcopy"],
+            ["Sistem informasi eksisting", "IT DPU / OPD terkait", "Observasi & demo sistem", "Akses langsung"],
         ],
         col_widths=[1.5, 1.4, 1.8, 1.4]
     )
@@ -437,9 +437,9 @@ def create_metodologi_docx(output_path):
 
     add_p("B. Focus Group Discussion (FGD I)", bold_prefix="")
     add_p("Memvalidasi temuan awal, membangun konsensus kebutuhan lintas bagian, dan mengidentifikasi prioritas fitur.", bold_prefix="Tujuan: ")
-    add_p("8–12 orang: perwakilan Bidang Jakon, Verifikator, Tim Pengawas, IT DPUPR, perwakilan BUJK.", bold_prefix="Peserta: ")
+    add_p("8–12 orang: perwakilan Bidang Jakon, Verifikator, Tim Pengawas, IT DPU, perwakilan BUJK.", bold_prefix="Peserta: ")
     add_p("System & Business Analyst.", bold_prefix="Fasilitator: ")
-    add_p("3–4 jam di Ruang rapat DPUPR Kabupaten Bogor.", bold_prefix="Durasi & Lokasi: ")
+    add_p("3–4 jam di Ruang rapat DPU Kabupaten Bogor.", bold_prefix="Durasi & Lokasi: ")
 
     add_p("Teknik fasilitasi FGD:")
     add_bullet("Card Sorting: Peserta mengelompokkan fitur-fitur yang dibutuhkan ke dalam kategori modul")
@@ -825,7 +825,7 @@ def create_metodologi_docx(output_path):
         [
             ["Rapat Internal Tim", "2× per minggu (Senin & Kamis)", "Seluruh tim konsultan", "Sinkronisasi progress"],
             ["Koordinasi dengan PPK", "1× per minggu (Rabu)", "Team Leader + PPK", "Update progress, eskalasi kendala"],
-            ["Presentasi Milestone", "Sesuai jadwal milestone", "Tim + Tim Teknis DPUPR", "Presentasi deliverable"],
+            ["Presentasi Milestone", "Sesuai jadwal milestone", "Tim + Tim Teknis DPU", "Presentasi deliverable"],
             ["FGD Formal", "2× selama proyek", "Multi-stakeholder", "Validasi kebutuhan & review prototipe"],
         ],
         col_widths=[1.6, 1.5, 1.5, 1.9]
@@ -893,7 +893,7 @@ def create_metodologi_docx(output_path):
     add_num("Penyusunan oleh PIC (Penanggung Jawab)")
     add_num("Peer Review oleh tim internal")
     add_num("Quality Check oleh Team Leader")
-    add_num("Presentasi & Validasi PPK/DPUPR")
+    add_num("Presentasi & Validasi PPK/DPU")
     add_num("Revisi (jika ada) & Finalisasi")
 
     add_heading_2("8.2 Checklist Kualitas Dokumen")
@@ -946,8 +946,8 @@ def create_metodologi_docx(output_path):
     # 10. PENUTUP
     # ========================================
     add_heading_1("10. PENUTUP")
-    add_p("Dokumen Metodologi Perencanaan ini disusun sebagai panduan komprehensif bagi seluruh tim konsultan perencana dan stakeholder DPUPR Kabupaten Bogor dalam melaksanakan kegiatan Penyusunan Rancangan dan DED Sistem Informasi Jasa Konstruksi (SIJAKON).")
-    add_p("Metodologi ini bersifat hidup (living document) dan dapat diperbaharui sesuai kebutuhan dengan persetujuan bersama antara Tim Konsultan dan PPK DPUPR Kabupaten Bogor, dengan tetap menjaga keselarasan terhadap lingkup pekerjaan yang tercantum dalam Kerangka Acuan Kerja (KAK).")
+    add_p("Dokumen Metodologi Perencanaan ini disusun sebagai panduan komprehensif bagi seluruh tim konsultan perencana dan stakeholder DPU Kabupaten Bogor dalam melaksanakan kegiatan Penyusunan Rancangan dan DED Sistem Informasi Jasa Konstruksi (SIJAKON).")
+    add_p("Metodologi ini bersifat hidup (living document) dan dapat diperbaharui sesuai kebutuhan dengan persetujuan bersama antara Tim Konsultan dan PPK DPU Kabupaten Bogor, dengan tetap menjaga keselarasan terhadap lingkup pekerjaan yang tercantum dalam Kerangka Acuan Kerja (KAK).")
 
     add_divider()
 

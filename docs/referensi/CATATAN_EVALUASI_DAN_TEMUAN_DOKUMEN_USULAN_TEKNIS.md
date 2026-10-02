@@ -1,7 +1,7 @@
 # LAPORAN AUDIT & EVALUASI TEKNIS
 ## DOKUMEN USULAN TEKNIS JASA KONSULTANSI PERENCANAAN SISTEM INFORMASI JASA KONSTRUKSI (SIJAKON) KABUPATEN BOGOR TA 2026
 
-**Pengguna Jasa:** Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor  
+**Pengguna Jasa:** Dinas Pekerjaan Umum (DPU) Kabupaten Bogor  
 **Dokumen Diuji:** `DOKUMEN USULAN TEKNIS FIX.pdf` (Ukuran: 1,67 MB, 42 Halaman)  
 **Dokumen Acuan:** `KAK_PERENCANAAN_SISTEM_INFORMASI_JAKON_BOGOR_2026.docx` / `.md`  
 **File Word (.docx):** [`CATATAN_EVALUASI_DAN_TEMUAN_DOKUMEN_USULAN_TEKNIS.docx`](file:///u:/Project/ciptabintar/CATATAN_EVALUASI_DAN_TEMUAN_DOKUMEN_USULAN_TEKNIS.docx)  
@@ -20,7 +20,7 @@
 | Parameter Evaluasi | Rincian / Data Lapangan |
 | :--- | :--- |
 | **Nama Paket Pekerjaan** | Jasa Konsultansi Perencanaan Sistem Informasi Jasa Konstruksi (SIJAKON) |
-| **Pengguna Jasa** | Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor |
+| **Pengguna Jasa** | Dinas Pekerjaan Umum (DPU) Kabupaten Bogor |
 | **Tahun Anggaran** | 2026 |
 | **Dokumen yang Diuji** | `DOKUMEN USULAN TEKNIS FIX.pdf` (42 Halaman, 1.674.488 bytes) |
 | **Dokumen Acuan Uji** | KAK Perencanaan Sistem Informasi Jasa Konstruksi Bogor 2026 & Perpres No. 16/2018 jo No. 12/2021 |
@@ -149,7 +149,7 @@ Gantikan isi Tabel 2.1 (hal 5), Tabel 2.2 (hal 13), dan Tabel 2.8 (hal 42) denga
 
 | No | Posisi Penugasan | Kualifikasi Pendidikan & Pengalaman | Uraian Tugas & Tanggung Jawab Utama | Alokasi Waktu |
 | :-: | :--- | :--- | :--- | :-: |
-| **1** | **Team Leader / Ahli Sistem Informasi** | S1 Teknik Informatika / Ilmu Komputer / Sistem Informasi. Pengalaman kerja min. 5 tahun di bidang SI/TI. | Memimpin seluruh pelaksanaan kegiatan perencanaan, mengoordinasikan tim ahli, mengendalikan mutu laporan, memfasilitasi FGD/asistensi dengan DPUPR, dan menyusun Blueprint Arsitektur Sistem. | 2 Bulan (2 OB) |
+| **1** | **Team Leader / Ahli Sistem Informasi** | S1 Teknik Informatika / Ilmu Komputer / Sistem Informasi. Pengalaman kerja min. 5 tahun di bidang SI/TI. | Memimpin seluruh pelaksanaan kegiatan perencanaan, mengoordinasikan tim ahli, mengendalikan mutu laporan, memfasilitasi FGD/asistensi dengan DPU, dan menyusun Blueprint Arsitektur Sistem. | 2 Bulan (2 OB) |
 | **2** | **System & Business Analyst** | S1 Teknik Informatika / Sistem Informasi. Pengalaman kerja min. 3 tahun dalam analisis proses bisnis dan perancangan SI. | Melakukan identifikasi dan analisis proses bisnis pembinaan jasa konstruksi, menyusun Software Requirements Specification (SRS), merancang diagram alir data (DFD/BPMN), dan menyusun DED modul. | 2 Bulan (2 OB) |
 | **3** | **UI/UX Prototyper / Ahli Desain Antarmuka** | S1 Desain Komunikasi Visual (DKV) / Teknik Informatika / Sistem Informasi. Pengalaman kerja min. 3 tahun dalam UI/UX. | Merancang User Experience (UX), Wireframe, Design System, High-Fidelity UI, dan membangun Prototipe Interaktif (clickable prototype) berbasis Figma untuk seluruh 7 modul SIJAKON. | 2 Bulan (2 OB) |
 | **4** | **GIS & Spatial Data Specialist** | S1 Teknik Geodesi / Geografi / Geomatika / Informatika. Pengalaman kerja min. 3 tahun di bidang WebGIS. | Merancang arsitektur data spasial proyek konstruksi, skema geodatabase (PostGIS/GeoJSON), integrasi basemap One Map Policy, serta pemetaan sebaran TKK, badan usaha, dan material konstruksi. | 2 Bulan (2 OB) |
@@ -163,10 +163,10 @@ Salin teks berikut untuk mengisi kekosongan Subbab 2.5.1 pada halaman 40:
 > **2.5.1. STRUKTUR ORGANISASI PELAKSANAAN KEGIATAN**  
 > Untuk menjamin kelancaran, efektivitas, mutu teknis, dan ketepatan waktu dalam pelaksanaan pekerjaan Perencanaan Sistem Informasi Jasa Konstruksi (SIJAKON) Kabupaten Bogor Tahun Anggaran 2026, dibentuk struktur organisasi pelaksana yang terintegrasi secara profesional antara Pengguna Jasa dan Tim Konsultan.
 >
-> Struktur organisasi ini menghubungkan secara koordinatif antara Pejabat Pembuat Komitmen (PPK) dan PPTK pada Dinas Pekerjaan Umum dan Penataan Ruang (DPUPR) Kabupaten Bogor, Tim Teknis Pembina Jasa Konstruksi, dengan Tim Konsultan Perencana yang dipimpin oleh Team Leader.
+> Struktur organisasi ini menghubungkan secara koordinatif antara Pejabat Pembuat Komitmen (PPK) dan PPTK pada Dinas Pekerjaan Umum (DPU) Kabupaten Bogor, Tim Teknis Pembina Jasa Konstruksi, dengan Tim Konsultan Perencana yang dipimpin oleh Team Leader.
 >
 > **Mekanisme Kerja dan Pembagian Tanggung Jawab:**  
-> 1. **Pejabat Pembuat Komitmen (PPK) & PPTK DPUPR:** Memberikan arahan kebijakan, memantau kemajuan pekerjaan sesuai kontrak, menyetujui tahapan laporan, dan menandatangani Berita Acara Serah Terima Hasil Pekerjaan.  
+> 1. **Pejabat Pembuat Komitmen (PPK) & PPTK DPU:** Memberikan arahan kebijakan, memantau kemajuan pekerjaan sesuai kontrak, menyetujui tahapan laporan, dan menandatangani Berita Acara Serah Terima Hasil Pekerjaan.  
 > 2. **Team Leader (Ahli Sistem Informasi):** Bertanggung jawab penuh kepada PPK atas seluruh manajemen proyek, koordinasi seluruh personil ahli, pengendalian mutu teknis, fasilitasi FGD dan asistensi teknis, serta penyusunan Blueprint Arsitektur Sistem Informasi.  
 > 3. **System & Business Analyst:** Bertanggung jawab dalam mengidentifikasi kebutuhan proses bisnis pembinaan jasa konstruksi, perumusan Software Requirements Specification (SRS), perancangan diagram alir (DFD/BPMN), dan penyusunan Detail Engineering Design (DED) modul aplikasi.  
 > 4. **UI/UX Prototyper (Ahli Desain Antarmuka):** Bertanggung jawab menerjemahkan rumusan kebutuhan fungsional ke dalam rancangan User Experience (UX), Wireframe, Design System, serta membangun Prototipe Antarmuka Interaktif berbasis Figma (clickable prototype) untuk seluruh modul.  
@@ -225,4 +225,4 @@ Ganti teks pada halaman 35 dan 39 yang menyebut merek komersial "Qwen" dengan re
 
 ---
 
-*Laporan disusun untuk Tim Pengusul Teknis & Manajemen Proyek DPUPR Kabupaten Bogor TA 2026.*
+*Laporan disusun untuk Tim Pengusul Teknis & Manajemen Proyek DPU Kabupaten Bogor TA 2026.*

@@ -32,7 +32,7 @@ const mockTrainingEvents: TrainingEvent[] = [
     tahun: "2026",
     namaKegiatan: "Pelatihan & Sertifikasi Pelaksana Lapangan Pekerjaan Jalan Madya",
     metode: "Hybrid",
-    lokasi: "Pusdiklat DPUPR Cibinong",
+    lokasi: "Pusdiklat DPU Cibinong",
     lakiLaki: 38,
     perempuan: 7,
     totalPeserta: 45,
@@ -882,7 +882,7 @@ export default function SipjakiPelatihanPage() {
             <input
               type="text"
               required
-              placeholder="Contoh: Pusdiklat DPUPR Cibinong / Kantor Kecamatan Ciawi"
+              placeholder="Contoh: Pusdiklat DPU Cibinong / Kantor Kecamatan Ciawi"
               value={formData.lokasi}
               onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
               style={{

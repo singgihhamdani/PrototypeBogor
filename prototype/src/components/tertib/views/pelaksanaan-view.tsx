@@ -1127,7 +1127,7 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
             {/* Kop Surat Simulasi */}
             <div style={{ borderBottom: "2px solid #0F2E5C", paddingBottom: "12px", textAlign: "center" }}>
               <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase" }}>
-                Pemerintah Kabupaten Bogor — Dinas Pekerjaan Umum dan Penataan Ruang
+                Pemerintah Kabupaten Bogor — Dinas Pekerjaan Umum
               </span>
               <h3 style={{ fontSize: "16px", fontWeight: 900, color: "#0F2E5C", margin: "4px 0" }}>
                 BERITA ACARA PEMERIKSAAN PENGAWASAN JASA KONSTRUKSI
