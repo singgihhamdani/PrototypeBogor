@@ -8,7 +8,7 @@ import {
   StatusBadge, FileUploader, DataTableView, 
   ModalForm, ColumnDef 
 } from "@/components/common";
-import { Users, Plus, Download, FileText, Eye } from "lucide-react";
+import { Users, Plus, Download, FileText, Eye, Shield, CheckCircle2, Award } from "lucide-react";
 
 interface PerencanaanSDMViewProps {
   tertibType: TertibType;
@@ -191,26 +191,192 @@ export default function PerencanaanSDMView({ tertibType }: PerencanaanSDMViewPro
 
       <PerencanaanSubtabNav tertibType={tertibType} activeSubtab="sdm" />
 
-      {/* Stats Cards */}
+      {/* Stats Cards (UI/UX Standardized) */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Total SDM Ditugaskan</span>
-          <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: "6px 0 2px 0" }}>{totalSDM} Personil</h3>
-          <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>Tahun Anggaran 2026</span>
-        </div>
-
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Jumlah Tim Pengawas</span>
-          <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: "6px 0 2px 0" }}>{data.length} Tim Tersebar</h3>
-          <span style={{ fontSize: "11px", color: "#2563EB", fontWeight: 700 }}>Mencakup 40 Kecamatan</span>
-        </div>
-
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Status Verifikasi Data</span>
-          <div style={{ marginTop: "6px" }}>
-            <StatusBadge status="Terverifikasi" size="md" />
+        {/* Card 1: Total SDM */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #0F2E5C",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Total SDM Ditugaskan
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EBF2FA",
+                color: "#0F2E5C",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Users style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <p style={{ fontSize: "11px", color: "#64748B", margin: "4px 0 0 0" }}>Tersinkronisasi ke SIPJAKI Nasional</p>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {totalSDM} Personil
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10B981" }} />
+              <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>
+                Tahun Anggaran 2026
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 2: Jumlah Tim */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #2563EB",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Tim Pengawas Satgas
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DBEAFE",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Shield style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {data.length} Tim Tersebar
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>
+                Mencakup 40 Kecamatan
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 3: Verifikasi Sinkronisasi */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #059669",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Status Verifikasi
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#059669",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <CheckCircle2 style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "20px", fontWeight: 900, color: "#059669", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              Terverifikasi Penuh
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#059669" }} />
+              <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700 }}>
+                Sinkron SIPJAKI Nasional
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Legalitas SK */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #D97706",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Legalitas Tim
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Award style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "22px", fontWeight: 900, color: "#D97706", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              SK Kadis & Bupati
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>
+                Surat Keputusan Sah Aktif
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

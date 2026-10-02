@@ -193,153 +193,203 @@ export default function PerencanaanTargetView({ tertibType }: PerencanaanTargetV
       {/* Subtab Navigation */}
       <PerencanaanSubtabNav tertibType={tertibType} activeSubtab="target" />
 
-      {/* 4 Summary Stat Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: "16px" }}>
+      {/* 4 Summary Stat Cards (UI/UX Standardized) */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+        {/* Card 1: Rata-rata Capaian IKU */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #059669",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#DCFCE7",
-              color: "#166534",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <TrendingUp style={{ width: "22px", height: "22px" }} />
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Capaian IKU
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#059669",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <TrendingUp style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
           <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
-              Rata-rata Capaian IKU
-            </span>
-            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#166534", margin: "2px 0 0 0" }}>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#059669", whiteSpace: "nowrap", lineHeight: 1.2 }}>
               {avgCapaian}%
-            </h3>
-            <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700 }}>Progres komulatif TA 2026</span>
+            </div>
+            <div style={{ marginTop: "10px" }}>
+              <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "999px", overflow: "hidden" }}>
+                <div style={{ width: `${avgCapaian}%`, height: "100%", backgroundColor: "#059669", borderRadius: "999px" }} />
+              </div>
+              <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700, marginTop: "4px", display: "inline-block" }}>
+                Progres kumulatif TA 2026
+              </span>
+            </div>
           </div>
         </div>
 
+        {/* Card 2: Total Indikator */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #0F2E5C",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#EBF2FA",
-              color: "#0F2E5C",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <Target style={{ width: "22px", height: "22px" }} />
-          </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
               Total Indikator
             </span>
-            <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EBF2FA",
+                color: "#0F2E5C",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Target style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", whiteSpace: "nowrap", lineHeight: 1.2 }}>
               {data.length} Indikator Kunci
-            </h3>
-            <span style={{ fontSize: "11px", color: "#64748B" }}>Matriks Perencanaan Kinerja</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>
+                Matriks Perencanaan Kinerja
+              </span>
+            </div>
           </div>
         </div>
 
+        {/* Card 3: Indikator Tuntas */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #D97706",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#FEF3C7",
-              color: "#92400E",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <Award style={{ width: "22px", height: "22px" }} />
-          </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
               Indikator Tuntas
             </span>
-            <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#92400E", margin: "2px 0 0 0" }}>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Award style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#D97706", whiteSpace: "nowrap", lineHeight: 1.2 }}>
               {targetTuntas} dari {data.length} IKU
-            </h3>
-            <span style={{ fontSize: "11px", color: "#64748B" }}>Memenuhi kuota target</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#D97706" }} />
+              <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>
+                Memenuhi kuota target
+              </span>
+            </div>
           </div>
         </div>
 
+        {/* Card 4: Total Realisasi Volume */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #2563EB",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#F1F5F9",
-              color: "#2563EB",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <BarChart3 style={{ width: "22px", height: "22px" }} />
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Realisasi Volume
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DBEAFE",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <BarChart3 style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
           <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
-              Total Realiasi Volume
-            </span>
-            <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#2563EB", margin: "2px 0 0 0" }}>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB", whiteSpace: "nowrap", lineHeight: 1.2 }}>
               {totalRealisasiKuantitatif} Realisasi
-            </h3>
-            <span style={{ fontSize: "11px", color: "#64748B" }}>Dari total target {totalTargetKuantitatif}</span>
+            </div>
+            <div style={{ marginTop: "10px" }}>
+              <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "999px", overflow: "hidden" }}>
+                <div
+                  style={{
+                    width: `${totalTargetKuantitatif > 0 ? Math.min(100, Math.round((totalRealisasiKuantitatif / totalTargetKuantitatif) * 100)) : 0}%`,
+                    height: "100%",
+                    backgroundColor: "#2563EB",
+                    borderRadius: "999px"
+                  }}
+                />
+              </div>
+              <span style={{ fontSize: "11px", color: "#64748B", marginTop: "4px", display: "inline-block" }}>
+                Target: {totalTargetKuantitatif}
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -85,12 +85,12 @@ export default function BUJKPage() {
         </div>
       </div>
 
-      {/* 4 Stats Cards */}
+      {/* 4 Stats Cards (UI/UX Standardized) */}
       <div 
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "18px"
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: "16px"
         }}
       >
         {stats.map((s) => {
@@ -101,41 +101,46 @@ export default function BUJKPage() {
               style={{
                 borderRadius: "16px",
                 border: "1px solid #E2E8F0",
+                borderTop: `3px solid ${s.color}`,
                 backgroundColor: "#FFFFFF",
-                padding: "20px 22px",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+                padding: "20px",
+                boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "12px"
+                justifyContent: "space-between"
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+                <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                   {s.label}
                 </span>
                 <div 
                   style={{
-                    height: "36px",
-                    width: "36px",
+                    height: "40px",
+                    width: "40px",
                     borderRadius: "10px",
                     backgroundColor: s.bg,
                     color: s.color,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
+                    flexShrink: 0
                   }}
                 >
-                  <Icon style={{ width: "18px", height: "18px" }} />
+                  <Icon style={{ width: "20px", height: "20px" }} />
                 </div>
               </div>
 
               <div>
-                <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>
-                  {s.value}
+                <p style={{ fontSize: "24px", fontWeight: 900, color: s.color === "#0F2E5C" ? "#0F2E5C" : s.color, margin: 0, lineHeight: 1.2, whiteSpace: "nowrap" }}>
+                  {s.value} BUJK
                 </p>
-                <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>
-                  {s.sub}
-                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+                  <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: s.color }} />
+                  <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 600 }}>
+                    {s.sub}
+                  </span>
+                </div>
               </div>
             </div>
           );

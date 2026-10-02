@@ -8,7 +8,7 @@ import {
   StatusBadge, FileUploader, DataTableView, 
   ModalForm, ColumnDef 
 } from "@/components/common";
-import { Calendar, Plus, Download, FileText, Clock, CheckCircle2, AlertCircle, Filter, Eye } from "lucide-react";
+import { Calendar, Plus, Download, FileText, Clock, CheckCircle2, AlertCircle, Filter, Eye, TrendingUp } from "lucide-react";
 
 interface PerencanaanTimelineViewProps {
   tertibType: TertibType;
@@ -198,116 +198,200 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
       {/* Subtab Navigation */}
       <PerencanaanSubtabNav tertibType={tertibType} activeSubtab="timeline" />
 
-      {/* Metric Stat Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: "16px" }}>
+      {/* Metric Stat Cards (UI/UX Standardized) */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+        {/* Card 1: Total Agenda */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #0F2E5C",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#EBF2FA",
-              color: "#0F2E5C",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <Calendar style={{ width: "22px", height: "22px" }} />
-          </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
               Total Agenda
             </span>
-            <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EBF2FA",
+                color: "#0F2E5C",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Calendar style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", whiteSpace: "nowrap", lineHeight: 1.2 }}>
               {data.length} Siklus Jadwal
-            </h3>
-            <span style={{ fontSize: "11px", color: "#64748B" }}>Tahun Anggaran 2026</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>
+                Tahun Anggaran 2026
+              </span>
+            </div>
           </div>
         </div>
 
+        {/* Card 2: Target Objek */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #2563EB",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#FEF3C7",
-              color: "#92400E",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <Clock style={{ width: "22px", height: "22px" }} />
-          </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
               Target Objek
             </span>
-            <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#92400E", margin: "2px 0 0 0" }}>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DBEAFE",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Clock style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB", whiteSpace: "nowrap", lineHeight: 1.2 }}>
               {totalTarget} Objek
-            </h3>
-            <span style={{ fontSize: "11px", color: "#64748B" }}>{totalBerjalan} kegiatan sedang berjalan</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>
+                Target kumulatif siklus
+              </span>
+            </div>
           </div>
         </div>
 
+        {/* Card 3: Sedang Berjalan */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
-            padding: "18px 20px",
+            padding: "20px",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 2px 8px rgba(15, 46, 92, 0.03)",
+            borderTop: "3px solid #D97706",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
-            alignItems: "center",
-            gap: "14px"
+            flexDirection: "column",
+            justifyContent: "space-between"
           }}
         >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              backgroundColor: "#DCFCE7",
-              color: "#166534",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <CheckCircle2 style={{ width: "22px", height: "22px" }} />
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Sedang Berjalan
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <TrendingUp style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
           <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#D97706", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {totalBerjalan} Kegiatan
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#D97706" }} />
+              <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>
+                Aktivitas lapangan aktif
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Jadwal Tuntas */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #059669",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
               Jadwal Tuntas
             </span>
-            <h3 style={{ fontSize: "20px", fontWeight: 900, color: "#166534", margin: "2px 0 0 0" }}>
-              {totalSelesai} Tahapan Selesai
-            </h3>
-            <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700 }}>Dokumentasi terunggah</span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#059669",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <CheckCircle2 style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#059669", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {totalSelesai} Tahapan
+            </div>
+            <div style={{ marginTop: "10px" }}>
+              <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "999px", overflow: "hidden" }}>
+                <div
+                  style={{
+                    width: `${data.length > 0 ? Math.round((totalSelesai / data.length) * 100) : 0}%`,
+                    height: "100%",
+                    backgroundColor: "#059669",
+                    borderRadius: "999px"
+                  }}
+                />
+              </div>
+              <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700, marginTop: "4px", display: "inline-block" }}>
+                {data.length > 0 ? Math.round((totalSelesai / data.length) * 100) : 0}% Agenda selesai terlaksana
+              </span>
+            </div>
           </div>
         </div>
       </div>

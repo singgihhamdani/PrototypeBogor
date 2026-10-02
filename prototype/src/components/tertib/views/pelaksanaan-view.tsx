@@ -342,49 +342,235 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
         ]}
       />
 
-      {/* Top 4 Summary Stat Cards (Glassmorphism SIPJAKI) */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #0F2E5C, #1E40AF)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <ClipboardCheck style={{ width: "24px", height: "24px" }} />
+      {/* Top 4 Summary Stat Cards (Modern UI/UX Revamped) */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "16px" }}>
+        {/* Card 1: Total Pemeriksaan */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #2563EB",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Total Pemeriksaan
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
+                Audit Lapangan SIMAK
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EFF6FF",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <ClipboardCheck style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Total Pemeriksaan</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: "2px 0 0 0" }}>{statTotal} Objek</h3>
-            <span style={{ fontSize: "10px", color: "#64748B" }}>Tahun Anggaran {filterTahun}</span>
+
+          <div style={{ marginTop: "14px" }}>
+            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#0F2E5C", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {statTotal} Objek
+            </h3>
+          </div>
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+            <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 600 }}>Tahun Anggaran {filterTahun}</span>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "9999px" }}>
+              SIMAK Baku
+            </span>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <AlertCircle style={{ width: "24px", height: "24px" }} />
+        {/* Card 2: Menunggu Verifikasi */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #F59E0B",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Menunggu Verifikasi
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#D97706", fontWeight: 700, marginTop: "2px" }}>
+                Perlu Tindakan Pengawas
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <AlertCircle style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Menunggu Verifikasi</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#D97706", margin: "2px 0 0 0" }}>{statPending} Draft</h3>
-            <span style={{ fontSize: "10px", color: "#D97706", fontWeight: 700 }}>Perlu Tindakan Pengawas</span>
+
+          <div style={{ marginTop: "14px" }}>
+            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#D97706", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {statPending} Draft
+            </h3>
+          </div>
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+            <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>Menunggu Review</span>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: "#92400E", backgroundColor: "#FEF3C7", padding: "2px 8px", borderRadius: "9999px" }}>
+              Antrian
+            </span>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #10B981, #059669)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CheckCircle2 style={{ width: "24px", height: "24px" }} />
+        {/* Card 3: Terverifikasi (Verified) */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #10B981",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Terverifikasi (Verified)
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#166534", fontWeight: 700, marginTop: "2px" }}>
+                Sah & Siap Sinkron SIPJAKI
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#166534",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <CheckCircle2 style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Terverifikasi (Verified)</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#059669", margin: "2px 0 0 0" }}>{statVerified} BAP</h3>
-            <span style={{ fontSize: "10px", color: "#059669", fontWeight: 700 }}>Sah & Siap Sinkron SIPJAKI</span>
+
+          <div style={{ marginTop: "14px" }}>
+            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#166534", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {statVerified} BAP
+            </h3>
+          </div>
+
+          <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B" }}>Tingkat Verifikasi</span>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#166534" }}>
+                {statTotal > 0 ? Math.round((statVerified / statTotal) * 100) : 0}%
+              </span>
+            </div>
+            <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
+              <div
+                style={{
+                  width: `${statTotal > 0 ? Math.min(Math.round((statVerified / statTotal) * 100), 100) : 0}%`,
+                  height: "100%",
+                  backgroundColor: "#10B981",
+                  borderRadius: "9999px"
+                }}
+              />
+            </div>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #EF4444, #DC2626)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <XCircle style={{ width: "24px", height: "24px" }} />
+        {/* Card 4: Ditolak / Investigasi */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #EF4444",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Ditolak / Perbaikan
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#DC2626", fontWeight: 700, marginTop: "2px" }}>
+                Perlu Perbaikan Lapangan
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEE2E2",
+                color: "#DC2626",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <XCircle style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Ditolak / Investigasi</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#DC2626", margin: "2px 0 0 0" }}>{statRejected} Rekomendasi</h3>
-            <span style={{ fontSize: "10px", color: "#DC2626", fontWeight: 700 }}>Perlu Perbaikan Lapangan</span>
+
+          <div style={{ marginTop: "14px" }}>
+            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#DC2626", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {statRejected} Rekomendasi
+            </h3>
+          </div>
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+            <span style={{ fontSize: "11px", color: statRejected > 0 ? "#DC2626" : "#64748B", fontWeight: 700 }}>
+              {statRejected > 0 ? "Perlu Tindak Lanjut" : "Nihil Temuan Kritis"}
+            </span>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: statRejected > 0 ? "#991B1B" : "#166534", backgroundColor: statRejected > 0 ? "#FEE2E2" : "#DCFCE7", padding: "2px 8px", borderRadius: "9999px" }}>
+              {statRejected > 0 ? "Temuan" : "Aman"}
+            </span>
           </div>
         </div>
       </div>

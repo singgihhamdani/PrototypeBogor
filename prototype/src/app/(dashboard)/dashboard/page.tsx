@@ -325,12 +325,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 2. 4 Summary Metric Cards */}
+      {/* 2. 4 Summary Metric Cards (UI/UX Standardized) */}
       <div 
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          gap: "20px"
+          gap: "16px"
         }}
       >
         {summaryCards.map((card) => {
@@ -341,60 +341,61 @@ export default function DashboardPage() {
               style={{
                 borderRadius: "16px",
                 border: "1px solid #E2E8F0",
+                borderTop: `3px solid ${card.iconColor}`,
                 backgroundColor: "#FFFFFF",
-                padding: "22px 24px",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+                padding: "20px",
+                boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between",
-                gap: "16px"
+                justifyContent: "space-between"
               }}
             >
-              {/* Top Row: Icon + Badge */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              {/* Top Row: Label uppercase + Icon */}
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+                <div>
+                  <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    {card.label}
+                  </span>
+                </div>
                 <div 
                   style={{
-                    height: "44px",
-                    width: "44px",
-                    borderRadius: "12px",
+                    height: "40px",
+                    width: "40px",
+                    borderRadius: "10px",
                     backgroundColor: card.iconBg,
                     color: card.iconColor,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
+                    flexShrink: 0
                   }}
                 >
-                  <Icon style={{ width: "22px", height: "22px" }} />
+                  <Icon style={{ width: "20px", height: "20px" }} />
                 </div>
-                <span 
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    padding: "4px 10px",
-                    borderRadius: "9999px",
-                    backgroundColor: card.iconBg,
-                    color: card.iconColor
-                  }}
-                >
-                  {card.badge}
-                </span>
               </div>
 
-              {/* Middle: Number & Title */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <p style={{ fontSize: "32px", fontWeight: 900, color: "#0F172A", letterSpacing: "-0.5px", margin: 0, lineHeight: 1.1 }}>
+              {/* Middle: Big Value */}
+              <div>
+                <p style={{ fontSize: "28px", fontWeight: 900, color: card.iconColor === "#0F2E5C" ? "#0F2E5C" : card.iconColor, letterSpacing: "-0.5px", margin: 0, lineHeight: 1.2, whiteSpace: "nowrap" }}>
                   {card.value}
                 </p>
-                <p style={{ fontSize: "13px", fontWeight: 700, color: "#334155", margin: 0 }}>
-                  {card.label}
-                </p>
-              </div>
-
-              {/* Bottom: Subtitle with clearance */}
-              <div style={{ paddingTop: "8px", borderTop: "1px solid #F1F5F9" }}>
-                <p style={{ fontSize: "11px", color: "#64748B", margin: 0, fontWeight: 500 }}>
-                  {card.sub}
-                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+                  <span 
+                    style={{
+                      fontSize: "10px",
+                      fontWeight: 800,
+                      padding: "2px 8px",
+                      borderRadius: "6px",
+                      backgroundColor: card.iconBg,
+                      color: card.iconColor
+                    }}
+                  >
+                    {card.badge}
+                  </span>
+                  <span style={{ fontSize: "11px", color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {card.sub}
+                  </span>
+                </div>
               </div>
             </div>
           );

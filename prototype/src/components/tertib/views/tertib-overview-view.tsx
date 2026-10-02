@@ -99,32 +99,195 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
         ]}
       />
 
-      {/* Top Highlight Summary Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Tim Pengawas Terdaftar</span>
-          <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: "6px 0 2px 0" }}>{sdmData.reduce((a, c) => a + c.jumlahSdm, 0) || 16} Personil</h3>
-          <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>SK Bupati & Kadis Terbit</span>
+      {/* Top Highlight Summary Stats (UI/UX Standardized) */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+        {/* Card 1: Tim Pengawas */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #0F2E5C",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Tim Pengawas Terdaftar
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EBF2FA",
+                color: "#0F2E5C",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Users style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {sdmData.reduce((a, c) => a + c.jumlahSdm, 0) || 16} Personil
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10B981" }} />
+              <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>
+                SK Bupati & Kadis Terbit
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Alokasi Pagu Anggaran</span>
-          <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#0F2E5C", margin: "6px 0 2px 0" }}>
-            Rp {(totalPagu / 1000000).toLocaleString('id-ID')} Juta
-          </h3>
-          <span style={{ fontSize: "11px", color: "#2563EB", fontWeight: 700 }}>Sumber Dana APBD TA 2026</span>
+        {/* Card 2: Alokasi Pagu */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #2563EB",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Alokasi Pagu Anggaran
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DBEAFE",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Wallet style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              Rp {(totalPagu / 1000000).toLocaleString('id-ID')} Jt
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>
+                Sumber Dana APBD TA 2026
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Objek Diaudit (SIMAK)</span>
-          <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: "6px 0 2px 0" }}>{pelaksanaanData.length || 12} Objek</h3>
-          <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>Rata-rata Skor: 82% (Tertib)</span>
+        {/* Card 3: Objek Diaudit */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #059669",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Objek Diaudit (SIMAK)
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#059669",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <ShieldCheck style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#059669", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {pelaksanaanData.length || 12} Objek
+            </div>
+            <div style={{ marginTop: "10px" }}>
+              <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "999px", overflow: "hidden" }}>
+                <div style={{ width: "82%", height: "100%", backgroundColor: "#059669", borderRadius: "999px" }} />
+              </div>
+              <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700, marginTop: "4px", display: "inline-block" }}>
+                Rata-rata Skor: 82% (Tertib)
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0", boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Rekomendasi & Tindak Lanjut</span>
-          <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: "6px 0 2px 0" }}>{rekomendasiData.length || 3} Rekomendasi</h3>
-          <span style={{ fontSize: "11px", color: "#F59E0B", fontWeight: 700 }}>Status: Dalam Pemantauan</span>
+        {/* Card 4: Rekomendasi */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #D97706",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Rekomendasi Tindak Lanjut
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <AlertTriangle style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#D97706", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {rekomendasiData.length || 3} Temuan
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#D97706" }} />
+              <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>
+                Status: Dalam Pemantauan
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

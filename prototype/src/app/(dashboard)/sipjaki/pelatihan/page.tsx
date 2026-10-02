@@ -337,38 +337,194 @@ export default function SipjakiPelatihanPage() {
         ]}
       />
 
-      {/* Top 3 Metric Cards */}
+      {/* Top 4 Metric Cards (UI/UX Standardized) */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "52px", height: "52px", borderRadius: "14px", backgroundColor: "#EBF2FA", color: "#0F2E5C", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <GraduationCap style={{ width: "26px", height: "26px" }} />
+        {/* Card 1: Total Program */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #0F2E5C",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Total Program Pelatihan
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EBF2FA",
+                color: "#0F2E5C",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <GraduationCap style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
           <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Total Kegiatan</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: "2px 0 0 0" }}>{trainingList.length} Program</h3>
-            <span style={{ fontSize: "10px", color: "#10B981", fontWeight: 700 }}>Tahun Anggaran 2026</span>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {trainingList.length} Program
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10B981" }} />
+              <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>
+                Tahun Anggaran 2026
+              </span>
+            </div>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "52px", height: "52px", borderRadius: "14px", backgroundColor: "#FEF3C7", color: "#92400E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Users style={{ width: "26px", height: "26px" }} />
+        {/* Card 2: Total Peserta */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #2563EB",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Total Peserta TKK
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DBEAFE",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Users style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
           <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Total Peserta TKK</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#92400E", margin: "2px 0 0 0" }}>{totalPeserta} Orang</h3>
-            <span style={{ fontSize: "10px", color: "#64748B" }}>👨 {percentLaki}% Pria • 👩 {percentPerempuan}% Wanita</span>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {totalPeserta} Orang
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>
+                👨 {percentLaki}% Pria • 👩 {percentPerempuan}% Wanita
+              </span>
+            </div>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "16px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "52px", height: "52px", borderRadius: "14px", backgroundColor: "#DCFCE7", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Award style={{ width: "26px", height: "26px" }} />
+        {/* Card 3: Kelulusan SKK */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #059669",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Kelulusan Asesmen SKK
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#059669",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Award style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
           <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Rasio Kelulusan SKK</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#166534", margin: "2px 0 0 0" }}>94.2%</h3>
-            <span style={{ fontSize: "10px", color: "#10B981", fontWeight: 700 }}>Lulus Asesmen BNSP/LSP</span>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#059669", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              94.2%
+            </div>
+            <div style={{ marginTop: "10px" }}>
+              <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "999px", overflow: "hidden" }}>
+                <div style={{ width: "94.2%", height: "100%", backgroundColor: "#059669", borderRadius: "999px" }} />
+              </div>
+              <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700, marginTop: "4px", display: "inline-block" }}>
+                Tersertifikasi BNSP / LSP
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Status Penyelesaian */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #D97706",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Status Penyelesaian
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <CheckCircle2 style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#D97706", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {trainingList.filter(t => t.status.includes("Selesai")).length} / {trainingList.length} Selesai
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#D97706" }} />
+              <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>
+                {trainingList.filter(t => t.status.includes("Sedang Berjalan")).length} Kelas Sedang Aktif
+              </span>
+            </div>
           </div>
         </div>
       </div>

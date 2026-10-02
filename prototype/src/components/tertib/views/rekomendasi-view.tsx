@@ -233,49 +233,235 @@ export default function RekomendasiView({ tertibType }: RekomendasiViewProps) {
         ]}
       />
 
-      {/* 4 Summary Stat Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #0F2E5C, #1E40AF)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <FileText style={{ width: "24px", height: "24px" }} />
+      {/* 4 Summary Stat Cards (Modern UI/UX Revamped) */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "16px" }}>
+        {/* Card 1: Total Rekomendasi */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #2563EB",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Total Rekomendasi
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
+                Tindak Lanjut SIMAK
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EFF6FF",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <FileText style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Total Rekomendasi</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: "2px 0 0 0" }}>{totalRekomendasi} Surat</h3>
-            <span style={{ fontSize: "10px", color: "#64748B" }}>Tahun Anggaran 2026</span>
+
+          <div style={{ marginTop: "14px" }}>
+            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#0F2E5C", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {totalRekomendasi} Surat
+            </h3>
+          </div>
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+            <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 600 }}>Tahun Anggaran 2026</span>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "9999px" }}>
+              Dokumen Terbit
+            </span>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Clock style={{ width: "24px", height: "24px" }} />
+        {/* Card 2: Dalam Proses Koreksi */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #F59E0B",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Dalam Proses Koreksi
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#D97706", fontWeight: 700, marginTop: "2px" }}>
+                Menunggu Bukti Perbaikan
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Clock style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Dalam Proses Koreksi</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#D97706", margin: "2px 0 0 0" }}>{dalamProses} Rekanan</h3>
-            <span style={{ fontSize: "10px", color: "#D97706", fontWeight: 700 }}>Menunggu Bukti Perbaikan</span>
+
+          <div style={{ marginTop: "14px" }}>
+            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#D97706", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {dalamProses} Rekanan
+            </h3>
+          </div>
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+            <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>Batas Waktu SP Aktif</span>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: "#92400E", backgroundColor: "#FEF3C7", padding: "2px 8px", borderRadius: "9999px" }}>
+              Proses
+            </span>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #10B981, #059669)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CheckCircle2 style={{ width: "24px", height: "24px" }} />
+        {/* Card 3: Selesai & Patuh */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #10B981",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Selesai & Patuh
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#166534", fontWeight: 700, marginTop: "2px" }}>
+                Perbaikan Diterima Tim
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#166534",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <CheckCircle2 style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Selesai & Patuh</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#059669", margin: "2px 0 0 0" }}>{selesaiPatuh} Kasus</h3>
-            <span style={{ fontSize: "10px", color: "#059669", fontWeight: 700 }}>Tindakan Perbaikan Diterima</span>
+
+          <div style={{ marginTop: "14px" }}>
+            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#166534", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {selesaiPatuh} Kasus
+            </h3>
+          </div>
+
+          <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B" }}>Tingkat Kepatuhan</span>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#166534" }}>
+                {totalRekomendasi > 0 ? Math.round((selesaiPatuh / totalRekomendasi) * 100) : 0}%
+              </span>
+            </div>
+            <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
+              <div
+                style={{
+                  width: `${totalRekomendasi > 0 ? Math.min(Math.round((selesaiPatuh / totalRekomendasi) * 100), 100) : 0}%`,
+                  height: "100%",
+                  backgroundColor: "#10B981",
+                  borderRadius: "9999px"
+                }}
+              />
+            </div>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #EF4444, #DC2626)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Scale style={{ width: "24px", height: "24px" }} />
+        {/* Card 4: Dikenakan Sanksi */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #EF4444",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Dikenakan Sanksi
+              </span>
+              <span style={{ display: "block", fontSize: "11px", color: "#DC2626", fontWeight: 700, marginTop: "2px" }}>
+                Eskalasi Surat Peringatan
+              </span>
+            </div>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEE2E2",
+                color: "#DC2626",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Scale style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Dikenakan Sanksi</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#DC2626", margin: "2px 0 0 0" }}>{diberiSanksi} Sanksi</h3>
-            <span style={{ fontSize: "10px", color: "#DC2626", fontWeight: 700 }}>Eskalasi Surat Peringatan</span>
+
+          <div style={{ marginTop: "14px" }}>
+            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#DC2626", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+              {diberiSanksi} Sanksi
+            </h3>
+          </div>
+
+          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+            <span style={{ fontSize: "11px", color: diberiSanksi > 0 ? "#DC2626" : "#64748B", fontWeight: 700 }}>
+              {diberiSanksi > 0 ? "Pemberitahuan LPJK/PUPR" : "Nihil Sanksi Berat"}
+            </span>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: diberiSanksi > 0 ? "#991B1B" : "#166534", backgroundColor: diberiSanksi > 0 ? "#FEE2E2" : "#DCFCE7", padding: "2px 8px", borderRadius: "9999px" }}>
+              {diberiSanksi > 0 ? "Sanksi" : "Nihil"}
+            </span>
           </div>
         </div>
       </div>

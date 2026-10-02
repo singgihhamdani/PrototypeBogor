@@ -287,38 +287,194 @@ export default function PelaporanView({ tertibType }: PelaporanViewProps) {
         </button>
       </div>
 
-      {/* 3 Summary Metrics */}
+      {/* 4 Summary Metrics (UI/UX Standardized) */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #0F2E5C, #1E40AF)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <FileBarChart style={{ width: "24px", height: "24px" }} />
+        {/* Card 1: Total Objek */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #0F2E5C",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Total Objek Terlapor
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EBF2FA",
+                color: "#0F2E5C",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <FileBarChart style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
           <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Total Objek Terlapor</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: "2px 0 0 0" }}>{totalObjek} Objek</h3>
-            <span style={{ fontSize: "10px", color: "#10B981", fontWeight: 700 }}>100% Sesuai Rencana Pengawasan</span>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {totalObjek} Objek
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10B981" }} />
+              <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>
+                100% Sesuai Rencana
+              </span>
+            </div>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #10B981, #059669)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <ShieldCheck style={{ width: "24px", height: "24px" }} />
+        {/* Card 2: Rata-rata Kepatuhan */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #059669",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Indeks Kepatuhan
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#059669",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <ShieldCheck style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
           <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Rata-rata Indeks Kepatuhan</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#059669", margin: "2px 0 0 0" }}>{avgKepatuhan}%</h3>
-            <span style={{ fontSize: "10px", color: "#64748B" }}>Kategori Tertib Tertinggi se-Jawa Barat</span>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#059669", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {avgKepatuhan}%
+            </div>
+            <div style={{ marginTop: "10px" }}>
+              <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "999px", overflow: "hidden" }}>
+                <div style={{ width: `${avgKepatuhan}%`, height: "100%", backgroundColor: "#059669", borderRadius: "999px" }} />
+              </div>
+              <span style={{ fontSize: "11px", color: "#64748B", marginTop: "4px", display: "inline-block" }}>
+                Kategori Tertib Sangat Baik
+              </span>
+            </div>
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "14px" }}>
-          <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: "linear-gradient(135deg, #3B82F6, #2563EB)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Database style={{ width: "24px", height: "24px" }} />
+        {/* Card 3: Sinkronisasi SIPJAKI */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #2563EB",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Sinkronisasi SIPJAKI
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DBEAFE",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Database style={{ width: "20px", height: "20px" }} />
+            </div>
           </div>
           <div>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Tersinkronisasi ke Pusat</span>
-            <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB", margin: "2px 0 0 0" }}>{syncedCount} / {data.length} Paket</h3>
-            <span style={{ fontSize: "10px", color: "#2563EB", fontWeight: 700 }}>SIPJAKI Nasional Status Verified</span>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {syncedCount} / {data.length} Paket
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#2563EB" }} />
+              <span style={{ fontSize: "11px", color: "#2563EB", fontWeight: 700 }}>
+                Status Verified Nasional
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Periode Laporan */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #D97706",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Periode Pelaporan
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Calendar style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#D97706", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {data.length} Berkas
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>
+                Semester I & II TA 2026
+              </span>
+            </div>
           </div>
         </div>
       </div>

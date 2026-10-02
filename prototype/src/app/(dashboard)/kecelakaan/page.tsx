@@ -276,32 +276,193 @@ export default function KecelakaanPage() {
         </div>
       </div>
 
-      {/* 4 Stats Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
-        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "18px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Total Laporan K3</span>
-          <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#0F2E5C", margin: "4px 0 2px 0" }}>{incidents.length} Kejadian</h3>
-          <span style={{ fontSize: "11px", color: "#64748B" }}>Tahun Anggaran 2026</span>
+      {/* 4 Stats Cards (UI/UX Standardized) */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+        {/* Card 1: Total Laporan */}
+        <div
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #0F2E5C",
+            backgroundColor: "#FFFFFF",
+            padding: "20px",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Total Laporan K3
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EBF2FA",
+                color: "#0F2E5C",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <ShieldAlert style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {incidents.length} Kejadian
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10B981" }} />
+              <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>
+                Tahun Anggaran 2026
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "18px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Fatalitas (Kematian)</span>
-          <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#059669", margin: "4px 0 2px 0" }}>0 Korban</h3>
-          <span style={{ fontSize: "11px", color: "#059669", fontWeight: 700 }}>Zero Fatalities Tercapai</span>
+        {/* Card 2: Fatalitas */}
+        <div
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #059669",
+            backgroundColor: "#FFFFFF",
+            padding: "20px",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Fatalitas (Kematian)
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#059669",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <ShieldCheck style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#059669", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              0 Korban
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#059669" }} />
+              <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700 }}>
+                Zero Fatalities Tercapai
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "18px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Luka Berat / Ringan</span>
-          <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#D97706", margin: "4px 0 2px 0" }}>
-            {incidents.filter(i => i.severity.includes("Luka")).length} Kasus
-          </h3>
-          <span style={{ fontSize: "11px", color: "#D97706" }}>Dalam perawatan medis & evaluasi</span>
+        {/* Card 3: Luka Berat / Ringan */}
+        <div
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #D97706",
+            backgroundColor: "#FFFFFF",
+            padding: "20px",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Luka Berat / Ringan
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <AlertTriangle style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#D97706", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {incidents.filter(i => i.severity.includes("Luka")).length} Kasus
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#64748B" }}>
+                Dalam perawatan medis & evaluasi
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "18px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Sinkronisasi SIPJAKI</span>
-          <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#2563EB", margin: "4px 0 2px 0" }}>100% Terlaporkan</h3>
-          <span style={{ fontSize: "11px", color: "#2563EB" }}>Pusat Data K3 Nasional</span>
+        {/* Card 4: Sinkronisasi SIPJAKI */}
+        <div
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #2563EB",
+            backgroundColor: "#FFFFFF",
+            padding: "20px",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Sinkronisasi SIPJAKI
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#DBEAFE",
+                color: "#2563EB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <CheckCircle2 style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              100% Valid
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#2563EB" }} />
+              <span style={{ fontSize: "11px", color: "#2563EB", fontWeight: 700 }}>
+                Pusat Data K3 Nasional
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
