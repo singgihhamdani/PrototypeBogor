@@ -21,8 +21,10 @@ const summaryCards = [
   { 
     label: "Total BUJK Terdaftar", 
     value: "1.240", 
-    sub: "312 Kualifikasi Besar • 480 Menengah", 
+    sub: "312 Besar · 480 Menengah · 448 Kecil", 
     badge: "+12% Thn Lalu",
+    badgeBg: "#ECFDF5",
+    badgeColor: "#059669",
     isPositive: true,
     icon: Building2, 
     iconBg: "#EBF2FA",
@@ -31,8 +33,10 @@ const summaryCards = [
   { 
     label: "Paket Pekerjaan TA 2026", 
     value: "342", 
-    sub: "Total Nilai Kontrak Rp 420 Miliar", 
+    sub: "Akumulasi Nilai: Rp 420 Miliar", 
     badge: "328 Pelaksanaan",
+    badgeBg: "#EFF6FF",
+    badgeColor: "#2563EB",
     isPositive: true,
     icon: Package, 
     iconBg: "#EFF6FF",
@@ -41,8 +45,10 @@ const summaryCards = [
   { 
     label: "TKK Tersertifikasi SKK", 
     value: "4.850", 
-    sub: "Realisasi 97% dari target 5.000 org", 
+    sub: "Target Tahunan: 5.000 Tenaga Kerja", 
     badge: "97% Target",
+    badgeBg: "#FFFBEB",
+    badgeColor: "#B45309",
     isPositive: true,
     icon: GraduationCap, 
     iconBg: "#FFFBEB",
@@ -51,8 +57,10 @@ const summaryCards = [
   { 
     label: "Tingkat Fatalitas K3", 
     value: "0", 
-    sub: "Zero Fatal Accident tercapai", 
+    sub: "Zero Fatal Accident di 40 Kecamatan", 
     badge: "100% Aman",
+    badgeBg: "#ECFDF5",
+    badgeColor: "#059669",
     isPositive: true,
     icon: ShieldCheck, 
     iconBg: "#ECFDF5",
@@ -374,28 +382,42 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Middle: Big Value */}
+              {/* Middle: Big Value + Inline Trend Badge */}
               <div>
-                <p style={{ fontSize: "28px", fontWeight: 900, color: card.iconColor === "#0F2E5C" ? "#0F2E5C" : card.iconColor, letterSpacing: "-0.5px", margin: 0, lineHeight: 1.2, whiteSpace: "nowrap" }}>
-                  {card.value}
-                </p>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
-                  <span 
-                    style={{
-                      fontSize: "10px",
-                      fontWeight: 800,
-                      padding: "2px 8px",
-                      borderRadius: "6px",
-                      backgroundColor: card.iconBg,
-                      color: card.iconColor
-                    }}
-                  >
-                    {card.badge}
+                <div style={{ display: "flex", alignItems: "baseline", gap: "10px", flexWrap: "wrap" }}>
+                  <span style={{ fontSize: "28px", fontWeight: 900, color: card.iconColor === "#0F2E5C" ? "#0F2E5C" : card.iconColor, letterSpacing: "-0.5px", lineHeight: 1 }}>
+                    {card.value}
                   </span>
-                  <span style={{ fontSize: "11px", color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {card.sub}
-                  </span>
+                  {card.badge && (
+                    <span 
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        padding: "3px 8px",
+                        borderRadius: "6px",
+                        backgroundColor: card.badgeBg || card.iconBg,
+                        color: card.badgeColor || card.iconColor,
+                        whiteSpace: "nowrap",
+                        lineHeight: 1.2
+                      }}
+                    >
+                      {card.badge}
+                    </span>
+                  )}
                 </div>
+
+                {/* Bottom: Clean Full-Width Subtitle */}
+                <p 
+                  style={{ 
+                    fontSize: "12px", 
+                    color: "#64748B", 
+                    margin: "10px 0 0 0", 
+                    lineHeight: 1.4,
+                    fontWeight: 500
+                  }}
+                >
+                  {card.sub}
+                </p>
               </div>
             </div>
           );

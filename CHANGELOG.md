@@ -28,6 +28,12 @@ Semua perubahan penting pada proyek **SIJAKON (Sistem Informasi Jasa Konstruksi)
   - Integrasi tombol **`[📗 Import Excel]`** dan `BatchImportModal` dengan `TEMPLATE_PELATIHAN`.
   - Integrasi tombol **`[📥 Export SIPJAKI]`** dengan format multi-sheet (Data, Petunjuk, & Kamus Data).
 
+### 🎨 Desain & UI/UX Refinement
+- **`src/app/(dashboard)/dashboard/page.tsx`**:
+  - Refaktor 4 kartu metrik utama (KPI Summary Cards) menerapkan **Opsi 1 (Inline Trend Pill & Full-Width Subtitle)**.
+  - Memindahkan badge tren ke samping angka utama (baseline alignment) dengan `white-space: nowrap` untuk mencegah badge terlipat 2 baris.
+  - Memberikan lebar 100% penuh untuk teks keterangan sub-kategori, meniadakan pemotongan teks terpotong (*truncation ellipsis* `...`), dan mengeliminasi redundansi kalimat.
+
 ---
 
 ## [v1.7.0] — 2026-10-18
