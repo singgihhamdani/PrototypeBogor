@@ -231,7 +231,7 @@ export default function AiCopilotDrawer() {
           }}
         >
           <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Sparkles style={{ width: isMounted && isMobile ? "18px" : "15px", height: isMounted && isMobile ? "18px" : "15px", color: "#FFC000" }} />
+            <Bot style={{ width: isMounted && isMobile ? "18px" : "16px", height: isMounted && isMobile ? "18px" : "16px", color: "#FFC000" }} />
             <span
               style={{
                 position: "absolute",
@@ -320,7 +320,7 @@ export default function AiCopilotDrawer() {
                   justifyContent: "center",
                 }}
               >
-                <Sparkles style={{ width: "18px", height: "18px", color: "#FFC000" }} />
+                <Bot style={{ width: "18px", height: "18px", color: "#FFC000" }} />
               </div>
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>

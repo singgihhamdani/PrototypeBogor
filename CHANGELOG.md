@@ -33,6 +33,10 @@ Semua perubahan penting pada proyek **SIJAKON (Sistem Informasi Jasa Konstruksi)
   - Refaktor 4 kartu metrik utama (KPI Summary Cards) menerapkan **Opsi 1 (Inline Trend Pill & Full-Width Subtitle)**.
   - Memindahkan badge tren ke samping angka utama (baseline alignment) dengan `white-space: nowrap` untuk mencegah badge terlipat 2 baris.
   - Memberikan lebar 100% penuh untuk teks keterangan sub-kategori, meniadakan pemotongan teks terpotong (*truncation ellipsis* `...`), dan mengeliminasi redundansi kalimat.
+  - Harmonisasi semantik icon: Mengganti icon lencana sesi dari `Sparkles` menjadi **`ShieldCheck`** (otoritas resmi dinas).
+- **`src/components/layout/topbar.tsx` & `src/components/common/ai-copilot-drawer.tsx`**:
+  - Mengganti icon AI Copilot dari `Sparkles` menjadi **`Bot`** (asisten cerdas analitik) pada topbar trigger, drawer header, dan floating action button (FAB).
+  - Mengganti icon Simulasi Role pada topbar switcher dari `Sparkles` menjadi **`Users`** (manajemen peran multi-persona) untuk menghilangkan benturan semantik ikon.
 
 ---
 

@@ -233,7 +233,7 @@ export default function DashboardPage() {
             </div>
 
             <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", backgroundColor: "rgba(255, 192, 0, 0.15)", padding: "6px 12px", fontSize: "11px", fontWeight: 800, color: "#FFC000", border: "1px solid rgba(255, 192, 0, 0.3)" }}>
-              <Sparkles style={{ width: "12px", height: "12px" }} />
+              <ShieldCheck style={{ width: "13px", height: "13px" }} />
               <span>Sesi: {user?.roleLabel || "Super Admin"} {user?.variantLabel ? `(${user.variantLabel})` : ""}</span>
             </div>
           </div>

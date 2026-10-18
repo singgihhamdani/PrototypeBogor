@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   Bell, Search, LogOut, User, ShieldCheck, 
-  Sparkles, RefreshCw, ChevronDown, Check, Building2, GraduationCap, Menu
+  Sparkles, RefreshCw, ChevronDown, Check, Building2, GraduationCap, Menu,
+  Bot, Users
 } from "lucide-react";
 import { useAuth, ROLE_CONFIGS, RoleCode } from "@/lib/mock-auth";
 import RoleSwitcherModal from "@/components/layout/role-switcher-modal";
@@ -149,7 +150,7 @@ export default function Topbar({ onMobileMenuClick }: TopbarProps = {}) {
               e.currentTarget.style.borderColor = "#E2E8F0";
             }}
           >
-            <Sparkles style={{ width: "13px", height: "13px", color: "#D97706" }} />
+            <Bot style={{ width: "13px", height: "13px", color: "#D97706" }} />
             {(!isMounted || !isMobile) ? (
               <>
                 <span>AI Copilot</span>
@@ -180,7 +181,7 @@ export default function Topbar({ onMobileMenuClick }: TopbarProps = {}) {
               transition: "transform 0.15s ease"
             }}
           >
-            <Sparkles style={{ width: "13px", height: "13px", color: "#FFC000" }} />
+            <Users style={{ width: "13px", height: "13px", color: "#FFC000" }} />
             {(!isMounted || !isMobile) && <span>Simulasi Role:</span>}
             <span
               style={{
