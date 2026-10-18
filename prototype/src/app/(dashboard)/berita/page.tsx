@@ -346,7 +346,7 @@ export default function BeritaPage() {
           </div>
 
           {/* News Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: "20px" }}>
             {filtered.map((item) => (
               <div 
                 key={item.id} 

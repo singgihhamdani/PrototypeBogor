@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { exportToSpreadsheet, exportToCSV, ExportColumn } from "@/lib/export-utils";
 import { SipjakiTemplate } from "@/lib/sipjaki-templates";
+import { useResponsive } from "@/lib/use-responsive";
 
 export interface ColumnDef<T> {
   key: string;
@@ -50,6 +51,7 @@ export default function DataTableView<T extends object>({
   sipjakiTemplate,
   hideExport = false
 }: DataTableViewProps<T>) {
+  const { isMobile, isMounted } = useResponsive();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -146,8 +148,8 @@ export default function DataTableView<T extends object>({
     <div
       style={{
         backgroundColor: "#FFFFFF",
-        borderRadius: "20px",
-        padding: "20px",
+        borderRadius: isMounted && isMobile ? "14px" : "20px",
+        padding: isMounted && isMobile ? "14px 12px" : "20px",
         border: "1px solid #E2E8F0",
         boxShadow: "0 4px 16px rgba(15, 46, 92, 0.03)",
         display: "flex",
@@ -305,8 +307,28 @@ export default function DataTableView<T extends object>({
         )}
       </div>
 
+      {/* Mobile Scroll Hint */}
+      {isMounted && isMobile && (
+        <div 
+          style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "space-between", 
+            padding: "6px 10px", 
+            backgroundColor: "#F8FAFC", 
+            borderRadius: "8px", 
+            border: "1px dashed #CBD5E1", 
+            fontSize: "11px", 
+            color: "#64748B" 
+          }}
+        >
+          <span>↔ Geser tabel ke samping untuk melihat kolom lengkap</span>
+          <span style={{ fontWeight: 800, color: "#0F2E5C", whiteSpace: "nowrap" }}>{columns.length} Kolom</span>
+        </div>
+      )}
+
       {/* Main Table */}
-      <div style={{ overflowX: "auto" }}>
+      <div className="custom-touch-scroll" style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 6px" }}>
           <thead>
             <tr style={{ backgroundColor: "#F8FAFC" }}>
@@ -465,50 +487,51 @@ export default function DataTableView<T extends object>({
       <div
         style={{
           display: "flex",
-          alignItems: "center",
+          alignItems: isMounted && isMobile ? "stretch" : "center",
           justifyContent: "space-between",
-          flexWrap: "wrap",
+          flexDirection: isMounted && isMobile ? "column" : "row",
           gap: "12px",
           paddingTop: "12px",
           borderTop: "1px solid #F1F5F9"
         }}
       >
         {/* Left: Row per page selector & Info */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "11px", color: "#64748B" }}>Tampilkan:</span>
-          <select
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            style={{
-              height: "32px",
-              borderRadius: "8px",
-              border: "1px solid #CBD5E1",
-              padding: "0 8px",
-              fontSize: "11px",
-              fontWeight: 700,
-              color: "#0F2E5C",
-              backgroundColor: "#FFFFFF",
-              outline: "none"
-            }}
-          >
-            {pageSizeOptions.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt} Baris
-              </option>
-            ))}
-          </select>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: isMounted && isMobile ? "space-between" : "flex-start", flexWrap: "wrap", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "11px", color: "#64748B" }}>Tampilkan:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              style={{
+                height: "34px",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                padding: "0 8px",
+                fontSize: "11px",
+                fontWeight: 700,
+                color: "#0F2E5C",
+                backgroundColor: "#FFFFFF",
+                outline: "none"
+              }}
+            >
+              {pageSizeOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt} Baris
+                </option>
+              ))}
+            </select>
+          </div>
 
           <span style={{ fontSize: "11px", color: "#64748B" }}>
-            Menampilkan <b>{sortedData.length > 0 ? startIndex + 1 : 0}</b> -{" "}
-            <b>{Math.min(startIndex + pageSize, sortedData.length)}</b> dari <b>{sortedData.length}</b> data
+            <b>{sortedData.length > 0 ? startIndex + 1 : 0}</b>-<b>{Math.min(startIndex + pageSize, sortedData.length)}</b> dari <b>{sortedData.length}</b>
           </span>
         </div>
 
         {/* Right: Page Buttons */}
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: isMounted && isMobile ? "center" : "flex-end", flexWrap: "wrap", gap: "4px" }}>
           <button
             type="button"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

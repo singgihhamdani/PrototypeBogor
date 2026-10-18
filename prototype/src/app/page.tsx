@@ -67,7 +67,7 @@ const NAV_LINKS = [
       { label: "Profil 40 OPD", href: "/profil-opd", desc: "Kepatuhan pengawasan OPD pelaksana teknis se-Kabupaten" },
       { label: "Pelaporan SIPJAKI PUPR", href: "/pelaporan", desc: "Sinkronisasi 5 pilar pembinaan ke Kementerian PUPR" },
       { label: "Pencatatan K3 Konstruksi", href: "/kecelakaan", desc: "Monitoring zero fatal accident & kepatuhan SMKK daerah" },
-      { label: "Regulasi & Dasar Hukum", href: "/regulasi", desc: "UU No. 2/2017, PP 14/2021 & pedoman peraturan daerah" },
+      { label: "Regulasi & Dasar Hukum", href: "/regulasi", desc: "UU No. 2/2017 jo. UU 6/2023, PP 22/2020, Permen PUPR 1/2023, Perda Jabar 6/2024 & SE Dirjen 299/2025" },
     ]
   },
   { label: "Berita", href: "#news" },
@@ -412,12 +412,12 @@ export default function HomePage() {
                 onClick={() => setMobileMenuOpen(true)}
                 className="homepage-mobile-toggle"
                 style={{
-                  fontSize: "1.5rem",
                   color: scrolled ? "#FFFFFF" : "#1E293B",
                   cursor: "pointer",
                   background: "none",
                   border: "none",
-                  display: "none",
+                  padding: "6px",
+                  borderRadius: "8px",
                 }}
                 aria-label="Buka Menu"
               >
@@ -432,20 +432,24 @@ export default function HomePage() {
       </div>
 
       {/* Mobile Drawer */}
-      <div style={{
-        position: "fixed",
-        top: 0,
-        right: mobileMenuOpen ? 0 : "-100%",
-        width: "100%",
-        height: "100%",
-        background: "#1B3061",
-        zIndex: 9800,
-        transition: "0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-        padding: "80px 30px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 18,
-      }}>
+      <div 
+        className="custom-touch-scroll"
+        style={{
+          position: "fixed",
+          top: 0,
+          right: mobileMenuOpen ? 0 : "-100%",
+          width: "100%",
+          height: "100%",
+          background: "#1B3061",
+          zIndex: 9800,
+          transition: "0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          padding: "70px 24px 30px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+          overflowY: "auto"
+        }}
+      >
         <button
           onClick={() => setMobileMenuOpen(false)}
           style={{ position: "absolute", top: 20, right: 20, color: "white", fontSize: "2rem", cursor: "pointer", background: "none", border: "none" }}
@@ -458,22 +462,41 @@ export default function HomePage() {
           <span style={{ color: "#E2E8F0", fontSize: "0.82rem", fontWeight: 700 }}>SIPJAKI Online • 40 Kecamatan</span>
         </div>
         {NAV_LINKS.map((link, i) => (
-          <a
-            key={i}
-            href={link.href}
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              color: "white",
-              fontSize: "1.1rem",
-              fontWeight: 700,
-              textDecoration: "none",
-              textTransform: "uppercase",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
-              paddingBottom: 8,
-            }}
-          >
-            {link.label}
-          </a>
+          <div key={i} style={{ display: "flex", flexDirection: "column", gap: 6, borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: 10 }}>
+            <a
+              href={link.href}
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                color: link.active ? "#FFC000" : "white",
+                fontSize: "1.05rem",
+                fontWeight: 700,
+                textDecoration: "none",
+                textTransform: "uppercase",
+              }}
+            >
+              {link.label}
+            </a>
+            {link.dropdown && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 4, paddingLeft: 12 }}>
+                {link.dropdown.map((sub, sIdx) => (
+                  <a
+                    key={sIdx}
+                    href={sub.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      color: "rgba(255, 255, 255, 0.75)",
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                      textDecoration: "none",
+                      padding: "3px 0"
+                    }}
+                  >
+                    • {sub.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
         <Link
           href={user ? targetRoute : "/login"}
@@ -498,7 +521,7 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════════════════════════
           HERO SECTION (With Counter Animation & Leaflet Interactive Map)
           ═══════════════════════════════════════════════════════════════════ */}
-      <section style={{ paddingTop: 148, paddingBottom: 60, background: "#FFFFFF", position: "relative" }}>
+      <section className="homepage-hero-section" style={{ paddingTop: 148, paddingBottom: 60, background: "#FFFFFF", position: "relative" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 20px" }}>
           {/* Header Title */}
           <div style={{ textAlign: "center", maxWidth: 920, margin: "0 auto 36px" }}>

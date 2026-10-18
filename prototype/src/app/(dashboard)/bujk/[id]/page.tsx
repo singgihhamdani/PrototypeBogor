@@ -99,7 +99,7 @@ export default function BUJKDetailPage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* Info grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: "16px" }}>
         <div 
           style={{
             borderRadius: "18px",

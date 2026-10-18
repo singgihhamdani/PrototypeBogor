@@ -84,3 +84,6 @@ extracted_*.txt
 
 # ---- Vercel ----
 .vercel
+
+# ---- Heavy Media / Presentation Files ----
+*.pptx

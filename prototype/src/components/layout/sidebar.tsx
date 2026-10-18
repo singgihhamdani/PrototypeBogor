@@ -7,10 +7,11 @@ import {
   Package, Landmark, FileBarChart, BookOpen, Newspaper, Settings,
   ChevronLeft, ChevronRight, ShieldAlert, ArrowUpRight, ChevronDown,
   Briefcase, Cog, HeartHandshake, Layers, HardHat, FileSpreadsheet,
-  CheckCircle2, LucideIcon
+  CheckCircle2, LucideIcon, X
 } from "lucide-react";
 import Logo, { BrandIcon } from "@/components/ui/logo";
 import { useAuth, ROLE_CONFIGS, RoleCode } from "@/lib/mock-auth";
+import { useResponsive } from "@/lib/use-responsive";
 
 export interface NavChildItem {
   label: string;
@@ -194,11 +195,16 @@ const navSections: NavSection[] = [
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { isMobile, isMounted } = useResponsive();
+  const isMobileDrawer = isMounted && isMobile;
+  const effectiveCollapsed = isMobileDrawer ? false : collapsed;
 
   const currentRole = user?.role || "SUPER_ADMIN";
   const roleConfig = ROLE_CONFIGS[currentRole];
@@ -211,6 +217,13 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     "sipjaki-master": false,
     "pelatihan-tkk": false
   });
+
+  // Auto-close drawer on route change on mobile
+  useEffect(() => {
+    if (isMobileDrawer && mobileOpen && onMobileClose) {
+      onMobileClose();
+    }
+  }, [pathname]);
 
   // Auto-expand group jika user sedang berada di route child-nya
   useEffect(() => {
@@ -235,6 +248,12 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     }));
   };
 
+  const handleNavClick = () => {
+    if (isMobileDrawer && onMobileClose) {
+      onMobileClose();
+    }
+  };
+
   // Filter items berdasarkan role
   const isItemVisible = (item: { allowedRoles?: RoleCode[]; allowedVariants?: string[] }) => {
     if (item.allowedRoles && !item.allowedRoles.includes(currentRole)) {
@@ -249,427 +268,516 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   };
 
   return (
-    <aside
-      style={{
-        position: "fixed",
-        left: 0,
-        top: 0,
-        zIndex: 40,
-        height: "100vh",
-        width: collapsed ? "72px" : "270px",
-        display: "flex",
-        flexDirection: "column",
-        borderRight: "1px solid #E2E8F0",
-        backgroundColor: "#FFFFFF",
-        transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        boxShadow: "2px 0 10px rgba(0, 0, 0, 0.03)"
-      }}
-    >
-      {/* Logo Header */}
-      <div
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isMobileDrawer && (
+        <div
+          onClick={onMobileClose}
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(15, 23, 42, 0.6)",
+            backdropFilter: "blur(4px)",
+            zIndex: 49,
+            opacity: mobileOpen ? 1 : 0,
+            pointerEvents: mobileOpen ? "auto" : "none",
+            transition: "opacity 0.25s ease"
+          }}
+        />
+      )}
+
+      <aside
+        className={`app-sidebar ${isMobileDrawer && mobileOpen ? "sidebar-drawer-enter" : ""}`}
         style={{
-          height: "64px",
+          position: "fixed",
+          left: 0,
+          top: 0,
+          zIndex: isMobileDrawer ? 50 : 40,
+          height: "100vh",
+          width: isMobileDrawer ? "290px" : (collapsed ? "72px" : "270px"),
+          maxWidth: "85vw",
           display: "flex",
-          alignItems: "center",
-          justifyContent: collapsed ? "center" : "space-between",
-          padding: "0 16px",
-          borderBottom: "1px solid #E2E8F0",
-          backgroundColor: "#0F2E5C",
-          color: "#FFFFFF",
-          flexShrink: 0
+          flexDirection: "column",
+          borderRight: "1px solid #E2E8F0",
+          backgroundColor: "#FFFFFF",
+          transition: isMobileDrawer
+            ? "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+            : "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          transform: isMobileDrawer
+            ? (mobileOpen ? "translateX(0)" : "translateX(-100%)")
+            : "none",
+          boxShadow: isMobileDrawer && mobileOpen
+            ? "6px 0 28px rgba(0, 0, 0, 0.25)"
+            : "2px 0 10px rgba(0, 0, 0, 0.03)",
+          pointerEvents: isMobileDrawer && !mobileOpen ? "none" : "auto"
         }}
       >
-        {!collapsed ? (
-          <Link href="/dashboard" style={{ display: "inline-flex", textDecoration: "none" }}>
-            <Logo size={36} theme="dark" subtitle="DPU KAB. BOGOR" />
-          </Link>
-        ) : (
-          <Link href="/dashboard" style={{ display: "inline-flex", textDecoration: "none" }}>
-            <BrandIcon size={32} bgBadge />
-          </Link>
-        )}
-      </div>
-
-      {/* Role Badge Indicator */}
-      {!collapsed && user && (
+        {/* Logo Header */}
         <div
           style={{
-            padding: "8px 14px",
-            backgroundColor: "#F8FAFC",
-            borderBottom: "1px solid #E2E8F0",
+            height: "64px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: effectiveCollapsed ? "center" : "space-between",
+            padding: "0 16px",
+            borderBottom: "1px solid #E2E8F0",
+            backgroundColor: "#0F2E5C",
+            color: "#FFFFFF",
             flexShrink: 0
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-            <span style={{ fontSize: "9px", color: "#64748B", fontWeight: 800, textTransform: "uppercase" }}>
-              Peran Aktif:
-            </span>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
-              <span
-                style={{
-                  fontSize: "11px",
-                  fontWeight: 800,
-                  backgroundColor: roleConfig?.badgeBg || "#0F2E5C",
-                  color: roleConfig?.badgeText || "#FFFFFF",
-                  padding: "1px 8px",
-                  borderRadius: "9999px",
-                  whiteSpace: "nowrap"
-                }}
-              >
-                {user.roleLabel || currentRole}
-              </span>
-            </div>
-          </div>
+          {!effectiveCollapsed ? (
+            <Link href="/dashboard" onClick={handleNavClick} style={{ display: "inline-flex", textDecoration: "none" }}>
+              <Logo size={36} theme="dark" subtitle="DPU KAB. BOGOR" />
+            </Link>
+          ) : (
+            <Link href="/dashboard" style={{ display: "inline-flex", textDecoration: "none" }}>
+              <BrandIcon size={32} bgBadge />
+            </Link>
+          )}
+
+          {isMobileDrawer && onMobileClose && (
+            <button
+              onClick={onMobileClose}
+              aria-label="Tutup Menu"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "34px",
+                height: "34px",
+                borderRadius: "8px",
+                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                color: "#FFFFFF",
+                border: "none",
+                cursor: "pointer",
+                transition: "background-color 0.15s ease"
+              }}
+            >
+              <X style={{ width: "18px", height: "18px" }} />
+            </button>
+          )}
         </div>
-      )}
 
-      {/* Nav List */}
-      <nav
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "10px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px"
-        }}
-      >
-        {navSections.map((section, sIdx) => {
-          const visibleItems = section.items.filter(isItemVisible);
-          if (visibleItems.length === 0) return null;
-
-          return (
-            <div key={sIdx} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              {/* Section Header Label */}
-              {!collapsed && (
-                <div
+        {/* Role Badge Indicator */}
+        {!effectiveCollapsed && user && (
+          <div
+            style={{
+              padding: "8px 14px",
+              backgroundColor: "#F8FAFC",
+              borderBottom: "1px solid #E2E8F0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexShrink: 0
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+              <span style={{ fontSize: "9px", color: "#64748B", fontWeight: 800, textTransform: "uppercase" }}>
+                Peran Aktif:
+              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
+                <span
                   style={{
-                    padding: "6px 8px 3px 8px",
-                    fontSize: "10px",
+                    fontSize: "11px",
                     fontWeight: 800,
-                    color: "#94A3B8",
-                    letterSpacing: "0.5px",
-                    textTransform: "uppercase"
+                    backgroundColor: roleConfig?.badgeBg || "#0F2E5C",
+                    color: roleConfig?.badgeText || "#FFFFFF",
+                    padding: "1px 8px",
+                    borderRadius: "9999px",
+                    whiteSpace: "nowrap"
                   }}
                 >
-                  {section.sectionTitle}
-                </div>
-              )}
+                  {user.roleLabel || currentRole}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
-              {visibleItems.map((item) => {
-                const Icon = item.icon;
-                const hasChildren = item.children && item.children.length > 0;
-                const isGroupOpen = !!openGroups[item.id];
+        {/* Nav List */}
+        <nav
+          className="custom-touch-scroll"
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "10px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px"
+          }}
+        >
+          {navSections.map((section, sIdx) => {
+            const visibleItems = section.items.filter(isItemVisible);
+            if (visibleItems.length === 0) return null;
 
-                // Direct active hanya aktif jika exact match atau subpath yang benar-benar miliknya (bukan overlap /pengawasan dengan /pengawasan/tertib-*)
-                const isDirectActive = item.href 
-                  ? (item.href === "/pengawasan" 
-                      ? pathname === "/pengawasan" 
-                      : pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`)))
-                  : false;
+            return (
+              <div key={sIdx} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                {/* Section Header Label */}
+                {!effectiveCollapsed && (
+                  <div
+                    style={{
+                      padding: "6px 8px 3px 8px",
+                      fontSize: "10px",
+                      fontWeight: 800,
+                      color: "#94A3B8",
+                      letterSpacing: "0.5px",
+                      textTransform: "uppercase"
+                    }}
+                  >
+                    {section.sectionTitle}
+                  </div>
+                )}
 
-                const isChildActive = Boolean(
-                  hasChildren &&
-                  item.children?.some(
-                    (c) => pathname === c.href || (c.href !== "/" && (pathname.startsWith(`${c.href}/`) || pathname.startsWith(c.href)))
-                  )
-                );
-                const isActive = isDirectActive || isChildActive;
+                {visibleItems.map((item) => {
+                  const Icon = item.icon;
+                  const hasChildren = item.children && item.children.length > 0;
+                  const isGroupOpen = !!openGroups[item.id];
 
-                if (!hasChildren) {
-                  return (
-                    <Link
-                      key={item.id}
-                      href={item.href || "#"}
-                      title={collapsed ? item.label : undefined}
-                      style={{
-                        position: "relative",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        borderRadius: "10px",
-                        padding: "8px 10px",
-                        fontSize: "12px",
-                        fontWeight: 700,
-                        textDecoration: "none",
-                        transition: "all 0.15s ease",
-                        backgroundColor: isActive ? "#0F2E5C" : "transparent",
-                        color: isActive ? "#FFFFFF" : "#475569"
-                      }}
-                    >
-                      <Icon
-                        style={{
-                          width: "17px",
-                          height: "17px",
-                          flexShrink: 0,
-                          color: isActive ? "#FFC000" : "#64748B"
-                        }}
-                      />
-                      {!collapsed && <span style={{ flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.label}</span>}
-                      {!collapsed && item.badge && (
-                        <span
-                          style={{
-                            marginLeft: "auto",
-                            display: "flex",
-                            height: "18px",
-                            minWidth: "18px",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            borderRadius: "9999px",
-                            fontSize: "10px",
-                            fontWeight: 800,
-                            padding: "0 6px",
-                            backgroundColor: isActive ? "#FFC000" : "#EF4444",
-                            color: isActive ? "#0F2E5C" : "#FFFFFF"
-                          }}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                      {isActive && (
-                        <span
-                          style={{
-                            position: "absolute",
-                            left: 0,
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            height: "20px",
-                            width: "3px",
-                            borderTopRightRadius: "3px",
-                            borderBottomRightRadius: "3px",
-                            backgroundColor: "#FFC000"
-                          }}
-                        />
-                      )}
-                    </Link>
+                  const isDirectActive = item.href 
+                    ? (item.href === "/pengawasan" 
+                        ? pathname === "/pengawasan" 
+                        : pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`)))
+                    : false;
+
+                  const isChildActive = Boolean(
+                    hasChildren &&
+                    item.children?.some(
+                      (c) => pathname === c.href || (c.href !== "/" && (pathname.startsWith(`${c.href}/`) || pathname.startsWith(c.href)))
+                    )
                   );
-                }
+                  const isActive = isDirectActive || isChildActive;
 
-                // If item has children (Accordion group)
-                return (
-                  <div key={item.id} style={{ display: "flex", flexDirection: "column" }}>
-                    <div
-                      onClick={() => {
-                        if (collapsed) {
-                          onToggle();
-                        }
-                        toggleGroup(item.id);
-                      }}
-                      title={collapsed ? item.label : undefined}
-                      style={{
-                        position: "relative",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        borderRadius: "10px",
-                        padding: "8px 10px",
-                        fontSize: "12px",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        userSelect: "none",
-                        transition: "all 0.15s ease",
-                        backgroundColor: isActive && !isGroupOpen ? "#EBF2FA" : isGroupOpen ? "#F8FAFC" : "transparent",
-                        color: isActive ? "#0F2E5C" : "#475569"
-                      }}
-                    >
-                      <Icon
+                  if (!hasChildren) {
+                    return (
+                      <Link
+                        key={item.id}
+                        href={item.href || "#"}
+                        onClick={handleNavClick}
+                        title={effectiveCollapsed ? item.label : undefined}
                         style={{
-                          width: "17px",
-                          height: "17px",
-                          flexShrink: 0,
-                          color: isActive ? "#0F2E5C" : "#64748B"
-                        }}
-                      />
-                      {!collapsed && (
-                        <span style={{ flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {item.label}
-                        </span>
-                      )}
-                      {!collapsed && item.badge && (
-                        <span
-                          style={{
-                            marginRight: "4px",
-                            display: "flex",
-                            height: "16px",
-                            padding: "0 5px",
-                            alignItems: "center",
-                            borderRadius: "9999px",
-                            fontSize: "9px",
-                            fontWeight: 800,
-                            backgroundColor: "#FEF3C7",
-                            color: "#92400E"
-                          }}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                      {!collapsed && (
-                        <ChevronDown
-                          style={{
-                            width: "14px",
-                            height: "14px",
-                            color: "#94A3B8",
-                            transition: "transform 0.2s ease",
-                            transform: isGroupOpen ? "rotate(180deg)" : "rotate(0deg)"
-                          }}
-                        />
-                      )}
-                    </div>
-
-                    {/* Submenu child items */}
-                    {!collapsed && isGroupOpen && (
-                      <div
-                        style={{
+                          position: "relative",
                           display: "flex",
-                          flexDirection: "column",
-                          gap: "1px",
-                          paddingLeft: "26px",
-                          marginTop: "2px",
-                          marginBottom: "4px",
-                          borderLeft: "2px solid #E2E8F0",
-                          marginLeft: "18px"
+                          alignItems: "center",
+                          gap: "10px",
+                          borderRadius: "10px",
+                          padding: "8px 10px",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          textDecoration: "none",
+                          transition: "all 0.15s ease",
+                          backgroundColor: isActive ? "#0F2E5C" : "transparent",
+                          color: isActive ? "#FFFFFF" : "#475569"
                         }}
                       >
-                        {item.children?.map((child, cIdx) => {
-                          const isChildCurrent =
-                            pathname === child.href ||
-                            (pathname.startsWith(`${child.href}/`) &&
-                              !item.children?.some(
-                                (other) =>
-                                  other.href !== child.href &&
-                                  other.href.startsWith(`${child.href}/`) &&
-                                  (pathname === other.href || pathname.startsWith(`${other.href}/`))
-                              ));
+                        <Icon
+                          style={{
+                            width: "17px",
+                            height: "17px",
+                            flexShrink: 0,
+                            color: isActive ? "#FFC000" : "#64748B"
+                          }}
+                        />
+                        {!effectiveCollapsed && <span style={{ flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.label}</span>}
+                        {!effectiveCollapsed && item.badge && (
+                          <span
+                            style={{
+                              marginLeft: "auto",
+                              display: "flex",
+                              height: "18px",
+                              minWidth: "18px",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: "9999px",
+                              fontSize: "10px",
+                              fontWeight: 800,
+                              padding: "0 6px",
+                              backgroundColor: isActive ? "#FFC000" : "#EF4444",
+                              color: isActive ? "#0F2E5C" : "#FFFFFF"
+                            }}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                        {isActive && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: 0,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              height: "20px",
+                              width: "3px",
+                              borderTopRightRadius: "3px",
+                              borderBottomRightRadius: "3px",
+                              backgroundColor: "#FFC000"
+                            }}
+                          />
+                        )}
+                      </Link>
+                    );
+                  }
 
-                          return (
-                            <Link
-                              key={cIdx}
-                              href={child.href}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                borderRadius: "8px",
-                                padding: "6px 10px",
-                                fontSize: "11px",
-                                fontWeight: isChildCurrent ? 800 : 600,
-                                textDecoration: "none",
-                                transition: "all 0.15s ease",
-                                backgroundColor: isChildCurrent ? "#0F2E5C" : "transparent",
-                                color: isChildCurrent ? "#FFFFFF" : "#64748B"
-                              }}
-                            >
-                              <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                {child.label}
-                              </span>
-                              {child.badge && (
-                                <span
-                                  style={{
-                                    fontSize: "9px",
-                                    fontWeight: 700,
-                                    padding: "1px 5px",
-                                    borderRadius: "4px",
-                                    backgroundColor: isChildCurrent ? "rgba(255,255,255,0.2)" : "#F1F5F9",
-                                    color: isChildCurrent ? "#FFFFFF" : "#475569"
-                                  }}
-                                >
-                                  {child.badge}
-                                </span>
-                              )}
-                            </Link>
-                          );
-                        })}
+                  // If item has children (Accordion group)
+                  return (
+                    <div key={item.id} style={{ display: "flex", flexDirection: "column" }}>
+                      <div
+                        onClick={() => {
+                          if (effectiveCollapsed) {
+                            onToggle();
+                          }
+                          toggleGroup(item.id);
+                        }}
+                        title={effectiveCollapsed ? item.label : undefined}
+                        style={{
+                          position: "relative",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          borderRadius: "10px",
+                          padding: "8px 10px",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          userSelect: "none",
+                          transition: "all 0.15s ease",
+                          backgroundColor: isActive && !isGroupOpen ? "#EBF2FA" : isGroupOpen ? "#F8FAFC" : "transparent",
+                          color: isActive ? "#0F2E5C" : "#475569"
+                        }}
+                      >
+                        <Icon
+                          style={{
+                            width: "17px",
+                            height: "17px",
+                            flexShrink: 0,
+                            color: isActive ? "#0F2E5C" : "#64748B"
+                          }}
+                        />
+                        {!effectiveCollapsed && (
+                          <span style={{ flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {item.label}
+                          </span>
+                        )}
+                        {!effectiveCollapsed && item.badge && (
+                          <span
+                            style={{
+                              marginRight: "4px",
+                              display: "flex",
+                              height: "16px",
+                              padding: "0 5px",
+                              alignItems: "center",
+                              borderRadius: "9999px",
+                              fontSize: "9px",
+                              fontWeight: 800,
+                              backgroundColor: "#FEF3C7",
+                              color: "#92400E"
+                            }}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                        {!effectiveCollapsed && (
+                          <ChevronDown
+                            style={{
+                              width: "14px",
+                              height: "14px",
+                              color: "#94A3B8",
+                              transition: "transform 0.2s ease",
+                              transform: isGroupOpen ? "rotate(180deg)" : "rotate(0deg)"
+                            }}
+                          />
+                        )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
-      </nav>
 
-      {/* Public Home portal link */}
-      <div style={{ padding: "0 10px 8px 10px" }}>
-        <Link
-          href="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            borderRadius: "10px",
-            padding: collapsed ? "8px 0" : "8px 10px",
-            justifyContent: collapsed ? "center" : "flex-start",
-            fontSize: "11px",
-            fontWeight: 700,
-            color: "#0F2E5C",
-            backgroundColor: "#F1F5F9",
-            border: "1px solid #E2E8F0",
-            textDecoration: "none"
-          }}
-          title="Buka Beranda Publik"
-        >
-          <ArrowUpRight style={{ width: "15px", height: "15px", color: "#2563EB", flexShrink: 0 }} />
-          {!collapsed && <span>Portal Beranda Publik</span>}
-        </Link>
-      </div>
+                      {/* Submenu child items */}
+                      {!effectiveCollapsed && isGroupOpen && (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "1px",
+                            paddingLeft: "26px",
+                            marginTop: "2px",
+                            marginBottom: "4px",
+                            borderLeft: "2px solid #E2E8F0",
+                            marginLeft: "18px"
+                          }}
+                        >
+                          {item.children?.map((child, cIdx) => {
+                            const isChildCurrent =
+                              pathname === child.href ||
+                              (pathname.startsWith(`${child.href}/`) &&
+                                !item.children?.some(
+                                  (other) =>
+                                    other.href !== child.href &&
+                                    other.href.startsWith(`${child.href}/`) &&
+                                    (pathname === other.href || pathname.startsWith(`${other.href}/`))
+                                ));
 
-      {/* Gateway status */}
-      {!collapsed && (
-        <div
-          style={{
-            margin: "0 10px 10px 10px",
-            padding: "8px 10px",
-            borderRadius: "10px",
-            backgroundColor: "#F8FAFC",
-            border: "1px solid #E2E8F0",
-            fontSize: "10px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between"
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: 700, color: "#1E293B" }}>
-            <span style={{ height: "6px", width: "6px", borderRadius: "9999px", backgroundColor: "#10B981" }} />
-            <span>SIPJAKI Sync</span>
-          </div>
-          <span style={{ fontSize: "10px", color: "#10B981", fontWeight: 800 }}>Aktif</span>
+                            return (
+                              <Link
+                                key={cIdx}
+                                href={child.href}
+                                onClick={handleNavClick}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  borderRadius: "8px",
+                                  padding: "6px 10px",
+                                  fontSize: "11px",
+                                  fontWeight: isChildCurrent ? 800 : 600,
+                                  textDecoration: "none",
+                                  transition: "all 0.15s ease",
+                                  backgroundColor: isChildCurrent ? "#0F2E5C" : "transparent",
+                                  color: isChildCurrent ? "#FFFFFF" : "#64748B"
+                                }}
+                              >
+                                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {child.label}
+                                </span>
+                                {child.badge && (
+                                  <span
+                                    style={{
+                                      fontSize: "9px",
+                                      fontWeight: 700,
+                                      padding: "1px 5px",
+                                      borderRadius: "4px",
+                                      backgroundColor: isChildCurrent ? "rgba(255,255,255,0.2)" : "#F1F5F9",
+                                      color: isChildCurrent ? "#FFFFFF" : "#475569"
+                                    }}
+                                  >
+                                    {child.badge}
+                                  </span>
+                                )}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* Public Home portal link */}
+        <div style={{ padding: "0 10px 8px 10px" }}>
+          <Link
+            href="/"
+            onClick={handleNavClick}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "10px",
+              padding: effectiveCollapsed ? "8px 0" : "8px 10px",
+              justifyContent: effectiveCollapsed ? "center" : "flex-start",
+              fontSize: "11px",
+              fontWeight: 700,
+              color: "#0F2E5C",
+              backgroundColor: "#F1F5F9",
+              border: "1px solid #E2E8F0",
+              textDecoration: "none"
+            }}
+            title="Buka Beranda Publik"
+          >
+            <ArrowUpRight style={{ width: "15px", height: "15px", color: "#2563EB", flexShrink: 0 }} />
+            {!effectiveCollapsed && <span>Portal Beranda Publik</span>}
+          </Link>
         </div>
-      )}
 
-      {/* Toggle button */}
-      <div
-        style={{
-          borderTop: "1px solid #E2E8F0",
-          padding: "8px",
-          backgroundColor: "#F8FAFC",
-          flexShrink: 0
-        }}
-      >
-        <button
-          onClick={onToggle}
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "6px",
-            borderRadius: "8px",
-            padding: "6px",
-            fontSize: "11px",
-            fontWeight: 700,
-            color: "#64748B",
-            backgroundColor: "transparent",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
-          {collapsed ? <ChevronRight style={{ width: "16px", height: "16px" }} /> : <><ChevronLeft style={{ width: "16px", height: "16px" }} /><span>Ciutkan Menu</span></>}
-        </button>
-      </div>
-    </aside>
+        {/* Gateway status */}
+        {!effectiveCollapsed && (
+          <div
+            style={{
+              margin: "0 10px 10px 10px",
+              padding: "8px 10px",
+              borderRadius: "10px",
+              backgroundColor: "#F8FAFC",
+              border: "1px solid #E2E8F0",
+              fontSize: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: 700, color: "#1E293B" }}>
+              <span style={{ height: "6px", width: "6px", borderRadius: "9999px", backgroundColor: "#10B981" }} />
+              <span>SIPJAKI Sync</span>
+            </div>
+            <span style={{ fontSize: "10px", color: "#10B981", fontWeight: 800 }}>Aktif</span>
+          </div>
+        )}
+
+        {/* Toggle / Close footer */}
+        {!isMobileDrawer ? (
+          <div
+            style={{
+              borderTop: "1px solid #E2E8F0",
+              padding: "8px",
+              backgroundColor: "#F8FAFC",
+              flexShrink: 0
+            }}
+          >
+            <button
+              onClick={onToggle}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                borderRadius: "8px",
+                padding: "6px",
+                fontSize: "11px",
+                fontWeight: 700,
+                color: "#64748B",
+                backgroundColor: "transparent",
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              {collapsed ? <ChevronRight style={{ width: "16px", height: "16px" }} /> : <><ChevronLeft style={{ width: "16px", height: "16px" }} /><span>Ciutkan Menu</span></>}
+            </button>
+          </div>
+        ) : (
+          <div
+            style={{
+              borderTop: "1px solid #E2E8F0",
+              padding: "10px",
+              backgroundColor: "#F8FAFC",
+              flexShrink: 0
+            }}
+          >
+            <button
+              onClick={onMobileClose}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                borderRadius: "8px",
+                padding: "8px",
+                fontSize: "12px",
+                fontWeight: 700,
+                color: "#64748B",
+                backgroundColor: "#F1F5F9",
+                border: "1px solid #E2E8F0",
+                cursor: "pointer"
+              }}
+            >
+              <X style={{ width: "15px", height: "15px" }} />
+              <span>Tutup Menu</span>
+            </button>
+          </div>
+        )}
+      </aside>
+    </>
   );
 }
+

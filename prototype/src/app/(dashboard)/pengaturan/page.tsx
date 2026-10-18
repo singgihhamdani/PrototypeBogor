@@ -19,6 +19,7 @@ import {
   TEMPLATE_PELAKSANAAN,
   TEMPLATE_REKOMENDASI 
 } from "@/lib/sipjaki-templates";
+import { useResponsive } from "@/lib/use-responsive";
 
 const RESOURCES = [
   "DASHBOARD", "BUJK", "SBU", "PROJECT", "SUPERVISION", 
@@ -75,6 +76,7 @@ const INITIAL_ROLE_PERMS: Record<RoleCode, Set<string>> = {
 };
 
 export default function PengaturanPage() {
+  const { isMobile, isMounted } = useResponsive();
   const [activeTab, setActiveTab] = useState<"template" | "users" | "rbac" | "general">("rbac");
 
   // RBAC State
@@ -377,7 +379,13 @@ export default function PengaturanPage() {
           )}
 
           {/* Matrix Grid */}
-          <div style={{ overflowX: "auto" }}>
+          {isMounted && isMobile && (
+            <div style={{ padding: "8px 12px", backgroundColor: "#EFF6FF", borderRadius: "8px", border: "1px solid #BFDBFE", display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#1E3A8A", fontWeight: 700 }}>
+              <span>↔</span>
+              <span>Geser tabel ke samping untuk melihat seluruh 7 kolom hak akses (Action)</span>
+            </div>
+          )}
+          <div className="custom-touch-scroll" style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px", textAlign: "center" }}>
               <thead>
                 <tr style={{ backgroundColor: "#0F2E5C", color: "#FFFFFF" }}>

@@ -3,14 +3,21 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   Bell, Search, LogOut, User, ShieldCheck, 
-  Sparkles, RefreshCw, ChevronDown, Check, Building2, GraduationCap
+  Sparkles, RefreshCw, ChevronDown, Check, Building2, GraduationCap, Menu
 } from "lucide-react";
 import { useAuth, ROLE_CONFIGS, RoleCode } from "@/lib/mock-auth";
 import RoleSwitcherModal from "@/components/layout/role-switcher-modal";
+import { useResponsive } from "@/lib/use-responsive";
+import { openAiCopilot } from "@/components/common/ai-copilot-drawer";
 
-export default function Topbar() {
+interface TopbarProps {
+  onMobileMenuClick?: () => void;
+}
+
+export default function Topbar({ onMobileMenuClick }: TopbarProps = {}) {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const { isMobile, isMounted } = useResponsive();
   const [showUser, setShowUser] = useState(false);
   const [showSwitcher, setShowSwitcher] = useState(false);
 
@@ -29,72 +36,142 @@ export default function Topbar() {
           position: "sticky",
           top: 0,
           zIndex: 30,
-          height: "64px",
+          height: isMounted && isMobile ? "56px" : "64px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           borderBottom: "1px solid #E2E8F0",
           backgroundColor: "rgba(255, 255, 255, 0.95)",
           backdropFilter: "blur(8px)",
-          padding: "0 28px",
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.02)"
+          padding: isMounted && isMobile ? "0 12px" : "0 28px",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.02)",
+          transition: "padding 0.2s ease, height 0.2s ease"
         }}
       >
-        {/* Search Bar */}
-        <div style={{ position: "relative", width: "100%", maxWidth: "380px" }}>
-          <Search style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94A3B8" }} />
-          <input
-            type="text"
-            placeholder="Cari nomor kontrak, BUJK, NIB... (Ctrl+K)"
-            style={{
-              width: "100%",
-              height: "38px",
-              borderRadius: "12px",
-              border: "1px solid #E2E8F0",
-              backgroundColor: "#F8FAFC",
-              paddingLeft: "40px",
-              paddingRight: "60px",
-              fontSize: "12px",
-              color: "#1E293B",
-              outline: "none"
-            }}
-          />
-          <kbd 
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              height: "20px",
-              display: "inline-flex",
-              alignItems: "center",
-              borderRadius: "6px",
-              border: "1px solid #E2E8F0",
-              backgroundColor: "#F1F5F9",
-              padding: "0 6px",
-              fontSize: "10px",
-              fontWeight: 700,
-              color: "#64748B"
-            }}
-          >
-            Ctrl K
-          </kbd>
+        {/* Left Side: Hamburger (Mobile) + Search Bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0, maxWidth: isMounted && isMobile ? "240px" : "380px" }}>
+          {/* Hamburger Menu on Mobile */}
+          {isMounted && isMobile && onMobileMenuClick && (
+            <button
+              onClick={onMobileMenuClick}
+              aria-label="Buka Menu"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "36px",
+                height: "36px",
+                borderRadius: "10px",
+                backgroundColor: "#F1F5F9",
+                border: "1px solid #E2E8F0",
+                color: "#0F2E5C",
+                cursor: "pointer",
+                flexShrink: 0
+              }}
+            >
+              <Menu style={{ width: "20px", height: "20px" }} />
+            </button>
+          )}
+
+          {/* Search Bar */}
+          <div style={{ position: "relative", width: "100%" }}>
+            <Search style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", width: "15px", height: "15px", color: "#94A3B8" }} />
+            <input
+              type="text"
+              placeholder={isMounted && isMobile ? "Cari..." : "Cari nomor kontrak, BUJK, NIB... (Ctrl+K)"}
+              style={{
+                width: "100%",
+                height: "36px",
+                borderRadius: "10px",
+                border: "1px solid #E2E8F0",
+                backgroundColor: "#F8FAFC",
+                paddingLeft: "34px",
+                paddingRight: isMounted && isMobile ? "12px" : "60px",
+                fontSize: "12px",
+                color: "#1E293B",
+                outline: "none"
+              }}
+            />
+            {(!isMounted || !isMobile) && (
+              <kbd 
+                style={{
+                  position: "absolute",
+                  right: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  height: "20px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  borderRadius: "6px",
+                  border: "1px solid #E2E8F0",
+                  backgroundColor: "#F1F5F9",
+                  padding: "0 6px",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  color: "#64748B"
+                }}
+              >
+                Ctrl K
+              </kbd>
+            )}
+          </div>
         </div>
 
         {/* Right Side Controls */}
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "16px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: isMounted && isMobile ? "8px" : "10px", marginLeft: "8px", flexShrink: 0 }}>
           
-          {/* Quick Role Switcher Trigger Button */}
+          {/* Seamless AI Copilot Trigger in Topbar */}
           <button
-            onClick={() => setShowSwitcher(true)}
+            type="button"
+            onClick={openAiCopilot}
+            title="Buka SIJAKON AI Copilot (Pintasan: Ctrl + /)"
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: "8px",
+              gap: "6px",
+              borderRadius: "9999px",
+              backgroundColor: "#F8FAFC",
+              border: "1px solid #E2E8F0",
+              padding: isMounted && isMobile ? "5px 9px" : "6px 12px",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#0F2E5C",
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04)",
+              transition: "all 0.15s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#EBF2FA";
+              e.currentTarget.style.borderColor = "#93C5FD";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#F8FAFC";
+              e.currentTarget.style.borderColor = "#E2E8F0";
+            }}
+          >
+            <Sparkles style={{ width: "13px", height: "13px", color: "#D97706" }} />
+            {(!isMounted || !isMobile) ? (
+              <>
+                <span>AI Copilot</span>
+                <kbd style={{ fontSize: "9.5px", color: "#64748B", backgroundColor: "#EDE9FE", padding: "1px 4px", borderRadius: "4px" }}>Ctrl /</kbd>
+              </>
+            ) : (
+              <span>AI</span>
+            )}
+          </button>
+
+          {/* Quick Role Switcher Trigger Button */}
+          <button
+            onClick={() => setShowSwitcher(true)}
+            title="Ganti Simulasi Role"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: isMounted && isMobile ? "4px" : "8px",
               borderRadius: "9999px",
               backgroundColor: "#0F2E5C",
               border: "1px solid #FFC000",
-              padding: "6px 14px",
+              padding: isMounted && isMobile ? "5px 9px" : "6px 14px",
               fontSize: "12px",
               fontWeight: 800,
               color: "#FFFFFF",
@@ -103,13 +180,13 @@ export default function Topbar() {
               transition: "transform 0.15s ease"
             }}
           >
-            <Sparkles style={{ width: "14px", height: "14px", color: "#FFC000" }} />
-            <span>Simulasi Role:</span>
+            <Sparkles style={{ width: "13px", height: "13px", color: "#FFC000" }} />
+            {(!isMounted || !isMobile) && <span>Simulasi Role:</span>}
             <span
               style={{
                 backgroundColor: "#FFC000",
                 color: "#0F2E5C",
-                padding: "2px 8px",
+                padding: "2px 7px",
                 borderRadius: "9999px",
                 fontSize: "11px",
                 fontWeight: 900
@@ -120,23 +197,25 @@ export default function Topbar() {
             <ChevronDown style={{ width: "12px", height: "12px", color: "#FFC000" }} />
           </button>
 
-          {/* SIPJAKI National Sync Badge */}
-          <div 
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              borderRadius: "9999px",
-              backgroundColor: "#EBF2FA",
-              border: "1px solid rgba(15, 46, 92, 0.15)",
-              padding: "4px 12px",
-              fontSize: "11px"
-            }}
-          >
-            <span style={{ height: "7px", width: "7px", borderRadius: "9999px", backgroundColor: "#10B981" }} />
-            <span style={{ fontWeight: 800, color: "#0F2E5C" }}>SIPJAKI</span>
-            <span style={{ fontSize: "10px", color: "#64748B" }}>Aktif</span>
-          </div>
+          {/* SIPJAKI National Sync Badge - Desktop only */}
+          {(!isMounted || !isMobile) && (
+            <div 
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                borderRadius: "9999px",
+                backgroundColor: "#EBF2FA",
+                border: "1px solid rgba(15, 46, 92, 0.15)",
+                padding: "4px 12px",
+                fontSize: "11px"
+              }}
+            >
+              <span style={{ height: "7px", width: "7px", borderRadius: "9999px", backgroundColor: "#10B981" }} />
+              <span style={{ fontWeight: 800, color: "#0F2E5C" }}>SIPJAKI</span>
+              <span style={{ fontSize: "10px", color: "#64748B" }}>Aktif</span>
+            </div>
+          )}
 
           {/* Notifications */}
           <button 
@@ -177,7 +256,7 @@ export default function Topbar() {
             </span>
           </button>
 
-          <div style={{ height: "24px", width: "1px", backgroundColor: "#E2E8F0" }} />
+          <div style={{ height: "20px", width: "1px", backgroundColor: "#E2E8F0" }} />
 
           {/* User profile dropdown */}
           <div style={{ position: "relative" }}>
@@ -186,9 +265,9 @@ export default function Topbar() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
+                gap: "8px",
                 borderRadius: "10px",
-                padding: "4px 8px",
+                padding: isMounted && isMobile ? "2px" : "4px 8px",
                 backgroundColor: "transparent",
                 border: "none",
                 cursor: "pointer"
@@ -212,14 +291,16 @@ export default function Topbar() {
               >
                 {user?.name ? user.name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() : "AD"}
               </div>
-              <div style={{ textAlign: "left", lineHeight: 1.2 }}>
-                <span style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {user?.name || "Admin DPU"}
-                </span>
-                <span style={{ display: "block", fontSize: "10px", fontWeight: 600, color: "#64748B" }}>
-                  {user?.roleLabel || "Super Admin"}
-                </span>
-              </div>
+              {(!isMounted || !isMobile) && (
+                <div style={{ textAlign: "left", lineHeight: 1.2 }}>
+                  <span style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {user?.name || "Admin DPU"}
+                  </span>
+                  <span style={{ display: "block", fontSize: "10px", fontWeight: 600, color: "#64748B" }}>
+                    {user?.roleLabel || "Super Admin"}
+                  </span>
+                </div>
+              )}
             </button>
 
             {showUser && (

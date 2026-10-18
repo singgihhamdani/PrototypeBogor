@@ -85,3 +85,105 @@ body {
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE RESPONSIVE UTILITIES & ANIMATIONS
+   ───────────────────────────────────────────────────────────── */
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideOutLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+.sidebar-drawer-enter {
+  animation: slideInLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (max-width: 767px) {
+  .mobile-hidden {
+    display: none !important;
+  }
+  .mobile-block {
+    display: block !important;
+  }
+  .mobile-flex {
+    display: flex !important;
+  }
+  .mobile-w-full {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .mobile-col {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .mobile-p-3 {
+    padding: 12px !important;
+  }
+  .mobile-p-4 {
+    padding: 16px !important;
+  }
+  .mobile-text-sm {
+    font-size: 13px !important;
+  }
+  .mobile-gap-2 {
+    gap: 8px !important;
+  }
+  .dashboard-content-wrapper {
+    margin-left: 0 !important;
+  }
+  .dashboard-main-content {
+    padding: 14px 12px !important;
+  }
+  /* Ensure dialog and modals fit small mobile screens */
+  .responsive-modal-container {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 8px !important;
+    border-radius: 16px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .desktop-hidden {
+    display: none !important;
+  }
+}
+
+/* Horizontal scroll styling and touch responsiveness */
+.custom-touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* Homepage navigation responsive rules */
+@media (max-width: 960px) {
+  .homepage-nav-desktop {
+    display: none !important;
+  }
+  .homepage-mobile-toggle {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+@media (min-width: 961px) {
+  .homepage-mobile-toggle {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .homepage-hero-section {
+    padding-top: 115px !important;
+    padding-bottom: 36px !important;
+  }
+}
+
+
+

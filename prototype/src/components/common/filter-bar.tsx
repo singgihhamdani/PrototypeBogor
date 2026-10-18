@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Search, Filter, RotateCcw, X } from "lucide-react";
+import { useResponsive } from "@/lib/use-responsive";
 
 export interface ProvinceCityData {
   province: string;
@@ -101,6 +102,7 @@ export default function FilterBar({
   years = ["2026", "2025", "2024", "2023"],
   statuses = ["Semua", "Terverifikasi", "Menunggu Verifikasi", "Ditolak"]
 }: FilterBarProps) {
+  const { isMobile, isMounted } = useResponsive();
   // Cascading cities based on current selected province
   const currentProvinceData = INDONESIA_PROVINCES.find((p) => p.province === values.province);
   const availableCities = currentProvinceData ? currentProvinceData.cities : [];
@@ -157,7 +159,7 @@ export default function FilterBar({
       style={{
         backgroundColor: "#FFFFFF",
         borderRadius: "16px",
-        padding: "16px",
+        padding: isMounted && isMobile ? "12px" : "16px",
         border: "1px solid #E2E8F0",
         display: "flex",
         flexDirection: "column",
@@ -168,13 +170,13 @@ export default function FilterBar({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gridTemplateColumns: isMounted && isMobile ? "1fr" : "repeat(auto-fit, minmax(180px, 1fr))",
           gap: "12px",
           alignItems: "flex-end"
         }}
       >
         {/* Search Input */}
-        <div style={{ minWidth: "220px" }}>
+        <div style={{ minWidth: isMounted && isMobile ? "0px" : "220px" }}>
           <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", marginBottom: "4px" }}>
             Pencarian
           </label>
@@ -187,7 +189,7 @@ export default function FilterBar({
               onChange={handleSearchChange}
               style={{
                 width: "100%",
-                height: "38px",
+                height: isMounted && isMobile ? "42px" : "38px",
                 borderRadius: "10px",
                 border: "1px solid #CBD5E1",
                 paddingLeft: "32px",
@@ -231,7 +233,7 @@ export default function FilterBar({
               onChange={handleProvinceChange}
               style={{
                 width: "100%",
-                height: "38px",
+                height: isMounted && isMobile ? "42px" : "38px",
                 borderRadius: "10px",
                 border: "1px solid #CBD5E1",
                 padding: "0 10px",
@@ -264,7 +266,7 @@ export default function FilterBar({
               disabled={!values.province}
               style={{
                 width: "100%",
-                height: "38px",
+                height: isMounted && isMobile ? "42px" : "38px",
                 borderRadius: "10px",
                 border: "1px solid #CBD5E1",
                 padding: "0 10px",
@@ -299,7 +301,7 @@ export default function FilterBar({
               onChange={handleYearChange}
               style={{
                 width: "100%",
-                height: "38px",
+                height: isMounted && isMobile ? "42px" : "38px",
                 borderRadius: "10px",
                 border: "1px solid #CBD5E1",
                 padding: "0 10px",
@@ -331,7 +333,7 @@ export default function FilterBar({
               onChange={handleStatusChange}
               style={{
                 width: "100%",
-                height: "38px",
+                height: isMounted && isMobile ? "42px" : "38px",
                 borderRadius: "10px",
                 border: "1px solid #CBD5E1",
                 padding: "0 10px",
@@ -358,7 +360,7 @@ export default function FilterBar({
             onClick={handleReset}
             disabled={!hasActiveFilters}
             style={{
-              height: "38px",
+              height: isMounted && isMobile ? "42px" : "38px",
               width: "100%",
               display: "inline-flex",
               alignItems: "center",

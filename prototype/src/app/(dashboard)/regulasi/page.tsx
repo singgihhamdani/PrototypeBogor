@@ -3,12 +3,14 @@ import React, { useState } from "react";
 import { 
   BookOpen, Search, Download, Calendar, FileText, 
   Plus, CheckCircle2, Eye, Trash2, ShieldCheck, 
-  Layers, Filter, ArrowUpRight
+  Layers, Filter, ArrowUpRight, Scale, ExternalLink,
+  CheckCircle, AlertCircle, Building2, HardHat
 } from "lucide-react";
 import regulationsData from "@/data/regulations.json";
 import DataTableView, { ColumnDef } from "@/components/common/data-table-view";
 import ModalForm from "@/components/common/modal-form";
 import FileUploader from "@/components/common/file-uploader";
+import { useResponsive } from "@/lib/use-responsive";
 
 export interface RegulationItem {
   id: string;
@@ -17,18 +19,34 @@ export interface RegulationItem {
   year: number;
   title: string;
   summary: string;
+  policyMandate?: string;
+  relatedModules?: string[];
   fileSize: string;
   dateEnacted: string;
   status: "Berlaku" | "Diubah" | "Dicabut";
   downloadUrl?: string;
 }
 
-const initialRegulations: RegulationItem[] = (regulationsData as any[]).map((r, i) => ({
+const initialRegulations: RegulationItem[] = (regulationsData as any[]).map((r) => ({
   ...r,
-  status: "Berlaku"
+  status: r.status || "Berlaku"
 }));
 
+const CATEGORIES = [
+  "Semua",
+  "Undang-Undang",
+  "Peraturan Pemerintah",
+  "Peraturan Presiden",
+  "Peraturan Menteri PUPR",
+  "Peraturan Daerah Provinsi",
+  "Peraturan Daerah Kab. Bogor",
+  "Surat Edaran Dirjen",
+  "Surat Edaran Bupati",
+  "SOP & Pedoman Teknis"
+];
+
 export default function RegulasiPage() {
+  const { isMobile, isMounted } = useResponsive();
   const [regulations, setRegulations] = useState<RegulationItem[]>(initialRegulations);
   const [activeTab, setActiveTab] = useState<"katalog" | "cms">("katalog");
   const [search, setSearch] = useState("");
@@ -41,10 +59,12 @@ export default function RegulasiPage() {
   // Form State
   const [formData, setFormData] = useState({
     number: "",
-    category: "Peraturan Daerah",
+    category: "Peraturan Daerah Kab. Bogor",
     year: new Date().getFullYear(),
     title: "",
     summary: "",
+    policyMandate: "",
+    relatedModules: "Pengawasan 3 Tertib, Database BUJK",
     dateEnacted: new Date().toISOString().split("T")[0],
     status: "Berlaku" as "Berlaku" | "Diubah" | "Dicabut",
     uploadedFile: null as File | null
@@ -52,12 +72,32 @@ export default function RegulasiPage() {
 
   // Filter for Katalog
   const filtered = regulations.filter((r) => {
-    const matchSearch = r.title.toLowerCase().includes(search.toLowerCase()) || 
-                        r.number.toLowerCase().includes(search.toLowerCase()) ||
-                        r.summary.toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase();
+    const matchSearch = 
+      r.title.toLowerCase().includes(q) || 
+      r.number.toLowerCase().includes(q) ||
+      r.summary.toLowerCase().includes(q) ||
+      (r.policyMandate && r.policyMandate.toLowerCase().includes(q)) ||
+      (r.relatedModules && r.relatedModules.some(m => m.toLowerCase().includes(q)));
+      
     const matchCat = category === "Semua" || r.category === category;
     return matchSearch && matchCat;
   });
+
+  // Download Handler
+  const handleDownload = (reg: RegulationItem) => {
+    if (reg.downloadUrl) {
+      const link = document.createElement("a");
+      link.href = reg.downloadUrl;
+      link.download = `${reg.number.replace(/[/\\?%*:|"<>]/g, "-")}.pdf`;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      alert(`Mengunduh salinan berkas resmi ${reg.number} (${reg.fileSize})...\n\nDokumen resmi tersimpan dalam arsip hukum Sub-Urusan Jasa Konstruksi DPU Kab. Bogor.`);
+    }
+  };
 
   // Handle Upload Submission
   const handleUploadSubmit = (e: React.FormEvent) => {
@@ -72,6 +112,10 @@ export default function RegulasiPage() {
       ? `${(formData.uploadedFile.size / (1024 * 1024)).toFixed(1)} MB` 
       : "2.4 MB";
 
+    const modulesList = formData.relatedModules
+      ? formData.relatedModules.split(",").map(m => m.trim()).filter(Boolean)
+      : ["Pengawasan 3 Tertib"];
+
     const newReg: RegulationItem = {
       id: newId,
       category: formData.category,
@@ -79,6 +123,8 @@ export default function RegulasiPage() {
       year: Number(formData.year) || 2026,
       title: formData.title,
       summary: formData.summary,
+      policyMandate: formData.policyMandate || "Dasar kebijakan pembinaan dan pengawasan jasa konstruksi Kabupaten Bogor.",
+      relatedModules: modulesList,
       fileSize: fileSizeFormatted,
       dateEnacted: formData.dateEnacted,
       status: formData.status
@@ -89,10 +135,12 @@ export default function RegulasiPage() {
     // Reset
     setFormData({
       number: "",
-      category: "Peraturan Daerah",
+      category: "Peraturan Daerah Kab. Bogor",
       year: new Date().getFullYear(),
       title: "",
       summary: "",
+      policyMandate: "",
+      relatedModules: "Pengawasan 3 Tertib, Database BUJK",
       dateEnacted: new Date().toISOString().split("T")[0],
       status: "Berlaku",
       uploadedFile: null
@@ -120,30 +168,38 @@ export default function RegulasiPage() {
     {
       key: "number",
       label: "NOMOR & TAHUN",
-      width: "180px",
+      width: "200px",
       render: (row) => (
         <div>
           <span style={{ fontFamily: "monospace", fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "2px 6px", borderRadius: "4px" }}>
             {row.number}
           </span>
           <div style={{ fontSize: "10px", color: "#64748B", marginTop: "3px" }}>
-            Tahun {row.year}
+            Tahun {row.year} • {row.category}
           </div>
         </div>
       )
     },
     {
       key: "title",
-      label: "JUDUL & TENTANG REGULASI",
+      label: "JUDUL & DASAR KEBIJAKAN SISTEM",
       render: (row) => (
         <div>
           <div style={{ fontSize: "13px", fontWeight: 800, color: "#0F172A", lineHeight: 1.35 }}>
             {row.title}
           </div>
-          <div style={{ fontSize: "11px", color: "#64748B", marginTop: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ fontWeight: 700, color: "#0F2E5C" }}>{row.category}</span>
-            <span>•</span>
+          {row.policyMandate && (
+            <div style={{ fontSize: "11px", color: "#1E3A8A", backgroundColor: "#EFF6FF", padding: "4px 8px", borderRadius: "6px", marginTop: "5px", lineHeight: 1.4 }}>
+              <strong>Mandat:</strong> {row.policyMandate.length > 120 ? row.policyMandate.substring(0, 120) + "..." : row.policyMandate}
+            </div>
+          )}
+          <div style={{ fontSize: "10px", color: "#64748B", marginTop: "4px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
             <span>Berkas: {row.fileSize}</span>
+            {row.downloadUrl && (
+              <span style={{ color: "#166534", fontWeight: 700, backgroundColor: "#DCFCE7", padding: "1px 6px", borderRadius: "4px" }}>
+                ✓ Berkas Resmi Tersedia
+              </span>
+            )}
           </div>
         </div>
       )
@@ -161,8 +217,8 @@ export default function RegulasiPage() {
     },
     {
       key: "status",
-      label: "STATUS HUKUM",
-      width: "110px",
+      label: "STATUS",
+      width: "100px",
       align: "center",
       render: (row) => (
         <span
@@ -183,22 +239,38 @@ export default function RegulasiPage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-            <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-              <BookOpen style={{ width: "12px", height: "12px" }} /> Basis Hukum & Kebijakan SIPJAKI
+      {/* Header Banner */}
+      <div 
+        style={{ 
+          display: "flex", 
+          alignItems: "flex-start", 
+          justifyContent: "space-between", 
+          flexWrap: "wrap", 
+          gap: "16px",
+          backgroundColor: "#FFFFFF",
+          borderRadius: "16px",
+          border: "1px solid #E2E8F0",
+          padding: isMounted && isMobile ? "18px 16px" : "24px 28px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.03)"
+        }}
+      >
+        <div style={{ maxWidth: "800px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "4px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <Scale style={{ width: "13px", height: "13px" }} /> Landasan Kebijakan & Regulasi Hukum
             </span>
-            <span style={{ fontSize: "11px", fontWeight: 800, color: "#166534", backgroundColor: "#DCFCE7", padding: "3px 10px", borderRadius: "9999px" }}>
-              {regulations.filter(r => r.status === "Berlaku").length} Regulasi Berlaku
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#166534", backgroundColor: "#DCFCE7", padding: "4px 10px", borderRadius: "9999px" }}>
+              {regulations.filter(r => r.status === "Berlaku").length} Dokumen Berlaku Aktif
+            </span>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#92400E", backgroundColor: "#FEF3C7", padding: "4px 10px", borderRadius: "9999px" }}>
+              Rujukan KAK & Sub-Urusan Jasa Konstruksi
             </span>
           </div>
-          <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
-            Regulasi & Dasar Hukum Jasa Konstruksi
+          <h1 style={{ fontSize: isMounted && isMobile ? "20px" : "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
+            Dasar Kebijakan & Regulasi Jasa Konstruksi
           </h1>
-          <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
-            Himpunan peraturan perundang-undangan daerah dan nasional terkait tertib pembinaan dan pengawasan jasa konstruksi
+          <p style={{ fontSize: "13px", color: "#64748B", margin: "6px 0 0 0", lineHeight: 1.5 }}>
+            Himpunan peraturan perundang-undangan dari tingkat Undang-Undang, Peraturan Pemerintah, Permen PUPR, Perda Jawa Barat, hingga Perda & Surat Edaran Bupati Bogor yang menjadi landasan mandat operasional sistem SIJAKON.
           </p>
         </div>
 
@@ -246,7 +318,7 @@ export default function RegulasiPage() {
           }}
         >
           <BookOpen style={{ width: "14px", height: "14px" }} />
-          <span>Katalog Regulasi ({filtered.length})</span>
+          <span>Katalog & Dasar Kebijakan ({filtered.length})</span>
         </button>
 
         <button
@@ -268,7 +340,7 @@ export default function RegulasiPage() {
           }}
         >
           <Layers style={{ width: "14px", height: "14px" }} />
-          <span>Manajemen Master Regulasi ({regulations.length})</span>
+          <span>Kelola Master Regulasi ({regulations.length})</span>
         </button>
       </div>
 
@@ -284,19 +356,17 @@ export default function RegulasiPage() {
               padding: "16px 20px",
               boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
+              flexDirection: "column",
               gap: "14px"
             }}
           >
-            <div style={{ position: "relative", flex: 1, minWidth: "260px" }}>
+            <div style={{ position: "relative", width: "100%" }}>
               <Search style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94A3B8" }} />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cari nomor peraturan, judul regulasi, atau kata kunci..."
+                placeholder="Cari nomor peraturan, judul regulasi, kata kunci mandat, atau modul terkait..."
                 style={{
                   width: "100%",
                   height: "42px",
@@ -312,8 +382,21 @@ export default function RegulasiPage() {
               />
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#F1F5F9", padding: "4px", borderRadius: "10px", flexWrap: "wrap" }}>
-              {["Semua", "Peraturan Daerah", "Undang-Undang", "Peraturan Menteri PUPR", "Surat Edaran Bupati"].map((cat) => {
+            {/* Category Pills (Horizontal Scroll on Mobile) */}
+            <div 
+              style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "6px", 
+                backgroundColor: "#F8FAFC", 
+                padding: "6px", 
+                borderRadius: "10px", 
+                border: "1px solid #E2E8F0",
+                overflowX: "auto",
+                whiteSpace: "nowrap"
+              }}
+            >
+              {CATEGORIES.map((cat) => {
                 const isSelected = category === cat;
                 return (
                   <button
@@ -328,7 +411,8 @@ export default function RegulasiPage() {
                       cursor: "pointer",
                       backgroundColor: isSelected ? "#0F2E5C" : "transparent",
                       color: isSelected ? "#FFFFFF" : "#475569",
-                      transition: "all 0.15s ease"
+                      transition: "all 0.15s ease",
+                      flexShrink: 0
                     }}
                   >
                     {cat}
@@ -339,7 +423,7 @@ export default function RegulasiPage() {
           </div>
 
           {/* Regulations List */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             {filtered.map((reg) => (
               <div 
                 key={reg.id} 
@@ -347,17 +431,18 @@ export default function RegulasiPage() {
                   borderRadius: "16px",
                   border: "1px solid #E2E8F0",
                   backgroundColor: "#FFFFFF",
-                  padding: "22px 24px",
+                  padding: isMounted && isMobile ? "18px 16px" : "22px 24px",
                   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.03)",
                   display: "flex",
-                  alignItems: "center",
+                  flexDirection: isMounted && isMobile ? "column" : "row",
+                  alignItems: isMounted && isMobile ? "stretch" : "flex-start",
                   justifyContent: "space-between",
-                  flexWrap: "wrap",
                   gap: "18px",
                   transition: "border-color 0.15s ease"
                 }}
               >
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxWidth: "820px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", flex: 1 }}>
+                  {/* Meta Tag Line */}
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                     <span style={{ fontFamily: "monospace", fontSize: "11px", fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "3px 8px", borderRadius: "6px" }}>
                       {reg.number}
@@ -377,62 +462,136 @@ export default function RegulasiPage() {
                     >
                       {reg.status}
                     </span>
+                    {reg.downloadUrl && (
+                      <span style={{ fontSize: "10px", fontWeight: 800, color: "#1D4ED8", backgroundColor: "#EFF6FF", padding: "2px 8px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                        <CheckCircle style={{ width: "10px", height: "10px" }} /> Berkas Resmi
+                      </span>
+                    )}
                   </div>
-                  <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: 0, lineHeight: 1.35 }}>
+
+                  {/* Title */}
+                  <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#0F172A", margin: 0, lineHeight: 1.35 }}>
                     {reg.title}
                   </h3>
-                  <p style={{ fontSize: "12px", color: "#475569", margin: 0, lineHeight: 1.5 }}>
+
+                  {/* Summary */}
+                  <p style={{ fontSize: "12px", color: "#475569", margin: 0, lineHeight: 1.55 }}>
                     {reg.summary}
                   </p>
+
+                  {/* Policy Mandate Box (Highlights the Legal Rationale) */}
+                  {reg.policyMandate && (
+                    <div 
+                      style={{
+                        backgroundColor: "#F8FAFC",
+                        borderRadius: "10px",
+                        borderLeft: "4px solid #0F2E5C",
+                        borderTop: "1px solid #E2E8F0",
+                        borderRight: "1px solid #E2E8F0",
+                        borderBottom: "1px solid #E2E8F0",
+                        padding: "12px 14px"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                        <ShieldCheck style={{ width: "14px", height: "14px", color: "#0F2E5C" }} />
+                        <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", textTransform: "uppercase", letterSpacing: "0.4px" }}>
+                          Dasar Kebijakan & Mandat Sistem SIJAKON:
+                        </span>
+                      </div>
+                      <p style={{ fontSize: "12px", color: "#1E293B", margin: 0, lineHeight: 1.55 }}>
+                        {reg.policyMandate}
+                      </p>
+
+                      {/* Related Modules */}
+                      {reg.relatedModules && reg.relatedModules.length > 0 && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "8px", flexWrap: "wrap" }}>
+                          <span style={{ fontSize: "10px", fontWeight: 700, color: "#64748B" }}>Modul Terkait:</span>
+                          {reg.relatedModules.map((mod, idx) => (
+                            <span 
+                              key={idx}
+                              style={{
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                color: "#0F2E5C",
+                                backgroundColor: "#EBF2FA",
+                                padding: "2px 8px",
+                                borderRadius: "6px"
+                              }}
+                            >
+                              {mod}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <p style={{ fontSize: "11px", color: "#94A3B8", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
                     <Calendar style={{ width: "12px", height: "12px" }} /> Diundangkan: {reg.dateEnacted}
                   </p>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
-                  <span style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", fontWeight: 600 }}>{reg.fileSize}</span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedReg(reg)}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      borderRadius: "10px",
-                      backgroundColor: "#FFFFFF",
-                      color: "#0F2E5C",
-                      border: "1px solid #CBD5E1",
-                      padding: "8px 14px",
-                      fontSize: "12px",
-                      fontWeight: 800,
-                      cursor: "pointer"
-                    }}
-                  >
-                    <Eye style={{ width: "14px", height: "14px" }} />
-                    <span>Pratinjau</span>
-                  </button>
+                {/* Action Buttons */}
+                <div 
+                  style={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    gap: "10px", 
+                    flexShrink: 0,
+                    width: isMounted && isMobile ? "100%" : "auto",
+                    justifyContent: isMounted && isMobile ? "space-between" : "flex-end",
+                    borderTop: isMounted && isMobile ? "1px solid #F1F5F9" : "none",
+                    paddingTop: isMounted && isMobile ? "12px" : "0"
+                  }}
+                >
+                  <span style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", fontWeight: 600 }}>
+                    {reg.fileSize}
+                  </span>
+                  
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedReg(reg)}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        borderRadius: "10px",
+                        backgroundColor: "#FFFFFF",
+                        color: "#0F2E5C",
+                        border: "1px solid #CBD5E1",
+                        padding: "8px 14px",
+                        fontSize: "12px",
+                        fontWeight: 800,
+                        cursor: "pointer"
+                      }}
+                    >
+                      <Eye style={{ width: "14px", height: "14px" }} />
+                      <span>Detail</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => alert(`Mengunduh salinan berkas resmi ${reg.number} (PDF, ${reg.fileSize})...`)}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      borderRadius: "10px",
-                      backgroundColor: "#0F2E5C",
-                      color: "#FFFFFF",
-                      border: "none",
-                      padding: "9px 16px",
-                      fontSize: "12px",
-                      fontWeight: 800,
-                      cursor: "pointer",
-                      transition: "all 0.15s ease"
-                    }}
-                  >
-                    <Download style={{ width: "14px", height: "14px", color: "#FFC000" }} />
-                    <span>Unduh PDF</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDownload(reg)}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        borderRadius: "10px",
+                        backgroundColor: "#0F2E5C",
+                        color: "#FFFFFF",
+                        border: "none",
+                        padding: "9px 16px",
+                        fontSize: "12px",
+                        fontWeight: 800,
+                        cursor: "pointer",
+                        transition: "all 0.15s ease"
+                      }}
+                    >
+                      <Download style={{ width: "14px", height: "14px", color: "#FFC000" }} />
+                      <span>Unduh PDF</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -492,7 +651,7 @@ export default function RegulasiPage() {
               <button
                 type="button"
                 title="Unduh Salinan PDF"
-                onClick={() => alert(`Mengunduh berkas ${row.number}...`)}
+                onClick={() => handleDownload(row)}
                 style={{
                   padding: "6px",
                   borderRadius: "6px",
@@ -536,7 +695,7 @@ export default function RegulasiPage() {
         onSubmit={handleUploadSubmit}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMounted && isMobile ? "1fr" : "1.2fr 1fr", gap: "14px" }}>
             <div>
               <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "6px" }}>
                 Nomor Peraturan / Regulasi <span style={{ color: "#EF4444" }}>*</span>
@@ -572,17 +731,14 @@ export default function RegulasiPage() {
                   fontSize: "13px"
                 }}
               >
-                <option value="Peraturan Daerah">Peraturan Daerah (Perda)</option>
-                <option value="Undang-Undang">Undang-Undang (UU)</option>
-                <option value="Peraturan Pemerintah">Peraturan Pemerintah (PP)</option>
-                <option value="Peraturan Menteri PUPR">Peraturan Menteri PUPR</option>
-                <option value="Surat Edaran Bupati">Surat Edaran Bupati</option>
-                <option value="Keputusan Kepala Dinas">Keputusan Kepala Dinas</option>
+                {CATEGORIES.filter(c => c !== "Semua").map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
               </select>
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMounted && isMobile ? "1fr" : "1fr 1fr 1fr", gap: "14px" }}>
             <div>
               <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "6px" }}>
                 Tahun Terbit
@@ -663,11 +819,11 @@ export default function RegulasiPage() {
 
           <div>
             <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "6px" }}>
-              Ringkasan Kebijakan & Pokok Pengaturan <span style={{ color: "#EF4444" }}>*</span>
+              Ringkasan Pokok Pengaturan <span style={{ color: "#EF4444" }}>*</span>
             </label>
             <textarea
               required
-              rows={3}
+              rows={2}
               value={formData.summary}
               onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
               placeholder="Jelaskan ruang lingkup, sasaran kewajiban, dan substansi utama regulasi..."
@@ -678,6 +834,45 @@ export default function RegulasiPage() {
                 border: "1px solid #CBD5E1",
                 fontSize: "13px",
                 fontFamily: "inherit"
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "6px" }}>
+              Dasar Kebijakan & Mandat Sistem SIJAKON
+            </label>
+            <textarea
+              rows={2}
+              value={formData.policyMandate}
+              onChange={(e) => setFormData({ ...formData, policyMandate: e.target.value })}
+              placeholder="Jelaskan implikasi spesifik regulasi ini terhadap pembinaan DPU dan fitur SIJAKON..."
+              style={{
+                width: "100%",
+                padding: "9px 12px",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                fontSize: "13px",
+                fontFamily: "inherit"
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "6px" }}>
+              Modul Terkait di SIJAKON (pisahkan dengan koma)
+            </label>
+            <input
+              type="text"
+              placeholder="Contoh: Pengawasan 3 Tertib, Database BUJK, Pelatihan TKK"
+              value={formData.relatedModules}
+              onChange={(e) => setFormData({ ...formData, relatedModules: e.target.value })}
+              style={{
+                width: "100%",
+                padding: "9px 12px",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                fontSize: "13px"
               }}
             />
           </div>
@@ -707,69 +902,108 @@ export default function RegulasiPage() {
           hideFooter
         >
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: "12px", borderBottom: "1px solid #E2E8F0" }}>
-              <span
-                style={{
-                  fontSize: "11px",
-                  fontWeight: 800,
-                  padding: "4px 10px",
-                  borderRadius: "6px",
-                  backgroundColor: selectedReg.status === "Berlaku" ? "#DCFCE7" : "#FEF3C7",
-                  color: selectedReg.status === "Berlaku" ? "#166534" : "#92400E"
-                }}
-              >
-                Status: {selectedReg.status}
-              </span>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: "12px", borderBottom: "1px solid #E2E8F0", flexWrap: "wrap", gap: "8px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: 800,
+                    padding: "4px 10px",
+                    borderRadius: "6px",
+                    backgroundColor: selectedReg.status === "Berlaku" ? "#DCFCE7" : "#FEF3C7",
+                    color: selectedReg.status === "Berlaku" ? "#166534" : "#92400E"
+                  }}
+                >
+                  Status: {selectedReg.status}
+                </span>
+                {selectedReg.downloadUrl && (
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: "#1D4ED8", backgroundColor: "#EFF6FF", padding: "4px 10px", borderRadius: "6px" }}>
+                    ✓ Berkas Resmi Otentik
+                  </span>
+                )}
+              </div>
               <span style={{ fontSize: "12px", color: "#64748B" }}>
                 Diundangkan: {selectedReg.dateEnacted}
               </span>
             </div>
 
             <div>
-              <h4 style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: "0 0 8px 0", lineHeight: 1.4 }}>
+              <h4 style={{ fontSize: "16px", fontWeight: 800, color: "#0F172A", margin: "0 0 10px 0", lineHeight: 1.4 }}>
                 {selectedReg.title}
               </h4>
-              <div style={{ backgroundColor: "#F8FAFC", borderRadius: "10px", padding: "14px", border: "1px solid #E2E8F0" }}>
-                <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>
-                  Pokok-Pokok Pengaturan
+              
+              {/* Pokok Pengaturan */}
+              <div style={{ backgroundColor: "#F8FAFC", borderRadius: "10px", padding: "14px", border: "1px solid #E2E8F0", marginBottom: "12px" }}>
+                <span style={{ fontSize: "11px", fontWeight: 800, color: "#475569", textTransform: "uppercase", display: "block", marginBottom: "6px" }}>
+                  Ringkasan Pokok Pengaturan
                 </span>
-                <p style={{ fontSize: "12px", color: "#334155", margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: "12.5px", color: "#334155", margin: 0, lineHeight: 1.6 }}>
                   {selectedReg.summary}
                 </p>
               </div>
+
+              {/* Dasar Kebijakan & Mandat Sistem */}
+              {selectedReg.policyMandate && (
+                <div style={{ backgroundColor: "#EFF6FF", borderRadius: "10px", padding: "16px", border: "1px solid #BFDBFE" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <ShieldCheck style={{ width: "16px", height: "16px", color: "#1E3A8A" }} />
+                    <span style={{ fontSize: "12px", fontWeight: 800, color: "#1E3A8A", textTransform: "uppercase" }}>
+                      Dasar Kebijakan & Mandat Sistem SIJAKON:
+                    </span>
+                  </div>
+                  <p style={{ fontSize: "12.5px", color: "#1E293B", margin: 0, lineHeight: 1.65 }}>
+                    {selectedReg.policyMandate}
+                  </p>
+
+                  {selectedReg.relatedModules && selectedReg.relatedModules.length > 0 && (
+                    <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1px dashed #93C5FD", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <span style={{ fontSize: "11px", fontWeight: 700, color: "#1E3A8A" }}>
+                        Modul & Fitur yang Terikat:
+                      </span>
+                      {selectedReg.relatedModules.map((m, idx) => (
+                        <span key={idx} style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C", backgroundColor: "#FFFFFF", padding: "3px 8px", borderRadius: "6px", border: "1px solid #CBD5E1" }}>
+                          {m}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            <div style={{ padding: "14px", borderRadius: "10px", backgroundColor: "#EFF6FF", border: "1px dashed #93C5FD", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            {/* Document Download Box */}
+            <div style={{ padding: "14px", borderRadius: "10px", backgroundColor: "#F8FAFC", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <FileText style={{ width: "24px", height: "24px", color: "#1D4ED8" }} />
+                <FileText style={{ width: "26px", height: "26px", color: "#0F2E5C" }} />
                 <div>
-                  <div style={{ fontSize: "12px", fontWeight: 800, color: "#1E3A8A" }}>
-                    Salinan Dokumen Lembaran Daerah (PDF)
+                  <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F172A" }}>
+                    Salinan Dokumen Lembaran Resmi (PDF)
                   </div>
                   <div style={{ fontSize: "11px", color: "#64748B" }}>
-                    Ukuran Berkas: {selectedReg.fileSize} • Terverifikasi Otentik
+                    Ukuran Berkas: {selectedReg.fileSize} {selectedReg.downloadUrl ? "• Berkas Asli Tersimpan di Server" : "• Arsip Legal Dinas PU"}
                   </div>
                 </div>
               </div>
+
               <button
                 type="button"
-                onClick={() => alert(`Mengunduh dokumen ${selectedReg.number}...`)}
+                onClick={() => handleDownload(selectedReg)}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",
-                  padding: "8px 14px",
+                  padding: "8px 16px",
                   borderRadius: "8px",
                   backgroundColor: "#0F2E5C",
                   color: "#FFFFFF",
                   border: "none",
-                  fontSize: "11px",
+                  fontSize: "12px",
                   fontWeight: 800,
                   cursor: "pointer"
                 }}
               >
-                <Download style={{ width: "13px", height: "13px", color: "#FFC000" }} />
-                <span>Unduh</span>
+                <Download style={{ width: "14px", height: "14px", color: "#FFC000" }} />
+                <span>Unduh Salinan PDF</span>
               </button>
             </div>
 

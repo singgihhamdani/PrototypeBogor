@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
+import { useResponsive } from "@/lib/use-responsive";
 
 export interface ModalFormProps {
   isOpen: boolean;
@@ -33,6 +34,8 @@ export default function ModalForm({
   headerBg = "#0F2E5C",
   hideFooter = false
 }: ModalFormProps) {
+  const { isMobile, isMounted } = useResponsive();
+
   // Close on ESC
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -53,7 +56,15 @@ export default function ModalForm({
   if (!isOpen) return null;
 
   const maxWidth =
-    size === "sm" ? "420px" : size === "lg" ? "740px" : size === "xl" ? "920px" : "560px";
+    isMounted && isMobile
+      ? "100%"
+      : size === "sm"
+      ? "420px"
+      : size === "lg"
+      ? "740px"
+      : size === "xl"
+      ? "920px"
+      : "560px";
 
   const content = (
     <div
@@ -62,11 +73,11 @@ export default function ModalForm({
         inset: 0,
         zIndex: 50,
         display: "flex",
-        alignItems: "center",
+        alignItems: isMounted && isMobile ? "flex-end" : "center",
         justifyContent: "center",
         backgroundColor: "rgba(15, 23, 42, 0.6)",
         backdropFilter: "blur(4px)",
-        padding: "16px"
+        padding: isMounted && isMobile ? "0" : "16px"
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget && !isLoading) {
@@ -75,15 +86,16 @@ export default function ModalForm({
       }}
     >
       <div
+        className="responsive-modal-container"
         style={{
           backgroundColor: "#FFFFFF",
-          borderRadius: "20px",
+          borderRadius: isMounted && isMobile ? "20px 20px 0 0" : "20px",
           width: "100%",
           maxWidth,
           boxShadow: "0 24px 48px -12px rgba(15, 46, 92, 0.25)",
           display: "flex",
           flexDirection: "column",
-          maxHeight: "90vh",
+          maxHeight: isMounted && isMobile ? "92vh" : "90vh",
           overflow: "hidden",
           animation: "modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
         }}
@@ -162,8 +174,9 @@ export default function ModalForm({
             }}
           >
             <div
+              className="custom-touch-scroll"
               style={{
-                padding: "20px 24px",
+                padding: isMounted && isMobile ? "16px 14px" : "20px 24px",
                 overflowY: "auto",
                 flex: 1,
                 display: "flex",
@@ -177,12 +190,12 @@ export default function ModalForm({
             {!hideFooter && (
               <div
                 style={{
-                  padding: "14px 24px",
+                  padding: isMounted && isMobile ? "12px 14px" : "14px 24px",
                   borderTop: "1px solid #E2E8F0",
                   backgroundColor: "#F8FAFC",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "flex-end",
+                  justifyContent: isMounted && isMobile ? "stretch" : "flex-end",
                   gap: "10px",
                   flexShrink: 0
                 }}
@@ -192,7 +205,8 @@ export default function ModalForm({
                   onClick={onClose}
                   disabled={isLoading}
                   style={{
-                    padding: "9px 18px",
+                    flex: isMounted && isMobile ? 1 : "initial",
+                    padding: "10px 18px",
                     borderRadius: "10px",
                     backgroundColor: "#FFFFFF",
                     border: "1px solid #CBD5E1",
@@ -208,7 +222,8 @@ export default function ModalForm({
                   type="submit"
                   disabled={isLoading}
                   style={{
-                    padding: "9px 20px",
+                    flex: isMounted && isMobile ? 1.4 : "initial",
+                    padding: "10px 20px",
                     borderRadius: "10px",
                     backgroundColor: "#0F2E5C",
                     border: "none",
@@ -218,6 +233,7 @@ export default function ModalForm({
                     cursor: isLoading ? "not-allowed" : "pointer",
                     display: "inline-flex",
                     alignItems: "center",
+                    justifyContent: "center",
                     gap: "6px",
                     boxShadow: "0 2px 6px rgba(15, 46, 92, 0.2)"
                   }}
@@ -230,8 +246,9 @@ export default function ModalForm({
           </form>
         ) : (
           <div
+            className="custom-touch-scroll"
             style={{
-              padding: "20px 24px",
+              padding: isMounted && isMobile ? "16px 14px" : "20px 24px",
               overflowY: "auto",
               flex: 1
             }}

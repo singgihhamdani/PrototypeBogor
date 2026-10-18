@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { ChevronRight, ArrowLeft, Download, Plus, Filter, ShieldCheck, Sparkles } from "lucide-react";
+import { useResponsive } from "@/lib/use-responsive";
 
 export interface BreadcrumbItem {
   label: string;
@@ -37,6 +38,7 @@ export default function ModuleHeader({
   actionButtons,
   backHref
 }: ModuleHeaderProps) {
+  const { isMobile, isMounted } = useResponsive();
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "8px" }}>
       {/* Breadcrumb line */}
@@ -106,7 +108,7 @@ export default function ModuleHeader({
           gap: "16px" 
         }}
       >
-        <div style={{ flex: 1, minWidth: "280px" }}>
+        <div style={{ flex: 1, minWidth: isMounted && isMobile ? "0px" : "280px" }}>
           <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
             {badgeText && (
               <span 
@@ -145,7 +147,7 @@ export default function ModuleHeader({
           
           <h1 
             style={{ 
-              fontSize: "24px", 
+              fontSize: isMounted && isMobile ? "20px" : "24px", 
               fontWeight: 900, 
               color: "#0F172A", 
               margin: 0, 
@@ -156,7 +158,7 @@ export default function ModuleHeader({
           </h1>
 
           {description && (
-            <p style={{ fontSize: "13px", color: "#64748B", margin: "6px 0 0 0", maxWidth: "800px", lineHeight: 1.5 }}>
+            <p style={{ fontSize: isMounted && isMobile ? "12px" : "13px", color: "#64748B", margin: "6px 0 0 0", maxWidth: "800px", lineHeight: 1.5 }}>
               {description}
             </p>
           )}
@@ -164,7 +166,7 @@ export default function ModuleHeader({
 
         {/* Action Buttons */}
         {actionButtons && actionButtons.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px", width: isMounted && isMobile ? "100%" : "auto" }}>
             {actionButtons.map((btn, idx) => {
               const Icon = btn.icon;
               const isPrimary = btn.variant === "primary";
@@ -175,7 +177,7 @@ export default function ModuleHeader({
                 alignItems: "center",
                 gap: "8px",
                 borderRadius: "10px",
-                padding: "8px 16px",
+                padding: isMounted && isMobile ? "8px 12px" : "8px 16px",
                 fontSize: "12px",
                 fontWeight: 700,
                 cursor: "pointer",

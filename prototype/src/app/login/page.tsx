@@ -9,6 +9,7 @@ import {
   ArrowLeft, Home
 } from "lucide-react";
 import Logo, { BrandIcon } from "@/components/ui/logo";
+import { useResponsive } from "@/lib/use-responsive";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@sijakon.bogor.go.id");
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const [selectedDemoUser, setSelectedDemoUser] = useState("superadmin");
   const { login } = useAuth();
   const router = useRouter();
+  const { isMobile, isMounted } = useResponsive();
 
   const handleSelectDemo = (usernameKey: string) => {
     setSelectedDemoUser(usernameKey);
@@ -62,7 +64,7 @@ export default function LoginPage() {
           width: "100%",
           backgroundColor: "#0F2E5C",
           borderBottom: "4px solid #FFC000",
-          padding: "12px 24px",
+          padding: isMounted && isMobile ? "10px 14px" : "12px 24px",
           boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
         }}
       >
@@ -73,7 +75,7 @@ export default function LoginPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: "16px"
+            gap: "12px"
           }}
         >
           {/* Clickable Brand Logo to Homepage */}
@@ -83,7 +85,7 @@ export default function LoginPage() {
             style={{ 
               display: "flex", 
               alignItems: "center", 
-              gap: "14px", 
+              gap: "10px", 
               textDecoration: "none",
               cursor: "pointer",
               transition: "transform 0.2s ease" 
@@ -91,12 +93,12 @@ export default function LoginPage() {
             onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.01)"}
             onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
           >
-            <BrandIcon size={38} bgBadge />
+            <BrandIcon size={isMounted && isMobile ? 32 : 38} bgBadge />
 
             <div style={{ display: "flex", flexDirection: "column" }}>
               <span 
                 style={{
-                  fontSize: "13px",
+                  fontSize: isMounted && isMobile ? "11px" : "13px",
                   fontWeight: 900,
                   color: "#FFC000",
                   letterSpacing: "0.5px",
@@ -106,20 +108,22 @@ export default function LoginPage() {
               >
                 DINAS PEKERJAAN UMUM
               </span>
-              <span 
-                style={{
-                  fontSize: "11px",
-                  color: "rgba(255, 255, 255, 0.8)",
-                  fontWeight: 500,
-                  lineHeight: 1.2
-                }}
-              >
-                Pemerintah Kabupaten Bogor • Terintegrasi SIPJAKI Kementerian PUPR
-              </span>
+              {(!isMounted || !isMobile) && (
+                <span 
+                  style={{
+                    fontSize: "11px",
+                    color: "rgba(255, 255, 255, 0.8)",
+                    fontWeight: 500,
+                    lineHeight: 1.2
+                  }}
+                >
+                  Pemerintah Kabupaten Bogor • Terintegrasi SIPJAKI Kementerian PUPR
+                </span>
+              )}
             </div>
           </Link>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {/* Shortcut: Kembali ke Beranda */}
             <Link
               href="/"
@@ -132,7 +136,7 @@ export default function LoginPage() {
                 fontWeight: 700,
                 color: "#FFFFFF",
                 backgroundColor: "rgba(255, 255, 255, 0.12)",
-                padding: "6px 14px",
+                padding: "6px 12px",
                 borderRadius: "9999px",
                 border: "1px solid rgba(255, 255, 255, 0.25)",
                 textDecoration: "none",
@@ -153,44 +157,48 @@ export default function LoginPage() {
               <span>Beranda</span>
             </Link>
 
-            <Link
-              href="/portal/login"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "11px",
-                fontWeight: 700,
-                color: "#FFC000",
-                backgroundColor: "rgba(255, 192, 0, 0.12)",
-                padding: "6px 12px",
-                borderRadius: "9999px",
-                border: "1px solid rgba(255, 192, 0, 0.3)",
-                textDecoration: "none"
-              }}
-            >
-              <span>Portal Mitra (BUJK/TKK)</span>
-              <ArrowRight style={{ width: "12px", height: "12px" }} />
-            </Link>
+            {(!isMounted || !isMobile) && (
+              <>
+                <Link
+                  href="/portal/login"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    color: "#FFC000",
+                    backgroundColor: "rgba(255, 192, 0, 0.12)",
+                    padding: "6px 12px",
+                    borderRadius: "9999px",
+                    border: "1px solid rgba(255, 192, 0, 0.3)",
+                    textDecoration: "none"
+                  }}
+                >
+                  <span>Portal Mitra (BUJK/TKK)</span>
+                  <ArrowRight style={{ width: "12px", height: "12px" }} />
+                </Link>
 
-            <div 
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "12px",
-                fontWeight: 600,
-                color: "#FFFFFF",
-                backgroundColor: "rgba(255,255,255,0.1)",
-                padding: "6px 14px",
-                borderRadius: "9999px",
-                border: "1px solid rgba(255,255,255,0.15)",
-                flexShrink: 0
-              }}
-            >
-              <ShieldCheck style={{ width: "16px", height: "16px", color: "#FFC000" }} />
-              <span>Portal Dinas Internal</span>
-            </div>
+                <div 
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "#FFFFFF",
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    padding: "6px 14px",
+                    borderRadius: "9999px",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    flexShrink: 0
+                  }}
+                >
+                  <ShieldCheck style={{ width: "16px", height: "16px", color: "#FFC000" }} />
+                  <span>Portal Dinas Internal</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -203,7 +211,7 @@ export default function LoginPage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "24px 16px"
+          padding: isMounted && isMobile ? "16px 12px" : "24px 16px"
         }}
       >
         {/* Navigation Breadcrumb / Top Bar Affordance */}
@@ -253,11 +261,13 @@ export default function LoginPage() {
             <span>Kembali ke Beranda Utama</span>
           </Link>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", color: "#64748B", fontWeight: 600 }}>
-            <span>Portal Resmi SIJAKON</span>
-            <span>•</span>
-            <span>Pemerintah Kabupaten Bogor</span>
-          </div>
+          {(!isMounted || !isMobile) && (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", color: "#64748B", fontWeight: 600 }}>
+              <span>Portal Resmi SIJAKON</span>
+              <span>•</span>
+              <span>Pemerintah Kabupaten Bogor</span>
+            </div>
+          )}
         </div>
 
         <div 
@@ -265,8 +275,8 @@ export default function LoginPage() {
             maxWidth: "960px",
             width: "100%",
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))",
-            borderRadius: "24px",
+            gridTemplateColumns: isMounted && isMobile ? "1fr" : "repeat(auto-fit, minmax(360px, 1fr))",
+            borderRadius: isMounted && isMobile ? "16px" : "24px",
             backgroundColor: "#FFFFFF",
             boxShadow: "0 25px 50px -12px rgba(15, 46, 92, 0.25)",
             border: "1px solid #E2E8F0",
@@ -277,7 +287,7 @@ export default function LoginPage() {
           <div 
             style={{
               background: "linear-gradient(135deg, #07182E 0%, #0F2E5C 50%, #163B75 100%)",
-              padding: "36px",
+              padding: isMounted && isMobile ? "24px 18px" : "36px",
               color: "#FFFFFF",
               display: "flex",
               flexDirection: "column",

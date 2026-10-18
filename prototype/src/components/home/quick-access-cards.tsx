@@ -4,6 +4,7 @@ import {
   BarChart3, Layers, Building2, FileText, Award,
   ShieldAlert, ArrowRight, Sparkles, ChevronRight
 } from "lucide-react";
+import { useResponsive } from "@/lib/use-responsive";
 
 const QUICK_MODULES = [
   {
@@ -63,9 +64,11 @@ const QUICK_MODULES = [
 ];
 
 export default function QuickAccessCards() {
+  const { isMobile, isMounted } = useResponsive();
+
   return (
-    <section style={{ padding: "40px 0 60px", background: "#FFFFFF", position: "relative" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 20px" }}>
+    <section style={{ padding: isMounted && isMobile ? "28px 0 40px" : "40px 0 60px", background: "#FFFFFF", position: "relative" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: isMounted && isMobile ? "0 14px" : "0 20px" }}>
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 28, flexWrap: "wrap", gap: 14 }}>
           <div>
@@ -117,8 +120,8 @@ export default function QuickAccessCards() {
         {/* 6 Cards Grid */}
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: 20,
+          gridTemplateColumns: isMounted && isMobile ? "1fr" : "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: isMounted && isMobile ? 14 : 20,
         }}>
           {QUICK_MODULES.map((mod, i) => {
             const Icon = mod.icon;

@@ -25,6 +25,7 @@ export default function PerencanaanSubtabNav({ tertibType }: PerencanaanSubtabNa
 
   return (
     <div
+      className="custom-touch-scroll"
       style={{
         display: "flex",
         alignItems: "center",

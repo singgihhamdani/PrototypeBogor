@@ -2,13 +2,18 @@
 import { useState } from "react";
 import { 
   GraduationCap, Search, Calendar, Users, Award, Download, 
-  CheckCircle2, Clock, Plus, QrCode, FileCheck, Eye, X
+  CheckCircle2, Clock, Plus, QrCode, FileCheck, Eye, X, FileSpreadsheet
 } from "lucide-react";
 import trainingData from "@/data/training.json";
+import BatchImportModal from "@/components/common/batch-import-modal";
+import { TEMPLATE_PELATIHAN } from "@/lib/sipjaki-templates";
+import { exportToSpreadsheet } from "@/lib/export-utils";
 
 export default function PelatihanPage() {
+  const [trainings, setTrainings] = useState(trainingData);
   const [activeTab, setActiveTab] = useState<"programs" | "tkk" | "cert">("programs");
   const [search, setSearch] = useState("");
+  const [showImportModal, setShowImportModal] = useState(false);
   const [selectedCert, setSelectedCert] = useState<{
     name: string;
     nik: string;
@@ -18,14 +23,36 @@ export default function PelatihanPage() {
   } | null>(null);
 
   // Extract all participants across training
-  const allTkk = trainingData.flatMap(t => 
-    t.participants.map(p => ({
+  const allTkk = trainings.flatMap(t => 
+    (t.participants || []).map(p => ({
       ...p,
       trainingTitle: t.title,
       skkLevel: t.skkLevel,
       date: t.endDate
     }))
   );
+
+  const handleBatchCommit = (parsedData: Record<string, any>[]) => {
+    const newItems = parsedData.map((d, i) => ({
+      id: d.id || `TR-2026-00${trainings.length + i + 1}`,
+      title: d.title || "Pelatihan Keahlian Konstruksi",
+      category: d.category || "Tata Kelola & Regulasi",
+      skkLevel: d.skkLevel || "Jenjang 5 (Teknisi/Analis)",
+      batch: d.batch || `Angkatan ${trainings.length + i + 1} / 2026`,
+      startDate: d.startDate || "2026-06-01",
+      endDate: d.endDate || "2026-06-05",
+      location: d.location || "Auditorium DPU Kab. Bogor",
+      quota: Number(d.quota) || 30,
+      registered: Number(d.registered) || 0,
+      passed: Number(d.passed) || 0,
+      status: d.status || "Pendaftaran Dibuka",
+      organizer: d.organizer || "DPU Kab. Bogor",
+      instructor: d.instructor || "Tim Pembina Jasa Konstruksi PUPR",
+      participants: []
+    }));
+    setTrainings((prev) => [...newItems, ...prev]);
+    alert(`Berhasil mengimpor ${newItems.length} kegiatan pelatihan ke dalam sistem!`);
+  };
 
   const filteredTkk = allTkk.filter(t => 
     t.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -54,10 +81,42 @@ export default function PelatihanPage() {
           </p>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          {/* Tombol Import Excel */}
+          <button 
+            type="button"
+            onClick={() => setShowImportModal(true)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#ECFDF5",
+              border: "1px solid #A7F3D0",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#065F46",
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+            }}
+          >
+            <FileSpreadsheet style={{ width: "15px", height: "15px", color: "#059669" }} />
+            <span>Import Excel</span>
+          </button>
+
+          {/* Tombol Export */}
           <button
             type="button"
-            onClick={() => alert("Mengunduh Rekapitulasi TKK Tersertifikasi Kab. Bogor (.xlsx)...")}
+            onClick={() => exportToSpreadsheet({
+              fileName: TEMPLATE_PELATIHAN.exportFileName,
+              sheetName: TEMPLATE_PELATIHAN.sheetName,
+              columns: TEMPLATE_PELATIHAN.columns,
+              data: trainings,
+              sipjakiMode: true,
+              includeDataDictionary: true,
+              dictionaryItems: TEMPLATE_PELATIHAN.dictionaryItems
+            })}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -73,7 +132,7 @@ export default function PelatihanPage() {
               boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
             }}
           >
-            <Download style={{ width: "15px", height: "15px" }} /> Export Data
+            <Download style={{ width: "15px", height: "15px" }} /> Export SIPJAKI
           </button>
           <button
             type="button"
@@ -109,8 +168,8 @@ export default function PelatihanPage() {
             </div>
           </div>
           <div>
-            <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>{trainingData.length}</p>
-            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>TA 2026 (4 Angkatan)</p>
+            <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>{trainings.length}</p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>TA 2026 ({trainings.length} Program)</p>
           </div>
         </div>
 
@@ -123,9 +182,9 @@ export default function PelatihanPage() {
           </div>
           <div>
             <p style={{ fontSize: "28px", fontWeight: 900, color: "#1E40AF", margin: 0, lineHeight: 1.1 }}>
-              {trainingData.reduce((acc, t) => acc + t.registered, 0)}
+              {trainings.reduce((acc, t) => acc + t.registered, 0)}
             </p>
-            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Dari Kuota 220 Orang</p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Dari Kuota {trainings.reduce((acc, t) => acc + t.quota, 0)} Orang</p>
           </div>
         </div>
 
@@ -138,7 +197,7 @@ export default function PelatihanPage() {
           </div>
           <div>
             <p style={{ fontSize: "28px", fontWeight: 900, color: "#059669", margin: 0, lineHeight: 1.1 }}>
-              {trainingData.reduce((acc, t) => acc + t.passed, 0)}
+              {trainings.reduce((acc, t) => acc + t.passed, 0)}
             </p>
             <p style={{ fontSize: "11px", color: "#059669", fontWeight: 700, margin: "4px 0 0 0" }}>Tersertifikasi BNSP / SKK</p>
           </div>
@@ -193,8 +252,8 @@ export default function PelatihanPage() {
 
       {/* Tab 1: Programs */}
       {activeTab === "programs" && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: "20px" }}>
-          {trainingData.map((t) => (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: "16px" }}>
+          {trainings.map((t) => (
             <div 
               key={t.id} 
               style={{
@@ -210,62 +269,99 @@ export default function PelatihanPage() {
               }}
             >
               <div>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span style={{ fontFamily: "monospace", fontSize: "11px", fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "2px 8px", borderRadius: "6px" }}>
-                        {t.id}
-                      </span>
-                      <span style={{ fontSize: "11px", fontWeight: 700, backgroundColor: "#F1F5F9", color: "#475569", padding: "2px 8px", borderRadius: "9999px" }}>
-                        {t.category}
-                      </span>
-                    </div>
-                    <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: "8px 0 0 0", lineHeight: 1.35 }}>
-                      {t.title}
-                    </h3>
-                    <p style={{ fontSize: "11px", color: "#64748B", margin: "4px 0 0 0" }}>
-                      {t.batch} • Jenjang SKK: {t.skkLevel}
-                    </p>
+                {/* Row 1: Top Meta Bar (ID + Category Left, Status Badge Right) */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                    <span 
+                      style={{ 
+                        fontFamily: "monospace", 
+                        fontSize: "11px", 
+                        fontWeight: 800, 
+                        backgroundColor: "#EBF2FA", 
+                        color: "#0F2E5C", 
+                        padding: "3px 8px", 
+                        borderRadius: "6px",
+                        whiteSpace: "nowrap",
+                        letterSpacing: "0.2px"
+                      }}
+                    >
+                      {t.id}
+                    </span>
+                    <span 
+                      style={{ 
+                        fontSize: "11px", 
+                        fontWeight: 700, 
+                        backgroundColor: "#F1F5F9", 
+                        color: "#475569", 
+                        padding: "3px 9px", 
+                        borderRadius: "9999px",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      {t.category}
+                    </span>
                   </div>
+
                   <span 
                     style={{
                       fontSize: "11px",
                       fontWeight: 800,
-                      padding: "4px 10px",
+                      padding: "3px 10px",
                       borderRadius: "9999px",
+                      whiteSpace: "nowrap",
                       flexShrink: 0,
                       backgroundColor: t.status === "Selesai" ? "#ECFDF5" : t.status === "Sedang Berjalan" ? "#EFF6FF" : "#FFFBEB",
-                      color: t.status === "Selesai" ? "#059669" : t.status === "Sedang Berjalan" ? "#1E40AF" : "#D97706"
+                      color: t.status === "Selesai" ? "#059669" : t.status === "Sedang Berjalan" ? "#1E40AF" : "#D97706",
+                      border: t.status === "Pendaftaran Dibuka" ? "1px solid #FDE68A" : "none"
                     }}
                   >
-                    {t.status}
+                    {t.status === "Selesai" ? "✓ Selesai" : t.status === "Sedang Berjalan" ? "● Sedang Berjalan" : "● Pendaftaran Dibuka"}
                   </span>
                 </div>
 
+                {/* Row 2: Full-width Title */}
+                <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: "0 0 6px 0", lineHeight: 1.4 }}>
+                  {t.title}
+                </h3>
+
+                {/* Row 3: Subtitle & Jenjang SKK */}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", fontSize: "11.5px", color: "#64748B", marginBottom: "12px" }}>
+                  <span style={{ fontWeight: 600 }}>{t.batch}</span>
+                  <span>•</span>
+                  <span style={{ backgroundColor: "#F8FAFC", padding: "2px 8px", borderRadius: "6px", border: "1px solid #E2E8F0", color: "#334155", fontWeight: 700 }}>
+                    Jenjang SKK: {t.skkLevel}
+                  </span>
+                </div>
+
+                {/* Info Details Box */}
                 <div style={{ backgroundColor: "#F8FAFC", borderRadius: "12px", border: "1px solid #E2E8F0", padding: "12px 14px", display: "flex", flexDirection: "column", gap: "8px", fontSize: "12px", color: "#475569" }}>
                   <p style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
-                    <Calendar style={{ width: "14px", height: "14px", color: "#94A3B8" }} />
+                    <Calendar style={{ width: "14px", height: "14px", color: "#94A3B8", flexShrink: 0 }} />
                     <span>{t.startDate} s/d {t.endDate}</span>
                   </p>
                   <p style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
-                    <Users style={{ width: "14px", height: "14px", color: "#94A3B8" }} />
-                    <span>Penyelenggara: {t.organizer}</span>
+                    <Users style={{ width: "14px", height: "14px", color: "#94A3B8", flexShrink: 0 }} />
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Penyelenggara: {t.organizer}</span>
                   </p>
                   <p style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
-                    <Award style={{ width: "14px", height: "14px", color: "#94A3B8" }} />
-                    <span>Instruktur: {t.instructor}</span>
+                    <Award style={{ width: "14px", height: "14px", color: "#94A3B8", flexShrink: 0 }} />
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Instruktur: {t.instructor}</span>
                   </p>
                 </div>
               </div>
 
-              <div style={{ paddingTop: "12px", borderTop: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px" }}>
+              <div style={{ paddingTop: "12px", borderTop: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", flexWrap: "wrap", gap: "6px" }}>
                 <div>
                   <span style={{ color: "#64748B" }}>Kuota: </span>
                   <span style={{ fontWeight: 800, color: "#0F172A" }}>{t.registered} / {t.quota} orang</span>
                 </div>
-                {t.passed > 0 && (
+                {t.passed > 0 ? (
                   <span style={{ fontWeight: 800, color: "#059669", backgroundColor: "#ECFDF5", padding: "3px 10px", borderRadius: "6px", fontSize: "11px" }}>
                     {t.passed} Peserta Lulus SKK
+                  </span>
+                ) : (
+                  <span style={{ fontWeight: 700, color: t.status === "Pendaftaran Dibuka" ? "#D97706" : "#64748B", backgroundColor: t.status === "Pendaftaran Dibuka" ? "#FFFBEB" : "#F1F5F9", padding: "3px 8px", borderRadius: "6px", fontSize: "11px" }}>
+                    {t.status === "Pendaftaran Dibuka" ? "Pendaftaran Terbuka" : "Tahap Bimtek"}
                   </span>
                 )}
               </div>
@@ -464,6 +560,19 @@ export default function PelatihanPage() {
           </div>
         </div>
       )}
+
+      {/* Batch Import Modal Pelatihan */}
+      <BatchImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        title="Impor Program Pelatihan & Bimtek (SIPJAKI)"
+        subtitle="Unggah berkas Excel (.xlsx) atau CSV data program pelatihan dan sertifikasi TKK Kabupaten Bogor"
+        templateFileName={TEMPLATE_PELATIHAN.exportFileName}
+        expectedColumns={TEMPLATE_PELATIHAN.importColumns}
+        sampleRows={TEMPLATE_PELATIHAN.sampleRows}
+        template={TEMPLATE_PELATIHAN}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }

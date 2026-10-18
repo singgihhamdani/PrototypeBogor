@@ -4,8 +4,10 @@ import {
   FileBarChart, Download, RefreshCw, CheckCircle2, 
   Calendar, FileSpreadsheet, FileText
 } from "lucide-react";
+import { useResponsive } from "@/lib/use-responsive";
 
 export default function PelaporanPage() {
+  const { isMobile, isMounted } = useResponsive();
   const [syncing, setSyncing] = useState(false);
   const [period, setPeriod] = useState("Semester I - 2026");
 
@@ -202,7 +204,13 @@ export default function PelaporanPage() {
 
       {/* Table Container */}
       <div style={{ borderRadius: "18px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-        <div style={{ overflowX: "auto" }}>
+        {isMounted && isMobile && (
+          <div style={{ padding: "8px 14px", backgroundColor: "#F8FAFC", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#64748B", fontWeight: 700 }}>
+            <span>↔</span>
+            <span>Geser tabel ke samping untuk melihat seluruh kolom pelaporan</span>
+          </div>
+        )}
+        <div className="custom-touch-scroll" style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
             <thead>
               <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "2px solid #E2E8F0", textAlign: "left" }}>

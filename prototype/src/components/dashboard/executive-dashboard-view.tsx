@@ -5,9 +5,11 @@ import {
   Download, FileBarChart, Calendar, Landmark, CheckCircle2, 
   MapPin, ArrowUpRight, BarChart3, PieChart, Sparkles, AlertCircle
 } from "lucide-react";
+import { useResponsive } from "@/lib/use-responsive";
 
 export default function ExecutiveDashboardView() {
   const [downloading, setDownloading] = useState(false);
+  const { isMobile, isMounted } = useResponsive();
 
   const handleExport = (format: "PDF" | "Excel") => {
     setDownloading(true);
@@ -65,14 +67,14 @@ export default function ExecutiveDashboardView() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: isMounted && isMobile ? "18px" : "28px" }}>
       
       {/* 1. Executive Banner */}
       <div 
         style={{
           borderRadius: "20px",
           background: "linear-gradient(135deg, #064E3B 0%, #065F46 50%, #047857 100%)",
-          padding: "32px 36px",
+          padding: isMounted && isMobile ? "20px 16px" : "32px 36px",
           color: "#FFFFFF",
           boxShadow: "0 10px 25px -5px rgba(6, 95, 70, 0.3)",
           position: "relative",
@@ -130,13 +132,11 @@ export default function ExecutiveDashboardView() {
                 <span>Export Excel</span>
               </button>
             </div>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <h1 style={{ fontSize: "28px", fontWeight: 900, color: "#FFFFFF", letterSpacing: "-0.5px", margin: 0 }}>
+          </div>          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <h1 style={{ fontSize: isMounted && isMobile ? "20px" : "28px", fontWeight: 900, color: "#FFFFFF", letterSpacing: "-0.5px", margin: 0 }}>
               Ringkasan Kinerja & Kepatuhan Jasa Konstruksi TA 2026
             </h1>
-            <p style={{ fontSize: "14px", color: "#D1FAE5", margin: 0, maxWidth: "820px", lineHeight: 1.5 }}>
+            <p style={{ fontSize: isMounted && isMobile ? "12px" : "14px", color: "#D1FAE5", margin: 0, maxWidth: "820px", lineHeight: 1.5 }}>
               Laporan strategis pimpinan daerah mengenai efektivitas 5 Pilar Pembinaan Jasa Konstruksi, status 342 paket pekerjaan DPU, serta kepatuhan 1.240 BUJK di 40 Kecamatan se-Kabupaten Bogor.
             </p>
           </div>
@@ -144,7 +144,7 @@ export default function ExecutiveDashboardView() {
       </div>
 
       {/* 2. Executive KPI Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMounted && isMobile ? "1fr" : "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
         {executiveKpis.map((kpi, idx) => {
           const Icon = kpi.icon;
           return (
@@ -154,7 +154,7 @@ export default function ExecutiveDashboardView() {
                 backgroundColor: "#FFFFFF",
                 borderRadius: "18px",
                 border: "1px solid #E2E8F0",
-                padding: "20px 22px",
+                padding: isMounted && isMobile ? "16px" : "20px 22px",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
                 display: "flex",
                 flexDirection: "column",
@@ -171,7 +171,7 @@ export default function ExecutiveDashboardView() {
               </div>
 
               <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginTop: "4px" }}>
-                <span style={{ fontSize: "26px", fontWeight: 900, color: "#0F172A" }}>
+                <span style={{ fontSize: isMounted && isMobile ? "22px" : "26px", fontWeight: 900, color: "#0F2E5C" }}>
                   {kpi.value}
                 </span>
                 <span style={{ fontSize: "11px", fontWeight: 800, color: "#059669", backgroundColor: "#ECFDF5", padding: "2px 8px", borderRadius: "9999px" }}>
@@ -188,10 +188,10 @@ export default function ExecutiveDashboardView() {
       </div>
 
       {/* 3. Sebaran Kepatuhan 5 Wilayah Pembangunan */}
-      <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", border: "1px solid #E2E8F0", padding: "24px 28px", boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+      <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", border: "1px solid #E2E8F0", padding: isMounted && isMobile ? "16px 14px" : "24px 28px", boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", marginBottom: "16px" }}>
           <div>
-            <h2 style={{ fontSize: "18px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
+            <h2 style={{ fontSize: isMounted && isMobile ? "15px" : "18px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
               Evaluasi Kepatuhan Tertib Konstruksi per Wilayah Pembinaan
             </h2>
             <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>
@@ -203,50 +203,52 @@ export default function ExecutiveDashboardView() {
           </span>
         </div>
 
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", textAlign: "left" }}>
-          <thead>
-            <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#64748B", fontWeight: 800 }}>
-              <th style={{ padding: "12px 14px" }}>Wilayah & Cakupan Kecamatan</th>
-              <th style={{ padding: "12px 14px" }}>BUJK Terdaftar</th>
-              <th style={{ padding: "12px 14px" }}>Paket Berjalan</th>
-              <th style={{ padding: "12px 14px" }}>Indeks Kepatuhan</th>
-              <th style={{ padding: "12px 14px" }}>Predikat Evaluasi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {wilayahKepatuhan.map((item, idx) => (
-              <tr key={idx} style={{ borderBottom: "1px solid #F1F5F9" }}>
-                <td style={{ padding: "14px", fontWeight: 700, color: "#1E293B" }}>
-                  {item.wilayah}
-                </td>
-                <td style={{ padding: "14px", color: "#475569" }}>{item.bujk} Badan Usaha</td>
-                <td style={{ padding: "14px", color: "#475569" }}>{item.paket} Paket</td>
-                <td style={{ padding: "14px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <div style={{ width: "100px", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "9999px", overflow: "hidden" }}>
-                      <div style={{ width: `${item.skor}%`, height: "100%", backgroundColor: item.skor > 80 ? "#10B981" : item.skor > 70 ? "#3B82F6" : "#F59E0B" }} />
-                    </div>
-                    <span style={{ fontWeight: 800, color: "#1E293B" }}>{item.skor}%</span>
-                  </div>
-                </td>
-                <td style={{ padding: "14px" }}>
-                  <span 
-                    style={{ 
-                      fontSize: "10px", 
-                      fontWeight: 800, 
-                      padding: "3px 10px", 
-                      borderRadius: "9999px",
-                      backgroundColor: item.skor > 80 ? "#ECFDF5" : "#EFF6FF",
-                      color: item.skor > 80 ? "#059669" : "#1D4ED8"
-                    }}
-                  >
-                    {item.status}
-                  </span>
-                </td>
+        <div className="custom-touch-scroll" style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <table style={{ width: "100%", minWidth: "620px", borderCollapse: "collapse", fontSize: "12px", textAlign: "left" }}>
+            <thead>
+              <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#64748B", fontWeight: 800 }}>
+                <th style={{ padding: "12px 14px" }}>Wilayah & Cakupan Kecamatan</th>
+                <th style={{ padding: "12px 14px" }}>BUJK Terdaftar</th>
+                <th style={{ padding: "12px 14px" }}>Paket Berjalan</th>
+                <th style={{ padding: "12px 14px" }}>Indeks Kepatuhan</th>
+                <th style={{ padding: "12px 14px" }}>Predikat Evaluasi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {wilayahKepatuhan.map((item, idx) => (
+                <tr key={idx} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                  <td style={{ padding: "14px", fontWeight: 700, color: "#1E293B" }}>
+                    {item.wilayah}
+                  </td>
+                  <td style={{ padding: "14px", color: "#475569" }}>{item.bujk} Badan Usaha</td>
+                  <td style={{ padding: "14px", color: "#475569" }}>{item.paket} Paket</td>
+                  <td style={{ padding: "14px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <div style={{ width: "100px", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "9999px", overflow: "hidden" }}>
+                        <div style={{ width: `${item.skor}%`, height: "100%", backgroundColor: item.skor > 80 ? "#10B981" : item.skor > 70 ? "#3B82F6" : "#F59E0B" }} />
+                      </div>
+                      <span style={{ fontWeight: 800, color: "#1E293B" }}>{item.skor}%</span>
+                    </div>
+                  </td>
+                  <td style={{ padding: "14px" }}>
+                    <span 
+                      style={{ 
+                        fontSize: "10px", 
+                        fontWeight: 800, 
+                        padding: "3px 10px", 
+                        borderRadius: "9999px",
+                        backgroundColor: item.skor > 80 ? "#ECFDF5" : "#EFF6FF",
+                        color: item.skor > 80 ? "#059669" : "#1D4ED8"
+                      }}
+                    >
+                      {item.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>

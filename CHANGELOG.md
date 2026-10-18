@@ -4,7 +4,89 @@ Semua perubahan penting pada proyek **SIJAKON (Sistem Informasi Jasa Konstruksi)
 
 ---
 
-## [Unreleased] / [v1.6.0-rc] — 2026-10-02
+## [v1.8.0] — 2026-10-19
+
+### 🤖 SIJAKON AI Copilot & Data Insights Assistant
+- **`src/components/common/ai-copilot-drawer.tsx`**:
+  - Implementasi **Floating Action Trigger Button (FAB)** melayang di pojok kanan bawah dengan aksen emas PUPR dan status live indicator.
+  - Panel drawer chat responsif desktop & mobile yang dilengkapi riwayat pesan, context indicator halaman aktif, quick suggestion chips, dan input teks interaktif.
+  - *Context-aware chips*: Saran pertanyaan otomatis menyesuaikan halaman yang dibuka pengguna (`/paket-pekerjaan`, `/bujk`, `/regulasi`, `/pelatihan`, `/kecelakaan`, dsb.).
+- **`src/components/common/ai-action-card.tsx`**:
+  - Komponen kartu aksi cerdas di dalam bubble chat untuk navigasi langsung (*deep-linking*) ke detail proyek, peta WebGIS, atau ekspor Excel.
+- **`src/lib/ai/ai-data-engine.ts`**:
+  - Mesin analitik data terintegrasi yang menghitung deviasi proyek kritis (Kurva-S), serapan anggaran fisik vs keuangan APBD/DAK/APBN, masa berlaku SBU BUJK, keselamatan kerja K3, serta capaian target 500 TKK tahun 2026.
+  - Generator *Executive Summary Brief* otomatis untuk bahan rapat koordinasi pimpinan.
+- **`src/lib/ai/ai-rag-engine.ts`**:
+  - Mesin pencarian regulasi berbasis RAG (*Retrieval Augmented Generation*) yang mengindeks 11 dokumen dasar hukum (UU 2/2017, PP 22/2020 jo PP 14/2021, Permen PUPR 1/2023, Perda Jabar 6/2024, dll.) lengkap dengan sitasi pasal dan modul terkait.
+- **`src/lib/ai/ai-copilot-service.ts`**:
+  - Layanan orkestrasi chat cerdas yang menggabungkan *Data Engine*, *RAG Engine*, role-aware filtering, dan FAQ panduan penggunaan sistem.
+- **`src/app/(dashboard)/layout.tsx`**:
+  - Pemasangan `AiCopilotDrawer` secara global di layout dashboard utama sehingga selalu siap diakses di seluruh menu.
+
+### 📗 Penyempurnaan Modul Upload Batch Excel (.xlsx) & CSV
+- **`src/app/(dashboard)/pelatihan/page.tsx`**:
+  - Integrasi tombol **`[📗 Import Excel]`** dan `BatchImportModal` dengan `TEMPLATE_PELATIHAN`.
+  - Integrasi tombol **`[📥 Export SIPJAKI]`** dengan format multi-sheet (Data, Petunjuk, & Kamus Data).
+
+---
+
+## [v1.7.0] — 2026-10-18
+
+### 🏛️ Basis Kebijakan, Regulasi & Dasar Hukum Jasa Konstruksi
+
+#### 1. Katalog & Matriks Regulasi Kebijakan Lengkap
+- **`src/data/regulations.json`**: Pemutakhiran dataset regulasi dengan 11 perundang-undangan pokok yang mendasari pembentukan sub-urusan jasa konstruksi dan modul operasional SIJAKON Bogor:
+  1. **UU No. 2/2017 jo. UU No. 6/2023** — Undang-Undang Jasa Konstruksi (Penetapan Perppu Cipta Kerja).
+  2. **PP No. 22/2020 jo. PP No. 14/2021** — Peraturan Pelaksanaan UU Jasa Konstruksi, standar K4 & perizinan berusaha.
+  3. **Perpres No. 12/2021 jo. Perpres No. 16/2018** — Pengadaan Barang/Jasa Pemerintah & paket pekerjaan APBD.
+  4. **Permen PUPR No. 9/2020** — Pembentukan LPJK, lisensi LSBU/LSP, dan validasi registri SBU/SKK.
+  5. **Permen PUPR No. 1/2023** — Pedoman Pengawasan Penyelenggaraan Jasa Konstruksi oleh Pemda (rujukan modul SIMAK).
+  6. **Perda Prov. Jawa Barat No. 6/2024** — Pembinaan dan Pengawasan Jasa Konstruksi di Daerah Provinsi Jawa Barat.
+  7. **SE Dirjen Bina Konstruksi No. 299/SE/D/2025** — Pedoman Penilaian Evaluasi (PE) Kinerja Pengawasan OPD Jakon.
+  8. **PP No. 16/2021** — Pelaksanaan UU Bangunan Gedung (Ketentuan SIMBG, PBG, SLF, dan Tertib Pemanfaatan).
+  9. **Permen PUPR No. 10/2021 & SOP K07.07** — Penerapan SMKK dan SOP Penilaian Evaluasi Penerapan SMKK.
+  10. **Perda Kab. Bogor No. 2/2020** — Penyelenggaraan Jasa Konstruksi di Kabupaten Bogor (regulasi induk daerah).
+  11. **SE Bupati Bogor No. 600/188-DPU/2025** — Kewajiban TKK bersertifikat kompetensi kerja pada proyek Pemda.
+- **`src/app/(dashboard)/regulasi/page.tsx`**:
+  - Penambahan highlight box **"🏛️ Dasar Kebijakan & Mandat Sistem SIJAKON"** di setiap kartu katalog regulasi.
+  - Penambahan badge **"Modul Terkait"** yang menghubungkan setiap regulasi ke fitur SIJAKON (misal: *Pengawasan 3 Tertib, Executive Dashboard, Rantai Pasok, Evaluasi Kinerja PE*).
+  - Integrasi tombol unduh salinan berkas resmi (PDF) langsung dari repositori `/docs/aturan/`.
+  - Filter kategori responsif 10 kategori regulasi dan pencarian kata kunci cerdas lintas nomor, judul, mandat, dan modul.
+  - Modal detail interaktif dengan ringkasan pokok pengaturan, mandat sistem, serta tautan berkas resmi.
+
+#### 2. Dokumentasi & Berkas Fisik Aturan
+- **`docs/DASAR_HUKUM_DAN_KEBIJAKAN.md`**: Dokumen komprehensif matriks regulasi, hierarki perundang-undangan, pemetaan pasal-pasal kewenangan daerah, dan inventaris berkas fisik di repositori.
+- **`prototype/public/docs/aturan/`**: Penyalinan berkas PDF resmi dari `docs/ATURAN/` ke direktori publik web app agar dapat diunduh langsung oleh pengguna.
+
+### 🎨 Audit & Perbaikan UI/UX Menyeluruh Lintas Menu & Sub-Menu
+
+#### 1. WebGIS Peta Interaktif (`/webgis`)
+- **Masalah Terdeteksi**: Pada viewport mobile/tablet (< 1024px, khususnya lebar 500px), peta terhimpit menjadi kolom sempit (~100px) akibat grid kaku `1fr 380px`.
+- **Perbaikan Diterapkan**:
+  - Implementasi kontrol mode responsif: **[🗺️ Peta]**, **[📋 Daftar Proyek]**, dan **[📑 Tumpuk]**.
+  - Pada mode Peta: Peta mengambil lebar penuh (100%) dan tinggi proporsional dengan floating pill button untuk berpindah ke daftar.
+  - Pada mode Daftar: Kartu proyek mengambil lebar penuh dengan indikator deviasi, progres fisik, dan nilai kontrak.
+  - Pada mode Tumpuk: Peta di bagian atas (tinggi 360px) dan daftar proyek di bawahnya dengan scroll sentuh.
+
+#### 2. Detail Paket Pekerjaan (`/paket-pekerjaan/[id]`)
+- **Perbaikan**: Mengganti `gridTemplateColumns: "2fr 1fr"` menjadi responsif `1fr` di mobile sehingga Kurva-S dan kartu metadata kontrak tersusun rapi secara vertikal tanpa terhimpit.
+- Penyesuaian tinggi canvas grafik Kurva-S (240px di mobile) dan ringkasan metrik 3 kolom menjadi 1 kolom.
+
+#### 3. Detail BUJK (`/bujk/[id]`)
+- **Perbaikan**: Mengganti `minmax(320px, 1fr)` menjadi `minmax(min(280px, 100%), 1fr)` untuk mencegah kartu terpotong pada layar smartphone ramping.
+
+#### 4. Hub Pelatihan (`/pelatihan`) & Portal Berita (`/berita`)
+- **Perbaikan**: Mengganti grid kartu kaku `minmax(360px, 1fr)` menjadi `minmax(min(300px, 100%), 1fr)` agar kartu program bimtek dan warta tidak overflow ke kanan.
+
+#### 5. Pelaporan SIPJAKI (`/pelaporan`) & Matriks RBAC (`/pengaturan`)
+- **Perbaikan**: Menambahkan kelas `.custom-touch-scroll` dan banner indikator gestur horizontal (*"↔ Geser tabel ke samping..."*) pada tabel data lebar.
+
+#### 6. Navigasi Subtab Tertib (`perencanaan-subtab-nav.tsx`)
+- **Perbaikan**: Menambahkan scrolling momentum sentuh halus (`custom-touch-scroll`) pada subtab navigasi 6 modul perencanaan.
+
+---
+
+## [v1.6.0-rc] — 2026-10-02
 
 ### 🚀 Fitur Baru Utama
 

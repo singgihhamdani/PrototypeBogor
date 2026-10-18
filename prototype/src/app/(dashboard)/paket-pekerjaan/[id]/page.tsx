@@ -21,6 +21,7 @@ import { Line } from "react-chartjs-2";
 import { formatCurrency } from "@/lib/utils";
 import projectsData from "@/data/projects.json";
 import districtsData from "@/data/districts.json";
+import { useResponsive } from "@/lib/use-responsive";
 
 // Register Chart.js components
 ChartJS.register(
@@ -35,6 +36,7 @@ ChartJS.register(
 );
 
 export default function PaketDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { isMobile, isMounted } = useResponsive();
   const resolvedParams = use(params);
   const project = projectsData.find((p) => p.id.toLowerCase() === resolvedParams.id.toLowerCase());
 
@@ -172,7 +174,7 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {/* Overview Metric Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(220px, 100%), 1fr))", gap: "16px" }}>
         <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "8px" }}>
           <p style={{ fontSize: "12px", fontWeight: 700, color: "#64748B", margin: 0 }}>Nilai Kontrak</p>
           <p style={{ fontSize: "22px", fontWeight: 900, color: "#0F172A", margin: 0, fontFamily: "monospace" }}>
@@ -210,21 +212,21 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {/* Main Content: Kurva-S + Metadata */}
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "20px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMounted && isMobile ? "1fr" : "2fr 1fr", gap: "20px" }}>
         {/* Left: Kurva-S */}
         <div 
           style={{
             borderRadius: "18px",
             border: "1px solid #E2E8F0",
             backgroundColor: "#FFFFFF",
-            padding: "24px 28px",
+            padding: isMounted && isMobile ? "18px 16px" : "24px 28px",
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
             display: "flex",
             flexDirection: "column",
             gap: "18px"
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F1F5F9", paddingBottom: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F1F5F9", paddingBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
             <div>
               <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#0F172A", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
                 <TrendingUp style={{ width: "18px", height: "18px", color: "#0F2E5C" }} /> Kurva-S Progres Konstruksi
@@ -238,7 +240,7 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
             </span>
           </div>
 
-          <div style={{ height: "300px", width: "100%" }}>
+          <div style={{ height: isMounted && isMobile ? "240px" : "300px", width: "100%" }}>
             <Line
               data={chartData}
               options={{
@@ -280,7 +282,7 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
             />
           </div>
 
-          <div style={{ paddingTop: "14px", borderTop: "1px solid #F1F5F9", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", textAlign: "center" }}>
+          <div style={{ paddingTop: "14px", borderTop: "1px solid #F1F5F9", display: "grid", gridTemplateColumns: isMounted && isMobile ? "1fr" : "repeat(3, 1fr)", gap: "10px", textAlign: "center" }}>
             <div style={{ backgroundColor: "#F8FAFC", padding: "10px", borderRadius: "10px", border: "1px solid #E2E8F0" }}>
               <p style={{ fontSize: "11px", color: "#64748B", margin: 0 }}>Target Kumulatif</p>
               <p style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: "3px 0 0 0" }}>{project.planProgress[project.realProgress.filter(v => v>0).length - 1] || 0}%</p>

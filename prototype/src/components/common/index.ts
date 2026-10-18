@@ -19,3 +19,7 @@ export type { VerificationDialogProps, VerificationTargetInfo } from "./verifica
 
 export { default as BatchImportModal } from "./batch-import-modal";
 export type { BatchImportModalProps, BatchColumnDef } from "./batch-import-modal";
+
+export { default as AiCopilotDrawer } from "./ai-copilot-drawer";
+export { default as AiActionCard } from "./ai-action-card";
+

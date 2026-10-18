@@ -597,7 +597,7 @@ export default function BatchImportModal<T extends Record<string, any>>({
             )}
 
             {/* Preview Data Table with Cell Error Highlights */}
-            <div style={{ border: "1px solid #E2E8F0", borderRadius: "12px", overflowX: "auto", maxHeight: "380px" }}>
+            <div className="custom-touch-scroll" style={{ border: "1px solid #E2E8F0", borderRadius: "12px", overflowX: "auto", maxHeight: "380px", WebkitOverflowScrolling: "touch" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
                 <thead style={{ position: "sticky", top: 0, backgroundColor: "#F1F5F9", zIndex: 1 }}>
                   <tr style={{ borderBottom: "1px solid #CBD5E1" }}>
