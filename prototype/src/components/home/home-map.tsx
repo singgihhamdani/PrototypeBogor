@@ -84,31 +84,38 @@ export default function HomeMap() {
 
   if (!mounted) {
     return (
-      <div style={{ position: "relative", width: "100%", height: "100%", minHeight: 520, borderRadius: 28, overflow: "hidden", background: "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="home-map-container" style={{ position: "relative", width: "100%", height: "100%", minHeight: 520, borderRadius: 28, overflow: "hidden", background: "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#64748B" }}>Memuat Peta Spasial Kabupaten Bogor...</span>
       </div>
     );
   }
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%", minHeight: 520, borderRadius: 28, overflow: "hidden" }}>
-      {/* Map Filter Controls Bar */}
-      <div style={{
-        position: "absolute",
-        top: 16,
-        left: 16,
-        zIndex: 20,
-        background: "rgba(255, 255, 255, 0.95)",
-        backdropFilter: "blur(12px)",
-        padding: "6px 8px",
-        borderRadius: 99,
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
-        border: "1px solid rgba(255,255,255,0.8)",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "0 8px", color: "#1B3061", fontWeight: 800, fontSize: "0.72rem" }}>
+    <div className="home-map-container" style={{ position: "relative", width: "100%", height: "100%", minHeight: 520, borderRadius: 28, overflow: "hidden" }}>
+      {/* Map Filter Controls Bar with Horizontal Scroll for Mobile */}
+      <div
+        className="no-scrollbar home-map-filter-bar"
+        style={{
+          position: "absolute",
+          top: 14,
+          left: 14,
+          zIndex: 20,
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(12px)",
+          padding: "5px 8px",
+          borderRadius: 99,
+          display: "flex",
+          alignItems: "center",
+          gap: 5,
+          boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
+          border: "1px solid rgba(255,255,255,0.8)",
+          maxWidth: "calc(100% - 28px)",
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "0 6px", color: "#1B3061", fontWeight: 800, fontSize: "0.72rem", flexShrink: 0 }}>
           <Filter size={13} />
           <span>PROYEK:</span>
         </div>
@@ -127,12 +134,14 @@ export default function HomeMap() {
                 border: "none",
                 background: isActive ? "#1B3061" : "transparent",
                 color: isActive ? "#FFC000" : "#475569",
-                padding: "6px 12px",
+                padding: "5px 11px",
                 borderRadius: 99,
-                fontSize: "0.75rem",
+                fontSize: "0.74rem",
                 fontWeight: isActive ? 700 : 600,
                 cursor: "pointer",
                 transition: "all 0.2s ease",
+                flexShrink: 0,
+                whiteSpace: "nowrap",
               }}
             >
               {tab.label}
@@ -146,6 +155,7 @@ export default function HomeMap() {
         center={[-6.56, 106.84]}
         zoom={10}
         scrollWheelZoom={false}
+        className="home-map-canvas"
         style={{ width: "100%", height: "100%", minHeight: 520, zIndex: 1 }}
       >
         <TileLayer
@@ -262,39 +272,63 @@ export default function HomeMap() {
       </MapContainer>
 
       {/* Map Legend Overlay bottom right */}
-      <div style={{
-        position: "absolute",
-        bottom: 16,
-        right: 16,
-        zIndex: 20,
-        background: "rgba(255, 255, 255, 0.94)",
-        backdropFilter: "blur(12px)",
-        padding: "10px 14px",
-        borderRadius: 14,
-        boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
-        border: "1px solid rgba(255,255,255,0.8)",
-        fontSize: "10px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 6,
-        color: "#334155"
-      }}>
+      <div
+        className="home-map-legend"
+        style={{
+          position: "absolute",
+          bottom: 16,
+          right: 16,
+          zIndex: 20,
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(12px)",
+          padding: "10px 14px",
+          borderRadius: 14,
+          boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
+          border: "1px solid rgba(255,255,255,0.8)",
+          fontSize: "10px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+          color: "#334155",
+          pointerEvents: "auto",
+        }}
+      >
         <div style={{ fontWeight: 800, color: "#1B3061", textTransform: "uppercase", letterSpacing: "0.5px" }}>
           Status Proyek Konstruksi
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#1B3061", display: "inline-block" }} />
+          <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#1B3061", display: "inline-block", flexShrink: 0 }} />
           <span>Pelaksanaan Berjalan (&gt;60%)</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F59E0B", display: "inline-block" }} />
+          <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F59E0B", display: "inline-block", flexShrink: 0 }} />
           <span>Pelaksanaan Awal (&lt;60%)</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#10B981", display: "inline-block" }} />
+          <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#10B981", display: "inline-block", flexShrink: 0 }} />
           <span>Selesai (100%)</span>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .home-map-container,
+          .home-map-canvas {
+            min-height: 420px !important;
+            height: 420px !important;
+            border-radius: 20px !important;
+          }
+          .home-map-legend {
+            bottom: 10px !important;
+            right: 10px !important;
+            padding: 8px 10px !important;
+            font-size: 9px !important;
+            gap: 4px !important;
+            border-radius: 12px !important;
+            max-width: 175px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

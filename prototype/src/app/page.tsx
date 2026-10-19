@@ -387,6 +387,7 @@ export default function HomePage() {
             <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
               <Link
                 href={user ? targetRoute : "/login"}
+                className="homepage-header-cta"
                 style={{
                   background: scrolled ? "#FFC000" : "#1B3061",
                   color: scrolled ? "#1B3061" : "#FFC000",
@@ -404,7 +405,9 @@ export default function HomePage() {
                   boxShadow: scrolled ? "0 4px 14px rgba(255,192,0,0.3)" : "0 4px 14px rgba(27,48,97,0.18)",
                 }}
               >
-                {user ? "KE DASHBOARD" : "MASUK"} <ArrowRight size={15} />
+                <span className="hidden sm:inline">{user ? "KE DASHBOARD" : "MASUK SISTEM"}</span>
+                <span className="sm:hidden">{user ? "DASHBOARD" : "MASUK"}</span>
+                <ArrowRight size={15} />
               </Link>
 
               {/* Mobile Hamburger */}
@@ -566,12 +569,22 @@ export default function HomePage() {
           </div>
 
           {/* Stats Cards (with AnimatedCounter) */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 18, maxWidth: 1040, margin: "0 auto 36px" }}>
+          <div
+            className="homepage-stats-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: 18,
+              maxWidth: 1040,
+              margin: "0 auto 36px"
+            }}
+          >
             {STATS.map((stat, i) => {
               const Icon = stat.icon;
               return (
                 <div
                   key={i}
+                  className="homepage-stat-card"
                   style={{
                     background: "#FFFFFF",
                     border: "1px solid #E2E8F0",
@@ -595,23 +608,26 @@ export default function HomePage() {
                     e.currentTarget.style.borderColor = "#E2E8F0";
                   }}
                 >
-                  <div style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 14,
-                    background: `${stat.color}15`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}>
+                  <div
+                    className="stat-icon-wrapper"
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 14,
+                      background: `${stat.color}15`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
                     <Icon size={24} color={stat.color} />
                   </div>
                   <div>
-                    <span style={{ fontSize: "1.6rem", fontWeight: 900, color: "#0F172A", display: "block", lineHeight: 1.1 }}>
+                    <span className="stat-value" style={{ fontSize: "1.6rem", fontWeight: 900, color: "#0F172A", display: "block", lineHeight: 1.1 }}>
                       <AnimatedCounter value={stat.value} />
                     </span>
-                    <span style={{ fontSize: "0.7rem", textTransform: "uppercase", fontWeight: 800, color: "#64748B", letterSpacing: "0.5px" }}>
+                    <span className="stat-label" style={{ fontSize: "0.7rem", textTransform: "uppercase", fontWeight: 800, color: "#64748B", letterSpacing: "0.5px" }}>
                       {stat.label}
                     </span>
                   </div>
@@ -664,9 +680,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Bottom-Left Floating Widget */}
+            {/* Bottom-Left Floating Widget (Desktop Only) */}
             <div
-              className="map-floating-widget-bottom"
+              className="map-floating-widget-bottom map-floating-widget-desktop"
               style={{
                 position: "absolute",
                 bottom: 18,
@@ -712,6 +728,46 @@ export default function HomePage() {
             {/* Real Interactive Map Component */}
             <HomeMap />
           </div>
+
+          {/* Mobile OPD Progress Card (Cleanly placed below map to prevent collision) */}
+          <div
+            className="map-floating-widget-mobile"
+            style={{
+              display: "none",
+              marginTop: 14,
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              borderRadius: 20,
+              padding: "16px 18px",
+              boxShadow: "0 6px 20px rgba(15,23,42,0.06)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontWeight: 800, color: "#1B3061", fontSize: "0.78rem", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+                Progres Profil 40 OPD
+              </span>
+              <span style={{ background: "#10B981", color: "white", padding: "2px 8px", borderRadius: 99, fontSize: "0.68rem", fontWeight: 800 }}>
+                85% Selesai
+              </span>
+            </div>
+            <div style={{ display: "flex", gap: 14, padding: "8px 0", borderTop: "1px solid rgba(0,0,0,0.06)", borderBottom: "1px solid rgba(0,0,0,0.06)", marginBottom: 10 }}>
+              <div style={{ flex: 1, borderRight: "1px solid rgba(0,0,0,0.06)", paddingRight: 12 }}>
+                <span style={{ fontSize: "1.3rem", fontWeight: 800, color: "#1B3061", display: "block", lineHeight: 1.1 }}>34</span>
+                <span style={{ fontSize: "0.68rem", textTransform: "uppercase", fontWeight: 700, color: "#64748B" }}>Telah Mengisi</span>
+              </div>
+              <div style={{ flex: 1 }}>
+                <span style={{ fontSize: "1.3rem", fontWeight: 800, color: "#B45309", display: "block", lineHeight: 1.1 }}>6</span>
+                <span style={{ fontSize: "0.68rem", textTransform: "uppercase", fontWeight: 700, color: "#64748B" }}>Belum Mengisi</span>
+              </div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+              <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "#64748B" }}>Cakupan Kabupaten</span>
+              <span style={{ fontSize: "0.74rem", fontWeight: 800, color: "#10B981" }}>85% (34/40)</span>
+            </div>
+            <div style={{ height: 7, borderRadius: 10, background: "#E2E8F0", overflow: "hidden" }}>
+              <div style={{ width: "85%", height: "100%", background: "linear-gradient(90deg, #1B3061, #2563EB)", borderRadius: 10 }} />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -756,6 +812,7 @@ export default function HomePage() {
               return (
                 <div
                   key={i}
+                  className="homepage-challenge-card"
                   style={{
                     background: "#FFFFFF",
                     borderRadius: 24,
@@ -832,6 +889,7 @@ export default function HomePage() {
               return (
                 <div
                   key={i}
+                  className="homepage-feature-card"
                   style={{
                     background: "#F8FAFC",
                     borderRadius: 20,
@@ -1260,7 +1318,48 @@ export default function HomePage() {
             display: none !important;
           }
           .map-floating-widget-bottom {
-            width: calc(100% - 36px) !important;
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .homepage-header-cta {
+            padding: 7px 12px !important;
+            font-size: 0.76rem !important;
+            gap: 4px !important;
+          }
+          .homepage-stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+            margin-bottom: 24px !important;
+          }
+          .homepage-stat-card {
+            padding: 12px 14px !important;
+            gap: 10px !important;
+            border-radius: 16px !important;
+          }
+          .homepage-stat-card .stat-icon-wrapper {
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 10px !important;
+          }
+          .homepage-stat-card .stat-icon-wrapper svg {
+            width: 20px !important;
+            height: 20px !important;
+          }
+          .homepage-stat-card .stat-value {
+            font-size: 1.35rem !important;
+          }
+          .homepage-stat-card .stat-label {
+            font-size: 0.62rem !important;
+          }
+          .homepage-challenge-card {
+            padding: 20px 18px !important;
+            border-radius: 18px !important;
+          }
+          .homepage-feature-card {
+            padding: 18px 16px !important;
+            border-radius: 16px !important;
           }
         }
       `}</style>

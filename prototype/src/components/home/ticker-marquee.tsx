@@ -30,23 +30,26 @@ export default function TickerMarquee({ onOpenAnnouncement }: TickerMarqueeProps
       fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
     }}>
       {/* Static Left Label Badge */}
-      <div style={{
-        background: "#1B3061",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "0 18px",
-        fontWeight: 800,
-        fontSize: "0.72rem",
-        letterSpacing: "0.8px",
-        color: "#FFC000",
-        textTransform: "uppercase",
-        flexShrink: 0,
-        zIndex: 5,
-        borderRight: "1px solid rgba(255, 192, 0, 0.3)",
-        boxShadow: "4px 0 12px rgba(0,0,0,0.2)",
-      }}>
+      <div
+        className="ticker-left-badge"
+        style={{
+          background: "#1B3061",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "0 18px",
+          fontWeight: 800,
+          fontSize: "0.72rem",
+          letterSpacing: "0.8px",
+          color: "#FFC000",
+          textTransform: "uppercase",
+          flexShrink: 0,
+          zIndex: 5,
+          borderRight: "1px solid rgba(255, 192, 0, 0.3)",
+          boxShadow: "4px 0 12px rgba(0,0,0,0.2)",
+        }}
+      >
         <span style={{
           width: 8,
           height: 8,
@@ -68,8 +71,11 @@ export default function TickerMarquee({ onOpenAnnouncement }: TickerMarqueeProps
           position: "relative",
           display: "flex",
           alignItems: "center",
+          cursor: "pointer",
         }}
         className="ticker-track-container"
+        onClick={onOpenAnnouncement}
+        title="Ketuk untuk membaca pengumuman lengkap"
       >
         <div className="ticker-track">
           {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, idx) => (
@@ -77,12 +83,10 @@ export default function TickerMarquee({ onOpenAnnouncement }: TickerMarqueeProps
               key={idx}
               style={{
                 display: "inline-block",
-                padding: "0 32px",
+                padding: "0 28px",
                 color: "#E2E8F0",
                 fontWeight: 500,
-                cursor: "pointer",
               }}
-              onClick={onOpenAnnouncement}
             >
               {item}
             </span>
@@ -94,6 +98,7 @@ export default function TickerMarquee({ onOpenAnnouncement }: TickerMarqueeProps
       {onOpenAnnouncement && (
         <button
           onClick={onOpenAnnouncement}
+          className="ticker-action-button"
           style={{
             height: "100%",
             background: "rgba(255, 192, 0, 0.12)",
@@ -139,6 +144,17 @@ export default function TickerMarquee({ onOpenAnnouncement }: TickerMarqueeProps
         @keyframes tickerScroll {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
+        }
+
+        @media (max-width: 640px) {
+          .ticker-action-button {
+            display: none !important;
+          }
+          .ticker-left-badge {
+            padding: 0 10px !important;
+            font-size: 0.65rem !important;
+            gap: 5px !important;
+          }
         }
       `}</style>
     </div>

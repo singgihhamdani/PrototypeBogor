@@ -475,10 +475,16 @@ export default function VideoShowcase() {
           .video-split-container {
             flex-direction: column !important;
             height: auto !important;
+            border-radius: 20px !important;
           }
           .video-item {
             flex: none !important;
-            min-height: 220px !important;
+            min-height: 85px !important;
+            padding: 16px 18px !important;
+          }
+          .video-item.active {
+            min-height: 270px !important;
+            padding: 24px 20px !important;
           }
         }
       `}</style>

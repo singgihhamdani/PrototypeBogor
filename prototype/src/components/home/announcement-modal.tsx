@@ -119,16 +119,20 @@ export default function AnnouncementModal({ forceOpen, onClose }: AnnouncementMo
       padding: 20,
       animation: "modalFadeIn 0.3s ease",
     }}>
-      <div style={{
-        position: "relative",
-        width: "100%",
-        maxWidth: 620,
-        background: "#FFFFFF",
-        borderRadius: 24,
-        overflow: "hidden",
-        boxShadow: "0 25px 70px rgba(0,0,0,0.35)",
-        border: "1px solid rgba(255,255,255,0.4)",
-      }}>
+      <div
+        className="announcement-modal-dialog"
+        style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: 620,
+          maxHeight: "90vh",
+          overflowY: "auto",
+          background: "#FFFFFF",
+          borderRadius: 24,
+          boxShadow: "0 25px 70px rgba(0,0,0,0.35)",
+          border: "1px solid rgba(255,255,255,0.4)",
+        }}
+      >
         {/* Modal Close Button */}
         <button
           onClick={handleClose}
@@ -155,13 +159,16 @@ export default function AnnouncementModal({ forceOpen, onClose }: AnnouncementMo
         </button>
 
         {/* Slide Visual Header Banner */}
-        <div style={{
-          background: slide.gradient,
-          padding: "36px 32px 30px",
-          color: "#FFFFFF",
-          position: "relative",
-          overflow: "hidden",
-        }}>
+        <div
+          className="announcement-modal-header"
+          style={{
+            background: slide.gradient,
+            padding: "36px 32px 30px",
+            color: "#FFFFFF",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
           {/* Subtle background decoration */}
           <div style={{
             position: "absolute",
@@ -203,7 +210,7 @@ export default function AnnouncementModal({ forceOpen, onClose }: AnnouncementMo
         </div>
 
         {/* Slide Body Content */}
-        <div style={{ padding: "26px 32px" }}>
+        <div className="announcement-modal-body" style={{ padding: "26px 32px" }}>
           <p style={{
             fontSize: "0.92rem",
             color: "#475569",
@@ -338,6 +345,22 @@ export default function AnnouncementModal({ forceOpen, onClose }: AnnouncementMo
         @keyframes modalFadeIn {
           from { opacity: 0; transform: scale(0.96); }
           to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 640px) {
+          .announcement-modal-dialog {
+            border-radius: 18px !important;
+            max-height: 88vh !important;
+          }
+          .announcement-modal-header {
+            padding: 24px 18px 20px !important;
+          }
+          .announcement-modal-header h3 {
+            font-size: 1.15rem !important;
+          }
+          .announcement-modal-body {
+            padding: 18px !important;
+          }
         }
       `}</style>
     </div>

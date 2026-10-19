@@ -177,11 +177,38 @@ body {
     display: none !important;
   }
 }
-
 @media (max-width: 767px) {
   .homepage-hero-section {
-    padding-top: 115px !important;
+    padding-top: 152px !important;
     padding-bottom: 36px !important;
+  }
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Responsive display helpers for home map widgets */
+@media (max-width: 767px) {
+  .map-floating-widget-desktop {
+    display: none !important;
+  }
+  .map-floating-widget-mobile {
+    display: block !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .map-floating-widget-desktop {
+    display: block !important;
+  }
+  .map-floating-widget-mobile {
+    display: none !important;
   }
 }
 

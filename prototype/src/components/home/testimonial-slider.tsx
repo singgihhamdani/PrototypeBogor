@@ -157,15 +157,18 @@ export default function TestimonialSlider() {
             </div>
 
             {/* Quote Text */}
-            <blockquote style={{
-              fontSize: "1.15rem",
-              lineHeight: 1.7,
-              color: "#1E293B",
-              fontWeight: 500,
-              margin: "0 0 28px 0",
-              position: "relative",
-              zIndex: 2,
-            }}>
+            <blockquote
+              className="testimonial-quote"
+              style={{
+                fontSize: "clamp(0.95rem, 2.5vw, 1.15rem)",
+                lineHeight: 1.65,
+                color: "#1E293B",
+                fontWeight: 500,
+                margin: "0 0 24px 0",
+                position: "relative",
+                zIndex: 2,
+              }}
+            >
               &ldquo;{current.quote}&rdquo;
             </blockquote>
 
@@ -290,7 +293,9 @@ export default function TestimonialSlider() {
       <style>{`
         @media (max-width: 640px) {
           .testimonial-card {
-            padding: 28px 20px !important;
+            padding: 24px 18px !important;
+            border-radius: 18px !important;
+            min-height: 240px !important;
           }
         }
       `}</style>
