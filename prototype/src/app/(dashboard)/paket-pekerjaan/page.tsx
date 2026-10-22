@@ -276,7 +276,7 @@ export default function PaketPekerjaanPage() {
             Paket Pekerjaan Konstruksi Kab. Bogor
           </h1>
           <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
-            Pemantauan progres fisik, realisasi keuangan, dan Kurva-S proyek APBD/DAK TA 2026 (Format Sinkronisasi SIPJAKI)
+            Pemantauan progres fisik, realisasi keuangan, dan data kontrak proyek APBD/DAK TA 2026 (Format Sinkronisasi SIPJAKI)
           </p>
         </div>
 
@@ -640,7 +640,7 @@ export default function PaketPekerjaanPage() {
       {/* DataTableView */}
       <DataTableView<ProjectItem>
         title={`Daftar Paket Pekerjaan Konstruksi (${filtered.length})`}
-        subtitle="Data paket proyek fisik APBD/DAK dengan status pelaporan progres Kurva-S"
+        subtitle="Data paket proyek fisik APBD/DAK dengan status pelaporan progres fisik & keuangan"
         data={filtered}
         columns={columns}
         defaultPageSize={10}
@@ -665,7 +665,7 @@ export default function PaketPekerjaanPage() {
             }}
           >
             <Eye style={{ width: "13px", height: "13px" }} />
-            <span>Detail / Kurva-S</span>
+            <span>Detail Proyek</span>
           </Link>
         )}
       />

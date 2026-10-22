@@ -1,12 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth, DEMO_USERS, RoleCode } from "@/lib/mock-auth";
 import { 
   Eye, EyeOff, ShieldCheck, Building2, 
   ArrowRight, Key, Mail, Lock, Sparkles, UserCheck, Crown, ClipboardCheck,
-  ArrowLeft, Home
+  ArrowLeft, Home, ShieldAlert
 } from "lucide-react";
 import Logo, { BrandIcon } from "@/components/ui/logo";
 import { useResponsive } from "@/lib/use-responsive";
@@ -18,9 +18,34 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedDemoUser, setSelectedDemoUser] = useState("superadmin");
+  const [redirectPath, setRedirectPath] = useState<string | null>(null);
   const { login } = useAuth();
   const router = useRouter();
   const { isMobile, isMounted } = useResponsive();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect");
+      if (redirect) {
+        setRedirectPath(redirect);
+      }
+    }
+  }, []);
+
+  const getPageTitleFromPath = (path: string) => {
+    if (path.includes("/regulasi")) return "Regulasi & Dasar Hukum";
+    if (path.includes("/profil-opd")) return "Profil 40 OPD";
+    if (path.includes("/pelaporan")) return "Pelaporan SIPJAKI PUPR";
+    if (path.includes("/kecelakaan")) return "Pencatatan K3 Konstruksi";
+    if (path.includes("/webgis")) return "WebGIS Geospasial";
+    if (path.includes("/pengawasan")) return "Audit Pengawasan SIMAK";
+    if (path.includes("/pelatihan")) return "Pelatihan & Sertifikasi SKK";
+    if (path.includes("/bujk")) return "Direktori BUJK";
+    if (path.includes("/paket-pekerjaan")) return "Paket Pekerjaan Konstruksi";
+    if (path.includes("/dashboard")) return "Dashboard Analitik";
+    return "Halaman Tujuan";
+  };
 
   const handleSelectDemo = (usernameKey: string) => {
     setSelectedDemoUser(usernameKey);
@@ -39,7 +64,8 @@ export default function LoginPage() {
     
     const result = await login(email, password);
     if (result.success) {
-      router.push(result.targetRoute);
+      const destination = redirectPath || result.targetRoute;
+      router.push(destination);
     } else {
       setError(result.error || "Kombinasi email atau kata sandi tidak valid.");
       setLoading(false);
@@ -459,6 +485,28 @@ export default function LoginPage() {
                   Akses modul pembinaan, pengawasan SIMAK, dan pelaporan internal
                 </p>
               </div>
+
+              {/* Target Redirect Notice */}
+              {redirectPath && (
+                <div 
+                  style={{
+                    backgroundColor: "#EFF6FF",
+                    border: "1px solid #BFDBFE",
+                    borderRadius: "12px",
+                    padding: "10px 14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    color: "#1E40AF"
+                  }}
+                >
+                  <ShieldAlert style={{ width: "20px", height: "20px", color: "#2563EB", flexShrink: 0 }} />
+                  <div style={{ fontSize: "12px", lineHeight: "1.4" }}>
+                    <strong style={{ color: "#1E3A8A" }}>Akses Terbatas:</strong> Silakan masuk ke akun Anda terlebih dahulu untuk mengakses menu{" "}
+                    <strong style={{ color: "#0F2E5C", textDecoration: "underline" }}>{getPageTitleFromPath(redirectPath)}</strong>.
+                  </div>
+                </div>
+              )}
 
               {/* Demo Account Fast Selector */}
               <div 

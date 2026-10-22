@@ -12,9 +12,15 @@ import RoleSwitcherModal from "@/components/layout/role-switcher-modal";
 
 export default function BujkPortalLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, isInitialized } = useAuth();
   const [showSwitcher, setShowSwitcher] = useState(false);
   const [activeHash, setActiveHash] = useState<string>("#dashboard");
+
+  useEffect(() => {
+    if (isInitialized && !user) {
+      router.replace("/portal/login");
+    }
+  }, [isInitialized, user, router]);
 
   useEffect(() => {
     const handleHash = () => {
@@ -31,6 +37,27 @@ export default function BujkPortalLayout({ children }: { children: React.ReactNo
     logout();
     router.push("/portal/login");
   };
+
+  if (!isInitialized || !user) {
+    return (
+      <div 
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#0A2540",
+          color: "#FFFFFF",
+          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+          gap: "16px"
+        }}
+      >
+        <BrandIcon size={48} />
+        <span style={{ fontSize: "14px", fontWeight: 700 }}>Memverifikasi Sesi Rekanan BUJK...</span>
+      </div>
+    );
+  }
 
   const navLinks = [
     { hash: "#dashboard", label: "Dashboard Badan Usaha", href: "/portal/bujk#dashboard", icon: Building2 },

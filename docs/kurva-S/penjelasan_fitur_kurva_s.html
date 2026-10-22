@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penjelasan Fitur Kurva-S & Tata Kelola Kewenangan — SIJAKON Kabupaten Bogor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --primary-dark: #172554;
+      --accent: #0284c7;
+      --success: #059669;
+      --success-bg: #ecfdf5;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --info: #0891b2;
+      --info-bg: #ecfeff;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 0;
+    }
+
+    /* Top Banner Status */
+    .status-banner {
+      background: linear-gradient(90deg, #b45309, #d97706);
+      color: #ffffff;
+      padding: 10px 24px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .status-banner .badge {
+      background: rgba(255,255,255,0.25);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.75rem;
+    }
+
+    /* Header Nav */
+    header.hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0369a1 100%);
+      color: #ffffff;
+      padding: 56px 24px 64px;
+      position: relative;
+      overflow: hidden;
+    }
+    header.hero::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.15), transparent 50%);
+      pointer-events: none;
+    }
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+    .tag-blue { background: rgba(59, 130, 246, 0.25); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3); }
+    .tag-amber { background: rgba(245, 158, 11, 0.25); color: #fde68a; border: 1px solid rgba(253, 230, 138, 0.3); }
+    .tag-green { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid rgba(110, 231, 183, 0.3); }
+
+    h1.hero-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      color: #ffffff;
+    }
+    p.hero-desc {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      max-width: 860px;
+      margin-bottom: 24px;
+    }
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .hero-stat-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      padding: 16px 20px;
+      border-radius: var(--radius);
+    }
+    .hero-stat-card .label {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .hero-stat-card .value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 4px;
+    }
+
+    /* Main Container */
+    main.main-content {
+      max-width: 1200px;
+      margin: -32px auto 60px;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Navigation Quick Tabs */
+    .quick-nav {
+      background: #ffffff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+    .quick-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 10px 18px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .quick-nav a:hover, .quick-nav a.active {
+      color: var(--primary);
+      background: #eff6ff;
+    }
+
+    /* Section Styles */
+    section.doc-section {
+      background: #ffffff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      padding: 36px 32px;
+      margin-bottom: 32px;
+    }
+    .section-header {
+      margin-bottom: 24px;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-header .icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .section-header p.sub {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      border-left: 4px solid;
+    }
+    .callout-info {
+      background: var(--info-bg);
+      border-color: var(--info);
+      color: #155e75;
+    }
+    .callout-warning {
+      background: var(--warning-bg);
+      border-color: var(--warning);
+      color: #92400e;
+    }
+    .callout-success {
+      background: var(--success-bg);
+      border-color: var(--success);
+      color: #065f46;
+    }
+    .callout-danger {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+      color: #991b1b;
+    }
+    .callout .callout-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .callout .callout-text h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .callout .callout-text p {
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    /* Benefit Grid */
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .benefit-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    .benefit-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: #cbd5e1;
+    }
+    .benefit-card .card-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-bupati { background: #fee2e2; color: #991b1b; }
+    .badge-ppk { background: #e0e7ff; color: #3730a3; }
+    .badge-pengawas { background: #fef3c7; color: #92400e; }
+    .badge-kontraktor { background: #ecfdf5; color: #065f46; }
+    .badge-apip { background: #f3e8ff; color: #6b21a8; }
+    .badge-sipjaki { background: #e0f2fe; color: #0369a1; }
+
+    .benefit-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+    .benefit-card ul {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 12px;
+    }
+    .benefit-card ul li {
+      font-size: 0.875rem;
+      color: #334155;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .benefit-card ul li::before {
+      content: "✔";
+      color: var(--success);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Tables */
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+    table.data-table thead {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+    table.data-table th, table.data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    table.data-table tbody tr:hover {
+      background: #f8fafc;
+    }
+    table.data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* RACI Badges */
+    .raci-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .raci-r { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; } /* Responsible */
+    .raci-a { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; } /* Accountable */
+    .raci-c { background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; } /* Consulted */
+    .raci-i { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; } /* Informed */
+
+    /* SCM / Kontrak Kritis Zones */
+    .scm-zones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .scm-card {
+      border-radius: 10px;
+      padding: 18px;
+      border: 1px solid;
+    }
+    .scm-card-green { background: #f0fdf4; border-color: #86efac; color: #166534; }
+    .scm-card-yellow { background: #fefce8; border-color: #fde047; color: #854d0e; }
+    .scm-card-red { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+
+    .scm-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .scm-card p {
+      font-size: 0.825rem;
+      line-height: 1.45;
+    }
+
+    /* Visual Workflow Steps */
+    .workflow-timeline {
+      position: relative;
+      margin: 32px 0 16px;
+      padding-left: 28px;
+    }
+    .workflow-timeline::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      bottom: 10px;
+      width: 2px;
+      background: #e2e8f0;
+    }
+    .workflow-step {
+      position: relative;
+      margin-bottom: 28px;
+    }
+    .workflow-step:last-child {
+      margin-bottom: 0;
+    }
+    .step-dot {
+      position: absolute;
+      left: -28px;
+      top: 2px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    .step-content {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+    .step-content h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-content p {
+      font-size: 0.875rem;
+      color: #475569;
+    }
+
+    /* Comparison Box */
+    .comparison-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    @media (max-width: 768px) {
+      .comparison-container {
+        grid-template-columns: 1fr;
+      }
+      h1.hero-title {
+        font-size: 1.75rem;
+      }
+    }
+    .comparison-box {
+      border-radius: var(--radius);
+      padding: 20px;
+      border: 1px solid;
+    }
+    .box-current {
+      background: #fff1f2;
+      border-color: #fecdd3;
+    }
+    .box-proposed {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+    .comparison-box h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .box-current h4 { color: #be123c; }
+    .box-proposed h4 { color: #15803d; }
+    .comparison-box ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .comparison-box ul li {
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .box-current ul li::before {
+      content: "✕";
+      position: absolute;
+      left: 0;
+      color: #e11d48;
+      font-weight: 700;
+    }
+    .box-proposed ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #16a34a;
+      font-weight: 700;
+    }
+
+    /* Footer */
+    footer.doc-footer {
+      max-width: 1200px;
+      margin: 0 auto 60px;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    .footer-stamp {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 9999px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    /* Print styling */
+    @media print {
+      body {
+        background: #ffffff;
+        color: #000000;
+      }
+      .status-banner, .quick-nav {
+        display: none;
+      }
+      header.hero {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 20px 0;
+      }
+      header.hero * {
+        color: #000000 !important;
+      }
+      section.doc-section {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Status Banner -->
+  <div class="status-banner">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 1.1rem;">⚠️</span>
+      <span>DOKUMEN PENJELASAN KONSEP & TATA KELOLA — <strong>BELUM DIEKSEKUSI KE KODE PROGRAM</strong></span>
+    </div>
+    <span class="badge">STATUS: REVIEW & ALIGNMENT</span>
+  </div>
+
+  <!-- Hero Header -->
+  <header class="hero">
+    <div class="header-container">
+      <div class="header-meta">
+        <span class="tag tag-blue">SIJAKON KABUPATEN BOGOR</span>
+        <span class="tag tag-amber">MODUL 3: BUJK & PAKET PEKERJAAN</span>
+        <span class="tag tag-green">REKOMENDASI KAK 2026 / PERMEN PUPR 1/2023</span>
+      </div>
+
+      <h1 class="hero-title">Penjelasan Fitur Monitoring Progres & Kurva-S<br><span style="color: #38bdf8; font-weight: 600; font-size: 1.8rem;">Manfaat Strategis, Matriks Kewenangan (RBAC), dan Tata Kelola Pengendalian Kontrak</span></h1>
+
+      <p class="hero-desc">
+        Kurva-S bukan sekadar grafik matematis, melainkan instrumen hukum dan manajerial utama bagi Pemerintah Kabupaten Bogor dalam memastikan seluruh paket pekerjaan konstruksi fisik selesai tepat waktu, tepat mutu, dan tepat anggaran tanpa risiko proyek mangkrak.
+      </p>
+
+      <div class="hero-stats">
+        <div class="hero-stat-card">
+          <div class="label">Dasar Hukum Utama</div>
+          <div class="value">Permen PUPR 1/2023</div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Tertib Penyelenggaraan Konstruksi</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="label">Early Warning Standard</div>
+          <div class="value">SE PUPR 15/2019</div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Tata Cara Show Cause Meeting (SCM)</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="label">Integrasi Nasional</div>
+          <div class="value">SIPJAKI KemenPUPR</div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Pelaporan Berkala Sub-Urusan Jakon</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="label">Tingkat Kewenangan</div>
+          <div class="value">6 Level Pengguna</div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Dari Pimpinan Daerah s/d Kontraktor</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Quick Navigation -->
+    <nav class="quick-nav">
+      <a href="#definisi">1. Definisi & Filosofi</a>
+      <a href="#manfaat">2. Manfaat Multi-Pihak</a>
+      <a href="#kewenangan">3. Matriks Kewenangan (RBAC)</a>
+      <a href="#scm">4. Early Warning & SCM</a>
+      <a href="#alur">5. Alur Kerja Fitur</a>
+      <a href="#komparasi">6. Kondisi Eksisting vs Usulan</a>
+    </nav>
+
+    <!-- SECTION 1: DEFINISI & FILOSOFI -->
+    <section id="definisi" class="doc-section">
+      <div class="section-header">
+        <div class="icon-wrap">📈</div>
+        <div>
+          <h2>1. Definisi, Karakteristik & Filosofi Fitur Kurva-S</h2>
+          <p class="sub">Mengapa setiap proyek konstruksi di Kabupaten Bogor unik dan membutuhkan kurva yang fleksibel</p>
+        </div>
+      </div>
+
+      <p style="margin-bottom: 16px;">
+        <strong>Kurva-S (S-Curve)</strong> adalah representasi grafis hubungan antara akumulasi progres fisik atau finansial pekerjaan (sumbu Y, 0–100%) terhadap waktu kalender pelaksanaan proyek (sumbu X, dari tanggal SPMK hingga PHO). Bentuknya menyerupai huruf <em>"S"</em> karena laju progres pekerjaan konstruksi biasanya lambat pada fase awal (persiapan & pembersihan), sangat cepat pada fase tengah (pekerjaan struktur utama), dan kembali melandai pada fase akhir (finishing, perapihan & uji fungsi).
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">💡</div>
+        <div class="callout-text">
+          <h4>Kritik Mendasar: Mengapa Tidak Boleh Memakai Data Seragam (Hardcoded)?</h4>
+          <p>
+            Karakteristik setiap paket proyek konstruksi di Kabupaten Bogor <strong>sangat bervariasi</strong>:
+          </p>
+          <ul style="margin-top: 8px; margin-left: 20px; font-size: 0.85rem;">
+            <li><strong>Paket Peningkatan Jalan & Jembatan:</strong> Dipengaruhi musim hujan dan pasokan hotmix. Laju progres melonjak tinggi saat pengaspalan (pekerjaan cepat berbiaya tinggi).</li>
+            <li><strong>Paket Gedung & Sarana Pendidikan:</strong> Kurva linier stabil pada pekerjaan lantai tipikal, namun melandai panjang pada pekerjaan MEP dan interior.</li>
+            <li><strong>Paket Drainase & TPT (Tembok Penahan Tanah):</strong> Rentan bencana longsor; membutuhkan porsi waktu galian yang lambat sebelum pasangan batu dimulai.</li>
+            <li><strong>Durasi Kontrak:</strong> Ada paket PL berdurasi 60 hari kalender, paket lelang 180 hari, hingga kontrak multi-years (tahun jamak).</li>
+          </ul>
+          <p style="margin-top: 8px; font-weight: 600;">
+            Oleh karena itu, sistem wajib memperbolehkan penetapan kurva rencana (baseline) sesuai jadwal resmi kontrak masing-masing proyek, bukan rumus angka statis.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: MANFAAT FITUR -->
+    <section id="manfaat" class="doc-section">
+      <div class="section-header">
+        <div class="icon-wrap">🎯</div>
+        <div>
+          <h2>2. Manfaat Strategis Berdasarkan Pemangku Kepentingan</h2>
+          <p class="sub">Nilai tambah konkret bagi seluruh jajaran pemerintahan daerah, penyedia jasa, dan auditor</p>
+        </div>
+      </div>
+
+      <div class="benefit-grid">
+
+        <!-- Card 1: Pimpinan Daerah -->
+        <div class="benefit-card">
+          <span class="card-badge badge-bupati">Pimpinan Eksekutif</span>
+          <h3>Bupati, Sekda & Kadis PUPR</h3>
+          <p style="font-size: 0.85rem; color: #64748b;">Pengambilan keputusan strategis berbasis data waktu nyata (Real-Time Executive Intelligence).</p>
+          <ul>
+            <li><strong>Deteksi Dini Titik Kritis:</strong> Mengetahui daftar paket proyek yang deviasinya minus sebelum terjadi kegagalan serapan anggaran di akhir tahun.</li>
+            <li><strong>Dashboard Portofolio Spasial:</strong> Melihat kondisi seluruh 40 kecamatan Kab. Bogor dalam satu peta komprehensif.</li>
+            <li><strong>Penegasan Akuntabilitas OPD:</strong> Mendorong dinas teknis (PUPR, Disdik, Dinkes, PRKP) menyelesaikan program prioritas RPJMD tanpa keterlambatan.</li>
+          </ul>
+        </div>
+
+        <!-- Card 2: PPK / Pengelola Proyek OPD -->
+        <div class="benefit-card">
+          <span class="card-badge badge-ppk">Pengelola Teknis</span>
+          <h3>PPK & PPTK OPD Pengguna</h3>
+          <p style="font-size: 0.85rem; color: #64748b;">Instrumen hukum dan administrasi kendali kontrak pengadaan barang/jasa.</p>
+          <ul>
+            <li><strong>Landasan Hukum Surat Peringatan:</strong> Memiliki data faktual untuk menerbitkan SP-1, SP-2, hingga pemanggilan <em>Show Cause Meeting (SCM)</em>.</li>
+            <li><strong>Sinkronisasi Fisik vs Keuangan:</strong> Mencegah overpayment dengan membandingkan pencairan termin SP2D terhadap opname fisik di lapangan.</li>
+            <li><strong>Tracking Riwayat Addendum:</strong> Membandingkan Kurva-S awal (Kontrak Awal) dengan Kurva-S Adendum (CCO) jika terjadi perubahan ruang lingkup.</li>
+          </ul>
+        </div>
+
+        <!-- Card 3: Konsultan Pengawas -->
+        <div class="benefit-card">
+          <span class="card-badge badge-pengawas">Pengawasan Lapangan</span>
+          <h3>Konsultan Pengawas / Tim Teknis</h3>
+          <p style="font-size: 0.85rem; color: #64748b;">Standarisasi pelaporan mingguan dan verifikasi opname volume pekerjaan.</p>
+          <ul>
+            <li><strong>Input Data Mingguan Terstandar:</strong> Menggantikan rekap spreadsheet manual yang rentan hilang atau terlambat dikirim.</li>
+            <li><strong>Dokumentasi Bukti Geotagging:</strong> Setiap input progres wajib melampirkan foto dokumentasi koordinat GPS dan catatan cuaca/kendala.</li>
+            <li><strong>Verifikasi Bertingkat:</strong> Memastikan angka yang diajukan kontraktor telah diuji dan diopname secara objektif di lapangan.</li>
+          </ul>
+        </div>
+
+        <!-- Card 4: Penyedia Jasa / Kontraktor -->
+        <div class="benefit-card">
+          <span class="card-badge badge-kontraktor">Penyedia Jasa</span>
+          <h3>BUJK / Kontraktor Pelaksana</h3>
+          <p style="font-size: 0.85rem; color: #64748b;">Transparansi penilaian kinerja dan kelancaran proses termin pembayaran.</p>
+          <ul>
+            <li><strong>Kepastian Klaim Progres:</strong> Mempercepat verifikasi berita acara kemajuan pekerjaan fisik untuk pencairan termin.</li>
+            <li><strong>Perlindungan Hak Kontrak:</strong> Menjadi bukti rekam jejak apabila keterlambatan disebabkan faktor eksternal (curah hujan ekstrem, pembebasan lahan, force majeure).</li>
+            <li><strong>Peningkatan Kredibilitas Usaha:</strong> Proyek yang selesai on-time terekam dalam portofolio SIPJAKI Kabupaten Bogor.</li>
+          </ul>
+        </div>
+
+        <!-- Card 5: Inspektorat / APIP & BPK -->
+        <div class="benefit-card">
+          <span class="card-badge badge-apip">Pengawasan Internal</span>
+          <h3>Inspektorat (APIP) & BPK RI</h3>
+          <p style="font-size: 0.85rem; color: #64748b;">Pencegahan tindak pidana korupsi dan audit kepatuhan pengadaan barang/jasa.</p>
+          <ul>
+            <li><strong>Audit Trail Tidak Dapat Dimanipulasi:</strong> Seluruh riwayat tanggal input, nama operator yang memasukkan, dan perubahan tersimpan di sistem.</li>
+            <li><strong>Mencegah Backdating & Fiktif:</strong> Menolak penginputan progres mundur yang sering dimanipulasi saat jelang audit akhir tahun.</li>
+            <li><strong>Evaluasi Kinerja Penyedia:</strong> Identifikasi BUJK yang memiliki rekam jejak wanprestasi berulang kali.</li>
+          </ul>
+        </div>
+
+        <!-- Card 6: Integrasi SIPJAKI & Publik -->
+        <div class="benefit-card">
+          <span class="card-badge badge-sipjaki">Regulasi & Tata Kelola</span>
+          <h3>Pembina Jakon & Publik</h3>
+          <p style="font-size: 0.85rem; color: #64748b;">Pemenuhan mandat UU No. 2/2017 & Keterbukaan Informasi Publik (KIP).</p>
+          <ul>
+            <li><strong>Sinkronisasi SIPJAKI KemenPUPR:</strong> Pemenuhan indikator pengawasan Tertib Penyelenggaraan Jasa Konstruksi (Permen PUPR 1/2023).</li>
+            <li><strong>Keterbukaan Informasi Publik Terbatas:</strong> Masyarakat dapat memantau pembangunan fasilitas publik di desanya (tanpa membuka rahasia harga satuan).</li>
+            <li><strong>Peningkatan Kepuasan Warga:</strong> Meminimalisir jalan mangkrak dan jembatan terbengkalai di wilayah pelosok Bogor.</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 3: KEWENANGAN & RBAC -->
+    <section id="kewenangan" class="doc-section">
+      <div class="section-header">
+        <div class="icon-wrap">🛡️</div>
+        <div>
+          <h2>3. Matriks Kewenangan & Hak Akses Pengguna (RBAC Matrix)</h2>
+          <p class="sub">Pembagian peran yang jelas untuk menjaga integritas dan keabsahan data laporan proyek</p>
+        </div>
+      </div>
+
+      <p style="margin-bottom: 16px;">
+        Untuk mencegah terjadinya manipulasi data kemajuan proyek (misalnya kontraktor menaikkan angka sendiri atau operator salah mengedit kurva baseline), sistem menerapkan prinsip pemisahan tugas <em>(Segregation of Duties)</em> berbasis peran:
+      </p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 28%;">Fungsi / Aksi Fitur Kurva-S</th>
+              <th style="text-align: center; width: 12%;">Super Admin</th>
+              <th style="text-align: center; width: 12%;">Bina Konstruksi</th>
+              <th style="text-align: center; width: 12%;">PPK / OPD</th>
+              <th style="text-align: center; width: 12%;">Konsultan Pengawas</th>
+              <th style="text-align: center; width: 12%;">Kontraktor (BUJK)</th>
+              <th style="text-align: center; width: 12%;">Eksekutif / Bupati</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Setup Kurva Baseline (Rencana Awal)</strong><br><small style="color:#64748b">Input jadwal rencana sesuai kontrak awal</small></td>
+              <td style="text-align: center;"><span class="raci-pill raci-a" title="Accountable">A</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-c" title="Consulted">C</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-r" title="Responsible (Otorisasi)">R</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-c" title="Consulted">C</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-r" title="Responsible (Draft)">R</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+            </tr>
+            <tr>
+              <td><strong>Input Progres Mingguan/Bulanan (Fisik)</strong><br><small style="color:#64748b">Entri capaian % aktual & kendala lapangan</small></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-a" title="Accountable">A</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-r" title="Responsible (Input Utama)">R</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-r" title="Responsible (Usulan)">R</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+            </tr>
+            <tr>
+              <td><strong>Verifikasi & Kunci Data Progres</strong><br><small style="color:#64748b">Pengesahan angka resmi (Lock Period)</small></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-r" title="Responsible (Pengesahan Akhir)">R</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-r" title="Responsible (Verifikasi Lapangan)">R</span></td>
+              <td style="text-align: center;">—</td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+            </tr>
+            <tr>
+              <td><strong>Update Realisasi Keuangan (SP2D)</strong><br><small style="color:#64748b">Input pencairan dana kas daerah BPKAD</small></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-r" title="Responsible (Bendahara/PPK)">R</span></td>
+              <td style="text-align: center;">—</td>
+              <td style="text-align: center;">—</td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+            </tr>
+            <tr>
+              <td><strong>Re-baseline Kurva-S (Addendum / CCO)</strong><br><small style="color:#64748b">Perubahan jadwal karena tambah-kurang waktu</small></td>
+              <td style="text-align: center;"><span class="raci-pill raci-a" title="Accountable">A</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-c" title="Consulted">C</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-r" title="Responsible (Hanya PPK)">R</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-c" title="Consulted">C</span></td>
+              <td style="text-align: center;">—</td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+            </tr>
+            <tr>
+              <td><strong>Penerbitan Surat Peringatan & Trigger SCM</strong><br><small style="color:#64748b">Aksi kontraktual jika terjadi deviasi kritis</small></td>
+              <td style="text-align: center;">—</td>
+              <td style="text-align: center;"><span class="raci-pill raci-c" title="Consulted">C</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-r" title="Responsible (Kewenangan Mutlak)">R</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-c" title="Consulted (Rekomendasi)">C</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+              <td style="text-align: center;"><span class="raci-pill raci-i" title="Informed">I</span></td>
+            </tr>
+            <tr>
+              <td><strong>Melihat Dashboard & Laporan Eksekutif</strong><br><small style="color:#64748b">Pemantauan visual & export laporan PDF</small></td>
+              <td style="text-align: center;">✅ Full</td>
+              <td style="text-align: center;">✅ Full</td>
+              <td style="text-align: center;">✅ Paket OPD</td>
+              <td style="text-align: center;">✅ Paket Binaan</td>
+              <td style="text-align: center;">✅ Paket Milik</td>
+              <td style="text-align: center;">✅ Read-Only Kab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; gap: 16px; margin-top: 14px; font-size: 0.8rem; color: #64748b;">
+        <span><strong style="color:#b91c1c;">[R] Responsible:</strong> Pihak yang melakukan input/eksekusi</span>
+        <span><strong style="color:#b45309;">[A] Accountable:</strong> Pihak yang bertanggung jawab penuh secara sistem</span>
+        <span><strong style="color:#4338ca;">[C] Consulted:</strong> Pihak yang dimintai telaah/kajian teknis</span>
+        <span><strong style="color:#64748b;">[I] Informed:</strong> Pihak yang menerima notifikasi/laporan</span>
+      </div>
+    </section>
+
+    <!-- SECTION 4: EARLY WARNING & SCM -->
+    <section id="scm" class="doc-section">
+      <div class="section-header">
+        <div class="icon-wrap">🚨</div>
+        <div>
+          <h2>4. Standar Deviasi, Early Warning System & Show Cause Meeting (SCM)</h2>
+          <p class="sub">Mengacu pada SE Menteri PUPR No. 15/SE/M/2019 tentang Tata Cara Penanganan Kontrak Kritis</p>
+        </div>
+      </div>
+
+      <p style="margin-bottom: 16px;">
+        Kurva-S bukan hanya memperlihatkan angka, melainkan mengkalkulasi <strong>Deviasi (Realisasi - Rencana)</strong> secara dinamis per periode. Apabila terjadi deviasi negatif (terlambat), sistem otomatis mengkategorikan proyek ke dalam 3 zona peringatan:
+      </p>
+
+      <div class="scm-zones">
+        <div class="scm-card scm-card-green">
+          <h4>
+            <span>ZONA HIJAU (ON TRACK)</span>
+            <span>✅</span>
+          </h4>
+          <p><strong>Deviasi:</strong> Lebih besar dari -5% (atau deviasi positif).</p>
+          <p style="margin-top: 6px;">
+            Pekerjaan berjalan normal sesuai target kontrak. Tidak diperlukan intervensi khusus. Laporan rutin mingguan diteruskan.
+          </p>
+        </div>
+
+        <div class="scm-card scm-card-yellow">
+          <h4>
+            <span>ZONA KUNING (WASPADA)</span>
+            <span>⚠️</span>
+          </h4>
+          <p><strong>Deviasi:</strong> Antara -5% hingga -10%.</p>
+          <p style="margin-top: 6px;">
+            Sistem mengirim <em>In-App Notification</em> dan email peringatan dini kepada PPK dan Kontraktor. PPK mewajibkan kontraktor menyusun rencana percepatan (penambahan jam kerja/lembur atau alat).
+          </p>
+        </div>
+
+        <div class="scm-card scm-card-red">
+          <h4>
+            <span>ZONA MERAH (KONTRAK KRITIS)</span>
+            <span>⛔</span>
+          </h4>
+          <p><strong>Deviasi:</strong> Minus &gt; 10% (Tahap 0–70%) atau &gt; 5% (Tahap 70–100%).</p>
+          <p style="margin-top: 6px;">
+            <strong>Mandat Penanganan SCM:</strong> Sistem mengunci status proyek menjadi <code>CRITICAL_DELAY</code> dan memicu draft undangan <em>Show Cause Meeting Tingkat 1 (SCM-1)</em>.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout callout-info" style="margin-top: 24px;">
+        <div class="callout-icon">📋</div>
+        <div class="callout-text">
+          <h4>Tahapan Rapat Pembuktian (Show Cause Meeting / SCM)</h4>
+          <p>
+            Berdasarkan SE Menteri PUPR 15/2019, jika proyek masuk Zona Merah:
+          </p>
+          <ol style="margin-left: 20px; margin-top: 6px; font-size: 0.85rem;">
+            <li><strong>SCM Tingkat 1:</strong> Kontraktor diberi waktu uji coba <em>(Test Period)</em> selama 1-2 minggu untuk mengejar ketertinggalan kurva kompensasi.</li>
+            <li><strong>SCM Tingkat 2:</strong> Jika uji coba SCM-1 gagal, PPK menerbitkan SP-2 dan menggelar SCM-2 dengan target yang lebih ketat.</li>
+            <li><strong>SCM Tingkat 3 & Pemutusan Kontrak:</strong> Jika SCM-2 tetap gagal, PPK bersama APIP menggelar SCM-3 untuk memutuskan pemutusan kontrak secara sepihak, pencairan jaminan pelaksanaan, dan usulan blacklist ke portal LKPP.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: ALUR KERJA FITUR -->
+    <section id="alur" class="doc-section">
+      <div class="section-header">
+        <div class="icon-wrap">🔄</div>
+        <div>
+          <h2>5. Siklus Alur Kerja Fitur (End-to-End Workflow)</h2>
+          <p class="sub">Bagaimana data mengalir dari penandatanganan kontrak hingga proyek selesai dan diserahterimakan</p>
+        </div>
+      </div>
+
+      <div class="workflow-timeline">
+
+        <div class="workflow-step">
+          <div class="step-dot">1</div>
+          <div class="step-content">
+            <h4>Perekaman Kontrak & Input Baseline Kurva-S</h4>
+            <p>
+              Saat SPMK diterbitkan, Operator Kontraktor/PPK menginput informasi dasar proyek (Nama, Lokasi Kecamatan, No Kontrak, Nilai Rp, Tanggal Mulai & Selesai). Kemudian mengupload atau menginput bobot rencana per periode (mingguan atau bulanan) yang total kumulatifnya tepat 100.00%. Data ini menjadi garis putus-putus biru <em>(Plan Baseline)</em> yang terkunci permanen.
+            </p>
+          </div>
+        </div>
+
+        <div class="workflow-step">
+          <div class="step-dot">2</div>
+          <div class="step-content">
+            <h4>Pelaporan Rutin Realisasi Lapangan</h4>
+            <p>
+              Setiap akhir periode (misal tiap hari Jumat untuk mingguan atau tanggal 25 untuk bulanan), Konsultan Pengawas bersama Kontraktor mengisi realisasi progres fisik (%) yang telah di-opname bersama, disertai upload 3 foto dokumentasi fisik lapangan dengan titik koordinat geotagging dan catatan kendala cuaca.
+            </p>
+          </div>
+        </div>
+
+        <div class="workflow-step">
+          <div class="step-dot">3</div>
+          <div class="step-content">
+            <h4>Input Realisasi Keuangan (SP2D Kas Daerah)</h4>
+            <p>
+              Operator PPK atau Bendahara OPD mencatat realisasi penyerapan anggaran (uang muka, termin 1, termin 2, dst.) berdasarkan SP2D yang diterbitkan BPKAD. Sistem membentuk garis ketiga berwarna oranye/amber pada Kurva-S.
+            </p>
+          </div>
+        </div>
+
+        <div class="workflow-step">
+          <div class="step-dot">4</div>
+          <div class="step-content">
+            <h4>Kalkulasi Deviasi Otomatis & Analisis Anomali</h4>
+            <p>
+              Sistem menghitung deviasi realisasi fisik terhadap rencana pada periode berjalan. Jika deviasi minus melampaui batas toleransi, status paket pekerjaan otomatis berubah menjadi peringatan dan memunculkan badge peringatan pada Dashboard Bupati dan Kadis PUPR.
+            </p>
+          </div>
+        </div>
+
+        <div class="workflow-step">
+          <div class="step-dot">5</div>
+          <div class="step-content">
+            <h4>Penutupan Proyek, BAST & PHO</h4>
+            <p>
+              Saat progres fisik mencapai 100%, sistem mengunci kurva dan menerbitkan ringkasan kurva final sebagai lampiran wajib Berita Acara Serah Terima Pertama (BAST / PHO) untuk diverifikasi oleh Tim Pengawas Tertib Konstruksi dan dikirim ke SIPJAKI KemenPUPR.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 6: KOMPARASI KONDISI EKSISTING VS USULAN -->
+    <section id="komparasi" class="doc-section">
+      <div class="section-header">
+        <div class="icon-wrap">⚖️</div>
+        <div>
+          <h2>6. Komparasi: Kondisi Eksisting vs Rekomendasi Solusi</h2>
+          <p class="sub">Menjawab kritik mendasar sebelum fitur ini diprogram ke dalam sistem</p>
+        </div>
+      </div>
+
+      <div class="comparison-container">
+        
+        <div class="comparison-box box-current">
+          <h4>Kondisi Eksisting Saat Ini (Kelemahan)</h4>
+          <ul>
+            <li><strong>Data Hardcoded:</strong> Angka kurva rencana seragam untuk semua proyek di <code>projects.json</code>, padahal tiap proyek beda durasi dan bobot.</li>
+            <li><strong>Label Sumbu-X Generik:</strong> Menggunakan "M-1, M-2, M-3..." yang tidak menunjukkan bulan kalender sebenarnya.</li>
+            <li><strong>Deviasi Salah Hitung:</strong> Rumus deviasi selalu membandingkan realisasi dengan indeks bulan ke-8, bukan bulan berjalan aktual.</li>
+            <li><strong>Tidak Ada Form Input:</strong> Operator dinas/kontraktor tidak memiliki antarmuka untuk mencatat progres mingguan.</li>
+            <li><strong>Hanya 1 Garis Realisasi:</strong> Tidak ada pemantauan realisasi keuangan (SP2D), hanya fisik.</li>
+            <li><strong>Tidak Ada Tabel Angka:</strong> Pengguna hanya melihat garis grafik tanpa tabel rincian data numerik.</li>
+          </ul>
+        </div>
+
+        <div class="comparison-box box-proposed">
+          <h4>Rekomendasi Solusi yang Disarankan (Ideal)</h4>
+          <ul>
+            <li><strong>Dinamis Berbasis Kontrak:</strong> Jumlah titik waktu dan kurva rencana dihitung otomatis dari tanggal mulai s/d tanggal selesai kontrak.</li>
+            <li><strong>Label Kalender Riil:</strong> Menampilkan "Mar 2026, Apr 2026, Mei 2026..." sesuai jadwal nyata proyek.</li>
+            <li><strong>Deviasi Waktu Berjalan Dinamis:</strong> Deviasi dihitung otomatis pada posisi tanggal hari ini terhadap baseline kurva.</li>
+            <li><strong>Form Input Progres Terverifikasi:</strong> Modal dialog untuk entri realisasi fisik, realisasi keuangan, dan unggah foto dokumentasi.</li>
+            <li><strong>Multi-Garis Komparatif:</strong> 3 garis (Rencana Fisik, Realisasi Fisik, Realisasi Keuangan SP2D) + Shading area deviasi.</li>
+            <li><strong>Tabel Tabular Lengkap:</strong> Tabel numerik di bawah grafik yang siap diekspor ke format Excel dan PDF resmi.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="callout callout-success" style="margin-top: 24px;">
+        <div class="callout-icon">✨</div>
+        <div class="callout-text">
+          <h4>Status Pengerjaan Saat Ini</h4>
+          <p>
+            Rancangan di atas telah disusun secara konseptual. <strong>Tidak ada perubahan kode yang dieksekusi ke aplikasi saat ini</strong>. Anda dapat mempelajari penjelasan ini dan memberikan arahan mengenai opsi atau prioritas yang ingin disepakati sebelum tahap implementasi dimulai.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="doc-footer">
+    <p>Sistem Informasi Pembina Jasa Konstruksi (SIJAKON) — Pemerintah Kabupaten Bogor</p>
+    <p style="font-size: 0.8rem; margin-top: 4px;">Dinas Pekerjaan Umum dan Penataan Ruang (PUPR) Kab. Bogor</p>
+    <div class="footer-stamp">
+      <span>🔒 Dokumen Tata Kelola Internal</span>
+      <span>•</span>
+      <span>Versi Konseptual 1.0 (Oktober 2026)</span>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,39 +1,15 @@
 "use client";
-import { use, useMemo } from "react";
+import { use } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { 
   ArrowLeft, Package, Calendar, DollarSign, Building2, MapPin, 
-  FileText, TrendingUp, Download, CheckCircle2, AlertTriangle, Clock
+  FileText, Download, CheckCircle2, Clock, ShieldCheck, HardHat, ExternalLink
 } from "lucide-react";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-} from "chart.js";
-import { Line } from "react-chartjs-2";
 import { formatCurrency } from "@/lib/utils";
 import projectsData from "@/data/projects.json";
 import districtsData from "@/data/districts.json";
 import { useResponsive } from "@/lib/use-responsive";
-
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
 
 export default function PaketDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { isMobile, isMounted } = useResponsive();
@@ -45,43 +21,6 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
   }
 
   const district = districtsData.find((d) => d.id === project.districtId);
-
-  // Kurva-S chart data
-  const months = ["M-1", "M-2", "M-3", "M-4", "M-5", "M-6", "M-7", "M-8", "M-9", "M-10", "M-11"];
-  const labels = months.slice(0, project.planProgress.length);
-
-  const chartData = useMemo(() => {
-    return {
-      labels,
-      datasets: [
-        {
-          label: "Rencana Kumulatif (%)",
-          data: project.planProgress,
-          borderColor: "#0F2E5C",
-          backgroundColor: "rgba(15, 46, 92, 0.08)",
-          borderWidth: 2.5,
-          borderDash: [4, 4],
-          pointRadius: 4,
-          pointBackgroundColor: "#0F2E5C",
-          tension: 0.3,
-          fill: false,
-        },
-        {
-          label: "Realisasi Kumulatif (%)",
-          data: project.realProgress.map(v => v === 0 ? null : v),
-          borderColor: "#059669",
-          backgroundColor: "rgba(5, 150, 105, 0.12)",
-          borderWidth: 3,
-          pointRadius: 5,
-          pointBackgroundColor: "#059669",
-          tension: 0.3,
-          fill: true,
-        },
-      ],
-    };
-  }, [labels, project.planProgress, project.realProgress]);
-
-  const deviasi = project.physProgress - (project.planProgress[Math.min(project.planProgress.length - 1, 7)] || 0);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
@@ -133,7 +72,7 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button
             type="button"
-            onClick={() => alert(`Mengunduh Berita Acara & Lembar SIPJAKI ${project.id}...`)}
+            onClick={() => alert(`Mengunduh Berita Acara & Dokumen Kontrak ${project.id}...`)}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -187,12 +126,12 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
           <p style={{ fontSize: "12px", fontWeight: 700, color: "#64748B", margin: 0 }}>Progres Fisik Lapangan</p>
           <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
             <p style={{ fontSize: "26px", fontWeight: 900, color: "#0F172A", margin: 0 }}>{project.physProgress}%</p>
-            <span style={{ fontSize: "11px", fontWeight: 800, color: deviasi >= 0 ? "#059669" : "#DC2626" }}>
-              {deviasi >= 0 ? `+${deviasi}% Ahead` : `${deviasi}% Delay`}
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#059669" }}>
+              Realisasi Aktual
             </span>
           </div>
           <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden", marginTop: "4px" }}>
-            <div style={{ width: `${project.physProgress}%`, height: "100%", backgroundColor: deviasi >= 0 ? "#059669" : "#DC2626", borderRadius: "9999px" }} />
+            <div style={{ width: `${project.physProgress}%`, height: "100%", backgroundColor: "#059669", borderRadius: "9999px" }} />
           </div>
         </div>
 
@@ -211,9 +150,9 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      {/* Main Content: Kurva-S + Metadata */}
+      {/* Main Content: Execution Details + Metadata */}
       <div style={{ display: "grid", gridTemplateColumns: isMounted && isMobile ? "1fr" : "2fr 1fr", gap: "20px" }}>
-        {/* Left: Kurva-S */}
+        {/* Left: Execution Details */}
         <div 
           style={{
             borderRadius: "18px",
@@ -223,16 +162,16 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
             display: "flex",
             flexDirection: "column",
-            gap: "18px"
+            gap: "20px"
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F1F5F9", paddingBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
             <div>
               <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#0F172A", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-                <TrendingUp style={{ width: "18px", height: "18px", color: "#0F2E5C" }} /> Kurva-S Progres Konstruksi
+                <HardHat style={{ width: "18px", height: "18px", color: "#0F2E5C" }} /> Status Pelaksanaan & Pemantauan Progres
               </h2>
               <p style={{ fontSize: "12px", color: "#64748B", margin: "3px 0 0 0" }}>
-                Perbandingan Kurva Rencana (Target Kontrak) vs Realisasi Fisik Lapangan
+                Rekapitulasi pencapaian fisik lapangan, penyerapan anggaran SP2D, dan kepatuhan kontrak
               </p>
             </div>
             <span style={{ fontSize: "11px", fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "4px 12px", borderRadius: "8px" }}>
@@ -240,61 +179,63 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
             </span>
           </div>
 
-          <div style={{ height: isMounted && isMobile ? "240px" : "300px", width: "100%" }}>
-            <Line
-              data={chartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    position: "top" as const,
-                    labels: {
-                      usePointStyle: true,
-                      boxWidth: 8,
-                      font: { size: 12, weight: "bold" },
-                    },
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => ` ${context.dataset.label}: ${context.parsed.y}%`,
-                    },
-                  },
-                },
-                scales: {
-                  y: {
-                    min: 0,
-                    max: 100,
-                    ticks: {
-                      callback: (val) => `${val}%`,
-                    },
-                    grid: {
-                      color: "#F1F5F9",
-                    },
-                  },
-                  x: {
-                    grid: {
-                      display: false,
-                    },
-                  },
-                },
-              }}
-            />
+          {/* Progress Indicators */}
+          <div style={{ display: "grid", gridTemplateColumns: isMounted && isMobile ? "1fr" : "1fr 1fr", gap: "16px" }}>
+            <div style={{ backgroundColor: "#F8FAFC", borderRadius: "14px", border: "1px solid #E2E8F0", padding: "18px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                <span style={{ fontSize: "12px", fontWeight: 700, color: "#334155" }}>Kemajuan Fisik Lapangan</span>
+                <span style={{ fontSize: "14px", fontWeight: 800, color: "#059669" }}>{project.physProgress}%</span>
+              </div>
+              <div style={{ width: "100%", height: "8px", backgroundColor: "#E2E8F0", borderRadius: "9999px", overflow: "hidden" }}>
+                <div style={{ width: `${project.physProgress}%`, height: "100%", backgroundColor: "#059669", borderRadius: "9999px" }} />
+              </div>
+              <p style={{ fontSize: "11px", color: "#64748B", margin: "8px 0 0 0" }}>
+                Berdasarkan Berita Acara Opname fisik terakhir bersama Konsultan Pengawas.
+              </p>
+            </div>
+
+            <div style={{ backgroundColor: "#F8FAFC", borderRadius: "14px", border: "1px solid #E2E8F0", padding: "18px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                <span style={{ fontSize: "12px", fontWeight: 700, color: "#334155" }}>Realisasi Keuangan (SP2D)</span>
+                <span style={{ fontSize: "14px", fontWeight: 800, color: "#0F2E5C" }}>{project.finProgress}%</span>
+              </div>
+              <div style={{ width: "100%", height: "8px", backgroundColor: "#E2E8F0", borderRadius: "9999px", overflow: "hidden" }}>
+                <div style={{ width: `${project.finProgress}%`, height: "100%", backgroundColor: "#0F2E5C", borderRadius: "9999px" }} />
+              </div>
+              <p style={{ fontSize: "11px", color: "#64748B", margin: "8px 0 0 0" }}>
+                Pencairan termin anggaran daerah melalui BPKAD Kab. Bogor.
+              </p>
+            </div>
           </div>
 
-          <div style={{ paddingTop: "14px", borderTop: "1px solid #F1F5F9", display: "grid", gridTemplateColumns: isMounted && isMobile ? "1fr" : "repeat(3, 1fr)", gap: "10px", textAlign: "center" }}>
-            <div style={{ backgroundColor: "#F8FAFC", padding: "10px", borderRadius: "10px", border: "1px solid #E2E8F0" }}>
-              <p style={{ fontSize: "11px", color: "#64748B", margin: 0 }}>Target Kumulatif</p>
-              <p style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: "3px 0 0 0" }}>{project.planProgress[project.realProgress.filter(v => v>0).length - 1] || 0}%</p>
+          {/* Timeline & Milestone */}
+          <div style={{ borderRadius: "14px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "18px" }}>
+            <h3 style={{ fontSize: "13px", fontWeight: 800, color: "#0F172A", margin: "0 0 14px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+              <Clock style={{ width: "15px", height: "15px", color: "#0F2E5C" }} /> Jadwal & Masa Pelaksanaan Kontrak
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: isMounted && isMobile ? "1fr" : "repeat(3, 1fr)", gap: "12px" }}>
+              <div style={{ backgroundColor: "#F8FAFC", padding: "12px", borderRadius: "10px", border: "1px solid #F1F5F9" }}>
+                <p style={{ fontSize: "11px", color: "#64748B", margin: 0 }}>Tanggal Mulai (SPMK)</p>
+                <p style={{ fontSize: "13px", fontWeight: 800, color: "#0F172A", margin: "4px 0 0 0" }}>{project.startDate}</p>
+              </div>
+              <div style={{ backgroundColor: "#F8FAFC", padding: "12px", borderRadius: "10px", border: "1px solid #F1F5F9" }}>
+                <p style={{ fontSize: "11px", color: "#64748B", margin: 0 }}>Target Selesai (PHO)</p>
+                <p style={{ fontSize: "13px", fontWeight: 800, color: "#0F172A", margin: "4px 0 0 0" }}>{project.endDate}</p>
+              </div>
+              <div style={{ backgroundColor: "#ECFDF5", padding: "12px", borderRadius: "10px", border: "1px solid #A7F3D0" }}>
+                <p style={{ fontSize: "11px", color: "#059669", margin: 0 }}>Status Pekerjaan</p>
+                <p style={{ fontSize: "13px", fontWeight: 800, color: "#059669", margin: "4px 0 0 0" }}>{project.status}</p>
+              </div>
             </div>
-            <div style={{ backgroundColor: "#ECFDF5", padding: "10px", borderRadius: "10px", border: "1px solid #A7F3D0" }}>
-              <p style={{ fontSize: "11px", color: "#059669", margin: 0 }}>Realisasi Aktual</p>
-              <p style={{ fontSize: "15px", fontWeight: 800, color: "#059669", margin: "3px 0 0 0" }}>{project.physProgress}%</p>
-            </div>
-            <div style={{ backgroundColor: deviasi >= 0 ? "#ECFDF5" : "#FEF2F2", padding: "10px", borderRadius: "10px", border: deviasi >= 0 ? "1px solid #A7F3D0" : "1px solid #FECACA" }}>
-              <p style={{ fontSize: "11px", color: deviasi >= 0 ? "#059669" : "#DC2626", margin: 0 }}>Status Deviasi</p>
-              <p style={{ fontSize: "15px", fontWeight: 800, color: deviasi >= 0 ? "#059669" : "#DC2626", margin: "3px 0 0 0" }}>
-                {deviasi >= 0 ? `+${deviasi}%` : `${deviasi}%`}
+          </div>
+
+          {/* Supervision Notice */}
+          <div style={{ display: "flex", gap: "12px", alignItems: "flex-start", backgroundColor: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: "12px", padding: "14px 16px" }}>
+            <ShieldCheck style={{ width: "20px", height: "20px", color: "#1D4ED8", flexShrink: 0, marginTop: "2px" }} />
+            <div style={{ fontSize: "12px", color: "#1E40AF", lineHeight: 1.5 }}>
+              <strong>Kepatuhan Pengawasan Tertib Konstruksi (Permen PUPR No. 1/2023):</strong>
+              <p style={{ margin: "4px 0 0 0", color: "#1E3A8A" }}>
+                Paket pekerjaan ini tercatat dalam pengawasan rutin Dinas PUPR Kab. Bogor. Pemeriksaan berkala mencakup pengujian mutu spesifikasi teknis, standar keselamatan K3/SMKK, dan validitas tenaga kerja bersertifikat (TKK).
               </p>
             </div>
           </div>
@@ -328,6 +269,11 @@ export default function PaketDetailPage({ params }: { params: Promise<{ id: stri
               <div>
                 <p style={{ color: "#64748B", fontWeight: 600, margin: 0 }}>Bentuk Kontrak:</p>
                 <p style={{ color: "#334155", fontWeight: 600, margin: "3px 0 0 0" }}>{project.contractType} ({project.contractChar})</p>
+              </div>
+
+              <div>
+                <p style={{ color: "#64748B", fontWeight: 600, margin: 0 }}>Sumber Dana:</p>
+                <p style={{ color: "#0F2E5C", fontWeight: 700, margin: "3px 0 0 0" }}>{project.source} TA {project.fiscalYear}</p>
               </div>
 
               <div>

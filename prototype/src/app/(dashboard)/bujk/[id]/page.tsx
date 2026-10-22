@@ -178,7 +178,7 @@ export default function BUJKDetailPage({ params }: { params: Promise<{ id: strin
         </h3>
         <div style={{ textAlign: "center", padding: "32px 20px", backgroundColor: "#F8FAFC", borderRadius: "14px", border: "1px dashed #CBD5E1" }}>
           <Briefcase style={{ width: "36px", height: "36px", color: "#94A3B8", margin: "0 auto 8px auto" }} />
-          <p style={{ fontSize: "13px", color: "#475569", fontWeight: 700, margin: 0 }}>Data paket konstruksi tervalidasi di modul Monitoring Kurva-S</p>
+          <p style={{ fontSize: "13px", color: "#475569", fontWeight: 700, margin: 0 }}>Data paket konstruksi tervalidasi di modul Paket Pekerjaan</p>
           <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Tersinkronisasi otomatis dengan SPSE & SIPJAKI PUPR</p>
         </div>
       </div>

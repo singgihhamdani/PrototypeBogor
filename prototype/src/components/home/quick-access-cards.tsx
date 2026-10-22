@@ -5,6 +5,7 @@ import {
   ShieldAlert, ArrowRight, Sparkles, ChevronRight
 } from "lucide-react";
 import { useResponsive } from "@/lib/use-responsive";
+import { useAuth } from "@/lib/mock-auth";
 
 const QUICK_MODULES = [
   {
@@ -65,6 +66,13 @@ const QUICK_MODULES = [
 
 export default function QuickAccessCards() {
   const { isMobile, isMounted } = useResponsive();
+  const { user } = useAuth();
+
+  const getHref = (href: string) => {
+    if (!href.startsWith("/") || href === "/") return href;
+    if (user) return href;
+    return `/login?redirect=${encodeURIComponent(href)}`;
+  };
 
   return (
     <section style={{ padding: isMounted && isMobile ? "28px 0 40px" : "40px 0 60px", background: "#FFFFFF", position: "relative" }}>
@@ -97,7 +105,7 @@ export default function QuickAccessCards() {
           </div>
 
           <Link
-            href="/dashboard"
+            href={getHref("/dashboard")}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -128,7 +136,7 @@ export default function QuickAccessCards() {
             return (
               <Link
                 key={i}
-                href={mod.href}
+                href={getHref(mod.href)}
                 style={{
                   background: "#FFFFFF",
                   border: "1px solid #E2E8F0",

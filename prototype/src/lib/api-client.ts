@@ -143,6 +143,8 @@ class ApiClient {
       if (typeof window !== "undefined") {
         localStorage.removeItem("sijakon_access_token");
         localStorage.removeItem("sijakon_refresh_token");
+        localStorage.removeItem("sijakon_user_v3");
+        localStorage.removeItem("sijakon_user_v2");
       }
     },
   };

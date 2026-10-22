@@ -658,7 +658,7 @@ export default function DashboardPage() {
                           textDecoration: "none"
                         }}
                       >
-                        Kurva-S
+                        Detail
                       </Link>
                     </td>
                   </tr>

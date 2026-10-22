@@ -163,6 +163,12 @@ export default function HomePage() {
       : "/dashboard"
     : "/login";
 
+  const getNavHref = (targetHref: string) => {
+    if (!targetHref.startsWith("/") || targetHref === "/") return targetHref;
+    if (user) return targetHref;
+    return `/login?redirect=${encodeURIComponent(targetHref)}`;
+  };
+
   const handleNavEnter = (i: number) => {
     if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
     setActiveDropdown(i);
@@ -346,7 +352,7 @@ export default function HomePage() {
                           {link.dropdown.map((item, j) => (
                             <a
                               key={j}
-                              href={item.href}
+                              href={getNavHref(item.href)}
                               style={{
                                 padding: "10px 14px",
                                 borderRadius: 10,
@@ -484,7 +490,7 @@ export default function HomePage() {
                 {link.dropdown.map((sub, sIdx) => (
                   <a
                     key={sIdx}
-                    href={sub.href}
+                    href={getNavHref(sub.href)}
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
                       color: "rgba(255, 255, 255, 0.75)",
