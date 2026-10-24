@@ -1,79 +1,22 @@
 "use client";
+import { useState, useEffect } from "react";
 import { 
   Building2, Package, GraduationCap, ShieldCheck, TrendingUp, TrendingDown, 
   AlertTriangle, Users, Landmark, FileBarChart, ArrowUpRight, CheckCircle2,
-  DollarSign, Sparkles, MapPin, ChevronRight
+  DollarSign, Sparkles, MapPin, ChevronRight, Database as DbIcon
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useAuth, ROLE_CONFIGS } from "@/lib/mock-auth";
 import ExecutiveDashboardView from "@/components/dashboard/executive-dashboard-view";
+import { fetchDashboardStats, DashboardStats } from "@/lib/services/master-data";
 
-const pilarData = [
+const defaultPilarData = [
   { label: "Tertib Usaha", value: 72, icon: Building2, color: "#0F2E5C", desc: "Kesesuaian Izin, NIB & SBU", status: "Baik" },
   { label: "Tertib Penyelenggaraan", value: 65, icon: ShieldCheck, color: "#1E40AF", desc: "Kontrak Kerja & K3 SMKK", status: "Cukup" },
   { label: "Tertib Pemanfaatan", value: 58, icon: Package, color: "#D97706", desc: "Fungsi & Umur Konstruksi", status: "Cukup" },
   { label: "Pelaporan SIPJAKI", value: 85, icon: FileBarChart, color: "#059669", desc: "Sinkronisasi Terjadwal", status: "Sangat Baik" },
   { label: "Fasilitasi SDM / TKK", value: 80, icon: GraduationCap, color: "#0F2E5C", desc: "Sertifikasi SKK BNSP", status: "Baik" },
-];
-
-const summaryCards = [
-  { 
-    label: "Total BUJK Terdaftar", 
-    value: "1.240", 
-    sub: "312 Besar · 480 Menengah · 448 Kecil", 
-    badge: "+12% Thn Lalu",
-    badgeBg: "#ECFDF5",
-    badgeColor: "#059669",
-    isPositive: true,
-    icon: Building2, 
-    iconBg: "#EBF2FA",
-    iconColor: "#0F2E5C"
-  },
-  { 
-    label: "Paket Pekerjaan TA 2026", 
-    value: "342", 
-    sub: "Akumulasi Nilai: Rp 420 Miliar", 
-    badge: "328 Pelaksanaan",
-    badgeBg: "#EFF6FF",
-    badgeColor: "#2563EB",
-    isPositive: true,
-    icon: Package, 
-    iconBg: "#EFF6FF",
-    iconColor: "#2563EB"
-  },
-  { 
-    label: "TKK Tersertifikasi SKK", 
-    value: "4.850", 
-    sub: "Target Tahunan: 5.000 Tenaga Kerja", 
-    badge: "97% Target",
-    badgeBg: "#FFFBEB",
-    badgeColor: "#B45309",
-    isPositive: true,
-    icon: GraduationCap, 
-    iconBg: "#FFFBEB",
-    iconColor: "#B45309"
-  },
-  { 
-    label: "Tingkat Fatalitas K3", 
-    value: "0", 
-    sub: "Zero Fatal Accident di 40 Kecamatan", 
-    badge: "100% Aman",
-    badgeBg: "#ECFDF5",
-    badgeColor: "#059669",
-    isPositive: true,
-    icon: ShieldCheck, 
-    iconBg: "#ECFDF5",
-    iconColor: "#059669"
-  },
-];
-
-const recentProjects = [
-  { id: "P001", name: "Rekonstruksi Jl. Raya Cibinong - Citeureup", contractor: "PT Bangun Jaya Konstruksi", progress: 68, plan: 60, value: "Rp 8,50 M", status: "Ahead", district: "Cibinong" },
-  { id: "P002", name: "Pembangunan Gedung PAUD Terpadu Kec. Gunung Putri", contractor: "CV Karya Mandiri Utama", progress: 82, plan: 80, value: "Rp 3,20 M", status: "Ahead", district: "Gunung Putri" },
-  { id: "P003", name: "Peningkatan Jalan Lingkungan Desa Sukamahi", contractor: "PT Mitra Pembangunan Nusantara", progress: 90, plan: 90, value: "Rp 1,85 M", status: "On Track", district: "Cileungsi" },
-  { id: "P004", name: "Pembangunan Drainase Primer Kec. Parung", contractor: "CV Teknik Sejahtera", progress: 45, plan: 60, value: "Rp 950 Jt", status: "Behind", district: "Parung" },
-  { id: "P005", name: "Rehabilitasi Jembatan Sungai Cikeas", contractor: "PT Infrastruktur Bogor Raya", progress: 58, plan: 60, value: "Rp 12,5 M", status: "On Track", district: "Ciawi" },
 ];
 
 function GaugeCircle({ value, size = 80, strokeWidth = 8, color = "#0F2E5C" }: { value: number; size?: number; strokeWidth?: number; color?: string }) {
@@ -95,6 +38,15 @@ function GaugeCircle({ value, size = 80, strokeWidth = 8, color = "#0F2E5C" }: {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardStats().then((res) => {
+      setStats(res);
+      setLoading(false);
+    });
+  }, []);
 
   // 1. Tampilan Khusus Eksekutif
   if (user?.role === "EKSEKUTIF") {
@@ -199,6 +151,69 @@ export default function DashboardPage() {
   const isPengawas = user?.variant === "PENGAWAS_ASESOR";
   const isBinkon = user?.variant === "BINA_KONSTRUKSI";
 
+  const summaryCards = [
+    { 
+      label: "Total BUJK Terdaftar", 
+      value: stats ? String(stats.bujk.total) : "10", 
+      sub: stats ? `${stats.bujk.besar} Besar · ${stats.bujk.menengah} Menengah · ${stats.bujk.kecil} Kecil` : "3 Besar · 4 Menengah · 3 Kecil", 
+      badge: stats?.source === "supabase" ? "Supabase Live" : "Data Lokal",
+      badgeBg: "#ECFDF5",
+      badgeColor: "#059669",
+      isPositive: true,
+      icon: Building2, 
+      iconBg: "#EBF2FA",
+      iconColor: "#0F2E5C"
+    },
+    { 
+      label: "Paket Pekerjaan TA 2026", 
+      value: stats ? String(stats.paket.total) : "8", 
+      sub: stats ? `Akumulasi Nilai: Rp ${stats.paket.nilaiTotalMiliar} Miliar` : "Akumulasi Nilai: Rp 38.6 Miliar", 
+      badge: stats ? `${stats.paket.pelaksanaan} Pelaksanaan` : "6 Pelaksanaan",
+      badgeBg: "#EFF6FF",
+      badgeColor: "#2563EB",
+      isPositive: true,
+      icon: Package, 
+      iconBg: "#EFF6FF",
+      iconColor: "#2563EB"
+    },
+    { 
+      label: "TKK Tersertifikasi SKK", 
+      value: stats ? String(stats.tkk.total) : "5", 
+      sub: stats ? `Target Awal: ${stats.tkk.target} Tenaga Kerja` : "Target Awal: 50 Tenaga Kerja", 
+      badge: stats ? `${stats.tkk.percent}% Target` : "10% Target",
+      badgeBg: "#FFFBEB",
+      badgeColor: "#B45309",
+      isPositive: true,
+      icon: GraduationCap, 
+      iconBg: "#FFFBEB",
+      iconColor: "#B45309"
+    },
+    { 
+      label: "Tingkat Fatalitas K3", 
+      value: "0", 
+      sub: "Zero Fatal Accident di 40 Kecamatan", 
+      badge: "100% Aman",
+      badgeBg: "#ECFDF5",
+      badgeColor: "#059669",
+      isPositive: true,
+      icon: ShieldCheck, 
+      iconBg: "#ECFDF5",
+      iconColor: "#059669"
+    },
+  ];
+
+  const recentProjects = stats?.recentProjects?.length ? stats.recentProjects : [
+    { id: "P001", name: "Rekonstruksi Jl. Raya Cibinong - Citeureup", contractor: "PT Bangun Jaya Konstruksi", progress: 68, plan: 60, value: "Rp 8,50 M", status: "Ahead", district: "Cibinong" },
+    { id: "P002", name: "Pembangunan Gedung PAUD Terpadu Kec. Gunung Putri", contractor: "CV Karya Mandiri Utama", progress: 82, plan: 80, value: "Rp 3,20 M", status: "Ahead", district: "Gunung Putri" },
+    { id: "P003", name: "Peningkatan Jalan Lingkungan Desa Sukamahi", contractor: "PT Mitra Pembangunan Nusantara", progress: 90, plan: 90, value: "Rp 1,85 M", status: "On Track", district: "Cileungsi" },
+    { id: "P004", name: "Pembangunan Drainase Primer Kec. Parung", contractor: "CV Teknik Sejahtera", progress: 45, plan: 60, value: "Rp 950 Jt", status: "Behind", district: "Parung" },
+    { id: "P005", name: "Rehabilitasi Jembatan Sungai Cikeas", contractor: "PT Infrastruktur Bogor Raya", progress: 58, plan: 60, value: "Rp 12,5 M", status: "On Track", district: "Ciawi" },
+  ];
+
+  const pilarList = stats?.pilar?.length 
+    ? stats.pilar.map((p, idx) => ({ ...p, icon: defaultPilarData[idx]?.icon || ShieldCheck }))
+    : defaultPilarData;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
       
@@ -235,6 +250,12 @@ export default function DashboardPage() {
             <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", backgroundColor: "rgba(255, 192, 0, 0.15)", padding: "6px 12px", fontSize: "11px", fontWeight: 800, color: "#FFC000", border: "1px solid rgba(255, 192, 0, 0.3)" }}>
               <ShieldCheck style={{ width: "13px", height: "13px" }} />
               <span>Sesi: {user?.roleLabel || "Super Admin"} {user?.variantLabel ? `(${user.variantLabel})` : ""}</span>
+            </div>
+
+            {/* Live Database Status Badge */}
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", backgroundColor: stats?.source === "supabase" ? "rgba(16, 185, 129, 0.2)" : "rgba(245, 158, 11, 0.2)", padding: "6px 12px", fontSize: "11px", fontWeight: 800, color: stats?.source === "supabase" ? "#A7F3D0" : "#FDE68A", border: `1px solid ${stats?.source === "supabase" ? "rgba(16, 185, 129, 0.4)" : "rgba(245, 158, 11, 0.4)"}` }}>
+              <DbIcon style={{ width: "12px", height: "12px" }} />
+              <span>{stats?.source === "supabase" ? "PostgreSQL Supabase (Live)" : "Cache Lokal"}</span>
             </div>
           </div>
 
@@ -460,7 +481,7 @@ export default function DashboardPage() {
               border: "1px solid rgba(15, 46, 92, 0.12)"
             }}
           >
-            Indeks Kepatuhan Kab. Bogor: 72% (Kategori Tertib)
+            Indeks Kepatuhan Kab. Bogor: {stats?.overallScore || 81}% (Kategori Tertib)
           </span>
         </div>
 
@@ -471,7 +492,7 @@ export default function DashboardPage() {
             gap: "16px"
           }}
         >
-          {pilarData.map((pilar) => {
+          {pilarList.map((pilar) => {
             const Icon = pilar.icon;
             return (
               <div 
