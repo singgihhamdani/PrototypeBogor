@@ -150,7 +150,7 @@
       letter-spacing: 0.5px;
     }
 
-    .tag-supabase {
+    .tag-postgres {
       background: rgba(16, 185, 129, 0.2);
       color: #34D399;
       border: 1px solid rgba(16, 185, 129, 0.35);
@@ -176,9 +176,9 @@
 
     .title-row p {
       font-size: 15px;
-      color: rgba(255, 255, 255, 0.82);
-      max-width: 860px;
-      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 920px;
+      line-height: 1.6;
     }
 
     /* Quick Specs Bar */
@@ -368,7 +368,7 @@
     /* ERD Visual Container */
     .erd-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
       gap: 20px;
       margin-top: 20px;
     }
@@ -394,7 +394,7 @@
     .table-card-head .table-name {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -426,7 +426,7 @@
     }
 
     .table-card td {
-      padding: 9px 14px;
+      padding: 8px 14px;
       border-bottom: 1px solid var(--slate-100);
       color: var(--slate-700);
     }
@@ -705,6 +705,46 @@
       margin-top: 1px;
     }
 
+    /* Migration Table Summary */
+    .migration-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .migration-card {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .migration-card .mig-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--navy-800);
+      background: var(--navy-100);
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .migration-card h5 {
+      font-size: 13px;
+      color: var(--slate-900);
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .migration-card p {
+      font-size: 11px;
+      color: var(--slate-600);
+      line-height: 1.4;
+    }
+
     /* Footer */
     footer {
       background: var(--navy-950);
@@ -741,7 +781,7 @@
             <span>PEMERINTAH KABUPATEN BOGOR — DINAS PUPR</span>
           </div>
           <div class="status-tags">
-            <span class="tag tag-supabase">⚡ Supabase Auth Cloud (Active)</span>
+            <span class="tag tag-postgres">⚡ PostgreSQL 15 Enterprise Engine (Active)</span>
             <span class="tag tag-gov">🏛️ Permen PUPR No. 1/2023</span>
           </div>
         </div>
@@ -749,7 +789,7 @@
         <div class="title-row">
           <h1>Arsitektur Database, Alur Login & <span class="gold">Pendaftaran Akun</span></h1>
           <p>
-            Dokumentasi teknis menyeluruh mengenai skema data kedinasan, mekanisme pendaftaran terisolasi via undangan admin (Opsi A), sistem autentikasi hybrid Supabase + Demo Personas, serta proteksi keamanan Row Level Security (RLS) pada aplikasi SIJAKON Kabupaten Bogor.
+            Dokumentasi teknis menyeluruh mengenai skema data kedinasan PostgreSQL 15 (16 tabel relasional dari 5 modul migrasi), mekanisme pendaftaran terisolasi via undangan admin (Opsi A), sistem autentikasi hybrid PostgreSQL + Demo Personas 6-tier, serta proteksi keamanan Row Level Security (RLS) pada aplikasi SIJAKON Kabupaten Bogor.
           </p>
         </div>
 
@@ -761,15 +801,15 @@
           </div>
           <div class="spec-item">
             <div class="label">Enkripsi & Sesi</div>
-            <div class="value">JWT (RS256) + Middleware</div>
+            <div class="value">JWT (RS256) + SSR Middleware</div>
           </div>
           <div class="spec-item">
             <div class="label">Multi-Tenancy</div>
-            <div class="value">5 OPD Awal (DPU, Bappeda, dll)</div>
+            <div class="value">Multi-OPD Kab. Bogor</div>
           </div>
           <div class="spec-item">
-            <div class="label">Tingkat Hak Akses</div>
-            <div class="value">6-Tier RBAC Kedinasan</div>
+            <div class="label">Cakupan Database</div>
+            <div class="value"><code>16 Tabel</code> (5 Modul Migrasi)</div>
           </div>
         </div>
       </div>
@@ -786,7 +826,7 @@
         </button>
         <button class="tab-btn" onclick="switchTab('skema')">
           <span>🗄️ Skema Database & ERD</span>
-          <span class="tab-badge">4 Tabel</span>
+          <span class="tab-badge">16 Tabel (5 Modul)</span>
         </button>
         <button class="tab-btn" onclick="switchTab('pendaftaran')">
           <span>✉️ Alur Pendaftaran (Opsi A)</span>
@@ -798,11 +838,11 @@
         </button>
         <button class="tab-btn" onclick="switchTab('rbac')">
           <span>👥 Matriks Peran & OPD</span>
-          <span class="tab-badge">6 Role</span>
+          <span class="tab-badge">5 Role (3 Variant)</span>
         </button>
         <button class="tab-btn" onclick="switchTab('keamanan')">
           <span>🛡️ Keamanan RLS & Token</span>
-          <span class="tab-badge">Supabase</span>
+          <span class="tab-badge">PostgreSQL RLS</span>
         </button>
       </div>
     </div>
@@ -829,33 +869,33 @@
           </div>
 
           <p style="font-size: 14px; color: var(--slate-700); margin-bottom: 16px;">
-            Aplikasi <strong>SIJAKON Kabupaten Bogor</strong> mengelola dokumen hukum konstruksi yang sensitif, seperti Berita Acara Pemeriksaan (BAP SIMAK 1 & 2), Surat Rekomendasi Sanksi, serta data keuangan kontrak proyek OPD. Oleh karena itu, skema pendaftaran publik terbuka (self-registration) dilarang. Sistem mengadopsi <strong>Opsi A (Admin-Invited Registration)</strong> dengan landasan berikut:
+            Aplikasi <strong>SIJAKON Kabupaten Bogor</strong> mengelola dokumen hukum konstruksi yang sensitif, seperti Berita Acara Pemeriksaan (BAP SIMAK Pilar 1–3), Surat Rekomendasi Sanksi, sertifikasi TKK, serta data keuangan kontrak paket APBD OPD. Oleh karena itu, skema pendaftaran publik terbuka (self-registration) ditutup demi alasan integritas. Sistem mengadopsi <strong>Opsi A (Admin-Invited Registration)</strong> dengan landasan berikut:
           </p>
 
           <div class="arch-grid">
             <div class="arch-box highlight">
-              <h4>🛡️ 1. Proteksi Data & Zero Spam</h4>
-              <p>Mencegah pendaftaran akun anonim atau pihak yang tidak berhak mengakses dokumen kontrak dan pelaporan pembinaan jasa konstruksi.</p>
+              <h4>🛡️ 1. Proteksi Dokumen Hukum & Zero Spam</h4>
+              <p>Mencegah pendaftaran akun anonim atau pihak luar yang tidak memiliki legitimasi hukum untuk mengakses dokumen kontrak, BAP temuan audit, dan pelaporan pembinaan.</p>
             </div>
             <div class="arch-box">
-              <h4>🏛️ 2. Validitas NIP & OPD Resmi</h4>
-              <p>Setiap akun wajib terikat dengan NIP (Nomor Induk Pegawai) ASN resmi dan terkunci pada OPD tertentu (Dinas PU, Disdik, Dinkes, dsb).</p>
+              <h4>🏛️ 2. Validitas NIP & Satuan Kerja Resmi</h4>
+              <p>Setiap akun ASN wajib terikat dengan NIP (Nomor Induk Pegawai) resmi dan terkunci pada OPD tertentu (Dinas PUPR, Disdik, Dinkes, Bappedalitbang, BPKAD, dsb).</p>
             </div>
             <div class="arch-box">
-              <h4>⚖️ 3. Otorisasi Berjenjang (RBAC)</h4>
-              <p>Peran akun (Super Admin, Pembina Jasa, Tim Pengawas, OPD, Auditor) ditentukan di awal oleh Super Admin DPU sesuai SK Penugasan.</p>
+              <h4>⚖️ 3. Otorisasi Berjenjang (RBAC Kedinasan)</h4>
+              <p>Peran akun (Super Admin, Admin Bidang, Eksekutif, Operator BUJK, Peserta TKK) ditentukan di awal oleh Super Admin DPU sesuai SK Penugasan Kepala Dinas.</p>
             </div>
             <div class="arch-box">
-              <h4>📋 4. Jejak Audit Lengkap</h4>
-              <p>Riwayat siapa pejabat yang mengundang, kapan tautan diaktivasi, dan IP address login pertama kali tersimpan di log sistem.</p>
+              <h4>📋 4. Jejak Audit Forensik Penuh</h4>
+              <p>Riwayat siapa pejabat yang mengundang, kapan tautan diaktivasi, penyetelan sandi pertama, dan alamat IP login pertama kali tersimpan di basis data log sistem.</p>
             </div>
           </div>
 
-          <div class="callout callout-info">
+          <div class="callout callout-info" style="margin-top: 24px;">
             <div class="callout-icon">💡</div>
             <div>
-              <strong>Mode Hibrida (Supabase Cloud + Persona Demo):</strong>
-              Sistem SIJAKON dibangun dengan arsitektur hibrida cerdas. Apabila koneksi internet atau Supabase Cloud aktif, aplikasi menggunakan data riil cloud secara otomatis. Namun untuk kebutuhan presentasi luring (offline demo) di depan pimpinan/auditor, mode persona 6-tier tetap tersedia dan dapat dialihkan secara instan tanpa merusak data database.
+              <strong>Mode Hibrida Cerdas (Basis Data PostgreSQL + Persona Demo):</strong>
+              Sistem SIJAKON dibangun dengan arsitektur hibrida berkeandalan tinggi. Apabila koneksi basis data PostgreSQL aktif, aplikasi terhubung langsung secara real-time dan menyajikan data produksi. Namun untuk kebutuhan evaluasi atau presentasi luring di depan pimpinan/auditor, mode persona 6-tier tetap tersedia dan dapat dialihkan secara instan tanpa mengganggu integritas database produksi.
             </div>
           </div>
         </div>
@@ -870,19 +910,48 @@
             <div class="card-title-group">
               <div class="icon-box icon-emerald">🗄️</div>
               <div>
-                <h2>Skema Database & Relasi Tabel (Supabase PostgreSQL)</h2>
-                <p>Struktur tabel inti untuk mendukung multi-tenancy OPD dan otentikasi kedinasan</p>
+                <h2>Skema Database & Relasi Tabel (PostgreSQL Enterprise Engine)</h2>
+                <p>Struktur 16 tabel relasional dari 5 modul migrasi SQL terstruktur</p>
               </div>
             </div>
             <span class="meta-pill meta-system">PostgreSQL 15</span>
           </div>
 
           <p style="font-size: 13px; color: var(--slate-600); margin-bottom: 20px;">
-            Database terintegrasi secara langsung dengan modul <strong>Supabase Auth (auth.users)</strong> menggunakan Foreign Key berintegritas tinggi serta Cascade Delete untuk keamanan.
+            Database terstruktur dalam 5 file migrasi SQL bersih di folder <code>prototype/supabase/migrations/</code>, mengintegrasikan autentikasi, master data kedinasan, pengawasan SIMAK 3 pilar, dan sertifikasi TKK:
           </p>
 
+          <!-- 5 Migrations Summary -->
+          <div class="migration-grid">
+            <div class="migration-card">
+              <span class="mig-code">001_initial_schema.sql</span>
+              <h5>Core Auth & Multi-OPD</h5>
+              <p>Tabel <code>opd</code>, <code>profiles</code>, <code>user_invitations</code>, serta trigger otomatis sinkronisasi <code>handle_new_user()</code>.</p>
+            </div>
+            <div class="migration-card">
+              <span class="mig-code">002_rls_policies.sql</span>
+              <h5>Row Level Security (RLS)</h5>
+              <p>Kebijakan isolasi multi-tenant OPD, hak akses peran SUPER_ADMIN, ADMIN_BIDANG, dan proteksi profil pengguna.</p>
+            </div>
+            <div class="migration-card">
+              <span class="mig-code">003_master_data_schema.sql</span>
+              <h5>Master Data SIPJAKI</h5>
+              <p>Tabel <code>bujk</code>, <code>paket_pekerjaan</code> (dengan koordinat Lat/Lng WebGIS & Kurva S), <code>tkk</code>, dan <code>kecelakaan_kerja</code>.</p>
+            </div>
+            <div class="migration-card">
+              <span class="mig-code">004_simak_pengawasan_schema.sql</span>
+              <h5>SIMAK Pengawasan (3 Pilar)</h5>
+              <p>Tabel <code>pengawasan_sesi</code>, <code>pengawasan_item_pemeriksaan</code>, <code>pengawasan_rekomendasi</code>, dan <code>pengawasan_sdm_perencanaan</code>.</p>
+            </div>
+            <div class="migration-card">
+              <span class="mig-code">005_pelatihan_tkk_schema.sql</span>
+              <h5>Pelatihan & Sertifikasi (Pilar 5)</h5>
+              <p>Tabel <code>pelatihan_agenda</code>, <code>pelatihan_peserta</code>, <code>pelatihan_perencanaan</code>, dan <code>pelatihan_laporan</code>.</p>
+            </div>
+          </div>
+
           <!-- ERD Visual Table Grid -->
-          <div class="erd-container">
+          <div class="erd-container" style="margin-top: 24px;">
 
             <!-- TABEL 1: OPD -->
             <div class="table-card">
@@ -895,39 +964,54 @@
                   <tr>
                     <th>Kolom</th>
                     <th>Tipe Data</th>
-                    <th>Atribut</th>
+                    <th>Keterangan</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td><span class="col-pk">id</span></td>
                     <td><span class="type-badge">UUID</span></td>
-                    <td>PRIMARY KEY</td>
+                    <td>PRIMARY KEY DEFAULT gen_random_uuid()</td>
                   </tr>
                   <tr>
-                    <td><strong>kode_opd</strong></td>
+                    <td><strong>kode</strong></td>
+                    <td><span class="type-badge">VARCHAR(20)</span></td>
+                    <td>UNIQUE, NOT NULL (DPU, BAPPEDA, dll)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>nama</strong></td>
+                    <td><span class="type-badge">VARCHAR(200)</span></td>
+                    <td>NOT NULL (Dinas Pekerjaan Umum, dll)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>nama_pendek</strong></td>
                     <td><span class="type-badge">VARCHAR(50)</span></td>
-                    <td>UNIQUE, NOT NULL</td>
+                    <td>Singkatan instansi (DPU, Disdik, dll)</td>
                   </tr>
                   <tr>
-                    <td><strong>nama_opd</strong></td>
-                    <td><span class="type-badge">VARCHAR(255)</span></td>
-                    <td>NOT NULL</td>
+                    <td><strong>kepala_opd</strong></td>
+                    <td><span class="type-badge">VARCHAR(200)</span></td>
+                    <td>Nama Kepala Dinas / Pimpinan</td>
                   </tr>
                   <tr>
-                    <td><strong>singkatan</strong></td>
-                    <td><span class="type-badge">VARCHAR(50)</span></td>
-                    <td>NOT NULL</td>
+                    <td><strong>alamat</strong></td>
+                    <td><span class="type-badge">TEXT</span></td>
+                    <td>Alamat kantor dinas</td>
                   </tr>
                   <tr>
-                    <td><strong>status_aktif</strong></td>
+                    <td><strong>telepon</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>Kontak resmi dinas</td>
+                  </tr>
+                  <tr>
+                    <td><strong>is_active</strong></td>
                     <td><span class="type-badge">BOOLEAN</span></td>
                     <td>DEFAULT TRUE</td>
                   </tr>
                   <tr>
                     <td><strong>created_at</strong></td>
                     <td><span class="type-badge">TIMESTAMPTZ</span></td>
-                    <td>NOW()</td>
+                    <td>DEFAULT NOW()</td>
                   </tr>
                 </tbody>
               </table>
@@ -937,56 +1021,71 @@
             <div class="table-card">
               <div class="table-card-head">
                 <span class="table-name">👤 public.profiles</span>
-                <span class="table-tag">Profil Pengguna</span>
+                <span class="table-tag">Profil Pengguna Kedinasan</span>
               </div>
               <table>
                 <thead>
                   <tr>
                     <th>Kolom</th>
                     <th>Tipe Data</th>
-                    <th>Atribut</th>
+                    <th>Keterangan</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td><span class="col-pk">id</span></td>
                     <td><span class="type-badge">UUID</span></td>
-                    <td>PK, FK -> auth.users.id</td>
-                  </tr>
-                  <tr>
-                    <td><span class="col-fk">opd_id</span></td>
-                    <td><span class="type-badge">UUID</span></td>
-                    <td>FK -> public.opd.id</td>
+                    <td>PK, FK -&gt; auth.users.id ON DELETE CASCADE</td>
                   </tr>
                   <tr>
                     <td><strong>email</strong></td>
                     <td><span class="type-badge">VARCHAR(255)</span></td>
-                    <td>UNIQUE, NOT NULL</td>
+                    <td>NOT NULL (email kedinasan/resmi)</td>
                   </tr>
                   <tr>
                     <td><strong>nama_lengkap</strong></td>
-                    <td><span class="type-badge">VARCHAR(255)</span></td>
+                    <td><span class="type-badge">VARCHAR(200)</span></td>
                     <td>NOT NULL</td>
                   </tr>
                   <tr>
                     <td><strong>nip</strong></td>
                     <td><span class="type-badge">VARCHAR(30)</span></td>
-                    <td>NULLABLE</td>
+                    <td>Nomor Induk Pegawai ASN</td>
                   </tr>
                   <tr>
                     <td><strong>role</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>SUPER_ADMIN, ADMIN_BIDANG, EKSEKUTIF, OPERATOR_BUJK, PESERTA_TKK</td>
+                  </tr>
+                  <tr>
+                    <td><strong>variant</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>BINA_KONSTRUKSI, PENGAWAS_ASESOR, PELATIHAN</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">opd_id</span></td>
+                    <td><span class="type-badge">UUID</span></td>
+                    <td>FK -&gt; public.opd.id ON DELETE SET NULL</td>
+                  </tr>
+                  <tr>
+                    <td><strong>bujk_id</strong></td>
                     <td><span class="type-badge">VARCHAR(50)</span></td>
-                    <td>DEFAULT 'PEMBINA_JASA'</td>
+                    <td>Kode BUJK (Khusus Rekanan)</td>
                   </tr>
                   <tr>
                     <td><strong>jabatan</strong></td>
-                    <td><span class="type-badge">VARCHAR(150)</span></td>
-                    <td>NULLABLE</td>
+                    <td><span class="type-badge">VARCHAR(200)</span></td>
+                    <td>Jabatan struktural / fungsional</td>
+                  </tr>
+                  <tr>
+                    <td><strong>status</strong></td>
+                    <td><span class="type-badge">VARCHAR(20)</span></td>
+                    <td>'active', 'pending', 'suspended'</td>
                   </tr>
                   <tr>
                     <td><strong>first_login</strong></td>
                     <td><span class="type-badge">BOOLEAN</span></td>
-                    <td>DEFAULT TRUE</td>
+                    <td>DEFAULT TRUE (Flag wajib ganti password)</td>
                   </tr>
                 </tbody>
               </table>
@@ -996,51 +1095,248 @@
             <div class="table-card">
               <div class="table-card-head">
                 <span class="table-name">✉️ public.user_invitations</span>
-                <span class="table-tag">Token Undangan</span>
+                <span class="table-tag">Token Undangan Opsi A</span>
               </div>
               <table>
                 <thead>
                   <tr>
                     <th>Kolom</th>
                     <th>Tipe Data</th>
-                    <th>Atribut</th>
+                    <th>Keterangan</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td><span class="col-pk">id</span></td>
                     <td><span class="type-badge">UUID</span></td>
-                    <td>PRIMARY KEY</td>
+                    <td>PRIMARY KEY DEFAULT gen_random_uuid()</td>
                   </tr>
                   <tr>
                     <td><strong>email</strong></td>
                     <td><span class="type-badge">VARCHAR(255)</span></td>
+                    <td>NOT NULL (Email tujuan undangan)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>nama_lengkap</strong></td>
+                    <td><span class="type-badge">VARCHAR(200)</span></td>
                     <td>NOT NULL</td>
                   </tr>
                   <tr>
-                    <td><strong>token</strong></td>
-                    <td><span class="type-badge">VARCHAR(128)</span></td>
-                    <td>UNIQUE, NOT NULL</td>
+                    <td><strong>nip</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>NIP calon pejabat</td>
+                  </tr>
+                  <tr>
+                    <td><strong>role</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>Tingkat peran yang diberikan</td>
+                  </tr>
+                  <tr>
+                    <td><strong>variant</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>Sub-spesialisasi peran</td>
                   </tr>
                   <tr>
                     <td><span class="col-fk">opd_id</span></td>
                     <td><span class="type-badge">UUID</span></td>
-                    <td>FK -> public.opd.id</td>
+                    <td>FK -&gt; public.opd.id</td>
                   </tr>
                   <tr>
-                    <td><strong>role</strong></td>
-                    <td><span class="type-badge">VARCHAR(50)</span></td>
-                    <td>NOT NULL</td>
+                    <td><span class="col-fk">invited_by</span></td>
+                    <td><span class="type-badge">UUID</span></td>
+                    <td>FK -&gt; public.profiles.id (Super Admin)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>token</strong></td>
+                    <td><span class="type-badge">VARCHAR(100)</span></td>
+                    <td>UNIQUE (One-Time Activation Token)</td>
                   </tr>
                   <tr>
                     <td><strong>status</strong></td>
                     <td><span class="type-badge">VARCHAR(20)</span></td>
-                    <td>'PENDING', 'ACCEPTED'</td>
+                    <td>'pending', 'accepted', 'expired', 'cancelled'</td>
                   </tr>
                   <tr>
-                    <td><strong>expired_at</strong></td>
+                    <td><strong>expires_at</strong></td>
                     <td><span class="type-badge">TIMESTAMPTZ</span></td>
-                    <td>NOW() + 7 HARI</td>
+                    <td>Masa berlaku (DEFAULT: +7 Hari)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- TABEL 4: PAKET PEKERJAAN -->
+            <div class="table-card">
+              <div class="table-card-head">
+                <span class="table-name">🏗️ public.paket_pekerjaan</span>
+                <span class="table-tag">Master Proyek & WebGIS</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Kolom</th>
+                    <th>Tipe Data</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="col-pk">id</span></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>PRIMARY KEY (e.g. PKT-2026-001)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>nama_paket</strong></td>
+                    <td><span class="type-badge">VARCHAR(255)</span></td>
+                    <td>Nama paket pekerjaan konstruksi</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">opd_id</span></td>
+                    <td><span class="type-badge">UUID</span></td>
+                    <td>FK -&gt; public.opd.id (Multi-Tenancy)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">bujk_id</span></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>FK -&gt; public.bujk.id (Penyedia Jasa)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>nilai_kontrak</strong></td>
+                    <td><span class="type-badge">NUMERIC(15,2)</span></td>
+                    <td>Nilai pagu / kontrak pekerjaan</td>
+                  </tr>
+                  <tr>
+                    <td><strong>lat / lng</strong></td>
+                    <td><span class="type-badge">NUMERIC(10,6)</span></td>
+                    <td>Koordinat geospasial WebGIS</td>
+                  </tr>
+                  <tr>
+                    <td><strong>kurva_s_rencana</strong></td>
+                    <td><span class="type-badge">NUMERIC(5,2)</span></td>
+                    <td>Target progress Kurva S</td>
+                  </tr>
+                  <tr>
+                    <td><strong>kurva_s_realisasi</strong></td>
+                    <td><span class="type-badge">NUMERIC(5,2)</span></td>
+                    <td>Realisasi fisik lapangan</td>
+                  </tr>
+                  <tr>
+                    <td><strong>status_pengawasan</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>Tertib, Peringatan, Sanksi</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- TABEL 5: PENGAWASAN SESI -->
+            <div class="table-card">
+              <div class="table-card-head">
+                <span class="table-name">📋 public.pengawasan_sesi</span>
+                <span class="table-tag">SIMAK Pilar 1, 2, 3</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Kolom</th>
+                    <th>Tipe Data</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="col-pk">id</span></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>PRIMARY KEY (e.g. SESI-TU-001)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>nomor_surat_tugas</strong></td>
+                    <td><span class="type-badge">VARCHAR(100)</span></td>
+                    <td>Nomor SK / Surat Tugas Resmi</td>
+                  </tr>
+                  <tr>
+                    <td><strong>jenis_pengawasan</strong></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>tertib-usaha, tertib-penyelenggaraan, tertib-pemanfaatan</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">opd_id</span></td>
+                    <td><span class="type-badge">UUID</span></td>
+                    <td>FK -&gt; public.opd.id</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">paket_pekerjaan_id</span></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>FK -&gt; public.paket_pekerjaan.id</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">bujk_id</span></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>FK -&gt; public.bujk.id</td>
+                  </tr>
+                  <tr>
+                    <td><strong>status_audit</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>Draft, Berjalan, Selesai, Rekomendasi</td>
+                  </tr>
+                  <tr>
+                    <td><strong>skor_kepatuhan</strong></td>
+                    <td><span class="type-badge">NUMERIC(5,2)</span></td>
+                    <td>Skor kumulatif indikator Permen PUPR</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- TABEL 6: PELATIHAN AGENDA -->
+            <div class="table-card">
+              <div class="table-card-head">
+                <span class="table-name">🎓 public.pelatihan_agenda</span>
+                <span class="table-tag">Pilar 5 Pembinaan TKK</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Kolom</th>
+                    <th>Tipe Data</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="col-pk">id</span></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>PRIMARY KEY (e.g. TRN-2026-001)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>judul_kegiatan</strong></td>
+                    <td><span class="type-badge">VARCHAR(255)</span></td>
+                    <td>Nama agenda bimbingan teknis / SKK</td>
+                  </tr>
+                  <tr>
+                    <td><strong>kategori</strong></td>
+                    <td><span class="type-badge">VARCHAR(100)</span></td>
+                    <td>BIMTEK, SERTIFIKASI_SKK, REFRESHMENT</td>
+                  </tr>
+                  <tr>
+                    <td><strong>angkatan</strong></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>Batch / Angkatan pelaksanaan</td>
+                  </tr>
+                  <tr>
+                    <td><strong>kuota / terdaftar</strong></td>
+                    <td><span class="type-badge">INTEGER</span></td>
+                    <td>Kapasitas peserta & realisasi daftar</td>
+                  </tr>
+                  <tr>
+                    <td><strong>skk_jenjang</strong></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>Jenjang SKK 1–9 LPJK</td>
+                  </tr>
+                  <tr>
+                    <td><strong>status</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>Pendaftaran, Berlangsung, Selesai</td>
                   </tr>
                 </tbody>
               </table>
@@ -1051,8 +1347,8 @@
           <div class="callout callout-success" style="margin-top: 24px;">
             <div class="callout-icon">🔗</div>
             <div>
-              <strong>Integritas Relasi Relasional:</strong>
-              Jika sebuah instansi OPD dihapus atau dinonaktifkan, profil pengguna di bawah OPD tersebut tidak akan hilang mendadak melainkan dibatasi aksesnya melalui aturan <code>ON DELETE RESTRICT</code>, sehingga histori audit BAP dan pengawasan tetap utuh.
+              <strong>Integritas Relasi & Perlindungan Foreign Key:</strong>
+              Jika data master instansi OPD dinonaktifkan, profil pengguna dan histori BAP pengawasan di bawah OPD tersebut tidak akan hilang mendadak melainkan terlindungi melalui aturan <code>ON DELETE SET NULL / RESTRICT</code>, sehingga riwayat audit pembinaan dan pertanggungjawaban hukum tetap utuh 100%.
             </div>
           </div>
         </div>
@@ -1082,11 +1378,11 @@
               <div class="step-content">
                 <h3>Super Admin Mengisi Formulir Undangan di Dashboard</h3>
                 <p>
-                  Super Admin DPU membuka menu <strong>Pengaturan &gt; Manajemen Pengguna</strong> (<code>/pengaturan/pengguna</code>) dan menekan tombol <strong>"+ Undang Pengguna Baru"</strong>. Admin memasukkan Nama Lengkap, NIP, Email Kedinasan, Nomor HP, Satuan Kerja (OPD), dan Tingkat Peran (Role).
+                  Super Admin DPU membuka menu <strong>Pengaturan &gt; Manajemen Pengguna</strong> (<code>/pengaturan/pengguna</code>) dan menekan tombol <strong>"+ Undang Pengguna Baru"</strong>. Modal formulir (<code>src/components/admin/invite-user-modal.tsx</code>) memuat input Nama Lengkap, NIP, Email Resmi, Nomor HP, Satuan Kerja (OPD), Tingkat Peran (Role), dan Sub-Spesialisasi (Variant).
                 </p>
                 <div class="step-meta-row">
                   <span class="meta-pill meta-actor">Aktor: Super Admin DPU</span>
-                  <span class="meta-pill meta-system">Lokasi: src/components/admin/invite-user-modal.tsx</span>
+                  <span class="meta-pill meta-system">Komponen: src/components/admin/invite-user-modal.tsx</span>
                 </div>
               </div>
             </div>
@@ -1094,13 +1390,13 @@
             <div class="flow-step-item">
               <div class="step-num">2</div>
               <div class="step-content">
-                <h3>Sistem Men-generate Kriptografi Token & Simpan ke Supabase</h3>
+                <h3>Sistem Men-generate Kriptografi Token & Simpan ke Basis Data</h3>
                 <p>
-                  Sistem membuat token acak berkeamanan tinggi sepanjang 64 karakter (UUID/SHA-256) dan menyimpannya di tabel <code>public.user_invitations</code> dengan status <code>PENDING</code> dan masa aktif 7 hari (<code>expired_at = NOW() + INTERVAL '7 days'</code>).
+                  Sistem menghasilkan token kriptografi acak berkeamanan tinggi dengan format <code>inv_xxxxxx</code> dan menyimpannya di tabel <code>public.user_invitations</code> dengan status <code>pending</code> serta masa aktif 7 hari (<code>expires_at = NOW() + INTERVAL '7 days'</code>).
                 </p>
                 <div class="step-meta-row">
                   <span class="meta-pill meta-system">Tabel: public.user_invitations</span>
-                  <span class="meta-pill meta-security">Keamanan: One-Time Token</span>
+                  <span class="meta-pill meta-security">Keamanan: One-Time Token (7 Hari)</span>
                 </div>
               </div>
             </div>
@@ -1108,15 +1404,15 @@
             <div class="flow-step-item">
               <div class="step-num">3</div>
               <div class="step-content">
-                <h3>Pengiriman Undangan & Tautan Aktivasi</h3>
+                <h3>Penerbitan Tautan Aktivasi Khusus</h3>
                 <p>
-                  Tautan aktivasi khusus dibentuk dengan format:<br>
-                  <code>https://sijakon.bogor.go.id/auth/set-password?token=INV-xxxxx&amp;email=user@bogor.go.id</code>.<br>
-                  Admin dapat menyalin tautan ini secara instan atau mengirimkannya otomatis ke email calon pejabat bersangkutan.
+                  Tautan aktivasi khusus dibentuk secara otomatis dengan format:<br>
+                  <code>https://sijakon.bogor.go.id/auth/set-password?token=inv_xxxxxx&amp;email=pejabat@bogor.go.id</code>.<br>
+                  Super Admin dapat menyalin tautan secara instan ke clipboard untuk dikirimkan melalui jalur kedinasan resmi (Email Dinas / WhatsApp Resmi).
                 </p>
                 <div class="step-meta-row">
                   <span class="meta-pill meta-system">Rute: /auth/set-password</span>
-                  <span class="meta-pill meta-security">Notifikasi Email / WA Kedinasan</span>
+                  <span class="meta-pill meta-security">Kanal: Komunikasi Kedinasan Terenkripsi</span>
                 </div>
               </div>
             </div>
@@ -1126,11 +1422,12 @@
               <div class="step-content">
                 <h3>Pengguna Membuka Halaman Aktivasi & Menyetel Kata Sandi Baru</h3>
                 <p>
-                  Calon pengguna membuka tautan resmi. Sistem memvalidasi token di Supabase. Halaman menampilkan form aktivasi dengan indikator kekuatan kata sandi (Password Strength Meter) minimal 8 karakter, kombinasi huruf besar, angka, dan simbol.
+                  Calon pengguna membuka tautan resmi di halaman <code>/auth/set-password</code>. Sistem memvalidasi token dan masa berlaku. Halaman menyajikan form penyetelan kata sandi dengan validasi keamanan minimal 8 karakter, konfirmasi pencocokan sandi, dan enkripsi tingkat tinggi.
                 </p>
                 <div class="step-meta-row">
                   <span class="meta-pill meta-actor">Aktor: Calon Pengguna ASN / OPD</span>
-                  <span class="meta-pill meta-security">Validasi: Minimal 8 Karakter</span>
+                  <span class="meta-pill meta-system">Komponen: src/app/auth/set-password/page.tsx</span>
+                  <span class="meta-pill meta-security">Syarat: Minimal 8 Karakter</span>
                 </div>
               </div>
             </div>
@@ -1138,13 +1435,13 @@
             <div class="flow-step-item">
               <div class="step-num">5</div>
               <div class="step-content">
-                <h3>Aktivasi Akun di Supabase Auth & Otomatis Masuk Dashboard</h3>
+                <h3>Aktivasi Akun di Basis Data & Otomatis Masuk Dashboard</h3>
                 <p>
-                  Sistem mengeksekusi pendaftaran pengguna ke modul <code>auth.users</code> dan mengaktifkan data di <code>public.profiles</code>. Token undangan ditandai <code>ACCEPTED</code>. Pengguna langsung diarahkan ke Dashboard sesuai kewenangan perannya.
+                  Setelah sandi tervalidasi, sistem memperbarui kredensial akun, menandai <code>first_login: false</code> pada <code>public.profiles</code>, dan mengubah status token undangan menjadi <code>accepted</code>. Pengguna langsung dialihkan ke Dashboard atau Portal mandiri sesuai peran yang dimilikinya.
                 </p>
                 <div class="step-meta-row">
-                  <span class="meta-pill meta-system">Status: Akun Aktif & Terverifikasi</span>
-                  <span class="meta-pill meta-actor">Redirect: /dashboard</span>
+                  <span class="meta-pill meta-system">Status: Profil Aktif (first_login = false)</span>
+                  <span class="meta-pill meta-actor">Redirect: /dashboard atau Portal Khusus</span>
                 </div>
               </div>
             </div>
@@ -1154,8 +1451,8 @@
           <div class="callout callout-warning">
             <div class="callout-icon">⚠️</div>
             <div>
-              <strong>Penanganan Undangan Kedaluwarsa:</strong>
-              Apabila calon pengguna tidak menyetel password dalam 7 hari, token akan otomatis menjadi <code>EXPIRED</code>. Super Admin dapat menekan tombol <strong>"Kirim Ulang Undangan"</strong> di tab <em>Undangan Menunggu</em> untuk memperpanjang token tanpa perlu menginput ulang data.
+              <strong>Penanganan Undangan Kedaluwarsa (Expired Token):</strong>
+              Apabila calon pengguna tidak menyetel sandi dalam kurun waktu 7 hari, token akan otomatis menjadi <code>expired</code>. Super Admin dapat menekan tombol <strong>"Kirim Ulang Undangan"</strong> di panel Manajemen Pengguna untuk memperpanjang token tanpa perlu menginput ulang biodata ASN.
             </div>
           </div>
         </div>
@@ -1170,65 +1467,73 @@
             <div class="card-title-group">
               <div class="icon-box icon-navy">🔐</div>
               <div>
-                <h2>Alur Login, Refresh Sesi JWT & Proteksi Rute</h2>
+                <h2>Alur Login, Refresh Sesi JWT & Proteksi Rute SSR</h2>
                 <p>Mekanisme autentikasi ganda yang aman, cepat, dan ramah simulasi</p>
               </div>
             </div>
-            <span class="meta-pill meta-system">Next.js Middleware + SSR</span>
+            <span class="meta-pill meta-system">Next.js SSR Middleware</span>
           </div>
 
           <div class="arch-grid">
             <div class="arch-box">
               <h4>1. Halaman Login Resmi (/login)</h4>
-              <p>Pengguna memasukkan Email Kedinasan dan Kata Sandi. Form dilengkapi dengan status lampu indikator koneksi Supabase Cloud secara real-time.</p>
+              <p>Pengguna memasukkan Email Kedinasan dan Kata Sandi. Form dilengkapi dengan status lampu indikator koneksi basis data PostgreSQL secara real-time.</p>
               <ul>
-                <li>Validasi format email domain dinas</li>
-                <li>Pilihan inline "Lupa Kata Sandi"</li>
-                <li>Pilihan cepat 6-Tier Demo Persona</li>
+                <li>Indikator status: <code>PostgreSQL (Live)</code></li>
+                <li>Modal pemulihan mandiri "Lupa Kata Sandi" via email</li>
+                <li>Quick-Switcher 6 Demo Persona untuk evaluasi offline</li>
               </ul>
             </div>
 
             <div class="arch-box">
-              <h4>2. Verifikasi Kredensial Supabase</h4>
-              <p>Mengirimkan permintaan ke Supabase Auth melalui <code>supabase.auth.signInWithPassword()</code>.</p>
+              <h4>2. Verifikasi Kredensial Engine Auth</h4>
+              <p>Mengirimkan permintaan ke modul Auth melalui <code>supabase.auth.signInWithPassword()</code>.</p>
               <ul>
-                <li>Pencocokan hash password (Argon2/Bcrypt)</li>
-                <li>Pengambilan data profil & OPD dari PostgreSQL</li>
-                <li>Penerbitan Access Token (JWT) & Refresh Token</li>
+                <li>Pencocokan hash password berstandar industri</li>
+                <li>Pengambilan profil lengkap dan relasi OPD via <code>fetchSupabaseProfile()</code></li>
+                <li>Penerbitan Access Token (JWT) & Refresh Token otomatis</li>
               </ul>
             </div>
 
             <div class="arch-box highlight">
-              <h4>3. Next.js Middleware (src/middleware.ts)</h4>
+              <h4>3. Next.js SSR Middleware (src/middleware.ts)</h4>
               <p>Setiap navigasi halaman di dashboard disaring oleh server middleware untuk menjamin proteksi penuh:</p>
               <ul>
                 <li>Memeriksa keabsahan cookie sesi JWT</li>
-                <li>Auto-refresh token jika mendekati masa habis</li>
-                <li>Mencegah akses rute terlindungi tanpa login</li>
+                <li>Auto-refresh token jika mendekati masa kedaluwarsa</li>
+                <li>Pencegahan akses rute terlindungi tanpa autentikasi sah</li>
               </ul>
             </div>
           </div>
 
           <!-- Code Snippet -->
           <h3 style="font-size: 14px; font-weight: 800; color: var(--slate-900); margin-top: 24px;">
-            Contoh Cuplikan Logika Login Hibrida (src/lib/mock-auth.tsx):
+            Cuplikan Logika Login & Pengambilan Profil (src/lib/mock-auth.tsx):
           </h3>
           <div class="code-block">
-<span class="code-keyword">const</span> <span class="code-func">loginWithSupabase</span> = <span class="code-keyword">async</span> (email: <span class="code-string">string</span>, password: <span class="code-string">string</span>) => {
-  <span class="code-keyword">const</span> supabase = <span class="code-func">createClient</span>();
-  <span class="code-keyword">const</span> { data, error } = <span class="code-keyword">await</span> supabase.auth.<span class="code-func">signInWithPassword</span>({ email, password });
-  
-  <span class="code-keyword">if</span> (error) <span class="code-keyword">throw</span> error;
+<span class="code-comment">// 1. Login Nyata ke Basis Data PostgreSQL Auth Engine</span>
+<span class="code-keyword">if</span> (hasSupabase && supabase) {
+  <span class="code-keyword">const</span> { data: authData, error: authError } = <span class="code-keyword">await</span> supabase.auth.<span class="code-func">signInWithPassword</span>({
+    email: identifier,
+    password: password,
+  });
 
-  <span class="code-comment">// Ambil profil lengkap dan Satuan Kerja (OPD) dari database</span>
-  <span class="code-keyword">const</span> { data: profile } = <span class="code-keyword">await</span> supabase
-    .<span class="code-func">from</span>(<span class="code-string">"profiles"</span>)
-    .<span class="code-func">select</span>(<span class="code-string">"*, opd:opd_id(id, nama_opd, singkatan)"</span>)
-    .<span class="code-func">eq</span>(<span class="code-string">"id"</span>, data.user.id)
-    .<span class="code-func">single</span>();
+  <span class="code-keyword">if</span> (!authError && authData.user) {
+    <span class="code-comment">// Ambil data profil relasional lengkap & relasi OPD dari PostgreSQL</span>
+    <span class="code-keyword">const</span> profileUser = <span class="code-keyword">await</span> <span class="code-func">fetchSupabaseProfile</span>(authData.user.id, authData.user.email);
+    <span class="code-keyword">if</span> (profileUser) {
+      <span class="code-func">setUser</span>(profileUser);
+      <span class="code-keyword">return</span> { success: <span class="code-keyword">true</span>, targetRoute: <span class="code-func">resolveTargetRoute</span>(profileUser.role) };
+    }
+  }
+}
 
-  <span class="code-func">setCurrentUser</span>(profile);
-};
+<span class="code-comment">// 2. Fallback Elegan: Akun Demo Personas (Zero-Downtime Offline Mode)</span>
+<span class="code-keyword">const</span> demoUser = DEMO_USERS[identifier];
+<span class="code-keyword">if</span> (demoUser) {
+  <span class="code-func">setUser</span>(demoUser);
+  <span class="code-keyword">return</span> { success: <span class="code-keyword">true</span>, targetRoute: <span class="code-func">resolveTargetRoute</span>(demoUser.role) };
+}
           </div>
         </div>
       </section>
@@ -1242,7 +1547,7 @@
             <div class="card-title-group">
               <div class="icon-box icon-emerald">👥</div>
               <div>
-                <h2>Matriks Hak Akses Peran Kedinasan (RBAC 6-Tier)</h2>
+                <h2>Matriks Hak Akses Peran Kedinasan (RBAC 5 Role & 3 Variant)</h2>
                 <p>Pemisahan wewenang operasional berdasarkan Permen PUPR No. 1/2023</p>
               </div>
             </div>
@@ -1254,61 +1559,131 @@
               <thead>
                 <tr>
                   <th>Tingkat Peran (Role)</th>
-                  <th>Instansi / Satuan Kerja</th>
-                  <th>Cakupan Akses OPD</th>
-                  <th>SIMAK 1 (Pengawasan)</th>
+                  <th>Sub-Variant Peran</th>
+                  <th>Cakupan Wilayah / OPD</th>
+                  <th>SIMAK Pengawasan (Pilar 1–3)</th>
                   <th>Manajemen User & OPD</th>
-                  <th>Pelaporan & BAP</th>
+                  <th>Portal / Target Rute</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td><strong>SUPER_ADMIN</strong><br><span style="font-size:11px;color:var(--slate-500)">Kepala Bidang / Admin IT</span></td>
-                  <td>Dinas PUPR Kab. Bogor</td>
+                  <td>-</td>
                   <td><span class="badge-permit">Seluruh OPD (Global)</span></td>
-                  <td><span class="badge-permit">Full Akses (15 Form)</span></td>
+                  <td><span class="badge-permit">Full Akses (Pilar 1–3)</span></td>
                   <td><span class="badge-permit">Undang & Edit Role</span></td>
-                  <td><span class="badge-permit">Finalisasi & Cetak</span></td>
+                  <td><code>/dashboard</code></td>
                 </tr>
                 <tr>
-                  <td><strong>PEMBINA_JASA</strong><br><span style="font-size:11px;color:var(--slate-500)">Seksi Bina Konstruksi</span></td>
-                  <td>Dinas PUPR Kab. Bogor</td>
+                  <td><strong>ADMIN_BIDANG</strong><br><span style="font-size:11px;color:var(--slate-500)">Pembina Jasa Konstruksi</span></td>
+                  <td><code>BINA_KONSTRUKSI</code></td>
                   <td><span class="badge-permit">Seluruh OPD (Global)</span></td>
-                  <td><span class="badge-permit">Input & Verifikasi</span></td>
+                  <td><span class="badge-permit">Verifikasi BAP & Temuan</span></td>
                   <td><span class="badge-deny">Tidak Berhak</span></td>
-                  <td><span class="badge-permit">Penyusunan BAP</span></td>
+                  <td><code>/dashboard</code></td>
                 </tr>
                 <tr>
-                  <td><strong>TIM_PENGAWAS</strong><br><span style="font-size:11px;color:var(--slate-500)">Petugas Lapangan DPU</span></td>
-                  <td>Dinas PUPR Kab. Bogor</td>
+                  <td><strong>ADMIN_BIDANG</strong><br><span style="font-size:11px;color:var(--slate-500)">Tim Pengawas Lapangan</span></td>
+                  <td><code>PENGAWAS_ASESOR</code></td>
                   <td><span class="badge-permit">Paket Yang Ditugaskan</span></td>
-                  <td><span class="badge-permit">Checklist 12 Form</span></td>
+                  <td><span class="badge-permit">Input Checklist & BAP</span></td>
                   <td><span class="badge-deny">Tidak Berhak</span></td>
-                  <td><span class="badge-permit">Draft Temuan</span></td>
+                  <td><code>/dashboard</code></td>
                 </tr>
                 <tr>
-                  <td><strong>PENANGGUNG_JAWAB_OPD</strong><br><span style="font-size:11px;color:var(--slate-500)">PPK / Pejabat Pengadaan</span></td>
-                  <td>Disdik, Dinkes, Bappeda, dll</td>
-                  <td><span class="badge-opd-only">Hanya OPD Sendiri</span></td>
-                  <td><span class="badge-opd-only">Lihat & Tanggapi</span></td>
+                  <td><strong>ADMIN_BIDANG</strong><br><span style="font-size:11px;color:var(--slate-500)">Seksi Pelatihan TKK</span></td>
+                  <td><code>PELATIHAN</code></td>
+                  <td><span class="badge-permit">Seluruh OPD (Pilar 5)</span></td>
+                  <td><span class="badge-deny">Read-Only</span></td>
                   <td><span class="badge-deny">Tidak Berhak</span></td>
-                  <td><span class="badge-opd-only">Pelaporan OPD</span></td>
+                  <td><code>/pelatihan</code></td>
                 </tr>
                 <tr>
-                  <td><strong>AUDITOR_INSPEKTORAT</strong><br><span style="font-size:11px;color:var(--slate-500)">Inspektorat Kab. Bogor</span></td>
-                  <td>Inspektorat Daerah</td>
+                  <td><strong>EKSEKUTIF</strong><br><span style="font-size:11px;color:var(--slate-500)">Kepala Dinas / Pimpinan</span></td>
+                  <td>-</td>
                   <td><span class="badge-permit">Seluruh OPD (Global)</span></td>
-                  <td><span class="badge-permit">Read-Only (Audit)</span></td>
+                  <td><span class="badge-permit">Read-Only & Unduh Laporan</span></td>
                   <td><span class="badge-deny">Tidak Berhak</span></td>
-                  <td><span class="badge-permit">Audit Trail & Log</span></td>
+                  <td><code>/dashboard</code></td>
                 </tr>
                 <tr>
-                  <td><strong>BUJK_KONTRAKTOR</strong><br><span style="font-size:11px;color:var(--slate-500)">Badan Usaha Konstruksi</span></td>
-                  <td>Penyedia Jasa Rekanan</td>
-                  <td><span class="badge-opd-only">Paket Milik Sendiri</span></td>
-                  <td><span class="badge-opd-only">Self-Assessment</span></td>
+                  <td><strong>OPERATOR_BUJK</strong><br><span style="font-size:11px;color:var(--slate-500)">Badan Usaha Jasa Konstruksi</span></td>
+                  <td>-</td>
+                  <td><span class="badge-opd-only">Hanya Entitas Sendiri</span></td>
+                  <td><span class="badge-opd-only">Pelaporan Mandiri / SBU</span></td>
+                  <td><span class="badge-deny">Tidak Berhak</span></td>
+                  <td><code>/portal/bujk</code></td>
+                </tr>
+                <tr>
+                  <td><strong>PESERTA_TKK</strong><br><span style="font-size:11px;color:var(--slate-500)">Tenaga Kerja Konstruksi</span></td>
+                  <td>-</td>
+                  <td><span class="badge-opd-only">Data Pribadi Sendiri</span></td>
                   <td><span class="badge-deny">Tidak Berhak</span></td>
                   <td><span class="badge-deny">Tidak Berhak</span></td>
+                  <td><code>/portal/peserta</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Demo Users Quick Reference Table -->
+          <h3 style="font-size: 14px; font-weight: 800; color: var(--navy-900); margin-top: 28px; margin-bottom: 12px;">
+            Daftar 6 Persona Akun Demo (Tersedia untuk Pengujian Cepat):
+          </h3>
+          <div class="matrix-wrapper">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>Username Demo</th>
+                  <th>Nama Pejabat / Pengguna</th>
+                  <th>Role Code</th>
+                  <th>Instansi / Jabatan</th>
+                  <th>Password Demo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>superadmin</code></td>
+                  <td>Ir. H. Raden Ridwan, ST, M.Si</td>
+                  <td><span class="badge-permit">SUPER_ADMIN</span></td>
+                  <td>Dinas PU Kab. Bogor (Kabid Bina Konstruksi)</td>
+                  <td><code>demo2026</code></td>
+                </tr>
+                <tr>
+                  <td><code>op_binkon</code></td>
+                  <td>Bayu Pratama, S.Kom</td>
+                  <td><span class="badge-permit">ADMIN_BIDANG (Bina Konstruksi)</span></td>
+                  <td>Dinas PU Kab. Bogor (Staf Teknis Jakon)</td>
+                  <td><code>demo2026</code></td>
+                </tr>
+                <tr>
+                  <td><code>op_pengawas</code></td>
+                  <td>Ir. Supriyatna, ST</td>
+                  <td><span class="badge-permit">ADMIN_BIDANG (Pengawas)</span></td>
+                  <td>Dinas PU Kab. Bogor (Fungsional Pengawas Jakon)</td>
+                  <td><code>demo2026</code></td>
+                </tr>
+                <tr>
+                  <td><code>eksekutif</code></td>
+                  <td>Drs. H. Suryanto Putra, M.Si</td>
+                  <td><span class="badge-permit">EKSEKUTIF</span></td>
+                  <td>Dinas PU Kab. Bogor (Kepala Dinas)</td>
+                  <td><code>demo2026</code></td>
+                </tr>
+                <tr>
+                  <td><code>bujk_demo</code></td>
+                  <td>Budi Santoso, ST</td>
+                  <td><span class="badge-opd-only">OPERATOR_BUJK</span></td>
+                  <td>PT Bangun Jaya Konstruksi (PJBU)</td>
+                  <td><code>demo2026</code></td>
+                </tr>
+                <tr>
+                  <td><code>peserta_demo</code></td>
+                  <td>Ahmad Fauzi, A.Md</td>
+                  <td><span class="badge-opd-only">PESERTA_TKK</span></td>
+                  <td>Tenaga Kerja Mandiri (Pelaksana Lapangan Gedung)</td>
+                  <td><code>demo2026</code></td>
                 </tr>
               </tbody>
             </table>
@@ -1317,8 +1692,8 @@
           <div class="callout callout-info" style="margin-top: 20px;">
             <div class="callout-icon">💡</div>
             <div>
-              <strong>Isolasi Data Antar-OPD (Tenant Isolation):</strong>
-              Pejabat dari Dinas Pendidikan (Disdik) tidak dapat melihat atau mengubah dokumen paket pekerjaan milik Dinas Kesehatan (Dinkes), begitu pula sebaliknya. Hanya Super Admin DPU dan Auditor Inspektorat yang memiliki visibilitas lintas OPD.
+              <strong>Isolasi Data Antar-OPD (Multi-Tenant Isolation):</strong>
+              Pejabat dari Dinas Pendidikan (Disdik) tidak dapat melihat atau mengubah dokumen paket pekerjaan milik Dinas Kesehatan (Dinkes), begitu pula sebaliknya. Hanya Super Admin DPU dan Eksekutif Pimpinan yang memiliki visibilitas global lintas OPD.
             </div>
           </div>
         </div>
@@ -1333,7 +1708,7 @@
             <div class="card-title-group">
               <div class="icon-box icon-navy">🛡️</div>
               <div>
-                <h2>Kebijakan Keamanan Row Level Security (RLS)</h2>
+                <h2>Kebijakan Keamanan Row Level Security (RLS) PostgreSQL</h2>
                 <p>Proteksi data di level engine PostgreSQL untuk mencegah manipulasi data</p>
               </div>
             </div>
@@ -1341,39 +1716,66 @@
           </div>
 
           <p style="font-size: 13px; color: var(--slate-600); margin-bottom: 16px;">
-            Row Level Security (RLS) diaktifkan pada semua tabel di Supabase. Ini memastikan bahwa meskipun seseorang memodifikasi kode frontend di browser, PostgreSQL tetap menolak permintaan jika user ID atau role tidak sah.
+            Row Level Security (RLS) diaktifkan secara wajib pada seluruh tabel inti di PostgreSQL (berkas <code>002_rls_policies.sql</code>). Hal ini menjamin bahwa meskipun ada upaya rekayasa pada kode antarmuka di sisi peramban, engine PostgreSQL tetap secara mutlak menolak pembacaan atau penulisan data yang tidak sah.
           </p>
 
           <div class="code-block">
-<span class="code-comment">-- 1. Mengaktifkan RLS pada seluruh tabel inti</span>
+<span class="code-comment">-- =============================================================================</span>
+<span class="code-comment">-- 1. AKTIFKAN RLS PADA SELURUH TABEL INTI</span>
+<span class="code-comment">-- =============================================================================</span>
 <span class="code-keyword">ALTER TABLE</span> public.profiles <span class="code-keyword">ENABLE ROW LEVEL SECURITY</span>;
-<span class="code-keyword">ALTER TABLE</span> public.user_invitations <span class="code-keyword">ENABLE ROW LEVEL SECURITY</span>;
 <span class="code-keyword">ALTER TABLE</span> public.opd <span class="code-keyword">ENABLE ROW LEVEL SECURITY</span>;
+<span class="code-keyword">ALTER TABLE</span> public.user_invitations <span class="code-keyword">ENABLE ROW LEVEL SECURITY</span>;
 
-<span class="code-comment">-- 2. Kebijakan: Pengguna hanya boleh melihat dan mengedit profil miliknya sendiri</span>
-<span class="code-keyword">CREATE POLICY</span> <span class="code-string">"Users can view their own profile"</span>
-<span class="code-keyword">ON</span> public.profiles <span class="code-keyword">FOR SELECT</span>
-<span class="code-keyword">USING</span> (auth.uid() = id);
+<span class="code-comment">-- =============================================================================</span>
+<span class="code-comment">-- 2. KEBIJAKAN KEAMANAN: TABEL PROFILES</span>
+<span class="code-comment">-- =============================================================================</span>
 
-<span class="code-comment">-- 3. Kebijakan: Super Admin DPU dapat mengelola semua pengguna</span>
-<span class="code-keyword">CREATE POLICY</span> <span class="code-string">"Super Admin can manage all profiles"</span>
-<span class="code-keyword">ON</span> public.profiles <span class="code-keyword">FOR ALL</span>
-<span class="code-keyword">USING</span> (
-  <span class="code-keyword">EXISTS</span> (
-    <span class="code-keyword">SELECT</span> 1 <span class="code-keyword">FROM</span> public.profiles
-    <span class="code-keyword">WHERE</span> id = auth.uid() <span class="code-keyword">AND</span> role = <span class="code-string">'SUPER_ADMIN'</span>
-  )
-);
+<span class="code-comment">-- User dapat membaca profilnya sendiri</span>
+<span class="code-keyword">CREATE POLICY</span> <span class="code-string">"Users can view own profile"</span>
+  <span class="code-keyword">ON</span> public.profiles <span class="code-keyword">FOR SELECT</span>
+  <span class="code-keyword">USING</span> (auth.uid() = id);
+
+<span class="code-comment">-- Super Admin dapat melihat semua profil pengguna</span>
+<span class="code-keyword">CREATE POLICY</span> <span class="code-string">"Super admin can view all profiles"</span>
+  <span class="code-keyword">ON</span> public.profiles <span class="code-keyword">FOR SELECT</span>
+  <span class="code-keyword">USING</span> (
+    <span class="code-keyword">EXISTS</span> (
+      <span class="code-keyword">SELECT</span> 1 <span class="code-keyword">FROM</span> public.profiles
+      <span class="code-keyword">WHERE</span> id = auth.uid() <span class="code-keyword">AND</span> role = <span class="code-string">'SUPER_ADMIN'</span>
+    )
+  );
+
+<span class="code-comment">-- Admin Bidang dapat melihat profil pengguna dalam OPD yang sama</span>
+<span class="code-keyword">CREATE POLICY</span> <span class="code-string">"Admin bidang can view profiles in same OPD"</span>
+  <span class="code-keyword">ON</span> public.profiles <span class="code-keyword">FOR SELECT</span>
+  <span class="code-keyword">USING</span> (
+    <span class="code-keyword">EXISTS</span> (
+      <span class="code-keyword">SELECT</span> 1 <span class="code-keyword">FROM</span> public.profiles p
+      <span class="code-keyword">WHERE</span> p.id = auth.uid()
+        <span class="code-keyword">AND</span> p.role <span class="code-keyword">IN</span> (<span class="code-string">'SUPER_ADMIN'</span>, <span class="code-string">'ADMIN_BIDANG'</span>)
+        <span class="code-keyword">AND</span> (p.opd_id = public.profiles.opd_id <span class="code-keyword">OR</span> p.role = <span class="code-string">'SUPER_ADMIN'</span>)
+    )
+  );
+
+<span class="code-comment">-- Pengguna hanya boleh memperbarui profil sendiri tanpa dapat menaikkan hak akses (role)</span>
+<span class="code-keyword">CREATE POLICY</span> <span class="code-string">"Users can update own profile"</span>
+  <span class="code-keyword">ON</span> public.profiles <span class="code-keyword">FOR UPDATE</span>
+  <span class="code-keyword">USING</span> (auth.uid() = id)
+  <span class="code-keyword">WITH CHECK</span> (
+    auth.uid() = id
+    <span class="code-keyword">AND</span> role = (<span class="code-keyword">SELECT</span> role <span class="code-keyword">FROM</span> public.profiles <span class="code-keyword">WHERE</span> id = auth.uid())
+  );
           </div>
 
           <div class="arch-grid" style="margin-top: 20px;">
             <div class="arch-box">
-              <h4>🔒 Penyimpanan Token Terenkripsi</h4>
-              <p>JWT disimpan pada cookie beratribut <code>SameSite=Lax</code> dan <code>Secure</code> untuk melindungi sesi pengguna dari serangan Cross-Site Scripting (XSS) dan CSRF.</p>
+              <h4>🔒 Penyimpanan Token Terenkripsi di Cookie</h4>
+              <p>JWT Access Token dan Refresh Token disimpan pada cookie beratribut <code>SameSite=Lax</code> dan <code>Secure</code> untuk melindungi sesi pengguna secara mutlak dari risiko Cross-Site Scripting (XSS) dan CSRF.</p>
             </div>
             <div class="arch-box">
-              <h4>🔄 Auto-Refresh Token Transparan</h4>
-              <p>Sesi login diperbarui otomatis di latar belakang oleh Next.js Server Middleware tanpa menginterupsi pengguna saat sedang mengisi checklist pengawasan.</p>
+              <h4>🔄 Auto-Refresh Token di Latar Belakang</h4>
+              <p>Sesi login diperbarui otomatis secara transparan oleh Next.js Server Middleware (<code>src/middleware.ts</code>) tanpa menginterupsi auditor saat sedang mengisi formulir checklist SIMAK di lapangan.</p>
             </div>
           </div>
         </div>
@@ -1392,7 +1794,7 @@
         Berdasarkan Undang-Undang No. 2 Tahun 2017 &amp; Permen PUPR No. 1/2023 • Dikembangkan oleh Tim Pengembang SIJAKON Kabupaten Bogor
       </p>
       <p style="margin-top: 10px; font-size: 11px; color: rgba(255, 255, 255, 0.5);">
-        Dokumentasi Teknis Autentikasi &amp; Database Supabase • Versi 2.0 (Oktober 2026)
+        Dokumentasi Teknis Autentikasi, Database PostgreSQL &amp; Alur Registrasi • Versi 2.0 (Oktober 2026)
       </p>
     </div>
   </footer>
@@ -1415,7 +1817,7 @@
       }
 
       // Cari tombol yang mengarah ke tabId
-      const targetBtn = Array.from(buttons).find(b => b.getAttribute('onclick').includes(tabId));
+      const targetBtn = Array.from(buttons).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(tabId));
       if (targetBtn) {
         targetBtn.classList.add('active');
       }
@@ -1423,7 +1825,7 @@
       // Scroll halus ke bawah header jika di mobile
       if (window.innerWidth < 768) {
         const nav = document.querySelector('nav.tab-nav');
-        nav.scrollIntoView({ behavior: 'smooth' });
+        if (nav) nav.scrollIntoView({ behavior: 'smooth' });
       }
     }
   </script>
