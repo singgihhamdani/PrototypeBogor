@@ -1,11 +1,17 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useState } from "react";
-import { Layers, Filter, MapPin, Building2, ChevronRight, CheckCircle2, List, Map as MapIcon, SlidersHorizontal } from "lucide-react";
+import { useState, useEffect } from "react";
+import { 
+  Layers, Filter, MapPin, Building2, ChevronRight, CheckCircle2, 
+  List, Map as MapIcon, SlidersHorizontal, Database as DbIcon, Loader2, RefreshCw
+} from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import districtsData from "@/data/districts.json";
-import projectsData from "@/data/projects.json";
 import { useResponsive } from "@/lib/use-responsive";
+import { 
+  fetchPaketList, fetchBUJKList, 
+  PaketItem, BUJKItem, DataSourceStatus 
+} from "@/lib/services/master-data";
 
 const MapComponent = dynamic(() => import("@/components/webgis/map-container"), { 
   ssr: false, 
@@ -16,19 +22,87 @@ const MapComponent = dynamic(() => import("@/components/webgis/map-container"), 
   ) 
 });
 
+interface MappedProject {
+  id: string;
+  name: string;
+  contractor: string;
+  contractValue: number;
+  physProgress: number;
+  lat: number;
+  lng: number;
+  districtId: string;
+  planProgress: number[];
+  realProgress: number[];
+}
+
 export default function WebGISPage() {
   const { isMobile, isMounted } = useResponsive();
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   const [layer, setLayer] = useState<"projects" | "bujk">("projects");
   const [mobileViewMode, setMobileViewMode] = useState<"peta" | "daftar" | "split">("peta");
 
+  const [projects, setProjects] = useState<MappedProject[]>([]);
+  const [bujkCount, setBujkCount] = useState<number>(10);
+  const [loading, setLoading] = useState(true);
+  const [dataStatus, setDataStatus] = useState<DataSourceStatus>({
+    source: "fallback",
+    message: "Menghubungkan ke basis data..."
+  });
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [paketRes, bujkRes] = await Promise.all([
+        fetchPaketList(),
+        fetchBUJKList()
+      ]);
+
+      const mapped: MappedProject[] = paketRes.data.map((p) => {
+        const planArr = Array.isArray(p.kurva_s_rencana) ? (p.kurva_s_rencana as number[]) : [0, 20, 40, 60, 80, 100];
+        const realArr = Array.isArray(p.kurva_s_realisasi) ? (p.kurva_s_realisasi as number[]) : [0, 15, 35, 55, 68];
+        return {
+          id: p.id,
+          name: p.nama_paket,
+          contractor: p.nama_penyedia,
+          contractValue: Number(p.nilai_kontrak) || 0,
+          physProgress: Number(p.progres_fisik) || 0,
+          lat: Number(p.lat) || -6.4816,
+          lng: Number(p.lng) || 106.8516,
+          districtId: p.kode_kecamatan || "01",
+          planProgress: planArr,
+          realProgress: realArr
+        };
+      });
+
+      setProjects(mapped);
+      setBujkCount(bujkRes.data.length);
+      setDataStatus(paketRes.status);
+    } catch (err) {
+      console.error("Gagal load WebGIS live data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
   const filteredProjects = selectedDistrict
-    ? projectsData.filter((p) => p.districtId === selectedDistrict)
-    : projectsData;
+    ? projects.filter((p) => p.districtId === selectedDistrict)
+    : projects;
 
   const currentDistrictName = districtsData.find((d) => d.id === selectedDistrict)?.name;
-
   const isSmallScreen = isMounted && isMobile;
+
+  // Recalculate district projects dynamically
+  const dynamicDistricts = districtsData.map((d) => {
+    const pCount = projects.filter(p => p.districtId === d.id).length;
+    return {
+      ...d,
+      projects: pCount > 0 ? pCount : d.projects
+    };
+  });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -39,17 +113,57 @@ export default function WebGISPage() {
             <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
               <MapPin style={{ width: "12px", height: "12px" }} /> Peta Geospasial SIPJAKI
             </span>
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: 800,
+                padding: "2px 8px",
+                borderRadius: "9999px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                backgroundColor: dataStatus.source === "supabase" ? "#DCFCE7" : "#FEF3C7",
+                color: dataStatus.source === "supabase" ? "#166534" : "#92400E",
+                border: `1px solid ${dataStatus.source === "supabase" ? "#86EFAC" : "#FDE68A"}`
+              }}
+            >
+              <DbIcon style={{ width: "11px", height: "11px" }} />
+              <span>{dataStatus.source === "supabase" ? "PostgreSQL Supabase (Live)" : "Cadangan Lokal"}</span>
+            </span>
           </div>
           <h1 style={{ fontSize: isSmallScreen ? "20px" : "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
             WebGIS Peta Interaktif Jasa Konstruksi
           </h1>
           <p style={{ fontSize: "12.5px", color: "#64748B", margin: "4px 0 0 0" }}>
-            Sebaran spasial 342 paket pekerjaan fisik dan sebaran BUJK di 40 kecamatan se-Kabupaten Bogor
+            Sebaran spasial {projects.length} paket pekerjaan fisik dan sebaran {bujkCount} BUJK di 40 kecamatan se-Kabupaten Bogor
           </p>
         </div>
 
         {/* Layer Switches & Actions */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", width: isSmallScreen ? "100%" : "auto" }}>
+          <button
+            type="button"
+            onClick={loadData}
+            disabled={loading}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              borderRadius: "10px",
+              padding: isSmallScreen ? "7px 12px" : "8px 14px",
+              fontSize: "12px",
+              fontWeight: 700,
+              cursor: loading ? "not-allowed" : "pointer",
+              backgroundColor: "#FFFFFF",
+              color: "#334155",
+              border: "1px solid #CBD5E1",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+            }}
+          >
+            {loading ? <Loader2 style={{ width: "13px", height: "13px", animation: "spin 1s linear infinite" }} /> : <RefreshCw style={{ width: "13px", height: "13px" }} />}
+            <span>Segarkan</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setLayer("projects")}
@@ -72,7 +186,7 @@ export default function WebGISPage() {
             }}
           >
             <MapPin style={{ width: "14px", height: "14px", color: layer === "projects" ? "#FFC000" : "#64748B" }} />
-            <span>Paket Proyek (342)</span>
+            <span>Paket Proyek ({projects.length})</span>
           </button>
           
           <button
@@ -97,7 +211,7 @@ export default function WebGISPage() {
             }}
           >
             <Building2 style={{ width: "14px", height: "14px", color: layer === "bujk" ? "#FFC000" : "#64748B" }} />
-            <span>Titik BUJK (1.240)</span>
+            <span>Titik BUJK ({bujkCount})</span>
           </button>
 
           {selectedDistrict && (
@@ -249,8 +363,8 @@ export default function WebGISPage() {
             }}
           >
             <MapComponent
-              districts={districtsData}
-              projects={projectsData}
+              districts={dynamicDistricts}
+              projects={projects}
               layer={layer}
               onSelectDistrict={setSelectedDistrict}
               selectedDistrict={selectedDistrict}
@@ -322,7 +436,7 @@ export default function WebGISPage() {
                   {selectedDistrict ? `Kecamatan ${currentDistrictName}` : "Semua Proyek"}
                 </h3>
                 <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>
-                  Menampilkan {filteredProjects.length} paket pekerjaan APBD 2026
+                  Menampilkan {filteredProjects.length} paket pekerjaan {dataStatus.source === "supabase" ? "Supabase Live" : "APBD 2026"}
                 </p>
               </div>
               <span style={{ fontSize: "11px", fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "4px 10px", borderRadius: "8px" }}>

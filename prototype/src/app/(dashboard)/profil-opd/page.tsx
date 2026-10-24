@@ -1,13 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Landmark, UserCheck, ShieldCheck, DollarSign, FileText, CheckCircle2, 
   RefreshCw, Building2, Phone, Mail, Sparkles, Send, Download, Check,
-  Plus, Layers, Eye, FileSpreadsheet
+  Plus, Layers, Eye, FileSpreadsheet, Database as DbIcon
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import opdData from "@/data/opd.json";
 import { mockMasterOpdList, MasterOpdRecord } from "@/data/opd-master";
+import { fetchOpdList, createOpdItem } from "@/lib/services/opd-service";
 import { 
   StatusBadge, DataTableView, FilterBar, 
   FilterBarValues, ModalForm, ColumnDef 
@@ -37,7 +38,44 @@ export default function ProfilOpdPage() {
 
   // Master OPD State
   const [masterList, setMasterList] = useState<MasterOpdRecord[]>(mockMasterOpdList);
+  const [isLiveSupabase, setIsLiveSupabase] = useState(false);
   const [showBatchImportModal, setShowBatchImportModal] = useState(false);
+
+  useEffect(() => {
+    async function loadOpds() {
+      try {
+        const res = await fetchOpdList();
+        if (res.status.source === "supabase") {
+          setIsLiveSupabase(true);
+        }
+        if (res.data.length > 0) {
+          const mapped: MasterOpdRecord[] = res.data.map(o => ({
+            id: o.id,
+            kodeOpd: o.kode,
+            namaOpd: o.nama,
+            tingkat: "Kabupaten/Kota",
+            provinsi: "Jawa Barat",
+            kabupatenKota: "Kabupaten Bogor",
+            alamat: o.alamat,
+            telepon: o.telepon,
+            email: `${o.kode.toLowerCase()}@bogorkab.go.id`,
+            kepalaDinas: o.kepalaOpd,
+            jumlahTimPembina: o.userCount || 5,
+            statusSinkronisasi: o.isActive ? "Terhubung" : "Menunggu Verifikasi",
+            tanggalRegistrasi: "2026-01-15"
+          }));
+          setMasterList(prev => {
+            const existingCodes = new Set(mapped.map(m => m.kodeOpd));
+            const remaining = prev.filter(p => !existingCodes.has(p.kodeOpd));
+            return [...mapped, ...remaining];
+          });
+        }
+      } catch (err) {
+        console.warn("Gagal load OPD dari Supabase:", err);
+      }
+    }
+    loadOpds();
+  }, []);
   const [filterValues, setFilterValues] = useState<FilterBarValues>({
     search: "",
     province: "",
@@ -78,7 +116,7 @@ export default function ProfilOpdPage() {
   const totalProv = masterList.filter((m) => m.tingkat === "Provinsi").length;
   const totalKabKota = masterList.filter((m) => m.tingkat === "Kabupaten/Kota").length;
 
-  const handleAddOpd = (e: React.FormEvent) => {
+  const handleAddOpd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formNama || !formKode) {
       alert("Mohon isi Nama OPD dan Kode OPD!");
@@ -86,7 +124,16 @@ export default function ProfilOpdPage() {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      await createOpdItem({
+        kode: formKode,
+        nama: formNama,
+        kepalaOpd: formKepalaDinas,
+        alamat: formAlamat,
+        telepon: formTelepon,
+        isActive: true
+      });
+
       const newOpd: MasterOpdRecord = {
         id: `OPD-${Date.now().toString().slice(-4)}`,
         kodeOpd: formKode,
@@ -109,8 +156,11 @@ export default function ProfilOpdPage() {
       setFormNama("");
       setFormKode("");
       setFormAlamat("");
-      alert(`Data OPD "${formNama}" berhasil didaftarkan ke SIPJAKI Master!`);
-    }, 600);
+      alert(`Data OPD "${formNama}" berhasil didaftarkan ke Supabase & SIPJAKI Master!`);
+    } catch (err: any) {
+      setIsSubmitting(false);
+      alert(`Gagal menyimpan OPD: ${err.message}`);
+    }
   };
 
   const masterColumns: ColumnDef<MasterOpdRecord>[] = [

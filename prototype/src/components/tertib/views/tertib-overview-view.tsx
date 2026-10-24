@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Briefcase, Cog, HeartHandshake, FileText, ArrowRight, 
@@ -12,6 +12,7 @@ import {
   mockSDMRecords, mockTimelineRecords, mockAnggaranRecords, 
   mockPelaksanaanRecords, mockRekomendasiRecords 
 } from "@/data/tertib-mock-data";
+import { fetchPelaksanaanList, fetchRekomendasiList } from "@/lib/services/pengawasan-service";
 
 interface TertibOverviewViewProps {
   tertibType: TertibType;
@@ -24,6 +25,25 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
   const anggaranData = mockAnggaranRecords.filter((r) => r.tertibType === tertibType);
   const pelaksanaanData = mockPelaksanaanRecords.filter((r) => r.tertibType === tertibType);
   const rekomendasiData = mockRekomendasiRecords.filter((r) => r.tertibType === tertibType);
+
+  const [pelaksanaanCount, setPelaksanaanCount] = useState<number>(pelaksanaanData.length);
+  const [rekomendasiCount, setRekomendasiCount] = useState<number>(rekomendasiData.length);
+
+  useEffect(() => {
+    async function loadCounts() {
+      try {
+        const [pelRes, rekRes] = await Promise.all([
+          fetchPelaksanaanList(tertibType),
+          fetchRekomendasiList(tertibType)
+        ]);
+        setPelaksanaanCount(pelRes.data.length);
+        setRekomendasiCount(rekRes.data.length);
+      } catch (e) {
+        console.warn("Gagal load count pengawasan:", e);
+      }
+    }
+    loadCounts();
+  }, [tertibType]);
 
   const totalPagu = anggaranData.reduce((acc, curr) => acc + curr.paguAnggaran, 0);
 
@@ -46,7 +66,7 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
       icon: ShieldCheck,
       accentBg: "#FEF3C7",
       accentColor: "#92400E",
-      metric: `${pelaksanaanData.length} Objek Terverifikasi`
+      metric: `${pelaksanaanCount} Objek Terverifikasi (Supabase Live)`
     },
     {
       title: "3. Rekomendasi & Tindak Lanjut",
@@ -56,7 +76,7 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
       icon: AlertTriangle,
       accentBg: "#DCFCE7",
       accentColor: "#166534",
-      metric: `${rekomendasiData.length} Rekomendasi Diterbitkan`
+      metric: `${rekomendasiCount} Rekomendasi Diterbitkan (Supabase Live)`
     },
     {
       title: "4. Pelaporan Pengawasan",

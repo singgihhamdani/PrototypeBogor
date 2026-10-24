@@ -2,131 +2,95 @@
 import { useState, useEffect, useMemo } from "react";
 import { 
   Building2, Plus, Search, CheckCircle2, AlertTriangle, 
-  Edit, Trash2, Users, MapPin, Phone, UserCheck, ShieldCheck, Eye
+  Edit, Trash2, Users, MapPin, Phone, UserCheck, ShieldCheck, Eye,
+  RefreshCw, Database as DbIcon, Loader2
 } from "lucide-react";
 import OpdFormModal, { OpdData } from "./opd-form-modal";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-
-const INITIAL_OPD_DATA: OpdData[] = [
-  {
-    id: "opd-dpu",
-    kode: "DPU",
-    nama: "Dinas Pekerjaan Umum",
-    namaPendek: "DPU",
-    kepalaOpd: "Drs. H. Suryanto Putra, M.Si",
-    nipKepala: "196811051994031002",
-    alamat: "Jl. Tegar Beriman No. 1, Cibinong, Kabupaten Bogor",
-    telepon: "(021) 8754123",
-    isActive: true,
-    userCount: 4,
-  },
-  {
-    id: "opd-bappeda",
-    kode: "BAPPEDA",
-    nama: "Badan Perencanaan Pembangunan Daerah",
-    namaPendek: "Bappeda",
-    kepalaOpd: "Ir. Hj. Nurhayati, MT",
-    nipKepala: "197203151998032003",
-    alamat: "Kompleks Perkantoran Pemkab Bogor, Cibinong",
-    telepon: "(021) 8754200",
-    isActive: true,
-    userCount: 1,
-  },
-  {
-    id: "opd-bpkad",
-    kode: "BPKAD",
-    nama: "Badan Pengelolaan Keuangan dan Aset Daerah",
-    namaPendek: "BPKAD",
-    kepalaOpd: "Achmad Wildan, SE, MM",
-    nipKepala: "197504202000031001",
-    alamat: "Jl. Bersih No. 2, Cibinong, Kabupaten Bogor",
-    telepon: "(021) 8754321",
-    isActive: true,
-    userCount: 1,
-  },
-  {
-    id: "opd-disdik",
-    kode: "DISDIK",
-    nama: "Dinas Pendidikan",
-    namaPendek: "Disdik",
-    kepalaOpd: "Bambang Widodo Tawekal, M.Pd",
-    nipKepala: "196908101995121001",
-    alamat: "Jl. Nyaman No. 5, Cibinong, Kabupaten Bogor",
-    telepon: "(021) 8754400",
-    isActive: true,
-    userCount: 1,
-  },
-  {
-    id: "opd-dinkes",
-    kode: "DINKES",
-    nama: "Dinas Kesehatan",
-    namaPendek: "Dinkes",
-    kepalaOpd: "dr. Mike Kaltarina, MARS",
-    nipKepala: "197412022002122001",
-    alamat: "Jl. Kesehatan No. 3, Cibinong, Kabupaten Bogor",
-    telepon: "(021) 8754500",
-    isActive: true,
-    userCount: 1,
-  },
-];
+import { 
+  fetchOpdList, createOpdItem, toggleOpdActiveStatus, 
+  OpdRecord, DataSourceStatus 
+} from "@/lib/services/opd-service";
 
 export default function OpdManagementView() {
-  const [opds, setOpds] = useState<OpdData[]>(INITIAL_OPD_DATA);
+  const [opds, setOpds] = useState<OpdRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dataStatus, setDataStatus] = useState<DataSourceStatus>({
+    source: "fallback",
+    message: "Menghubungkan ke basis data..."
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
   // Modals
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedOpd, setSelectedOpd] = useState<OpdData | null>(null);
-  const [viewDetailOpd, setViewDetailOpd] = useState<OpdData | null>(null);
+  const [selectedOpd, setSelectedOpd] = useState<OpdRecord | null>(null);
+  const [viewDetailOpd, setViewDetailOpd] = useState<OpdRecord | null>(null);
 
   // Toast
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadData = async () => {
+    setLoading(true);
     try {
-      const stored = typeof window !== "undefined" ? localStorage.getItem("sijakon_opd_list_v1") : null;
-      if (stored) {
-        setOpds(JSON.parse(stored));
-      }
-    } catch {
-      setOpds(INITIAL_OPD_DATA);
-    }
-  }, []);
-
-  const saveOpdList = (list: OpdData[]) => {
-    setOpds(list);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("sijakon_opd_list_v1", JSON.stringify(list));
+      const res = await fetchOpdList();
+      setOpds(res.data);
+      setDataStatus(res.status);
+    } catch (err) {
+      console.error("Gagal load data OPD:", err);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleSaveOpd = (saved: OpdData) => {
-    const existingIndex = opds.findIndex((o) => o.id === saved.id);
-    let updated: OpdData[];
+  const handleSaveOpd = async (saved: OpdData) => {
+    const existingIndex = opds.findIndex((o) => o.id === saved.id || o.kode === saved.kode);
     if (existingIndex >= 0) {
-      updated = opds.map((o) => (o.id === saved.id ? saved : o));
+      const updated = opds.map((o) => (o.id === saved.id ? { ...o, ...saved } : o));
+      setOpds(updated);
       showToast(`Satuan Kerja ${saved.kode} berhasil diperbarui.`);
     } else {
-      updated = [saved, ...opds];
-      showToast(`Satuan Kerja baru ${saved.kode} berhasil ditambahkan.`);
+      const res = await createOpdItem({
+        kode: saved.kode,
+        nama: saved.nama,
+        namaPendek: saved.namaPendek,
+        kepalaOpd: saved.kepalaOpd,
+        alamat: saved.alamat,
+        telepon: saved.telepon,
+        isActive: saved.isActive
+      });
+      if (res.success && res.data) {
+        setOpds([res.data, ...opds]);
+        const fallbackRecord: OpdRecord = {
+          ...saved,
+          kepalaOpd: saved.kepalaOpd || "",
+          alamat: saved.alamat || "",
+          telepon: saved.telepon || "",
+          userCount: 0
+        };
+        setOpds([fallbackRecord, ...opds]);
+        showToast(`Satuan Kerja baru ${saved.kode} disimpan secara lokal.`);
+      }
     }
-    saveOpdList(updated);
     setIsFormOpen(false);
     setSelectedOpd(null);
   };
 
-  const handleToggleStatus = (opdId: string) => {
+  const handleToggleStatus = async (opdId: string) => {
     const target = opds.find((o) => o.id === opdId);
     if (!target) return;
     const newStatus = !target.isActive;
     const updated = opds.map((o) => (o.id === opdId ? { ...o, isActive: newStatus } : o));
-    saveOpdList(updated);
+    setOpds(updated);
+    await toggleOpdActiveStatus(opdId, target.isActive);
     showToast(`Status ${target.kode} diubah menjadi ${newStatus ? "Aktif" : "Non-Aktif"}.`);
   };
 
@@ -208,22 +172,64 @@ export default function OpdManagementView() {
             <Building2 style={{ width: "22px", height: "22px", color: "#0F2E5C" }} />
           </div>
           <div>
-            <h2 style={{ fontSize: "18px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
-              Master Satuan Kerja & Organisasi Perangkat Daerah (OPD)
-            </h2>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+              <h2 style={{ fontSize: "18px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
+                Master Satuan Kerja & Organisasi Perangkat Daerah (OPD)
+              </h2>
+              <span
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  padding: "2px 8px",
+                  borderRadius: "9999px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  backgroundColor: dataStatus.source === "supabase" ? "#DCFCE7" : "#FEF3C7",
+                  color: dataStatus.source === "supabase" ? "#166534" : "#92400E",
+                  border: `1px solid ${dataStatus.source === "supabase" ? "#86EFAC" : "#FDE68A"}`
+                }}
+              >
+                <DbIcon style={{ width: "11px", height: "11px" }} />
+                <span>{dataStatus.source === "supabase" ? "PostgreSQL Supabase (Live)" : "Cadangan Lokal"}</span>
+              </span>
+            </div>
             <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>
               Kelola daftar dinas/badan di Kabupaten Bogor untuk isolasi data dan penugasan petugas
             </p>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setSelectedOpd(null);
-            setIsFormOpen(true);
-          }}
-          style={{
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <button
+            type="button"
+            onClick={loadData}
+            disabled={loading}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "9px 14px",
+              borderRadius: "10px",
+              border: "1px solid #CBD5E1",
+              backgroundColor: "#FFFFFF",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#334155",
+              cursor: loading ? "not-allowed" : "pointer"
+            }}
+          >
+            {loading ? <Loader2 style={{ width: "14px", height: "14px", animation: "spin 1s linear infinite" }} /> : <RefreshCw style={{ width: "14px", height: "14px" }} />}
+            <span>Segarkan</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedOpd(null);
+              setIsFormOpen(true);
+            }}
+            style={{
             display: "inline-flex",
             alignItems: "center",
             gap: "8px",
@@ -239,9 +245,10 @@ export default function OpdManagementView() {
             boxShadow: "0 4px 10px rgba(15, 46, 92, 0.2)",
           }}
         >
-          <Plus style={{ width: "15px", height: "15px", color: "#FFC000" }} />
-          <span>+ Tambah OPD Baru</span>
-        </button>
+            <Plus style={{ width: "15px", height: "15px", color: "#FFC000" }} />
+            <span>+ Tambah OPD Baru</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Stats */}
