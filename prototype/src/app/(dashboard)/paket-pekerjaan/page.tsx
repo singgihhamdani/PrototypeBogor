@@ -19,6 +19,7 @@ import {
   fetchPaketList, createPaket, batchInsertPaket, 
   DataSourceStatus, PaketInsert 
 } from "@/lib/services/master-data";
+import { createClient } from "@/lib/supabase/client";
 
 const paketBatchColumns: BatchColumnDef[] = [
   { key: "id", label: "ID Paket", required: true, example: "P005" },
@@ -127,6 +128,21 @@ export default function PaketPekerjaanPage() {
 
   useEffect(() => {
     loadData();
+
+    // Supabase Realtime subscription untuk mendeteksi penambahan / perubahan paket pekerjaan baru secara otomatis
+    const client = createClient();
+    if (client) {
+      const channel = client
+        .channel("realtime-paket-list")
+        .on("postgres_changes", { event: "*", schema: "public", table: "paket_pekerjaan" }, () => {
+          loadData();
+        })
+        .subscribe();
+
+      return () => {
+        client.removeChannel(channel);
+      };
+    }
   }, []);
 
   const filtered = projects.filter((p) => {

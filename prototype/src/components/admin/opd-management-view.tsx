@@ -10,6 +10,7 @@ import {
   fetchOpdList, createOpdItem, toggleOpdActiveStatus, 
   OpdRecord, DataSourceStatus 
 } from "@/lib/services/opd-service";
+import { createClient } from "@/lib/supabase/client";
 
 export default function OpdManagementView() {
   const [opds, setOpds] = useState<OpdRecord[]>([]);
@@ -44,6 +45,21 @@ export default function OpdManagementView() {
 
   useEffect(() => {
     loadData();
+
+    // Supabase Realtime subscription untuk mendeteksi penambahan / perubahan status OPD secara otomatis
+    const client = createClient();
+    if (client) {
+      const channel = client
+        .channel("realtime-opd-list")
+        .on("postgres_changes", { event: "*", schema: "public", table: "opd" }, () => {
+          loadData();
+        })
+        .subscribe();
+
+      return () => {
+        client.removeChannel(channel);
+      };
+    }
   }, []);
 
   const showToast = (msg: string) => {

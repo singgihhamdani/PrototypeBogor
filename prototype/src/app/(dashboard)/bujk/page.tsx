@@ -14,6 +14,7 @@ import {
   fetchBUJKList, createBUJK, batchInsertBUJK, 
   BUJKItem, DataSourceStatus 
 } from "@/lib/services/master-data";
+import { createClient } from "@/lib/supabase/client";
 
 export default function BUJKPage() {
   const [bujkList, setBujkList] = useState<any[]>([]);
@@ -78,6 +79,21 @@ export default function BUJKPage() {
 
   useEffect(() => {
     loadData();
+
+    // Supabase Realtime subscription untuk mendeteksi penambahan BUJK baru secara otomatis
+    const client = createClient();
+    if (client) {
+      const channel = client
+        .channel("realtime-bujk-list")
+        .on("postgres_changes", { event: "*", schema: "public", table: "bujk" }, () => {
+          loadData();
+        })
+        .subscribe();
+
+      return () => {
+        client.removeChannel(channel);
+      };
+    }
   }, []);
 
   const filtered = bujkList.filter((b) => {

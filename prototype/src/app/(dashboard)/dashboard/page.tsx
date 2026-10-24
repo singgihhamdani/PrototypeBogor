@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useAuth, ROLE_CONFIGS } from "@/lib/mock-auth";
 import ExecutiveDashboardView from "@/components/dashboard/executive-dashboard-view";
 import { fetchDashboardStats, DashboardStats } from "@/lib/services/master-data";
+import { createClient } from "@/lib/supabase/client";
 
 const defaultPilarData = [
   { label: "Tertib Usaha", value: 72, icon: Building2, color: "#0F2E5C", desc: "Kesesuaian Izin, NIB & SBU", status: "Baik" },
@@ -41,11 +42,36 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadData = () => {
     fetchDashboardStats().then((res) => {
       setStats(res);
       setLoading(false);
     });
+  };
+
+  useEffect(() => {
+    loadData();
+
+    // Supabase Realtime subscription untuk mendeteksi perubahan data baru secara langsung
+    const client = createClient();
+    if (client) {
+      const channel = client
+        .channel("realtime-dashboard-stats")
+        .on("postgres_changes", { event: "*", schema: "public", table: "bujk" }, () => {
+          loadData();
+        })
+        .on("postgres_changes", { event: "*", schema: "public", table: "paket_pekerjaan" }, () => {
+          loadData();
+        })
+        .on("postgres_changes", { event: "*", schema: "public", table: "tkk" }, () => {
+          loadData();
+        })
+        .subscribe();
+
+      return () => {
+        client.removeChannel(channel);
+      };
+    }
   }, []);
 
   // 1. Tampilan Khusus Eksekutif
