@@ -11,6 +11,98 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import InviteUserModal, { DEFAULT_OPDS } from "./invite-user-modal";
 import UserEditModal from "./user-edit-modal";
 
+// Helper untuk konfigurasi visual Role Badge (Soft Tint + Matching Border & Dot)
+const getRoleBadgeConfig = (role: string) => {
+  switch (role) {
+    case "SUPER_ADMIN":
+      return {
+        label: "Super Admin",
+        bg: "#FEF3C7",
+        text: "#92400E",
+        border: "#FDE68A",
+        dot: "#D97706",
+        avatarBg: "#FEF3C7",
+        avatarText: "#92400E",
+      };
+    case "ADMIN_BIDANG":
+      return {
+        label: "Admin Bidang",
+        bg: "#EFF6FF",
+        text: "#1D4ED8",
+        border: "#BFDBFE",
+        dot: "#3B82F6",
+        avatarBg: "#EFF6FF",
+        avatarText: "#1D4ED8",
+      };
+    case "EKSEKUTIF":
+      return {
+        label: "Eksekutif",
+        bg: "#ECFDF5",
+        text: "#065F46",
+        border: "#A7F3D0",
+        dot: "#10B981",
+        avatarBg: "#ECFDF5",
+        avatarText: "#065F46",
+      };
+    case "OPERATOR_BUJK":
+      return {
+        label: "Operator BUJK",
+        bg: "#FFF7ED",
+        text: "#C2410C",
+        border: "#FED7AA",
+        dot: "#EA580C",
+        avatarBg: "#FFF7ED",
+        avatarText: "#C2410C",
+      };
+    case "PESERTA_TKK":
+      return {
+        label: "Peserta TKK",
+        bg: "#F1F5F9",
+        text: "#334155",
+        border: "#CBD5E1",
+        dot: "#64748B",
+        avatarBg: "#F1F5F9",
+        avatarText: "#334155",
+      };
+    default:
+      return {
+        label: "Pengguna",
+        bg: "#F8FAFC",
+        text: "#475569",
+        border: "#E2E8F0",
+        dot: "#94A3B8",
+        avatarBg: "#F8FAFC",
+        avatarText: "#475569",
+      };
+  }
+};
+
+// Helper untuk sub-penugasan spesifik agar tidak terduplikasi dengan nama role
+const getPenugasanLabel = (u: any) => {
+  if (u.variant === "BINA_KONSTRUKSI" || u.variantLabel?.includes("Bina Konstruksi")) {
+    return "Seksi Bina Konstruksi";
+  }
+  if (u.variant === "PENGAWAS_ASESOR" || u.variantLabel?.includes("Pengawas")) {
+    return "Tim Pengawas & Asesor Lapangan";
+  }
+  if (u.variant === "PELATIHAN" || u.variantLabel?.includes("Pelatihan")) {
+    return "Seksi Pelatihan & Sertifikasi TKK";
+  }
+  if (u.role === "SUPER_ADMIN") {
+    return u.jabatan || "Kepala Bidang Bina Konstruksi";
+  }
+  if (u.role === "EKSEKUTIF") {
+    return u.jabatan || "Kepala Dinas PUPR";
+  }
+  if (u.role === "OPERATOR_BUJK") {
+    return u.bujkName ? `${u.bujkName} (PJBU)` : "Penyedia Jasa Rekanan";
+  }
+  if (u.role === "PESERTA_TKK") {
+    return "Tenaga Ahli Konstruksi (SKK)";
+  }
+  return u.variantLabel || u.jabatan || "Staff Kedinasan";
+};
+
 // Initial seed users berbasis 6 demo persona + penugasan OPD
 const INITIAL_USERS = [
   {
@@ -20,7 +112,9 @@ const INITIAL_USERS = [
     email: "admin@sijakon.bogor.go.id",
     nip: "197508121998031004",
     role: "SUPER_ADMIN" as RoleCode,
-    roleLabel: "Super Admin DPU",
+    roleLabel: "Super Admin",
+    variant: undefined,
+    variantLabel: "Kepala Bidang Bina Konstruksi",
     instansi: "Dinas Pekerjaan Umum",
     opdId: "opd-dpu",
     opdName: "Dinas Pekerjaan Umum",
@@ -35,7 +129,7 @@ const INITIAL_USERS = [
     email: "binkon@sijakon.bogor.go.id",
     nip: "199204142019021003",
     role: "ADMIN_BIDANG" as RoleCode,
-    roleLabel: "Admin Bidang (Bina Konstruksi)",
+    roleLabel: "Admin Bidang",
     variant: "BINA_KONSTRUKSI",
     variantLabel: "Seksi Bina Konstruksi",
     instansi: "Dinas Pekerjaan Umum",
@@ -52,7 +146,7 @@ const INITIAL_USERS = [
     email: "pengawas@sijakon.bogor.go.id",
     nip: "198306202008011007",
     role: "ADMIN_BIDANG" as RoleCode,
-    roleLabel: "Admin Bidang (Tim Pengawas / Asesor)",
+    roleLabel: "Admin Bidang",
     variant: "PENGAWAS_ASESOR",
     variantLabel: "Tim Pengawas & Asesor Lapangan",
     instansi: "Dinas Pekerjaan Umum",
@@ -69,7 +163,9 @@ const INITIAL_USERS = [
     email: "kadis@sijakon.bogor.go.id",
     nip: "196811051994031002",
     role: "EKSEKUTIF" as RoleCode,
-    roleLabel: "Pimpinan Eksekutif DPU",
+    roleLabel: "Eksekutif",
+    variant: undefined,
+    variantLabel: "Kepala Dinas PUPR",
     instansi: "Dinas Pekerjaan Umum",
     opdId: "opd-dpu",
     opdName: "Dinas Pekerjaan Umum",
@@ -84,12 +180,14 @@ const INITIAL_USERS = [
     email: "admin@ptbangunjaya.co.id",
     nip: "—",
     role: "OPERATOR_BUJK" as RoleCode,
-    roleLabel: "Operator BUJK Rekanan",
+    roleLabel: "Operator BUJK",
+    variant: undefined,
+    variantLabel: "Penyedia Jasa Konstruksi",
     bujkId: "BUJK-001",
     bujkName: "PT Bangun Jaya Konstruksi",
     instansi: "PT Bangun Jaya Konstruksi",
-    opdId: "opd-dpu",
-    opdName: "Dinas Pekerjaan Umum",
+    opdId: "bujk-pt-bangun-jaya",
+    opdName: "PT Bangun Jaya Konstruksi",
     jabatan: "Penanggung Jawab Teknis Badan Usaha (PJTBU)",
     status: "active",
     createdAt: "2026-02-01T14:10:00Z",
@@ -101,10 +199,12 @@ const INITIAL_USERS = [
     email: "ahmad.fauzi@gmail.com",
     nip: "—",
     role: "PESERTA_TKK" as RoleCode,
-    roleLabel: "Peserta Pelatihan TKK",
+    roleLabel: "Peserta TKK",
+    variant: undefined,
+    variantLabel: "Tenaga Kerja Konstruksi (SKK)",
     instansi: "Mandiri / Asosiasi Tenaga Kerja",
-    opdId: "opd-dpu",
-    opdName: "Dinas Pekerjaan Umum",
+    opdId: "mandiri-tkk",
+    opdName: "Mandiri / Asosiasi Tenaga Kerja",
     jabatan: "Pelaksana Lapangan Pekerjaan Gedung",
     status: "active",
     createdAt: "2026-02-10T10:20:00Z",
@@ -132,7 +232,7 @@ export default function UserManagementView() {
   // Load stored users from localStorage
   useEffect(() => {
     try {
-      const stored = typeof window !== "undefined" ? localStorage.getItem("sijakon_users_list_v2") : null;
+      const stored = typeof window !== "undefined" ? localStorage.getItem("sijakon_users_list_v4") : null;
       if (stored) {
         setUsers(JSON.parse(stored));
       }
@@ -144,7 +244,7 @@ export default function UserManagementView() {
   const saveUsers = (updatedList: any[]) => {
     setUsers(updatedList);
     if (typeof window !== "undefined") {
-      localStorage.setItem("sijakon_users_list_v2", JSON.stringify(updatedList));
+      localStorage.setItem("sijakon_users_list_v4", JSON.stringify(updatedList));
     }
   };
 
@@ -599,7 +699,8 @@ export default function UserManagementView() {
                 </tr>
               ) : (
                 filteredUsers.map((u, idx) => {
-                  const meta = ROLE_CONFIGS[u.role as RoleCode] || ROLE_CONFIGS.EKSEKUTIF;
+                  const roleBadge = getRoleBadgeConfig(u.role);
+                  const penugasanText = getPenugasanLabel(u);
                   const isPending = u.status === "pending";
                   const isSuspended = u.status === "suspended";
 
@@ -609,22 +710,24 @@ export default function UserManagementView() {
                       style={{
                         borderBottom: "1px solid #F1F5F9",
                         backgroundColor: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
+                        transition: "background-color 0.15s ease",
                       }}
                     >
                       {/* Nama & NIP */}
-                      <td style={{ padding: "14px 18px" }}>
+                      <td style={{ padding: "14px 18px", verticalAlign: "middle" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                           <div
                             style={{
-                              width: "34px",
-                              height: "34px",
-                              borderRadius: "50%",
-                              backgroundColor: meta.badgeBg,
-                              color: meta.badgeText,
+                              width: "36px",
+                              height: "36px",
+                              borderRadius: "10px",
+                              backgroundColor: roleBadge.avatarBg,
+                              color: roleBadge.avatarText,
+                              border: `1px solid ${roleBadge.border}`,
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              fontWeight: 900,
+                              fontWeight: 800,
                               fontSize: "12px",
                               flexShrink: 0,
                             }}
@@ -643,47 +746,77 @@ export default function UserManagementView() {
                       </td>
 
                       {/* Role & Penugasan */}
-                      <td style={{ padding: "14px 18px" }}>
-                        <span
-                          style={{
-                            display: "inline-block",
-                            fontSize: "11px",
-                            fontWeight: 800,
-                            backgroundColor: meta.badgeBg,
-                            color: meta.badgeText,
-                            padding: "3px 10px",
-                            borderRadius: "9999px",
-                          }}
-                        >
-                          {u.roleLabel || meta.label}
-                        </span>
-                        {u.variantLabel && (
+                      <td style={{ padding: "14px 18px", verticalAlign: "middle" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-start" }}>
                           <span
                             style={{
-                              display: "block",
-                              fontSize: "10px",
-                              color: "#0F2E5C",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              fontSize: "11px",
                               fontWeight: 700,
-                              marginTop: "3px",
+                              backgroundColor: roleBadge.bg,
+                              color: roleBadge.text,
+                              border: `1px solid ${roleBadge.border}`,
+                              padding: "3px 10px",
+                              borderRadius: "9999px",
+                              whiteSpace: "nowrap",
                             }}
                           >
-                            {u.variantLabel}
+                            <span
+                              style={{
+                                width: "6px",
+                                height: "6px",
+                                borderRadius: "50%",
+                                backgroundColor: roleBadge.dot,
+                              }}
+                            />
+                            {roleBadge.label}
                           </span>
-                        )}
-                      </td>
-
-                      {/* Satuan Kerja (OPD) */}
-                      <td style={{ padding: "14px 18px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <Building2 style={{ width: "14px", height: "14px", color: "#0F2E5C" }} />
-                          <span style={{ fontWeight: 700, color: "#1E293B" }}>
-                            {u.opdName || u.instansi || "Dinas Pekerjaan Umum"}
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              color: "#64748B",
+                              fontWeight: 600,
+                              lineHeight: 1.3,
+                            }}
+                          >
+                            {penugasanText}
                           </span>
                         </div>
                       </td>
 
+                      {/* Satuan Kerja (OPD) */}
+                      <td style={{ padding: "14px 18px", verticalAlign: "middle" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <div
+                            style={{
+                              width: "28px",
+                              height: "28px",
+                              borderRadius: "8px",
+                              backgroundColor: u.role === "OPERATOR_BUJK" ? "#FFF7ED" : u.role === "PESERTA_TKK" ? "#F1F5F9" : "#F8FAFC",
+                              border: "1px solid #E2E8F0",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Building2 style={{ width: "14px", height: "14px", color: u.role === "OPERATOR_BUJK" ? "#C2410C" : u.role === "PESERTA_TKK" ? "#64748B" : "#0F2E5C" }} />
+                          </div>
+                          <div>
+                            <span style={{ display: "block", fontWeight: 700, color: "#1E293B", fontSize: "12px" }}>
+                              {u.role === "OPERATOR_BUJK" ? (u.bujkName || u.instansi || "PT Bangun Jaya Konstruksi") : u.role === "PESERTA_TKK" ? (u.instansi || "Mandiri / Asosiasi Tenaga Kerja") : (u.opdName || u.instansi || "Dinas Pekerjaan Umum")}
+                            </span>
+                            <span style={{ display: "block", fontSize: "10px", color: "#94A3B8", fontWeight: 500 }}>
+                              {u.role === "OPERATOR_BUJK" ? "Rekanan Jasa Konstruksi" : u.role === "PESERTA_TKK" ? "Tenaga Ahli Bersertifikat" : "Pemerintah Kab. Bogor"}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
                       {/* Email & Jabatan */}
-                      <td style={{ padding: "14px 18px" }}>
+                      <td style={{ padding: "14px 18px", verticalAlign: "middle" }}>
                         <p style={{ margin: 0, color: "#0F172A", fontWeight: 600 }}>{u.email}</p>
                         <p style={{ margin: "2px 0 0 0", fontSize: "11px", color: "#64748B" }}>
                           {u.jabatan || "Staff Kedinasan"}
