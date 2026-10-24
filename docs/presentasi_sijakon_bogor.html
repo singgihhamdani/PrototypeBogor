@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIJAKON BOGOR — Executive Keynote TA 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       STRUCTURED TABLE-BASED EXECUTIVE SYSTEM (PRISTINE WHITESPACE & CLEAN TABLES)
+       ========================================================================== */
+    :root {
+      --bg: #FFFFFF;
+      --table-header-bg: #F1F5F9;
+      --table-border: #E2E8F0;
+      --table-hover: #F8FAFC;
+      
+      /* Typography */
+      --text-title: #0F172A;
+      --text-lead: #334155;
+      --text-body: #475569;
+      --text-muted: #64748B;
+      
+      /* Brand Accents */
+      --pupr-navy: #0F2E5C;
+      --gold: #D97706;
+      --gold-bg: #FEF3C7;
+      --cyan: #0284C7;
+      --cyan-bg: #E0F2FE;
+      --emerald: #059669;
+      --emerald-bg: #ECFDF5;
+      --danger: #DC2626;
+      --danger-bg: #FEF2F2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 90% 10%, rgba(2, 132, 199, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 10% 90%, rgba(217, 119, 6, 0.02) 0%, transparent 50%);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-body);
+      user-select: none;
+    }
+
+    /* Ambient Hairline Progress Bar */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #0F2E5C 0%, #D97706 50%, #0284C7 100%);
+      width: 8.33%;
+      z-index: 1000;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ==========================================================================
+       FULLSCREEN SLIDE STAGE
+       ========================================================================== */
+    .deck-viewport {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      padding: 5vh 8vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: translate3d(25px, 0, 0) scale(0.99);
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  visibility 0.45s;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translate3d(0, 0, 0) scale(1);
+      pointer-events: auto;
+    }
+
+    .slide.exit-left {
+      opacity: 0;
+      visibility: hidden;
+      transform: translate3d(-25px, 0, 0) scale(0.99);
+    }
+
+    /* Spacious Slide Container */
+    .slide-inner {
+      width: 100%;
+      max-width: 1180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* ==========================================================================
+       TYPOGRAPHY
+       ========================================================================== */
+    .tagline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.725rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--pupr-navy);
+      margin-bottom: 12px;
+    }
+    .tagline::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+
+    h1.hero-title {
+      font-size: clamp(2.3rem, 4vw, 3.6rem);
+      font-weight: 900;
+      color: var(--text-title);
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+      margin-bottom: 10px;
+    }
+
+    h2.slide-heading {
+      font-size: clamp(1.75rem, 2.8vw, 2.35rem);
+      font-weight: 900;
+      color: var(--text-title);
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    p.lead-text {
+      font-size: clamp(0.95rem, 1.25vw, 1.05rem);
+      color: var(--text-lead);
+      line-height: 1.55;
+      max-width: 900px;
+      margin-bottom: 24px;
+      font-weight: 400;
+    }
+
+    /* ==========================================================================
+       STRUCTURED TABLE STYLES (EXECUTIVE LEVEL)
+       ========================================================================== */
+    .table-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+      margin-bottom: 22px;
+    }
+
+    table.exec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.865rem;
+      text-align: left;
+    }
+
+    table.exec-table thead th {
+      background: #F8FAFC;
+      color: #0F2E5C;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 0.725rem;
+      letter-spacing: 0.08em;
+      padding: 14px 20px;
+      border-bottom: 1.5px solid #CBD5E1;
+    }
+
+    table.exec-table tbody td {
+      padding: 16px 20px;
+      color: var(--text-lead);
+      border-bottom: 1px solid #F1F5F9;
+      line-height: 1.55;
+      vertical-align: top;
+    }
+
+    table.exec-table tbody tr:hover td {
+      background: #F8FAFC;
+    }
+
+    table.exec-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Badges & Status Pills inside Tables */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.725rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .pill-red { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+    .pill-green { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+    .pill-blue { background: #F0F9FF; color: #0284C7; border: 1px solid #BAE6FD; }
+    .pill-gold { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+    .pill-navy { background: #EFF6FF; color: #0F2E5C; border: 1px solid #BFDBFE; }
+
+    /* Action Links */
+    .action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--pupr-navy);
+      color: #FFFFFF;
+      font-size: 0.825rem;
+      font-weight: 800;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 12px rgba(15, 46, 92, 0.18);
+    }
+    .action-pill:hover {
+      background: #172554;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(15, 46, 92, 0.28);
+    }
+
+    .action-pill-subtle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #F1F5F9;
+      border: 1px solid var(--table-border);
+      color: var(--text-title);
+      font-size: 0.825rem;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+    .action-pill-subtle:hover {
+      background: #E2E8F0;
+      color: var(--pupr-navy);
+    }
+
+    /* ==========================================================================
+       NARRATIVE PRESENTATION STYLES (KEYNOTE STORYTELLING)
+       ========================================================================== */
+    .narrative-quote {
+      font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+      font-weight: 700;
+      color: var(--pupr-navy);
+      line-height: 1.5;
+      letter-spacing: -0.02em;
+      margin-bottom: 30px;
+      padding-left: 20px;
+      border-left: 3.5px solid var(--gold);
+      max-width: 980px;
+    }
+
+    .narrative-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-bottom: 28px;
+    }
+
+    .narrative-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .narrative-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 36px;
+      margin-bottom: 28px;
+    }
+
+    .narrative-col {
+      border-top: 2px solid #E2E8F0;
+      padding-top: 18px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+    }
+    .narrative-col:hover {
+      border-top-color: var(--pupr-navy);
+      transform: translateY(-2px);
+    }
+    .narrative-col .col-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.725rem;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .narrative-col .col-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: var(--text-title);
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .narrative-col .col-desc {
+      font-size: 0.88rem;
+      color: var(--text-lead);
+      line-height: 1.62;
+      flex-grow: 1;
+    }
+
+    /* Live Demo Cue Strip */
+    .demo-cue {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 9999px;
+      padding: 8px 22px 8px 14px;
+      margin-top: 8px;
+    }
+    .demo-cue-tag {
+      background: #EFF6FF;
+      color: var(--pupr-navy);
+      font-size: 0.725rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      letter-spacing: 0.04em;
+      border: 1px solid #BFDBFE;
+    }
+    .demo-cue-text {
+      font-size: 0.835rem;
+      color: var(--text-title);
+      font-weight: 600;
+    }
+
+    /* Grid for Slide 1 Stats */
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .stat-box {
+      background: #FFFFFF;
+      border: 1px solid var(--table-border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+    .stat-box .label {
+      font-size: 0.725rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+    .stat-box .value {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: var(--pupr-navy);
+      margin-top: 4px;
+    }
+    .stat-box .sub {
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* ==========================================================================
+       SUBTLE FLOATING CONTROLS
+       ========================================================================== */
+    .floating-cloud-badge {
+      position: fixed;
+      top: 24px;
+      right: 36px;
+      z-index: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #065F46;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 7px 16px;
+      border-radius: 9999px;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      transition: all 0.25s ease;
+    }
+    .floating-cloud-badge:hover {
+      background: #D1FAE5;
+      transform: translateY(-1px);
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: #10B981;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #10B981;
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    .floating-counter {
+      position: fixed;
+      bottom: 24px;
+      right: 36px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.825rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #FFFFFF;
+      border: 1px solid var(--table-border);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .floating-counter kbd {
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      color: var(--pupr-navy);
+      font-weight: 800;
+    }
+
+    .floating-nav {
+      position: fixed;
+      bottom: 24px;
+      left: 36px;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-btn {
+      width: 38px;
+      height: 38px;
+      background: #FFFFFF;
+      border: 1px solid var(--table-border);
+      border-radius: 50%;
+      color: var(--text-title);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.15rem;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: all 0.2s ease;
+    }
+    .nav-btn:hover {
+      background: var(--pupr-navy);
+      color: #FFFFFF;
+      border-color: var(--pupr-navy);
+    }
+
+    /* Modal Overview (Press 'O') */
+    .overview-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(16px);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      padding: 60px 80px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .overview-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      background: #FFFFFF;
+      padding: 16px 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    }
+    .overview-title {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--text-title);
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      overflow-y: auto;
+    }
+    .overview-item {
+      background: #FFFFFF;
+      border: 1px solid var(--table-border);
+      border-radius: 14px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .overview-item:hover, .overview-item.active {
+      border-color: var(--pupr-navy);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.1);
+    }
+    .overview-item .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.725rem;
+      color: var(--gold);
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .overview-item .name {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-title);
+    }
+
+    @media (max-width: 900px) {
+      .grid-4 { grid-template-columns: 1fr; }
+      .slide { padding: 40px 20px; overflow-y: auto; }
+      h1.hero-title { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Thin Top Progress Bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Floating Live Cloud Badge (Top Right) -->
+  <a href="https://prototype-bogor.vercel.app/" target="_blank" class="floating-cloud-badge" title="Buka prototype live di Vercel">
+    <span class="pulse-dot"></span>
+    <span>prototype-bogor.vercel.app</span>
+  </a>
+
+  <!-- Floating Nav Controls (Bottom Left) -->
+  <div class="floating-nav">
+    <button class="nav-btn" onclick="prevSlide()" title="Slide Sebelumnya (←)">‹</button>
+    <button class="nav-btn" onclick="nextSlide()" title="Slide Selanjutnya (→ / Spasi)">›</button>
+  </div>
+
+  <!-- Floating Slide Counter (Bottom Right) -->
+  <div class="floating-counter">
+    <span id="slideIndicator">01 / 12</span>
+    <span>•</span>
+    <span>Tekan <kbd>O</kbd> untuk Overview</span>
+  </div>
+
+  <!-- Main Deck Viewport -->
+  <div class="deck-viewport">
+
+    <!-- ==========================================
+         SLIDE 1: COVER KEYNOTE
+         ========================================== -->
+    <section class="slide active" data-slide="1">
+      <div class="slide-inner">
+        <div class="tagline">PEMERINTAH KABUPATEN BOGOR • DINAS PUPR</div>
+        <h1 class="hero-title">SIJAKON BOGOR</h1>
+        <p class="lead-text">
+          Sistem Informasi Pembina Jasa Konstruksi Terpadu — Tata kelola ekosistem jasa konstruksi terintegrasi berbasis spasial (WebGIS 40 Kecamatan), digitalisasi pengawasan 3 Tertib (Permen PUPR 1/2023), sertifikasi tenaga kerja ber-QR Code, dan pelaporan otomatis ke portal SIPJAKI Kementerian PUPR.
+        </p>
+
+        <div class="grid-4" style="margin-bottom: 32px;">
+          <div class="stat-box">
+            <div class="label">Dasar Kebijakan</div>
+            <div class="value">Permen PUPR 1/2023</div>
+            <div class="sub">Pengawasan Sub-Urusan Jakon</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">Cakupan Wilayah</div>
+            <div class="value">40 Kecamatan</div>
+            <div class="sub">Peta Spasial Proyek Se-Bogor</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">Mandat Sertifikasi</div>
+            <div class="value" style="color: var(--gold);">500 TKK / Tahun</div>
+            <div class="sub">e-Sertifikat Digital + QR Code</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">Integrasi Nasional</div>
+            <div class="value" style="color: var(--emerald);">SIPJAKI KemenPUPR</div>
+            <div class="sub">Ekspor Format Standar Excel</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <a href="https://prototype-bogor.vercel.app/" target="_blank" class="action-pill">
+            🚀 Buka Live Prototype Sekarang
+          </a>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">
+            Gunakan tombol panah <kbd>→</kbd> atau <kbd>Spasi</kbd> untuk berpindah slide
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 2: LATAR BELAKANG & TABEL KOMPARASI
+         ========================================== -->
+    <section class="slide" data-slide="2">
+      <div class="slide-inner">
+        <div class="tagline">URGENSI TATA KELOLA DAERAH</div>
+        <h2 class="slide-heading">Mengapa Kabupaten Bogor Membutuhkan SIJAKON?</h2>
+        <p class="lead-text">
+          Tabel komparasi tata kelola proyek fisik konstruksi di Kabupaten Bogor sebelum dan sesudah penerapan SIJAKON.
+        </p>
+
+        <div class="table-card">
+          <table class="exec-table">
+            <thead>
+              <tr>
+                <th style="width: 6%; text-align: center;">No</th>
+                <th style="width: 24%;">Aspek Pengawasan</th>
+                <th style="width: 35%;">Kondisi Eksisting (Sebelum SIJAKON)</th>
+                <th style="width: 35%;">Solusi Strategis SIJAKON</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--pupr-navy); text-align: center;">01</td>
+                <td>
+                  <strong style="color: var(--text-title); font-size: 0.9rem;">Integrasi Data Lintas OPD</strong><br>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">PUPR, Disdik, Dinkes, PRKP</span>
+                </td>
+                <td>
+                  <div style="margin-bottom: 5px;"><span class="pill pill-red">🔴 Terfragmentasi Lintas Dinas</span></div>
+                  <div style="font-size: 0.84rem; color: var(--text-lead);">Data proyek fisik tersebar di masing-masing dinas teknis tanpa satu pintu pemantauan tunggal pimpinan.</div>
+                </td>
+                <td>
+                  <div style="margin-bottom: 5px;"><span class="pill pill-green">🟢 Satu Pintu Eksekutif</span></div>
+                  <div style="font-size: 0.84rem; color: var(--text-title); font-weight: 500;">Seluruh paket pekerjaan APBD & DAK terintegrasi terpusat dalam satu dasbor analitik real-time.</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--pupr-navy); text-align: center;">02</td>
+                <td>
+                  <strong style="color: var(--text-title); font-size: 0.9rem;">Deteksi Proyek Kritis</strong><br>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">Monitoring Fisik & Keuangan</span>
+                </td>
+                <td>
+                  <div style="margin-bottom: 5px;"><span class="pill pill-red">🔴 Masalah Terlambat Dideteksi</span></div>
+                  <div style="font-size: 0.84rem; color: var(--text-lead);">Deviasi fisik dan keterlambatan serapan sering baru terungkap menjelang tutup tahun anggaran (SiLPA).</div>
+                </td>
+                <td>
+                  <div style="margin-bottom: 5px;"><span class="pill pill-green">🟢 Early Warning Spasial</span></div>
+                  <div style="font-size: 0.84rem; color: var(--text-title); font-weight: 500;">Disparitas progres fisik vs pencairan SP2D kas daerah terpantau secara periodik dan visual di peta.</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--pupr-navy); text-align: center;">03</td>
+                <td>
+                  <strong style="color: var(--text-title); font-size: 0.9rem;">Audit 3 Tertib Jakon</strong><br>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">Mandat Permen PUPR 1/2023</span>
+                </td>
+                <td>
+                  <div style="margin-bottom: 5px;"><span class="pill pill-red">🔴 Formulir Manual Kertas</span></div>
+                  <div style="font-size: 0.84rem; color: var(--text-lead);">Pengawasan diisi manual di lembaran kertas, menyulitkan rekapitulasi penilaian indeks kepatuhan.</div>
+                </td>
+                <td>
+                  <div style="margin-bottom: 5px;"><span class="pill pill-green">🟢 Digitalisasi SIMAK Terpadu</span></div>
+                  <div style="font-size: 0.84rem; color: var(--text-title); font-weight: 500;">Pengisian audit digital, scoring indeks kepatuhan otomatis, dan penerbitan Berita Acara (BAP).</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--pupr-navy); text-align: center;">04</td>
+                <td>
+                  <strong style="color: var(--text-title); font-size: 0.9rem;">Validitas Sertifikat TKK</strong><br>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">Tukang, Mandor & Pelaksana</span>
+                </td>
+                <td>
+                  <div style="margin-bottom: 5px;"><span class="pill pill-red">🔴 Sulit Diverifikasi di Lapangan</span></div>
+                  <div style="font-size: 0.84rem; color: var(--text-lead);">Tidak ada sarana instan di lapangan untuk membuktikan keaslian sertifikat kompetensi pekerja fisik.</div>
+                </td>
+                <td>
+                  <div style="margin-bottom: 5px;"><span class="pill pill-green">🟢 Validasi Dynamic QR Code</span></div>
+                  <div style="font-size: 0.84rem; color: var(--text-title); font-weight: 500;">Pembuktian keabsahan sertifikat TKK langsung di lokasi proyek via pemindaian smartphone.</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="font-size: 0.825rem; color: var(--text-muted);">
+          💡 <em>SIJAKON mentransformasi proses administratif birokrasi menjadi ekosistem digital yang akuntabel dan mudah diaudit (auditable).</em>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 3: 4 PILAR ARSITEKTUR
+         ========================================== -->
+    <section class="slide" data-slide="3">
+      <div class="slide-inner">
+        <div class="tagline">VISI ARSITEKTUR LAYANAN</div>
+        <h2 class="slide-heading">Satu Dasbor, Empat Pilar Pengawalan Terpadu</h2>
+        <div class="narrative-quote">
+          “SIJAKON mentransformasi pembinaan jasa konstruksi dari sekadar kewajiban administratif rutin menjadi instrumen strategis pengendalian pembangunan daerah dari hulu ke hilir.”
+        </div>
+
+        <div class="narrative-grid-4">
+          <div class="narrative-col">
+            <div class="col-tag">Pilar 01 • Spasial</div>
+            <div class="col-title">WebGIS 40 Kecamatan</div>
+            <div class="col-desc">
+              Menjamin tidak ada titik proyek fisik yang luput dari pantauan visual pimpinan daerah, memetakan risiko keterlambatan antar wilayah secara geografis.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Pilar 02 • Kontrak</div>
+            <div class="col-title">Pengendalian Progres</div>
+            <div class="col-desc">
+              Memastikan setiap rupiah pencairan APBD berbanding lurus dengan realisasi fisik di lapangan, mencegah deviasi kritis dan potensi SiLPA.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Pilar 03 • Pengawasan</div>
+            <div class="col-title">Audit 3 Tertib (SIMAK)</div>
+            <div class="col-desc">
+              Digitalisasi pengawasan Permen PUPR 1/2023 untuk mengawal kepatuhan izin usaha, keselamatan kerja konstruksi (SMKK), dan kelaikan fungsi bangunan.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Pilar 04 • SDM Daerah</div>
+            <div class="col-title">Sertifikasi & QR Code</div>
+            <div class="col-desc">
+              Pemberdayaan 500 tenaga kerja lokal dengan e-Sertifikat dinas resmi yang dapat dibuktikan keasliannya secara instan di lokasi proyek via smartphone.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <a href="https://prototype-bogor.vercel.app/dashboard" target="_blank" class="action-pill">
+            🖥️ Buka Dasbor Eksekutif Live
+          </a>
+          <div class="demo-cue">
+            <span class="demo-cue-tag">Fokus Demo</span>
+            <span class="demo-cue-text">Tunjukkan integrasi metrik 4 pilar di halaman Dasbor Utama</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 4: FITUR 1 - WEBGIS SPASIAL
+         ========================================== -->
+    <section class="slide" data-slide="4">
+      <div class="slide-inner">
+        <div class="tagline">FITUR UNGGULAN #1 • GEOSPASIAL</div>
+        <h2 class="slide-heading">Melihat Kabupaten Bogor dari Satu Layar Tunggal</h2>
+        <div class="narrative-quote">
+          “Dari Cibinong yang padat hingga pelosok Sukamakmur dan Nanggung, pimpinan daerah dapat memantau sebaran kue pembangunan secara visual, transparan, dan real-time.”
+        </div>
+
+        <div class="narrative-grid-3">
+          <div class="narrative-col">
+            <div class="col-tag">Kemampuan Spasial</div>
+            <div class="col-title">Delineasi 40 Kecamatan</div>
+            <div class="col-desc">
+              Batas poligon administratif akurat seluruh kecamatan memungkinkan analisis spasial pemerataan alokasi APBD agar pembangunan tidak tersentralisasi di wilayah tertentu saja.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Visual Status Cerdas</div>
+            <div class="col-title">Pin Titik Proyek Interaktif</div>
+            <div class="col-desc">
+              Penanda warna status (Hijau: On-Track, Biru: Selesai, Merah: Butuh Intervensi) memudahkan scanning visual instan tanpa membaca tumpukan laporan tebal.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Filter Pendanaan</div>
+            <div class="col-title">Multi-Sumber Pembiayaan</div>
+            <div class="col-desc">
+              Pemisahan instan antara paket APBD Kabupaten, DAK Fisik Pusat, dan Bantuan Provinsi untuk mempermudah monitoring pertanggungjawaban dana transfer.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <a href="https://prototype-bogor.vercel.app/webgis" target="_blank" class="action-pill">
+            🗺️ Buka Peta Spasial Live
+          </a>
+          <div class="demo-cue">
+            <span class="demo-cue-tag">Skenario Demo</span>
+            <span class="demo-cue-text">Klik pin proyek di WebGIS untuk menampilkan pop-up ringkasan paket dan koordinat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 5: FITUR 2 - PAKET PEKERJAAN
+         ========================================== -->
+    <section class="slide" data-slide="5">
+      <div class="slide-inner">
+        <div class="tagline">FITUR UNGGULAN #2 • PENGENDALIAN KONTRAK</div>
+        <h2 class="slide-heading">Kawal Fisik Lapangan vs Pencairan Kas Daerah</h2>
+        <div class="narrative-quote">
+          “Menghilangkan jurang informasi antara laporan administratif di atas meja dengan realitas fisik batu dan aspal di lapangan, mencegah risiko keterlambatan dan SiLPA.”
+        </div>
+
+        <div class="narrative-grid-3">
+          <div class="narrative-col">
+            <div class="col-tag">Early Warning</div>
+            <div class="col-title">Deteksi Dini Deviasi Progres</div>
+            <div class="col-desc">
+              Membandingkan persentase opname fisik riil dengan serapan termin SP2D, sehingga potensi deviasi minus terdeteksi berbulan-bulan sebelum tahun anggaran ditutup.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Segregation of Duties</div>
+            <div class="col-title">Pemisahan 3 Arus Data</div>
+            <div class="col-desc">
+              PPK mengelola legalitas kontrak, konsultan pengawas menginput opname fisik mingguan, dan bendahara mencatat realisasi SP2D secara independen dan akuntabel.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Efisiensi Input</div>
+            <div class="col-title">Migrasi Massal Satu Klik</div>
+            <div class="col-desc">
+              Fasilitas batch import format Excel standar SIPJAKI memungkinkan ratusan paket pekerjaan OPD diinput dalam hitungan detik tanpa entri manual berulang.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <a href="https://prototype-bogor.vercel.app/paket-pekerjaan" target="_blank" class="action-pill">
+            📋 Buka Paket Pekerjaan Live
+          </a>
+          <a href="https://prototype-bogor.vercel.app/paket-pekerjaan/P001" target="_blank" class="action-pill-subtle">
+            🔍 Contoh Detail Proyek (P001)
+          </a>
+          <div class="demo-cue">
+            <span class="demo-cue-tag">Skenario Demo</span>
+            <span class="demo-cue-text">Tunjukkan status komparasi fisik vs SP2D pada paket RSUD Parung (P001)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 6: FITUR 3 - PENGAWASAN 3 TERTIB (SIMAK)
+         ========================================== -->
+    <section class="slide" data-slide="6">
+      <div class="slide-inner">
+        <div class="tagline">FITUR UNGGULAN #3 • REGULASI PERMEN PUPR 1/2023</div>
+        <h2 class="slide-heading">Tinggalkan Kertas, Wujudkan Audit Digital Terstandar</h2>
+        <div class="narrative-quote">
+          “Formulir audit manual digantikan oleh lembar kerja digital yang otomatis mengkalkulasi skor kepatuhan dan menerbitkan Berita Acara Pemeriksaan (BAP) resmi.”
+        </div>
+
+        <div class="narrative-grid-3">
+          <div class="narrative-col">
+            <div class="col-tag">Tertib Usaha</div>
+            <div class="col-title">Legalitas & Rantai Pasok</div>
+            <div class="col-desc">
+              Verifikasi keabsahan Nomor Induk Berusaha (NIB), kesesuaian KBLI, Sertifikat Badan Usaha (SBU), serta kepastian rantai pasok material berlisensi dari rekanan.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Tertib Penyelenggaraan</div>
+            <div class="col-title">Standar Mutu & SMKK / K3</div>
+            <div class="col-desc">
+              Pengawasan ketat terhadap keselamatan konstruksi (SMKK), pemenuhan spesifikasi teknis bahan, dan sertifikasi tenaga kerja di lokasi proyek aktif.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Tertib Pemanfaatan</div>
+            <div class="col-title">Kelaikan Fungsi & Garansi</div>
+            <div class="col-desc">
+              Pencatatan masa pemeliharaan, kesiapan Sertifikat Laik Fungsi (SLF), dan panduan pemeliharaan untuk memastikan infrastruktur aman dimanfaatkan publik.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <a href="https://prototype-bogor.vercel.app/pengawasan" target="_blank" class="action-pill">
+            ⚖️ Buka Modul Audit SIMAK Live
+          </a>
+          <div class="demo-cue">
+            <span class="demo-cue-tag">Skenario Demo</span>
+            <span class="demo-cue-text">Tunjukkan instrumen checklist digital dan scoring otomatis indeks kepatuhan</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 7: FITUR 4 - TKK & QR CODE
+         ========================================== -->
+    <section class="slide" data-slide="7">
+      <div class="slide-inner">
+        <div class="tagline">FITUR UNGGULAN #4 • PEMBINAAN SDM KONSTRUKSI</div>
+        <h2 class="slide-heading">Target 500 Tenaga Kerja & Validasi Lapangan Instan</h2>
+        <div class="narrative-quote">
+          “Meningkatkan martabat dan kompetensi tenaga kerja lokal dengan e-Sertifikat resmi dinas yang dapat dibuktikan keasliannya di lapangan dalam 2 detik.”
+        </div>
+
+        <div class="narrative-grid-3">
+          <div class="narrative-col">
+            <div class="col-tag">Pembinaan Berkelanjutan</div>
+            <div class="col-title">Bimtek Berbasis APBD</div>
+            <div class="col-desc">
+              Penyelenggaraan pelatihan tukang, mandor, dan pelaksana untuk memenuhi target minimum 500 TKK tersertifikasi setiap tahun anggaran.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Integritas Sertifikasi</div>
+            <div class="col-title">Validasi NIK Anti-Duplikasi</div>
+            <div class="col-desc">
+              Integrasi verifikasi 16 digit NIK memastikan alokasi kuota pelatihan tepat sasaran dan mencegah praktik sertifikasi ganda bagi pekerja yang sama.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Validasi Lapangan Instan</div>
+            <div class="col-title">Dynamic QR Code Scanner</div>
+            <div class="col-desc">
+              Pengawas proyek cukup memindai kartu atau helm pekerja menggunakan kamera smartphone untuk melihat bukti legalitas keahlian secara live.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <a href="https://prototype-bogor.vercel.app/pelatihan" target="_blank" class="action-pill">
+            👷 Buka Modul Pelatihan TKK Live
+          </a>
+          <div class="demo-cue">
+            <span class="demo-cue-tag">Skenario Demo</span>
+            <span class="demo-cue-text">Simulasikan scan QR Code sertifikat untuk melihat laman verifikasi instan pekerja</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 8: FITUR 5 - AI COPILOT & RAG
+         ========================================== -->
+    <section class="slide" data-slide="8">
+      <div class="slide-inner">
+        <div class="tagline">FITUR UNGGULAN #5 • KECERDASAN BUATAN</div>
+        <h2 class="slide-heading">SIJAKON AI Copilot: Asisten Cerdas Hukum & Analitik</h2>
+        <div class="narrative-quote">
+          “Tanya jawab regulasi hukum konstruksi dan penarikan ringkasan data proyek dalam hitungan detik tanpa membuka tumpukan dokumen tebal.”
+        </div>
+
+        <div class="narrative-grid-2">
+          <div class="narrative-col">
+            <div class="col-tag">Asisten Hukum Regulasi</div>
+            <div class="col-title">RAG Berbasis 11 Produk Hukum</div>
+            <div class="col-desc">
+              Menjawab pertanyaan hukum konstruksi lengkap dengan sitasi pasal akurat dari UU 2/2017, PP 14/2021, Permen PUPR 1/2023, hingga Perda Kabupaten Bogor No. 2/2020.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Asisten Analitik Eksekutif</div>
+            <div class="col-title">Query Proyek dengan Bahasa Alami</div>
+            <div class="col-desc">
+              Memproses perintah pimpinan seperti <em>“Tampilkan paket pekerjaan dengan deviasi kritis di Bogor Barat”</em> menjadi ringkasan eksekutif secara instan.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <a href="https://prototype-bogor.vercel.app/dashboard" target="_blank" class="action-pill">
+            🤖 Coba AI Copilot di Prototype
+          </a>
+          <div class="demo-cue">
+            <span class="demo-cue-tag">Skenario Demo</span>
+            <span class="demo-cue-text">Klik tombol AI di pojok kanan bawah dan tanyakan sanksi K3 atau status proyek</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 9: MATRIKS KEWENANGAN (RBAC)
+         ========================================== -->
+    <section class="slide" data-slide="9">
+      <div class="slide-inner">
+        <div class="tagline">KEAMANAN & TATA KELOLA AKSES</div>
+        <h2 class="slide-heading">Satu Sistem, Hak Akses Terukur untuk Setiap Peran</h2>
+        <div class="narrative-quote">
+          “Prinsip Segregation of Duties menjamin setiap dinas hanya mengelola kewenangannya, sementara pimpinan daerah memegang kendali pengawasan menyeluruh.”
+        </div>
+
+        <div class="narrative-grid-4">
+          <div class="narrative-col">
+            <div class="col-tag">Pimpinan Daerah</div>
+            <div class="col-title">Akses Eksekutif</div>
+            <div class="col-desc">
+              Bupati, Sekda, dan Kadis memiliki dasbor analitik spasial <em>read-only</em> untuk pemantauan makro, mitigasi risiko, dan pengambilan keputusan kebijakan.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Bina Konstruksi DPU</div>
+            <div class="col-title">Administrator Jakon</div>
+            <div class="col-desc">
+              Mengelola sertifikasi 500 TKK, memvalidasi instrumen audit SIMAK, serta mengekspor pelaporan rutin ke portal SIPJAKI Kementerian PUPR.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">PPK OPD Pengguna</div>
+            <div class="col-title">Pengelola Kontrak</div>
+            <div class="col-desc">
+              Pejabat dinas teknis (PUPR, Disdik, Dinkes, PRKP) menginput data kontrak, pembaruan SPMK/PHO, dan memantau serapan anggaran paket dinasnya.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Konsultan Pengawas</div>
+            <div class="col-title">Verifikator Fisik</div>
+            <div class="col-desc">
+              Tenaga ahli di lapangan menginput persentase opname fisik mingguan dan mengunggah dokumentasi foto pekerjaan sebagai dasar pembayaran termin.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <a href="https://prototype-bogor.vercel.app/dashboard" target="_blank" class="action-pill">
+            🔄 Simulasi Role di Live App
+          </a>
+          <div class="demo-cue">
+            <span class="demo-cue-tag">Skenario Demo</span>
+            <span class="demo-cue-text">Gunakan dropdown “Simulasi Role” di topbar untuk mendemokan perpindahan hak akses</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 10: OUTPUT KONKRET (DELIVERABLES)
+         ========================================== -->
+    <section class="slide" data-slide="10">
+      <div class="slide-inner">
+        <div class="tagline">NILAI TAMBAH & DAMPAK STRATEGIS</div>
+        <h2 class="slide-heading">Dampak Nyata bagi Pemerintah Kabupaten Bogor</h2>
+        <div class="narrative-quote">
+          “SIJAKON bukan sekadar proyek aplikasi, melainkan investasi tata kelola untuk mengamankan anggaran dan menjamin mutu infrastruktur bagi masyarakat.”
+        </div>
+
+        <div class="narrative-grid-3">
+          <div class="narrative-col">
+            <div class="col-tag">Bagi Pimpinan Daerah</div>
+            <div class="col-title">Pengendalian & Bahan Ekspose</div>
+            <div class="col-desc">
+              Visibilitas 100% sebaran proyek fisik 40 kecamatan dan deteksi dini deviasi anggaran, memberikan bahan ekspose pimpinan yang akurat dan kredibel.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Bagi APIP & Auditor</div>
+            <div class="col-title">Audit Trail Bebas Backdating</div>
+            <div class="col-desc">
+              Rekam jejak digital opname fisik dan pencairan SP2D tersimpan permanen dan transparan, meminimalkan potensi temuan pemeriksaan BPK / Inspektorat.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Bagi Kementerian PUPR</div>
+            <div class="col-title">Kepatuhan Nasional SIPJAKI</div>
+            <div class="col-desc">
+              Ekspor laporan otomatis format standar Excel SIPJAKI, mendongkrak skor indeks pembinaan jasa konstruksi Pemkab Bogor di tingkat nasional.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <a href="https://prototype-bogor.vercel.app/sipjaki" target="_blank" class="action-pill">
+            📊 Lihat Modul Ekspor SIPJAKI Live
+          </a>
+          <div class="demo-cue">
+            <span class="demo-cue-tag">Skenario Demo</span>
+            <span class="demo-cue-text">Tunjukkan fitur ekspor file laporan SIPJAKI multi-sheet yang siap kirim ke kementerian</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 11: IMPLEMENTATION ROADMAP
+         ========================================== -->
+    <section class="slide" data-slide="11">
+      <div class="slide-inner">
+        <div class="tagline">ROADMAP PRODUKSI 2026</div>
+        <h2 class="slide-heading">Langkah Nyata Menuju Penerapan Penuh di 2026</h2>
+        <div class="narrative-quote">
+          “Tahap prototipe telah selesai dan teruji 100%; langkah berikutnya adalah penguatan regulasi payung hukum daerah dan integrasi operasional dinas.”
+        </div>
+
+        <div class="narrative-grid-4">
+          <div class="narrative-col">
+            <div class="col-tag">Bulan 01 • Persiapan</div>
+            <div class="col-title">Regulasi & Draf Perbup</div>
+            <div class="col-desc">
+              Penerbitan SE Sekda / draf Peraturan Bupati tentang SIJAKON, pembentukan SK Tim Pelaksana, dan finalisasi instrumen audit dengan OPD teknis.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Bulan 02–03 • Engineering</div>
+            <div class="col-title">Basis Data & Migrasi</div>
+            <div class="col-desc">
+              Penyambungan backend PostgreSQL PostGIS, pengaturan keamanan server lokal dinas, dan migrasi ratusan data paket proyek via batch import.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Bulan 04 • Uji Operasional</div>
+            <div class="col-title">Pilot Testing 3 OPD</div>
+            <div class="col-desc">
+              Uji coba operasional pada 3 dinas pilot (DPUPR, Disdik, Dinkes), pelatihan teknis (Bimtek) staf PPK, pengawas, dan penandatanganan BAP UAT.
+            </div>
+          </div>
+          <div class="narrative-col">
+            <div class="col-tag">Bulan 05 • Go-Live</div>
+            <div class="col-title">Peluncuran Resmi</div>
+            <div class="col-desc">
+              Soft Launching oleh Bupati Bogor, aktivasi operasional menyeluruh se-Kabupaten Bogor, dan sinkronisasi rutin pelaporan ke portal SIPJAKI nasional.
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.875rem; color: #059669; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+          <span>✔</span>
+          <span>Kesiapan Saat Ini: Desain Antarmuka (UI/UX), Arsitektur Basis Data, dan Panduan Implementasi (PRD/KAK) Siap 100%.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 12: PENUTUP & Q&A
+         ========================================== -->
+    <section class="slide" data-slide="12">
+      <div class="slide-inner" style="align-items: center; text-align: center;">
+        <div class="tagline">WAKTUNYA DEMONSTRASI LANGSUNG</div>
+        <h1 class="hero-title" style="margin-bottom: 12px;">Mari Kita Eksplorasi Bersama</h1>
+        <p class="lead-text" style="text-align: center; margin-bottom: 28px; max-width: 780px;">
+          Seluruh modul yang dipresentasikan telah aktif dan dapat langsung dioperasikan secara interaktif melalui cloud deployment resmi prototype:
+        </p>
+
+        <div style="background: #F8FAFC; border: 1.5px dashed #CBD5E1; border-radius: 16px; max-width: 650px; width: 100%; text-align: center; margin-bottom: 30px; padding: 22px 32px;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.1em; margin-bottom: 8px;">
+            Alamat Akses Live Prototype:
+          </div>
+          <a href="https://prototype-bogor.vercel.app/" target="_blank" style="font-family: 'JetBrains Mono', monospace; font-size: 1.45rem; font-weight: 900; color: var(--pupr-navy); text-decoration: none; display: inline-block;">
+            https://prototype-bogor.vercel.app/
+          </a>
+          <div style="font-size: 0.825rem; color: var(--text-muted); margin-top: 8px;">
+            Dapat diakses secara bersamaan oleh seluruh dewan penguji via browser laptop maupun smartphone.
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+          <a href="https://prototype-bogor.vercel.app/webgis" target="_blank" class="action-pill">
+            🗺️ Buka Peta Spasial 40 Kecamatan
+          </a>
+          <a href="https://prototype-bogor.vercel.app/dashboard" target="_blank" class="action-pill-subtle">
+            🖥️ Buka Dasbor Eksekutif Terpadu
+          </a>
+          <a href="https://prototype-bogor.vercel.app/paket-pekerjaan" target="_blank" class="action-pill-subtle">
+            📋 Buka Manajemen Paket Pekerjaan
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ==========================================
+       OVERVIEW MODAL (PRESS 'O')
+       ========================================== -->
+  <div class="overview-backdrop" id="overviewModal">
+    <div class="overview-header">
+      <div class="overview-title">Ikhtisar Semua Slide (Tekan 'O' atau 'Esc' untuk Tutup)</div>
+      <button onclick="toggleOverview()" style="background: none; border: 1px solid var(--table-border); color: var(--text-title); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 800;">Tutup (ESC)</button>
+    </div>
+    <div class="overview-grid" id="overviewGrid">
+      <!-- Populated via JS -->
+    </div>
+  </div>
+
+  <!-- Keynote Navigation Script -->
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 12;
+    const slideNames = [
+      "Cover Eksekutif SIJAKON TA 2026",
+      "Tabel Komparasi Urgensi Daerah",
+      "4 Pilar Ekosistem Layanan",
+      "Fitur 1: WebGIS Spasial 40 Kecamatan",
+      "Fitur 2: Monitoring Paket Pekerjaan",
+      "Fitur 3: Pengawasan 3 Tertib (SIMAK)",
+      "Fitur 4: Sertifikasi TKK & QR Code",
+      "Fitur 5: AI Copilot & RAG Regulasi",
+      "Matriks Kewenangan Pengguna (RBAC)",
+      "Output Konkret Sistem (Deliverables)",
+      "Roadmap Implementasi Menuju Produksi",
+      "Penutup & Sesi Diskusi (Q&A)"
+    ];
+
+    const slides = document.querySelectorAll('.slide');
+    const indicator = document.getElementById('slideIndicator');
+    const progressBar = document.getElementById('progressBar');
+
+    function goToSlide(n) {
+      if (n < 1 || n > totalSlides) return;
+
+      slides.forEach((s) => {
+        const num = parseInt(s.getAttribute('data-slide'), 10);
+        s.classList.remove('active', 'exit-left');
+        if (num < n) s.classList.add('exit-left');
+      });
+
+      currentSlide = n;
+      const target = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+      if (target) target.classList.add('active');
+
+      indicator.textContent = `${String(currentSlide).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+      progressBar.style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+      document.querySelectorAll('.overview-item').forEach((item, idx) => {
+        item.classList.toggle('active', idx + 1 === currentSlide);
+      });
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) goToSlide(currentSlide - 1);
+    }
+
+    // Populate Overview
+    const grid = document.getElementById('overviewGrid');
+    slideNames.forEach((title, idx) => {
+      const card = document.createElement('div');
+      card.className = `overview-item ${idx + 1 === currentSlide ? 'active' : ''}`;
+      card.innerHTML = `
+        <div class="num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+        <div class="name">${title}</div>
+      `;
+      card.onclick = () => {
+        goToSlide(idx + 1);
+        toggleOverview();
+      };
+      grid.appendChild(card);
+    });
+
+    const modal = document.getElementById('overviewModal');
+    function toggleOverview() {
+      modal.classList.toggle('open');
+    }
+
+    // Keyboard Controller
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        modal.classList.remove('open');
+        return;
+      }
+      if (modal.classList.contains('open')) return;
+
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'o' || e.key === 'O') {
+        toggleOverview();
+      } else if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          if (document.exitFullscreen) document.exitFullscreen();
+        }
+      } else if (e.key === 'Home') {
+        goToSlide(1);
+      } else if (e.key === 'End') {
+        goToSlide(totalSlides);
+      }
+    });
+  </script>
+</body>
+</html>

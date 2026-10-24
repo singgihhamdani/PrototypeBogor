@@ -26,6 +26,10 @@ export interface User {
   phone?: string;
   instansi?: string;
   jabatan?: string;
+  opdId?: string;
+  opdName?: string;
+  nip?: string;
+  isSupabaseUser?: boolean;
 }
 
 export interface RoleMeta {

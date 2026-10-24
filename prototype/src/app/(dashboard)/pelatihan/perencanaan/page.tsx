@@ -3,13 +3,19 @@ import React, { useState } from "react";
 import ModuleHeader from "@/components/layout/module-header";
 import { 
   GraduationCap, Plus, Download, FileText, CheckCircle2, 
-  Calendar, Users, Search, Wallet, ShieldCheck, Trash2, Eye 
+  Calendar, Users, Search, Wallet, ShieldCheck, Trash2, Eye, FileSpreadsheet
 } from "lucide-react";
 import DataTableView, { ColumnDef } from "@/components/common/data-table-view";
 import ModalForm from "@/components/common/modal-form";
 import FileUploader from "@/components/common/file-uploader";
 import VerificationDialog from "@/components/common/verification-dialog";
 import StatusBadge from "@/components/common/status-badge";
+import BatchImportModal from "@/components/common/batch-import-modal";
+import DocStatusBadge from "@/components/common/doc-status-badge";
+import DocumentUploadMiniModal from "@/components/common/document-upload-mini-modal";
+import DocCompletionBar from "@/components/common/doc-completion-bar";
+import { TEMPLATE_PERENCANAAN_PELATIHAN } from "@/lib/sipjaki-templates";
+import { logDataActivity } from "@/lib/audit-log";
 
 interface PerencanaanPelatihanItem {
   id: string;
@@ -20,6 +26,7 @@ interface PerencanaanPelatihanItem {
   jadwal: string;
   dokumenKak: string;
   status: "Terverifikasi" | "Menunggu Verifikasi" | "Ditolak";
+  _docStatus?: "complete" | "pending";
 }
 
 const initialPelatihan: PerencanaanPelatihanItem[] = [
@@ -56,10 +63,18 @@ const initialPelatihan: PerencanaanPelatihanItem[] = [
 ];
 
 export default function PerencanaanPelatihanPage() {
-  const [data, setData] = useState<PerencanaanPelatihanItem[]>(initialPelatihan);
+  const [data, setData] = useState<PerencanaanPelatihanItem[]>(() =>
+    initialPelatihan.map((r) => ({
+      ...r,
+      _docStatus: r._docStatus || "complete"
+    }))
+  );
   
-  // Modals
+  // Modals & Batch Import State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
+  const [docUploadTarget, setDocUploadTarget] = useState<PerencanaanPelatihanItem | null>(null);
+  const [filterDocPending, setFilterDocPending] = useState(false);
   const [verifyTarget, setVerifyTarget] = useState<PerencanaanPelatihanItem | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -73,8 +88,68 @@ export default function PerencanaanPelatihanPage() {
     dokumenKak: "KAK_Program_Pelatihan_Baru.pdf"
   });
 
+  const filteredData = data.filter((item) => {
+    const matchDoc = !filterDocPending || item._docStatus === "pending" || !item.dokumenKak;
+    return matchDoc;
+  });
+
   const totalPeserta = data.reduce((acc, curr) => acc + curr.targetPeserta, 0);
   const totalAnggaran = data.reduce((acc, curr) => acc + curr.anggaran, 0);
+
+  const handleBatchCommit = (parsedRows: any[]) => {
+    const formatted: PerencanaanPelatihanItem[] = parsedRows.map((row, idx) => ({
+      id: `PP-2026-${String(data.length + idx + 1).padStart(2, "0")}`,
+      namaPaket: row.namaPaket || "Paket Pelatihan TKK Baru",
+      tahun: String(row.tahun || "2026"),
+      targetPeserta: Number(row.targetPeserta) || 50,
+      anggaran: Number(String(row.anggaran || 0).replace(/\D/g, "")) || 100000000,
+      jadwal: row.jadwal || "Mei - Agustus 2026",
+      dokumenKak: row.dokumenKak || "",
+      status: "Menunggu Verifikasi",
+      _docStatus: row._docStatus || "pending"
+    }));
+    setData([...formatted, ...data]);
+    logDataActivity({
+      action: "import",
+      module: "Perencanaan Pelatihan TKK",
+      format: "xlsx",
+      recordCount: formatted.length,
+      user: "Bidang Jakon / Pembina Jasa Konstruksi",
+      status: "success",
+      fileName: `${TEMPLATE_PERENCANAAN_PELATIHAN.exportFileName}.xlsx`,
+      details: `Impor batch ${formatted.length} paket perencanaan pelatihan - dokumen KAK dapat disusulkan`
+    });
+    alert(`Berhasil mengimpor ${formatted.length} paket rencana pelatihan! Dokumen KAK dapat diunggah menyusul.`);
+  };
+
+  const handleSaveUploadedDoc = (files: Record<string, File | null>, fileNames: Record<string, string>) => {
+    if (!docUploadTarget) return;
+    const newDocName = fileNames["dokumenKak"] || docUploadTarget.dokumenKak || `KAK_${docUploadTarget.id}.pdf`;
+    setData((prev) =>
+      prev.map((item) => {
+        if (item.id === docUploadTarget.id) {
+          return {
+            ...item,
+            dokumenKak: newDocName,
+            _docStatus: "complete"
+          };
+        }
+        return item;
+      })
+    );
+    logDataActivity({
+      action: "doc_upload",
+      module: "Perencanaan Pelatihan TKK",
+      format: "pdf",
+      recordCount: 1,
+      user: "Bidang Jakon / Pembina Jasa Konstruksi",
+      status: "success",
+      fileName: newDocName,
+      details: `Upload dokumen susulan ${newDocName} untuk paket ${docUploadTarget.namaPaket}`
+    });
+    alert(`Dokumen "${newDocName}" berhasil diunggah! Status kelengkapan diperbarui menjadi Lengkap.`);
+    setDocUploadTarget(null);
+  };
 
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,7 +167,8 @@ export default function PerencanaanPelatihanPage() {
       anggaran: Number(formData.anggaran) || 0,
       jadwal: formData.jadwal,
       dokumenKak: formData.dokumenKak,
-      status: "Menunggu Verifikasi"
+      status: "Menunggu Verifikasi",
+      _docStatus: "complete"
     };
 
     setData([newItem, ...data]);
@@ -178,25 +254,12 @@ export default function PerencanaanPelatihanPage() {
       label: "DOKUMEN KAK",
       width: "180px",
       render: (row) => (
-        <button
-          type="button"
-          onClick={() => alert(`Mengunduh berkas ${row.dokumenKak}...`)}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            background: "none",
-            border: "none",
-            color: "#2563EB",
-            fontSize: "11px",
-            fontWeight: 700,
-            cursor: "pointer",
-            padding: 0
-          }}
-        >
-          <FileText style={{ width: "12px", height: "12px" }} />
-          <span>{row.dokumenKak}</span>
-        </button>
+        <DocStatusBadge
+          status={row._docStatus || (row.dokumenKak ? "complete" : "pending")}
+          fileName={row.dokumenKak}
+          documentLabel="KAK Pelatihan"
+          onClick={() => setDocUploadTarget(row)}
+        />
       )
     },
     {
@@ -222,6 +285,12 @@ export default function PerencanaanPelatihanPage() {
         description="Penyusunan Kerangka Acuan Kerja (KAK), alokasi pagu APBD, dan target kuantitatif TKK tersertifikasi di Kabupaten Bogor."
         legalBasis="Pasal 7 UU No. 2/2017 & Permen PUPR No. 1/2023"
         actionButtons={[
+          {
+            label: "Import Batch KAK (Excel)",
+            icon: FileSpreadsheet,
+            variant: "secondary",
+            onClick: () => setIsBatchImportOpen(true)
+          },
           {
             label: "Tambah Paket Pelatihan",
             icon: Plus,
@@ -274,11 +343,19 @@ export default function PerencanaanPelatihanPage() {
         </div>
       </div>
 
+      {/* Indikator Kelengkapan Dokumen */}
+      <DocCompletionBar
+        records={data}
+        label="Kelengkapan Dokumen KAK Pelatihan (PDF)"
+        filterActive={filterDocPending}
+        onToggleFilter={() => setFilterDocPending(!filterDocPending)}
+      />
+
       {/* DataTableView */}
       <DataTableView<PerencanaanPelatihanItem>
-        title={`Rencana Kerja Program Pelatihan (${data.length} Paket)`}
+        title={`Rencana Kerja Program Pelatihan (${filteredData.length} Paket)`}
         subtitle="Dokumentasi KAK dan alokasi anggaran pelatihan tenaga kerja konstruksi"
-        data={data}
+        data={filteredData}
         columns={columns}
         exportFileName="Perencanaan_Pelatihan_Bogor"
         actionsHeader="AKSI"
@@ -462,6 +539,28 @@ export default function PerencanaanPelatihanPage() {
           isLoading={isVerifying}
         />
       )}
+
+      {/* Mini Modal Unggah Dokumen Susulan */}
+      {docUploadTarget && (
+        <DocumentUploadMiniModal
+          isOpen={!!docUploadTarget}
+          onClose={() => setDocUploadTarget(null)}
+          title={`Unggah Dokumen KAK: ${docUploadTarget.namaPaket}`}
+          documentFields={TEMPLATE_PERENCANAAN_PELATIHAN.documentFields || []}
+          existingDocuments={{
+            dokumenKak: docUploadTarget.dokumenKak
+          }}
+          onSave={handleSaveUploadedDoc}
+        />
+      )}
+
+      {/* Modal Batch Import Excel */}
+      <BatchImportModal
+        isOpen={isBatchImportOpen}
+        onClose={() => setIsBatchImportOpen(false)}
+        template={TEMPLATE_PERENCANAAN_PELATIHAN}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }

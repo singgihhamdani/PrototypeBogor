@@ -21,13 +21,14 @@ export interface BatchColumnDef {
 export interface BatchImportModalProps<T> {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   subtitle?: string;
-  templateFileName: string;
-  expectedColumns: BatchColumnDef[];
+  templateFileName?: string;
+  expectedColumns?: BatchColumnDef[];
   sampleRows?: Record<string, any>[];
   template?: SipjakiTemplate;
   onCommit: (parsedData: T[]) => void;
+  hasDocumentFields?: boolean;
 }
 
 export default function BatchImportModal<T extends Record<string, any>>({
@@ -39,8 +40,21 @@ export default function BatchImportModal<T extends Record<string, any>>({
   expectedColumns,
   sampleRows = [],
   template,
-  onCommit
+  onCommit,
+  hasDocumentFields = false
 }: BatchImportModalProps<T>) {
+  const actualTitle = title || (template ? `Import Batch: ${template.moduleName}` : "Import Batch Data");
+  const actualTemplateFileName = templateFileName || (template ? `${template.exportFileName}_template.xlsx` : "template.xlsx");
+  const actualExpectedColumns = (expectedColumns && expectedColumns.length > 0)
+    ? expectedColumns
+    : (template?.importColumns as BatchColumnDef[]) || [];
+  const actualSampleRows = sampleRows && sampleRows.length > 0
+    ? sampleRows
+    : (template?.sampleRows || []);
+
+  const requiresDocuments = Boolean(
+    hasDocumentFields || (template?.documentFields && template.documentFields.length > 0)
+  );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewData, setPreviewData] = useState<T[]>([]);
   const [validationResult, setValidationResult] = useState<BatchValidationSummary | null>(null);
@@ -64,16 +78,16 @@ export default function BatchImportModal<T extends Record<string, any>>({
     }
 
     // CSV Template Fallback
-    const headers = expectedColumns.map((c) => c.label).join(",");
-    const rows = sampleRows.length > 0
-      ? sampleRows.map((row) => 
-          expectedColumns.map((col) => `"${String(row[col.key] || col.example || "").replace(/"/g, '""')}"`).join(",")
+    const headers = actualExpectedColumns.map((c) => c.label).join(",");
+    const rows = actualSampleRows.length > 0
+      ? actualSampleRows.map((row) => 
+          actualExpectedColumns.map((col) => `"${String(row[col.key] || col.example || "").replace(/"/g, '""')}"`).join(",")
         ).join("\n")
-      : expectedColumns.map((c) => `"${c.example}"`).join(",");
+      : actualExpectedColumns.map((c) => `"${c.example}"`).join(",");
 
     const csvContent = "\uFEFF" + headers + "\n" + rows;
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const finalName = templateFileName.endsWith(".csv") ? templateFileName : `${templateFileName}.csv`;
+    const finalName = actualTemplateFileName.endsWith(".csv") ? actualTemplateFileName : `${actualTemplateFileName}.csv`;
     triggerBrowserDownload(blob, finalName);
   };
 
@@ -124,7 +138,7 @@ export default function BatchImportModal<T extends Record<string, any>>({
         }
 
         const rowObj: any = {};
-        expectedColumns.forEach((col, idx) => {
+        actualExpectedColumns.forEach((col, idx) => {
           const matchedHeaderIdx = headers.findIndex(
             (h) => h.toLowerCase() === col.label.toLowerCase() || h.toLowerCase() === col.key.toLowerCase()
           );
@@ -168,7 +182,7 @@ export default function BatchImportModal<T extends Record<string, any>>({
             }
 
             const rowObj: any = {};
-            expectedColumns.forEach((col, idx) => {
+            actualExpectedColumns.forEach((col, idx) => {
               // Cari header yang cocok berdasarkan label, key, atau sipjakiLabel
               const matchedHeaderIdx = rawHeaders.findIndex((h) => {
                 const hNorm = h.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -239,24 +253,32 @@ export default function BatchImportModal<T extends Record<string, any>>({
       return;
     }
 
+    const prepareRows = (rows: any[]) => {
+      if (!requiresDocuments) return rows;
+      return rows.map((r) => ({
+        ...r,
+        _docStatus: r._docStatus || "pending"
+      }));
+    };
+
     if (validationResult && onlyValid) {
       if (validationResult.validRows.length === 0) {
         alert("Tidak ada baris yang valid untuk disimpan! Harap perbaiki kesalahan terlebih dahulu.");
         return;
       }
-      onCommit(validationResult.validRows as T[]);
+      onCommit(prepareRows(validationResult.validRows) as T[]);
     } else if (validationResult && validationResult.errorCount > 0) {
       // Prompt user confirmation if committing with errors
       const confirmCommit = window.confirm(
         `Terdapat ${validationResult.errorCount} baris yang memiliki kesalahan validasi. Apakah Anda hanya ingin menyimpan ${validationResult.validCount} baris yang VALID?`
       );
       if (confirmCommit) {
-        onCommit(validationResult.validRows as T[]);
+        onCommit(prepareRows(validationResult.validRows) as T[]);
       } else {
         return;
       }
     } else {
-      onCommit(previewData);
+      onCommit(prepareRows(previewData) as T[]);
     }
 
     handleReset();
@@ -297,7 +319,7 @@ export default function BatchImportModal<T extends Record<string, any>>({
         handleReset();
         onClose();
       }}
-      title={title}
+      title={actualTitle}
       subtitle={subtitle}
       icon={FileSpreadsheet}
       size="xl"
@@ -583,6 +605,32 @@ export default function BatchImportModal<T extends Record<string, any>>({
               </div>
             </div>
 
+            {/* Deferred Document Info Banner */}
+            {requiresDocuments && (
+              <div
+                style={{
+                  backgroundColor: "#EFF6FF",
+                  border: "1px solid #BFDBFE",
+                  borderRadius: "10px",
+                  padding: "10px 14px",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "10px",
+                  color: "#1E40AF",
+                  fontSize: "12px",
+                  lineHeight: "1.5"
+                }}
+              >
+                <Info style={{ width: "16px", height: "16px", flexShrink: 0, marginTop: "2px", color: "#2563EB" }} />
+                <div>
+                  <span style={{ fontWeight: 800 }}>Mekanisme Dokumen Menyusul Aktif:</span>
+                  <p style={{ margin: "2px 0 0 0", fontSize: "11px", color: "#1D4ED8" }}>
+                    Modul ini memerlukan lampiran berkas dokumen ({template?.documentFields?.map((d) => d.label).join(", ") || "PDF"}). Dokumen dapat diunggah <b>menyusul</b> per baris setelah data berhasil disimpan ke sistem. Kolom "📎 DOKUMEN" di tabel akan ditandai dengan status <span style={{ backgroundColor: "#FEF3C7", color: "#92400E", padding: "1px 6px", borderRadius: "4px", fontWeight: 700 }}>⚠️ Menyusul</span>.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Error Notification Banner if any */}
             {validationResult && validationResult.errorCount > 0 && (
               <div style={{ backgroundColor: "#FEF2F2", border: "1px solid #FECACA", borderRadius: "10px", padding: "10px 14px", display: "flex", alignItems: "flex-start", gap: "10px", color: "#991B1B", fontSize: "12px" }}>
@@ -603,7 +651,12 @@ export default function BatchImportModal<T extends Record<string, any>>({
                   <tr style={{ borderBottom: "1px solid #CBD5E1" }}>
                     <th style={{ padding: "10px 12px", textAlign: "center", color: "#475569", width: "40px" }}>#</th>
                     <th style={{ padding: "10px 12px", textAlign: "center", color: "#475569", width: "70px" }}>STATUS</th>
-                    {expectedColumns.map((col) => (
+                    {requiresDocuments && (
+                      <th style={{ padding: "10px 12px", textAlign: "center", color: "#0F2E5C", fontWeight: 800, whiteSpace: "nowrap" }}>
+                        📎 DOKUMEN
+                      </th>
+                    )}
+                    {actualExpectedColumns.map((col) => (
                       <th key={col.key} style={{ padding: "10px 14px", textAlign: "left", color: "#0F2E5C", fontWeight: 800, whiteSpace: "nowrap" }}>
                         {col.label} {col.required && <span style={{ color: "#DC2626" }}>*</span>}
                       </th>
@@ -671,7 +724,27 @@ export default function BatchImportModal<T extends Record<string, any>>({
                             </span>
                           )}
                         </td>
-                        {expectedColumns.map((col) => {
+                        {requiresDocuments && (
+                          <td style={{ padding: "8px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                backgroundColor: "#FEF3C7",
+                                color: "#92400E",
+                                border: "1px dashed #F59E0B",
+                                padding: "2px 8px",
+                                borderRadius: "9999px"
+                              }}
+                            >
+                              ⚠️ Menyusul
+                            </span>
+                          </td>
+                        )}
+                        {actualExpectedColumns.map((col) => {
                           const cellError = validation?.errors.find((e) => e.columnKey === col.key);
                           const isCellInvalid = cellError?.severity === "error";
 
@@ -755,7 +828,11 @@ export default function BatchImportModal<T extends Record<string, any>>({
                     }}
                   >
                     <Check style={{ width: "14px", height: "14px" }} />
-                    <span>Simpan {validationResult.validCount} Baris Valid (Abaikan Error)</span>
+                    <span>
+                      {requiresDocuments
+                        ? `Simpan ${validationResult.validCount} Baris (Dokumen Menyusul)`
+                        : `Simpan ${validationResult.validCount} Baris Valid (Abaikan Error)`}
+                    </span>
                   </button>
                 ) : (
                   <button
@@ -778,7 +855,11 @@ export default function BatchImportModal<T extends Record<string, any>>({
                     }}
                   >
                     <Check style={{ width: "14px", height: "14px", color: "#FFC000" }} />
-                    <span>Simpan {previewData.length} Data Sekaligus</span>
+                    <span>
+                      {requiresDocuments
+                        ? `Simpan ${previewData.length} Data (Dokumen Menyusul)`
+                        : `Simpan ${previewData.length} Data Sekaligus`}
+                    </span>
                   </button>
                 )}
               </div>

@@ -19,7 +19,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [selectedDemoUser, setSelectedDemoUser] = useState("superadmin");
   const [redirectPath, setRedirectPath] = useState<string | null>(null);
-  const { login } = useAuth();
+
+  // Fitur Lupa Kata Sandi
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const { login, isSupabase, resetPassword } = useAuth();
   const router = useRouter();
   const { isMobile, isMounted } = useResponsive();
 
@@ -70,6 +77,19 @@ export default function LoginPage() {
       setError(result.error || "Kombinasi email atau kata sandi tidak valid.");
       setLoading(false);
     }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail) return;
+    setResetLoading(true);
+    setResetMessage(null);
+    const res = await resetPassword(resetEmail);
+    setResetLoading(false);
+    setResetMessage({
+      type: res.success ? "success" : "error",
+      text: res.message,
+    });
   };
 
   return (
@@ -336,24 +356,51 @@ export default function LoginPage() {
             />
 
             <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "20px" }}>
-              {/* Badge */}
-              <div 
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  padding: "4px 12px",
-                  borderRadius: "9999px",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  color: "#FFC000",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  alignSelf: "flex-start"
-                }}
-              >
-                <Sparkles style={{ width: "12px", height: "12px" }} />
-                <span>Multi-Role RBAC Prototype</span>
+              {/* Badges */}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <div 
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    padding: "4px 12px",
+                    borderRadius: "9999px",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    color: "#FFC000",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                  }}
+                >
+                  <Sparkles style={{ width: "12px", height: "12px" }} />
+                  <span>Multi-Role RBAC</span>
+                </div>
+
+                <div 
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    backgroundColor: isSupabase ? "rgba(34, 197, 94, 0.15)" : "rgba(255,255,255,0.08)",
+                    padding: "4px 10px",
+                    borderRadius: "9999px",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    color: isSupabase ? "#4ADE80" : "#CBD5E1",
+                    border: isSupabase ? "1px solid rgba(74, 222, 128, 0.3)" : "1px solid rgba(255,255,255,0.12)",
+                  }}
+                  title={isSupabase ? "Terhubung ke Supabase PostgreSQL & Auth" : "Mode Simulasi Demo Tanpa Cloud"}
+                >
+                  <span 
+                    style={{ 
+                      width: "6px", 
+                      height: "6px", 
+                      borderRadius: "50%", 
+                      backgroundColor: isSupabase ? "#22C55E" : "#94A3B8" 
+                    }} 
+                  />
+                  <span>{isSupabase ? "Supabase Cloud DB" : "Demo Mode DB"}</span>
+                </div>
               </div>
 
               {/* Title with Logo */}
@@ -597,7 +644,25 @@ export default function LoginPage() {
                     <label style={{ fontSize: "11px", fontWeight: 700, color: "#334155", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       Kata Sandi
                     </label>
-                    <span style={{ fontSize: "10px", color: "#94A3B8" }}>Default: demo2026</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForgotPasswordOpen(!forgotPasswordOpen);
+                        if (!resetEmail && email) setResetEmail(email);
+                      }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        fontSize: "11px",
+                        color: "#0F2E5C",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                        padding: 0,
+                      }}
+                    >
+                      {forgotPasswordOpen ? "Tutup Bantuan Sandi" : "Lupa Kata Sandi?"}
+                    </button>
                   </div>
                   <div style={{ position: "relative" }}>
                     <Lock style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94A3B8" }} />
@@ -638,6 +703,83 @@ export default function LoginPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* Expandable Forgot Password Card */}
+                {forgotPasswordOpen && (
+                  <div
+                    style={{
+                      borderRadius: "12px",
+                      backgroundColor: "#F1F5F9",
+                      border: "1px solid #CBD5E1",
+                      padding: "12px 14px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "8px",
+                      animation: "fadeIn 0.2s ease",
+                    }}
+                  >
+                    <div style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C" }}>
+                      Pemulihan Kata Sandi
+                    </div>
+                    <p style={{ fontSize: "11px", color: "#64748B", margin: 0, lineHeight: 1.4 }}>
+                      Masukkan alamat email kedinasan Anda untuk menerima tautan pembuatan kata sandi baru.
+                    </p>
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      <input
+                        type="email"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        placeholder="nama@sijakon.bogor.go.id"
+                        style={{
+                          flex: 1,
+                          height: "36px",
+                          borderRadius: "8px",
+                          border: "1px solid #CBD5E1",
+                          backgroundColor: "#FFFFFF",
+                          padding: "0 10px",
+                          fontSize: "11px",
+                          color: "#0F172A",
+                          outline: "none",
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleResetPassword}
+                        disabled={resetLoading || !resetEmail}
+                        style={{
+                          height: "36px",
+                          padding: "0 12px",
+                          borderRadius: "8px",
+                          backgroundColor: "#0F2E5C",
+                          color: "#FFFFFF",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          border: "none",
+                          cursor: resetLoading || !resetEmail ? "not-allowed" : "pointer",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {resetLoading ? "Mengirim..." : "Kirim Tautan"}
+                      </button>
+                    </div>
+
+                    {resetMessage && (
+                      <div
+                        style={{
+                          borderRadius: "6px",
+                          padding: "6px 10px",
+                          fontSize: "11px",
+                          fontWeight: 600,
+                          backgroundColor: resetMessage.type === "success" ? "#DCFCE7" : "#FEE2E2",
+                          color: resetMessage.type === "success" ? "#166534" : "#991B1B",
+                          border: `1px solid ${resetMessage.type === "success" ? "#BBF7D0" : "#FECACA"}`,
+                        }}
+                      >
+                        {resetMessage.text}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {error && (
                   <div 

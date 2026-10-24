@@ -186,7 +186,13 @@ const navSections: NavSection[] = [
         label: "Pengaturan & Role",
         href: "/pengaturan",
         icon: Settings,
-        allowedRoles: ["SUPER_ADMIN"]
+        allowedRoles: ["SUPER_ADMIN"],
+        children: [
+          { label: "Matriks RBAC & Konfigurasi", href: "/pengaturan" },
+          { label: "Manajemen Pengguna & Penugasan", href: "/pengaturan/pengguna" },
+          { label: "Master Satuan Kerja (OPD)", href: "/pengaturan/opd" },
+          { label: "Profil Saya & Keamanan", href: "/pengaturan/profil" }
+        ]
       }
     ]
   }

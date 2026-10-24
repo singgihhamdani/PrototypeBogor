@@ -20,6 +20,15 @@ export type { VerificationDialogProps, VerificationTargetInfo } from "./verifica
 export { default as BatchImportModal } from "./batch-import-modal";
 export type { BatchImportModalProps, BatchColumnDef } from "./batch-import-modal";
 
+export { default as DocStatusBadge } from "./doc-status-badge";
+export type { DocStatusBadgeProps, DocStatus } from "./doc-status-badge";
+
+export { default as DocumentUploadMiniModal } from "./document-upload-mini-modal";
+export type { DocumentUploadMiniModalProps } from "./document-upload-mini-modal";
+
+export { default as DocCompletionBar } from "./doc-completion-bar";
+export type { DocCompletionBarProps } from "./doc-completion-bar";
+
 export { default as AiCopilotDrawer } from "./ai-copilot-drawer";
 export { default as AiActionCard } from "./ai-action-card";
 

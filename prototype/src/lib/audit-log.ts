@@ -2,9 +2,9 @@ export interface DataActivityLog {
   id: string;
   timestamp: string;
   formattedDate: string;
-  action: "export" | "import";
+  action: "export" | "import" | "doc_upload";
   module: string;
-  format: "xlsx" | "csv";
+  format: "xlsx" | "csv" | "pdf";
   recordCount: number;
   user: string;
   status: "success" | "warning" | "failed";

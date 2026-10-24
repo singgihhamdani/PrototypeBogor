@@ -369,6 +369,27 @@ export default function Topbar({ onMobileMenuClick }: TopbarProps = {}) {
                 </button>
 
                 <button 
+                  onClick={() => { setShowUser(false); router.push("/pengaturan/profil"); }}
+                  style={{
+                    display: "flex",
+                    width: "100%",
+                    alignItems: "center",
+                    gap: "8px",
+                    borderRadius: "8px",
+                    padding: "8px 12px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "#334155",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    textAlign: "left"
+                  }}
+                >
+                  <User style={{ width: "16px", height: "16px", color: "#0F2E5C" }} /> Profil Saya & Kata Sandi
+                </button>
+
+                <button 
                   onClick={() => { setShowUser(false); router.push("/profil-opd"); }}
                   style={{
                     display: "flex",
@@ -386,7 +407,7 @@ export default function Topbar({ onMobileMenuClick }: TopbarProps = {}) {
                     textAlign: "left"
                   }}
                 >
-                  <User style={{ width: "16px", height: "16px", color: "#0F2E5C" }} /> Profil & Info Akun
+                  <Building2 style={{ width: "16px", height: "16px", color: "#0F2E5C" }} /> Direktori 40 OPD Pemkab
                 </button>
 
                 <button

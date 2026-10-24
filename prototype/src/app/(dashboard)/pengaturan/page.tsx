@@ -20,6 +20,8 @@ import {
   TEMPLATE_REKOMENDASI 
 } from "@/lib/sipjaki-templates";
 import { useResponsive } from "@/lib/use-responsive";
+import UserManagementView from "@/components/admin/user-management-view";
+import OpdManagementView from "@/components/admin/opd-management-view";
 
 const RESOURCES = [
   "DASHBOARD", "BUJK", "SBU", "PROJECT", "SUPERVISION", 
@@ -77,7 +79,7 @@ const INITIAL_ROLE_PERMS: Record<RoleCode, Set<string>> = {
 
 export default function PengaturanPage() {
   const { isMobile, isMounted } = useResponsive();
-  const [activeTab, setActiveTab] = useState<"template" | "users" | "rbac" | "general">("rbac");
+  const [activeTab, setActiveTab] = useState<"template" | "users" | "opd" | "rbac" | "general">("rbac");
 
   // RBAC State
   const [selectedRole, setSelectedRole] = useState<RoleCode>("ADMIN_BIDANG");
@@ -206,7 +208,8 @@ export default function PengaturanPage() {
       <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "1px solid #E2E8F0", paddingBottom: "10px", flexWrap: "wrap" }}>
         {[
           { id: "rbac", label: "Matriks Hak Akses & Role (RBAC)", icon: SlidersHorizontal },
-          { id: "users", label: "Manajemen Pengguna (6 Akun Demo)", icon: Users },
+          { id: "users", label: "Manajemen Pengguna & Penugasan OPD", icon: Users },
+          { id: "opd", label: "Master Satuan Kerja (OPD)", icon: Building2 },
           { id: "template", label: "Standar & Template Integrasi SIPJAKI", icon: FileSpreadsheet },
           { id: "general", label: "Preferensi Umum", icon: Globe },
         ].map((tab) => {
@@ -441,85 +444,14 @@ export default function PengaturanPage() {
         </div>
       )}
 
-      {/* TAB 2: Users Management (6 Demo Users) */}
+      {/* TAB 2: Users Management (Multi-User & OPD Architecture) */}
       {activeTab === "users" && (
-        <div style={{ borderRadius: "18px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", overflow: "hidden", boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)" }}>
-          <div style={{ padding: "20px 24px", borderBottom: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
-            <div>
-              <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#0F172A", margin: 0 }}>Daftar 6 Akun Demo Persona</h2>
-              <p style={{ fontSize: "12px", color: "#64748B", margin: "3px 0 0 0" }}>Setiap akun merepresentasikan 1 role dalam arsitektur 6-Tier SIJAKON</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => alert("Tambah Pengguna: Form terintegrasi dengan tabel roles dan role_permissions.")}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                borderRadius: "10px",
-                backgroundColor: "#0F2E5C",
-                border: "none",
-                borderBottom: "3px solid #FFC000",
-                padding: "8px 16px",
-                fontSize: "12px",
-                fontWeight: 800,
-                color: "#FFFFFF",
-                cursor: "pointer"
-              }}
-            >
-              <Plus style={{ width: "14px", height: "14px", color: "#FFC000" }} /> Tambah Pengguna Baru
-            </button>
-          </div>
+        <UserManagementView />
+      )}
 
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
-              <thead>
-                <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "2px solid #E2E8F0", textAlign: "left" }}>
-                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px" }}>NAMA & ID</th>
-                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px" }}>ROLE / PERAN</th>
-                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px" }}>INSTANSI / TENANT</th>
-                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px" }}>EMAIL DEMO</th>
-                  <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", textAlign: "center" }}>STATUS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.values(DEMO_USERS).map((u) => {
-                  const meta = ROLE_CONFIGS[u.role];
-                  return (
-                    <tr key={u.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
-                      <td style={{ padding: "16px 18px" }}>
-                        <p style={{ fontWeight: 800, color: "#0F172A", margin: 0, fontSize: "13px" }}>{u.name}</p>
-                        <p style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", margin: "2px 0 0 0" }}>{u.id} • {u.username}</p>
-                      </td>
-                      <td style={{ padding: "16px 18px" }}>
-                        <span style={{ fontSize: "11px", fontWeight: 800, backgroundColor: meta.badgeBg, color: meta.badgeText, padding: "3px 10px", borderRadius: "9999px" }}>
-                          {u.roleLabel}
-                        </span>
-                        {u.variantLabel && (
-                          <span style={{ display: "block", fontSize: "10px", color: "#0F2E5C", fontWeight: 700, marginTop: "4px" }}>
-                            {u.variantLabel}
-                          </span>
-                        )}
-                      </td>
-                      <td style={{ padding: "16px 18px", color: "#475569" }}>
-                        <span style={{ fontWeight: 700, color: "#1E293B" }}>{u.bujkName || u.instansi}</span>
-                        <span style={{ display: "block", fontSize: "10px", color: "#94A3B8" }}>{u.jabatan}</span>
-                      </td>
-                      <td style={{ padding: "16px 18px", color: "#475569", fontFamily: "monospace" }}>
-                        {u.email}
-                      </td>
-                      <td style={{ padding: "16px 18px", textAlign: "center" }}>
-                        <span style={{ display: "inline-block", backgroundColor: "#ECFDF5", color: "#059669", padding: "3px 10px", borderRadius: "9999px", fontSize: "11px", fontWeight: 800 }}>
-                          Aktif
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+      {/* TAB 3: Master Satuan Kerja (OPD) */}
+      {activeTab === "opd" && (
+        <OpdManagementView />
       )}
 
       {/* TAB 3: Standar & Template Integrasi SIPJAKI */}

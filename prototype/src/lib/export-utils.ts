@@ -16,6 +16,7 @@ export interface DataDictionaryItem {
   type: string;
   description: string;
   allowedValues?: string[];
+  example?: string;
 }
 
 export interface ExportOptions {

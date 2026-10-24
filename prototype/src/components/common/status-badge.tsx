@@ -46,7 +46,8 @@ export default function StatusBadge({
     normalized.includes("selesai") ||
     normalized === "tertib" ||
     normalized.includes("lulus") ||
-    normalized === "aktif"
+    normalized === "aktif" ||
+    normalized.includes("dokumen lengkap")
   ) {
     bg = "#DCFCE7";
     text = "#166534";
@@ -59,7 +60,9 @@ export default function StatusBadge({
     normalized.includes("berjalan") ||
     normalized.includes("sedang") ||
     normalized.includes("cukup") ||
-    normalized.includes("terjadwal")
+    normalized.includes("terjadwal") ||
+    normalized.includes("dokumen menyusul") ||
+    normalized.includes("belum upload")
   ) {
     bg = "#FEF3C7";
     text = "#92400E";

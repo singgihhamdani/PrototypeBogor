@@ -6,9 +6,12 @@ import { TertibType, TERTIB_CONFIGS } from "@/lib/tertib-config";
 import { mockAnggaranRecords, AnggaranRecord } from "@/data/tertib-mock-data";
 import { 
   StatusBadge, FileUploader, DataTableView, 
-  ModalForm, ColumnDef 
+  ModalForm, ColumnDef, BatchImportModal,
+  DocStatusBadge, DocumentUploadMiniModal, DocCompletionBar
 } from "@/components/common";
-import { Wallet, Plus, Download, FileText, CheckCircle2, TrendingUp, PieChart, Coins, Eye } from "lucide-react";
+import { Wallet, Plus, Download, FileText, CheckCircle2, TrendingUp, PieChart, Coins, Eye, FileSpreadsheet } from "lucide-react";
+import { TEMPLATE_PERENCANAAN_ANGGARAN } from "@/lib/sipjaki-templates";
+import { logDataActivity } from "@/lib/audit-log";
 
 interface PerencanaanAnggaranViewProps {
   tertibType: TertibType;
@@ -16,12 +19,18 @@ interface PerencanaanAnggaranViewProps {
 
 export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAnggaranViewProps) {
   const config = TERTIB_CONFIGS[tertibType];
-  const [data, setData] = useState<AnggaranRecord[]>(
-    mockAnggaranRecords.filter((r) => r.tertibType === tertibType)
+  const [data, setData] = useState<AnggaranRecord[]>(() =>
+    mockAnggaranRecords.filter((r) => r.tertibType === tertibType).map((r) => ({
+      ...r,
+      _docStatus: r._docStatus || "complete"
+    }))
   );
   const [filterSumberDana, setFilterSumberDana] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterDocPending, setFilterDocPending] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
+  const [docUploadTarget, setDocUploadTarget] = useState<AnggaranRecord | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form State
@@ -37,13 +46,69 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
     const matchSumber = filterSumberDana === "Semua" || item.sumberDana === filterSumberDana;
     const matchSearch = item.program.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         item.sumberDana.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchSumber && matchSearch;
+    const matchDoc = !filterDocPending || item._docStatus === "pending" || !item.dokumenRka;
+    return matchSumber && matchSearch && matchDoc;
   });
 
   const totalPagu = data.reduce((acc, curr) => acc + curr.paguAnggaran, 0);
   const totalRealisasi = data.reduce((acc, curr) => acc + curr.realisasi, 0);
   const percentSerapan = totalPagu > 0 ? Math.round((totalRealisasi / totalPagu) * 100) : 0;
   const sisaAnggaran = totalPagu - totalRealisasi;
+
+  const handleBatchCommit = (parsedRows: any[]) => {
+    const formatted: AnggaranRecord[] = parsedRows.map((row, idx) => ({
+      id: `ANG-${Date.now().toString().slice(-4)}-${idx + 1}`,
+      tertibType,
+      program: row.program || "Program Pengawasan Tertib Konstruksi",
+      tahun: String(row.tahun || "2026"),
+      paguAnggaran: Number(String(row.paguAnggaran || 0).replace(/\D/g, "")) || 100000000,
+      realisasi: Number(String(row.realisasi || 0).replace(/\D/g, "")) || 0,
+      sumberDana: (row.sumberDana as any) || "APBD Kab. Bogor",
+      dokumenRka: row.dokumenRka || "",
+      status: "Disetujui",
+      _docStatus: row._docStatus || "pending"
+    }));
+    setData([...formatted, ...data]);
+    logDataActivity({
+      action: "import",
+      module: `Perencanaan Anggaran (${config.shortTitle})`,
+      format: "xlsx",
+      recordCount: formatted.length,
+      user: "Admin Perencanaan Jakon",
+      status: "success",
+      fileName: `${TEMPLATE_PERENCANAAN_ANGGARAN.exportFileName}.xlsx`,
+      details: `Impor batch ${formatted.length} alokasi anggaran (${config.shortTitle}) - dokumen RKA dapat disusulkan`
+    });
+    alert(`Berhasil mengimpor ${formatted.length} data alokasi anggaran! Dokumen RKA dapat diunggah menyusul.`);
+  };
+
+  const handleSaveUploadedDoc = (files: Record<string, File | null>, fileNames: Record<string, string>) => {
+    if (!docUploadTarget) return;
+    const newDocName = fileNames["dokumenRka"] || docUploadTarget.dokumenRka || `RKA_${docUploadTarget.tahun}_${docUploadTarget.id}.pdf`;
+    setData((prev) =>
+      prev.map((item) => {
+        if (item.id === docUploadTarget.id) {
+          return {
+            ...item,
+            dokumenRka: newDocName,
+            _docStatus: "complete"
+          };
+        }
+        return item;
+      })
+    );
+    logDataActivity({
+      action: "doc_upload",
+      module: `Perencanaan Anggaran (${config.shortTitle})`,
+      format: "pdf",
+      recordCount: 1,
+      user: "Admin Perencanaan Jakon",
+      status: "success",
+      fileName: newDocName,
+      details: `Unggah Dokumen RKA susulan untuk program: ${docUploadTarget.program}`
+    });
+    setDocUploadTarget(null);
+  };
 
   const handleAddAnggaran = (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,27 +245,12 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
       label: "DOKUMEN RKA",
       sortable: false,
       render: (row) => (
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            alert(`Mengunduh berkas ${row.dokumenRka}...`);
-          }}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            fontSize: "11px",
-            fontWeight: 700,
-            color: "#2563EB",
-            textDecoration: "none"
-          }}
-        >
-          <FileText style={{ width: "13px", height: "13px" }} />
-          <span style={{ maxWidth: "140px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {row.dokumenRka}
-          </span>
-        </a>
+        <DocStatusBadge
+          status={row._docStatus || (row.dokumenRka ? "complete" : "pending")}
+          fileName={row.dokumenRka}
+          documentLabel="RKA Anggaran"
+          onClick={() => setDocUploadTarget(row)}
+        />
       )
     },
     {
@@ -228,6 +278,12 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
         description="Monitoring alokasi pagu DPA/RKA Dinas PUPR, serapan anggaran riil kegiatan audit, dan akuntabilitas keuangan pengawasan."
         legalBasis={config.legalBasis}
         actionButtons={[
+          {
+            label: "Import Batch (Excel)",
+            icon: FileSpreadsheet,
+            variant: "outline",
+            onClick: () => setIsBatchImportOpen(true)
+          },
           {
             label: "Tambah Alokasi RKA",
             icon: Plus,
@@ -561,10 +617,23 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
         </div>
       </div>
 
+      {/* Doc Completion Progress Bar */}
+      <DocCompletionBar
+        total={data.length}
+        completed={data.filter((d) => d._docStatus === "complete" || Boolean(d.dokumenRka)).length}
+        label="Kelengkapan Dokumen RKA Anggaran"
+        isFilterActive={filterDocPending}
+        onFilterPending={() => setFilterDocPending((prev) => !prev)}
+      />
+
       {/* Reusable DataTableView */}
       <DataTableView<AnggaranRecord>
         title={`Rencana Kerja & Anggaran (RKA) Pengawasan (${filteredData.length})`}
-        subtitle="Rincian pos alokasi dana operasional audit tertib konstruksi Kabupaten Bogor"
+        subtitle={
+          filterDocPending
+            ? "Menampilkan alokasi anggaran yang belum mengunggah berkas RKA/DPA (dapat disusulkan)"
+            : "Rincian pos alokasi dana operasional audit tertib konstruksi Kabupaten Bogor"
+        }
         data={filteredData}
         columns={columns}
         defaultPageSize={5}
@@ -739,6 +808,34 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
           />
         </div>
       </ModalForm>
+
+      {/* Mini Modal Upload Dokumen RKA Susulan */}
+      {docUploadTarget && (
+        <DocumentUploadMiniModal
+          isOpen={Boolean(docUploadTarget)}
+          onClose={() => setDocUploadTarget(null)}
+          title={`Unggah Dokumen RKA — ${docUploadTarget.program}`}
+          subtitle={`${docUploadTarget.sumberDana} • Tahun ${docUploadTarget.tahun} • Rp ${docUploadTarget.paguAnggaran.toLocaleString('id-ID')}`}
+          documentFields={TEMPLATE_PERENCANAAN_ANGGARAN.documentFields || [
+            { key: "dokumenRka", label: "Dokumen RKA Anggaran (PDF)", accept: ".pdf", maxSizeMb: 5, required: true }
+          ]}
+          currentValues={{ dokumenRka: docUploadTarget.dokumenRka }}
+          onSave={handleSaveUploadedDoc}
+        />
+      )}
+
+      {/* Batch Import Modal */}
+      <BatchImportModal<AnggaranRecord>
+        isOpen={isBatchImportOpen}
+        onClose={() => setIsBatchImportOpen(false)}
+        title={`Import Batch Anggaran Pengawasan (${config.shortTitle})`}
+        subtitle="Unggah spreadsheet rencana alokasi anggaran RKA sekaligus (Dokumen RKA dapat disusulkan)"
+        templateFileName={`${TEMPLATE_PERENCANAAN_ANGGARAN.exportFileName}_template.xlsx`}
+        expectedColumns={TEMPLATE_PERENCANAAN_ANGGARAN.importColumns}
+        sampleRows={TEMPLATE_PERENCANAAN_ANGGARAN.sampleRows}
+        template={TEMPLATE_PERENCANAAN_ANGGARAN}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }

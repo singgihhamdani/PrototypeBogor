@@ -15,8 +15,13 @@ import ModalForm from "@/components/common/modal-form";
 import FileUploader from "@/components/common/file-uploader";
 import VerificationDialog from "@/components/common/verification-dialog";
 import StatusBadge from "@/components/common/status-badge";
+import BatchImportModal from "@/components/common/batch-import-modal";
+import DocStatusBadge from "@/components/common/doc-status-badge";
+import DocumentUploadMiniModal from "@/components/common/document-upload-mini-modal";
+import DocCompletionBar from "@/components/common/doc-completion-bar";
 import { exportToSpreadsheet } from "@/lib/export-utils";
 import { TEMPLATE_PELAKSANAAN } from "@/lib/sipjaki-templates";
+import { logDataActivity } from "@/lib/audit-log";
 
 interface PelaksanaanViewProps {
   tertibType: TertibType;
@@ -27,18 +32,24 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
   
   // State data utama
   const [data, setData] = useState<PelaksanaanRecord[]>(() => 
-    mockPelaksanaanRecords.filter((r) => r.tertibType === tertibType)
+    mockPelaksanaanRecords.filter((r) => r.tertibType === tertibType).map((r) => ({
+      ...r,
+      _docStatus: r._docStatus || "complete"
+    }))
   );
   
   // Filter States
   const [activeVariant, setActiveVariant] = useState<string>("Semua");
   const [filterStatus, setFilterStatus] = useState<string>("Semua");
   const [filterTahun, setFilterTahun] = useState<string>("2026");
+  const [filterDocPending, setFilterDocPending] = useState(false);
 
   // Modal States
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isBapModalOpen, setIsBapModalOpen] = useState(false);
+  const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
   const [selectedRecordForBap, setSelectedRecordForBap] = useState<PelaksanaanRecord | null>(null);
+  const [docUploadTarget, setDocUploadTarget] = useState<PelaksanaanRecord | null>(null);
 
   // Verification Dialog States
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
@@ -113,7 +124,8 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       (filterStatus === "pending" && item.statusVerifikasi === "Draft") ||
       (filterStatus === "verified" && item.statusVerifikasi === "Terverifikasi") ||
       (filterStatus === "rejected" && item.statusVerifikasi === "Ditolak");
-    return matchVariant && matchStatus;
+    const matchDoc = !filterDocPending || item._docStatus === "pending" || !item.dokumenBAP;
+    return matchVariant && matchStatus && matchDoc;
   });
 
   // Calculate Stats
@@ -143,7 +155,8 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       skorTertib: computedScore,
       kategoriHasil: computedKategori,
       statusVerifikasi: "Draft",
-      dokumenBAP: `BAP_${auditForm.simakCode.replace(/\s+/g, "_")}_${auditForm.badanUsaha.replace(/[^a-zA-Z0-9]/g, "")}.pdf`
+      dokumenBAP: auditForm.dokumenBapFile ? auditForm.dokumenBapFile.name : `BAP_${auditForm.simakCode.replace(/\s+/g, "_")}_${auditForm.badanUsaha.replace(/[^a-zA-Z0-9]/g, "")}.pdf`,
+      _docStatus: auditForm.dokumenBapFile ? "complete" : "pending"
     };
 
     setData([newRecord, ...data]);
@@ -166,6 +179,65 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       rekomendasi: "",
       dokumenBapFile: null
     });
+  };
+
+  // Handle Batch Commit
+  const handleBatchCommit = (parsedRows: any[]) => {
+    const formatted: PelaksanaanRecord[] = parsedRows.map((row, idx) => ({
+      id: `SIMAK-${Date.now().toString().slice(-4)}-${idx + 1}`,
+      simakCode: row.simakCode || config.simakVariants[0]?.code || "SIMAK 1a1",
+      tertibType,
+      namaObjek: row.namaObjek || "Objek Pengawasan Lapangan",
+      badanUsaha: row.badanUsaha || "PT Penyedia Jasa Konstruksi",
+      lokasi: row.lokasi || "Kecamatan Cibinong",
+      tanggalAudit: row.tanggalAudit || new Date().toISOString().split("T")[0],
+      pengawas: row.pengawas || "Tim Pembina Jakon Kab. Bogor",
+      skorTertib: Number(row.skorTertib) || 85,
+      kategoriHasil: (row.kategoriHasil as any) || "Tertib",
+      statusVerifikasi: "Draft",
+      dokumenBAP: row.dokumenBAP || "",
+      _docStatus: row._docStatus || "pending"
+    }));
+    setData([...formatted, ...data]);
+    logDataActivity({
+      action: "import",
+      module: `Pelaksanaan Audit SIMAK (${config.shortTitle})`,
+      format: "xlsx",
+      recordCount: formatted.length,
+      user: "Auditor Pembina Jakon",
+      status: "success",
+      fileName: `${TEMPLATE_PELAKSANAAN.exportFileName}.xlsx`,
+      details: `Impor batch ${formatted.length} data audit SIMAK (${config.shortTitle}) - dokumen BAP dapat disusulkan`
+    });
+    alert(`Berhasil mengimpor ${formatted.length} data audit SIMAK! Dokumen BAP dapat diunggah menyusul per baris.`);
+  };
+
+  const handleSaveUploadedDoc = (files: Record<string, File | null>, fileNames: Record<string, string>) => {
+    if (!docUploadTarget) return;
+    const newBapName = fileNames["dokumenBAP"] || docUploadTarget.dokumenBAP || `BAP_${docUploadTarget.simakCode.replace(/\s+/g, "_")}_${docUploadTarget.id}.pdf`;
+    setData((prev) =>
+      prev.map((item) => {
+        if (item.id === docUploadTarget.id) {
+          return {
+            ...item,
+            dokumenBAP: newBapName,
+            _docStatus: "complete"
+          };
+        }
+        return item;
+      })
+    );
+    logDataActivity({
+      action: "doc_upload",
+      module: `Pelaksanaan Audit SIMAK (${config.shortTitle})`,
+      format: "pdf",
+      recordCount: 1,
+      user: "Auditor Pembina Jakon",
+      status: "success",
+      fileName: newBapName,
+      details: `Unggah Berita Acara Pemeriksaan (BAP) untuk audit: ${docUploadTarget.namaObjek} (${docUploadTarget.simakCode})`
+    });
+    setDocUploadTarget(null);
   };
 
   // Handle Verification Confirm
@@ -275,31 +347,14 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
     {
       key: "dokumenBAP",
       label: "BERITA ACARA (BAP)",
-      width: "180px",
+      width: "190px",
       render: (row) => (
-        <button
-          type="button"
-          onClick={() => {
-            setSelectedRecordForBap(row);
-            setIsBapModalOpen(true);
-          }}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "5px",
-            background: "none",
-            border: "none",
-            color: "#2563EB",
-            fontSize: "11px",
-            fontWeight: 700,
-            cursor: "pointer",
-            padding: 0,
-            textAlign: "left"
-          }}
-        >
-          <FileText style={{ width: "13px", height: "13px", flexShrink: 0 }} />
-          <span style={{ textDecoration: "underline", wordBreak: "break-all" }}>{row.dokumenBAP}</span>
-        </button>
+        <DocStatusBadge
+          status={row._docStatus || (row.dokumenBAP ? "complete" : "pending")}
+          fileName={row.dokumenBAP}
+          documentLabel="BAP SIMAK"
+          onClick={() => setDocUploadTarget(row)}
+        />
       )
     },
     {
@@ -330,6 +385,12 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
         description={`Audit kepatuhan teknis berbasis form SIMAK elektronik baku (${config.simakVariants.map(v => v.code).join(", ")}).`}
         legalBasis={config.legalBasis}
         actionButtons={[
+          {
+            label: "Import Batch SIMAK",
+            icon: FileSpreadsheet,
+            variant: "outline",
+            onClick: () => setIsBatchImportOpen(true)
+          },
           {
             label: "Buat Audit SIMAK Baru",
             icon: Plus,
@@ -725,10 +786,23 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
         ))}
       </div>
 
+      {/* Doc Completion Progress Bar */}
+      <DocCompletionBar
+        total={data.length}
+        completed={data.filter((d) => d._docStatus === "complete" || Boolean(d.dokumenBAP)).length}
+        label="Kelengkapan Berita Acara Pemeriksaan (BAP)"
+        isFilterActive={filterDocPending}
+        onFilterPending={() => setFilterDocPending((prev) => !prev)}
+      />
+
       {/* Table DataTableView */}
       <DataTableView<PelaksanaanRecord>
         title={`Daftar Hasil Audit Lapangan SIMAK (${filteredData.length} Kegiatan)`}
-        subtitle={`Audit kepatuhan pengawasan 3 tertib berbasis indikator baku Permen PUPR No. 1/2023`}
+        subtitle={
+          filterDocPending
+            ? "Menampilkan audit SIMAK yang belum memiliki berkas BAP resmi (dapat disusulkan)"
+            : "Audit kepatuhan pengawasan 3 tertib berbasis indikator baku Permen PUPR No. 1/2023"
+        }
         data={filteredData}
         columns={tableColumns}
         exportFileName={`audit-simak-${tertibType}-bogor`}
@@ -1224,6 +1298,34 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
           </div>
         </ModalForm>
       )}
+
+      {/* Mini Modal Upload Dokumen BAP Susulan */}
+      {docUploadTarget && (
+        <DocumentUploadMiniModal
+          isOpen={Boolean(docUploadTarget)}
+          onClose={() => setDocUploadTarget(null)}
+          title={`Unggah BAP — ${docUploadTarget.namaObjek}`}
+          subtitle={`${docUploadTarget.simakCode} • ${docUploadTarget.badanUsaha} • ${docUploadTarget.lokasi}`}
+          documentFields={TEMPLATE_PELAKSANAAN.documentFields || [
+            { key: "dokumenBAP", label: "Berita Acara Pemeriksaan (BAP)", accept: ".pdf", maxSizeMb: 5, required: true }
+          ]}
+          currentValues={{ dokumenBAP: docUploadTarget.dokumenBAP }}
+          onSave={handleSaveUploadedDoc}
+        />
+      )}
+
+      {/* Batch Import Modal */}
+      <BatchImportModal
+        isOpen={isBatchImportOpen}
+        onClose={() => setIsBatchImportOpen(false)}
+        title={`Import Batch Audit SIMAK (${config.shortTitle})`}
+        subtitle="Unggah spreadsheet data hasil pemeriksaan SIMAK sekaligus (Dokumen BAP dapat disusulkan)"
+        templateFileName={`${TEMPLATE_PELAKSANAAN.exportFileName}_template.xlsx`}
+        expectedColumns={TEMPLATE_PELAKSANAAN.importColumns}
+        sampleRows={TEMPLATE_PELAKSANAAN.sampleRows}
+        template={TEMPLATE_PELAKSANAAN}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }

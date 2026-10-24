@@ -9,6 +9,7 @@ export interface SDMRecord {
   keterangan?: string;
   namaTim?: string;
   ketuaTim?: string;
+  _docStatus?: 'complete' | 'pending';
 }
 
 export interface TimelineRecord {
@@ -21,6 +22,7 @@ export interface TimelineRecord {
   targetBujk: number;
   status: 'Selesai' | 'Berjalan' | 'Terjadwal';
   dokumenJadwal: string;
+  _docStatus?: 'complete' | 'pending';
 }
 
 export interface AnggaranRecord {
@@ -33,6 +35,7 @@ export interface AnggaranRecord {
   sumberDana: 'APBD Kab. Bogor' | 'DAK Fisik' | 'Bantuan Keuangan Provinsi';
   dokumenRka: string;
   status: 'Disetujui' | 'Revisi' | 'Usulan';
+  _docStatus?: 'complete' | 'pending';
 }
 
 export interface PemetaanRecord {
@@ -71,6 +74,7 @@ export interface PelaksanaanRecord {
   kategoriHasil: 'Tertib' | 'Cukup Tertib' | 'Kurang Tertib';
   statusVerifikasi: 'Draft' | 'Terverifikasi' | 'Ditolak';
   dokumenBAP: string;
+  _docStatus?: 'complete' | 'pending';
 }
 
 export interface RekomendasiRecord {

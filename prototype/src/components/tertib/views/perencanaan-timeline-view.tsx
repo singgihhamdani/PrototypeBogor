@@ -6,9 +6,12 @@ import { TertibType, TERTIB_CONFIGS } from "@/lib/tertib-config";
 import { mockTimelineRecords, TimelineRecord } from "@/data/tertib-mock-data";
 import { 
   StatusBadge, FileUploader, DataTableView, 
-  ModalForm, ColumnDef 
+  ModalForm, ColumnDef, BatchImportModal,
+  DocStatusBadge, DocumentUploadMiniModal, DocCompletionBar
 } from "@/components/common";
-import { Calendar, Plus, Download, FileText, Clock, CheckCircle2, AlertCircle, Filter, Eye, TrendingUp } from "lucide-react";
+import { Calendar, Plus, Download, FileText, Clock, CheckCircle2, AlertCircle, Filter, Eye, TrendingUp, FileSpreadsheet } from "lucide-react";
+import { TEMPLATE_PERENCANAAN_TIMELINE } from "@/lib/sipjaki-templates";
+import { logDataActivity } from "@/lib/audit-log";
 
 interface PerencanaanTimelineViewProps {
   tertibType: TertibType;
@@ -16,12 +19,18 @@ interface PerencanaanTimelineViewProps {
 
 export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimelineViewProps) {
   const config = TERTIB_CONFIGS[tertibType];
-  const [data, setData] = useState<TimelineRecord[]>(
-    mockTimelineRecords.filter((r) => r.tertibType === tertibType)
+  const [data, setData] = useState<TimelineRecord[]>(() =>
+    mockTimelineRecords.filter((r) => r.tertibType === tertibType).map((r) => ({
+      ...r,
+      _docStatus: r._docStatus || "complete"
+    }))
   );
   const [filterStatus, setFilterStatus] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterDocPending, setFilterDocPending] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
+  const [docUploadTarget, setDocUploadTarget] = useState<TimelineRecord | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form State
@@ -37,12 +46,69 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
     const matchStatus = filterStatus === "Semua" || item.status === filterStatus;
     const matchSearch = item.kegiatan.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         item.periode.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchStatus && matchSearch;
+    const matchDoc = !filterDocPending || item._docStatus === "pending" || !item.dokumenJadwal;
+    return matchStatus && matchSearch && matchDoc;
   });
 
   const totalTarget = data.reduce((acc, curr) => acc + curr.targetBujk, 0);
   const totalSelesai = data.filter((d) => d.status === "Selesai").length;
   const totalBerjalan = data.filter((d) => d.status === "Berjalan").length;
+
+  const handleBatchCommit = (parsedRows: any[]) => {
+    const formatted: TimelineRecord[] = parsedRows.map((row, idx) => ({
+      id: `TIME-${Date.now().toString().slice(-4)}-${idx + 1}`,
+      tertibType,
+      kegiatan: row.kegiatan || "Agenda Pengawasan Lapangan",
+      periode: row.periode || "Triwulan I (Jan - Mar 2026)",
+      bulanMulai: row.bulanMulai || "Januari 2026",
+      bulanSelesai: row.bulanSelesai || "Maret 2026",
+      targetBujk: Number(row.targetBujk) || 10,
+      status: (row.status as any) || "Terjadwal",
+      dokumenJadwal: row.dokumenJadwal || "",
+      _docStatus: row._docStatus || "pending"
+    }));
+    setData([...formatted, ...data]);
+    logDataActivity({
+      action: "import",
+      module: `Perencanaan Timeline (${config.shortTitle})`,
+      format: "xlsx",
+      recordCount: formatted.length,
+      user: "Admin Perencanaan Jakon",
+      status: "success",
+      fileName: `${TEMPLATE_PERENCANAAN_TIMELINE.exportFileName}.xlsx`,
+      details: `Impor batch ${formatted.length} timeline jadwal (${config.shortTitle}) - dokumen KAK dapat disusulkan`
+    });
+    alert(`Berhasil mengimpor ${formatted.length} data timeline jadwal! Dokumen KAK dapat diunggah menyusul.`);
+  };
+
+  const handleSaveUploadedDoc = (files: Record<string, File | null>, fileNames: Record<string, string>) => {
+    if (!docUploadTarget) return;
+    const newDocName = fileNames["dokumenJadwal"] || docUploadTarget.dokumenJadwal || `Jadwal_${docUploadTarget.periode.replace(/\s+/g, "_")}.pdf`;
+    setData((prev) =>
+      prev.map((item) => {
+        if (item.id === docUploadTarget.id) {
+          return {
+            ...item,
+            dokumenJadwal: newDocName,
+            _docStatus: "complete"
+          };
+        }
+        return item;
+      })
+    );
+    logDataActivity({
+      action: "doc_upload",
+      module: `Perencanaan Timeline (${config.shortTitle})`,
+      format: "pdf",
+      recordCount: 1,
+      user: "Admin Perencanaan Jakon",
+      status: "success",
+      fileName: newDocName,
+      details: `Upload dokumen susulan ${newDocName} untuk agenda ${docUploadTarget.kegiatan}`
+    });
+    alert(`Dokumen "${newDocName}" berhasil diunggah! Status kelengkapan diperbarui menjadi Lengkap.`);
+    setDocUploadTarget(null);
+  };
 
   const handleAddTimeline = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +128,8 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
         bulanSelesai: formBulanSelesai,
         targetBujk: parseInt(formTargetBujk, 10),
         status: formStatus,
-        dokumenJadwal: uploadedFile ? uploadedFile.name : `Jadwal_${formPeriode.replace(/\s+/g, "_")}.pdf`
+        dokumenJadwal: uploadedFile ? uploadedFile.name : `Jadwal_${formPeriode.replace(/\s+/g, "_")}.pdf`,
+        _docStatus: uploadedFile ? "complete" : "pending"
       };
 
       setData([newRecord, ...data]);
@@ -133,27 +200,12 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
       label: "DOKUMEN RENCANA",
       sortable: false,
       render: (row) => (
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            alert(`Mengunduh berkas ${row.dokumenJadwal}...`);
-          }}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            fontSize: "11px",
-            fontWeight: 700,
-            color: "#2563EB",
-            textDecoration: "none"
-          }}
-        >
-          <FileText style={{ width: "13px", height: "13px" }} />
-          <span style={{ maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {row.dokumenJadwal}
-          </span>
-        </a>
+        <DocStatusBadge
+          status={row._docStatus || (row.dokumenJadwal ? "complete" : "pending")}
+          fileName={row.dokumenJadwal}
+          documentLabel="Kerangka Jadwal / KAK"
+          onClick={() => setDocUploadTarget(row)}
+        />
       )
     },
     {
@@ -181,6 +233,12 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
         description="Jadwal waktu operasional pengawasan berkala, audit kepatuhan lapangan, dan siklus pelaporan triwulanan TA 2026."
         legalBasis={config.legalBasis}
         actionButtons={[
+          {
+            label: "Import Batch (Excel)",
+            icon: FileSpreadsheet,
+            variant: "secondary",
+            onClick: () => setIsBatchImportOpen(true)
+          },
           {
             label: "Tambah Jadwal",
             icon: Plus,
@@ -455,6 +513,14 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
         </div>
       </div>
 
+      {/* Indikator Kelengkapan Dokumen */}
+      <DocCompletionBar
+        records={data}
+        label="Kelengkapan Dokumen Kerangka Jadwal (KAK / PDF)"
+        filterActive={filterDocPending}
+        onToggleFilter={() => setFilterDocPending(!filterDocPending)}
+      />
+
       {/* Reusable DataTableView */}
       <DataTableView<TimelineRecord>
         title={`Matriks Jadwal & Siklus Pengawasan (${filteredData.length})`}
@@ -656,6 +722,28 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
           />
         </div>
       </ModalForm>
+
+      {/* Mini Modal Unggah Dokumen Susulan */}
+      {docUploadTarget && (
+        <DocumentUploadMiniModal
+          isOpen={!!docUploadTarget}
+          onClose={() => setDocUploadTarget(null)}
+          title={`Unggah Dokumen Jadwal: ${docUploadTarget.kegiatan}`}
+          documentFields={TEMPLATE_PERENCANAAN_TIMELINE.documentFields || []}
+          existingDocuments={{
+            dokumenJadwal: docUploadTarget.dokumenJadwal
+          }}
+          onSave={handleSaveUploadedDoc}
+        />
+      )}
+
+      {/* Modal Batch Import Excel */}
+      <BatchImportModal
+        isOpen={isBatchImportOpen}
+        onClose={() => setIsBatchImportOpen(false)}
+        template={TEMPLATE_PERENCANAAN_TIMELINE}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }

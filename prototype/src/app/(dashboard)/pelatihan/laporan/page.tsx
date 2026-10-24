@@ -11,6 +11,11 @@ import FileUploader from "@/components/common/file-uploader";
 import VerificationDialog from "@/components/common/verification-dialog";
 import StatusBadge from "@/components/common/status-badge";
 import BatchImportModal, { BatchColumnDef } from "@/components/common/batch-import-modal";
+import DocStatusBadge from "@/components/common/doc-status-badge";
+import DocumentUploadMiniModal from "@/components/common/document-upload-mini-modal";
+import DocCompletionBar from "@/components/common/doc-completion-bar";
+import { TEMPLATE_LAPORAN_PELATIHAN } from "@/lib/sipjaki-templates";
+import { logDataActivity } from "@/lib/audit-log";
 
 interface LaporanPelatihanItem {
   id: string;
@@ -21,6 +26,7 @@ interface LaporanPelatihanItem {
   lembagaSertifikasi: string;
   dokumenBa: string;
   status: "Terverifikasi" | "Menunggu Verifikasi" | "Ditolak";
+  _docStatus?: "complete" | "pending";
 }
 
 const mockLaporanPelatihan: LaporanPelatihanItem[] = [
@@ -32,7 +38,8 @@ const mockLaporanPelatihan: LaporanPelatihanItem[] = [
     jumlahLulusan: 48,
     lembagaSertifikasi: "LSP Gataki Karya Konstruksi",
     dokumenBa: "BA_Kelulusan_Mandor_2026.pdf",
-    status: "Terverifikasi"
+    status: "Terverifikasi",
+    _docStatus: "complete"
   },
   {
     id: "LAP-PEL-02",
@@ -42,7 +49,8 @@ const mockLaporanPelatihan: LaporanPelatihanItem[] = [
     jumlahLulusan: 62,
     lembagaSertifikasi: "LSP Keselamatan Konstruksi Indonesia",
     dokumenBa: "BA_Sertifikasi_K3_2026.pdf",
-    status: "Terverifikasi"
+    status: "Terverifikasi",
+    _docStatus: "complete"
   },
   {
     id: "LAP-PEL-03",
@@ -52,7 +60,8 @@ const mockLaporanPelatihan: LaporanPelatihanItem[] = [
     jumlahLulusan: 32,
     lembagaSertifikasi: "LSP Astekindo Jawa Barat",
     dokumenBa: "BA_Surveyor_2026.pdf",
-    status: "Menunggu Verifikasi"
+    status: "Menunggu Verifikasi",
+    _docStatus: "complete"
   }
 ];
 
@@ -77,6 +86,8 @@ export default function LaporanPelatihanPage() {
   const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
   const [verifyTarget, setVerifyTarget] = useState<LaporanPelatihanItem | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [docUploadTarget, setDocUploadTarget] = useState<LaporanPelatihanItem | null>(null);
+  const [filterDocPending, setFilterDocPending] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -96,11 +107,50 @@ export default function LaporanPelatihanPage() {
       tanggalSelesai: row.tanggalSelesai || new Date().toISOString().split("T")[0],
       jumlahLulusan: Number(row.jumlahLulusan) || 25,
       lembagaSertifikasi: row.lembagaSertifikasi || "LSP Terlisensi BNSP",
-      dokumenBa: `BA_Import_${String(row.nomorLaporan || "").replace(/[^a-zA-Z0-9]/g, "")}.pdf`,
-      status: "Terverifikasi"
+      dokumenBa: row.dokumenBa || "",
+      status: "Menunggu Verifikasi",
+      _docStatus: row._docStatus || "pending"
     }));
     setData([...formatted, ...data]);
-    alert(`Berhasil mengimpor ${formatted.length} Berita Acara sertifikasi TKK secara massal!`);
+    logDataActivity({
+      action: "import",
+      module: "Laporan Pelatihan & Sertifikasi TKK",
+      format: "xlsx",
+      recordCount: formatted.length,
+      user: "Admin Pelatihan Jakon",
+      status: "success",
+      fileName: "Import_Laporan_Pelatihan.xlsx",
+      details: `Impor batch ${formatted.length} laporan pelatihan via Excel (dokumen BA dapat disusulkan)`
+    });
+    alert(`Berhasil mengimpor ${formatted.length} Berita Acara sertifikasi TKK secara massal! Dokumen BA dapat disusulkan per baris.`);
+  };
+
+  const handleSaveUploadedDoc = (files: Record<string, File | null>, fileNames: Record<string, string>) => {
+    if (!docUploadTarget) return;
+    const newBaName = fileNames["dokumenBa"] || docUploadTarget.dokumenBa || `BA_${docUploadTarget.nomorLaporan.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+    setData((prev) =>
+      prev.map((item) => {
+        if (item.id === docUploadTarget.id) {
+          return {
+            ...item,
+            dokumenBa: newBaName,
+            _docStatus: "complete"
+          };
+        }
+        return item;
+      })
+    );
+    logDataActivity({
+      action: "doc_upload",
+      module: "Laporan Pelatihan & Sertifikasi TKK",
+      format: "pdf",
+      recordCount: 1,
+      user: "Admin Pelatihan Jakon",
+      status: "success",
+      fileName: newBaName,
+      details: `Unggah Berita Acara (BA) susulan untuk laporan: ${docUploadTarget.nomorLaporan}`
+    });
+    setDocUploadTarget(null);
   };
 
   const totalLulusan = data.reduce((acc, curr) => acc + curr.jumlahLulusan, 0);
@@ -200,27 +250,14 @@ export default function LaporanPelatihanPage() {
     {
       key: "dokumenBa",
       label: "BERITA ACARA (BA)",
-      width: "180px",
+      width: "190px",
       render: (row) => (
-        <button
-          type="button"
-          onClick={() => alert(`Mengunduh berkas ${row.dokumenBa}...`)}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            background: "none",
-            border: "none",
-            color: "#2563EB",
-            fontSize: "11px",
-            fontWeight: 700,
-            cursor: "pointer",
-            padding: 0
-          }}
-        >
-          <FileText style={{ width: "12px", height: "12px" }} />
-          <span>{row.dokumenBa}</span>
-        </button>
+        <DocStatusBadge
+          status={row._docStatus || (row.dokumenBa ? "complete" : "pending")}
+          fileName={row.dokumenBa}
+          documentLabel="BA Kelulusan"
+          onClick={() => setDocUploadTarget(row)}
+        />
       )
     },
     {
@@ -291,11 +328,24 @@ export default function LaporanPelatihanPage() {
         </div>
       </div>
 
+      {/* Doc Completion Progress Bar */}
+      <DocCompletionBar
+        total={data.length}
+        completed={data.filter((d) => d._docStatus === "complete" || Boolean(d.dokumenBa)).length}
+        label="Kelengkapan Berita Acara (BA) Sertifikasi"
+        isFilterActive={filterDocPending}
+        onFilterPending={() => setFilterDocPending((prev) => !prev)}
+      />
+
       {/* DataTableView */}
       <DataTableView<LaporanPelatihanItem>
         title={`Daftar Laporan Berita Acara Uji Sertifikasi (${data.length} BA)`}
-        subtitle="Rekapitulasi penetapan hasil uji kompetensi tenaga kerja konstruksi"
-        data={data}
+        subtitle={
+          filterDocPending
+            ? `Menampilkan entri yang belum memiliki lampiran Berita Acara (BA)`
+            : "Rekapitulasi penetapan hasil uji kompetensi tenaga kerja konstruksi"
+        }
+        data={filterDocPending ? data.filter((d) => d._docStatus === "pending" || !d.dokumenBa) : data}
         columns={columns}
         exportFileName="Laporan_Sertifikasi_TKK_Bogor"
         actionsHeader="AKSI"
@@ -479,15 +529,31 @@ export default function LaporanPelatihanPage() {
         />
       )}
 
+      {/* Mini Modal Upload Dokumen Susulan */}
+      {docUploadTarget && (
+        <DocumentUploadMiniModal
+          isOpen={Boolean(docUploadTarget)}
+          onClose={() => setDocUploadTarget(null)}
+          title={`Unggah Dokumen BA — ${docUploadTarget.nomorLaporan}`}
+          subtitle={`${docUploadTarget.namaKegiatan} • ${docUploadTarget.lembagaSertifikasi}`}
+          documentFields={TEMPLATE_LAPORAN_PELATIHAN.documentFields || [
+            { key: "dokumenBa", label: "Berita Acara Kelulusan (BA)", accept: ".pdf", maxSizeMb: 5, required: true }
+          ]}
+          currentValues={{ dokumenBa: docUploadTarget.dokumenBa }}
+          onSave={handleSaveUploadedDoc}
+        />
+      )}
+
       {/* Reusable Batch Import Modal */}
       <BatchImportModal<LaporanPelatihanItem>
         isOpen={isBatchImportOpen}
         onClose={() => setIsBatchImportOpen(false)}
         title="Import Batch Laporan Berita Acara Sertifikasi (Excel/CSV)"
-        subtitle="Unggah berkas rekapitulasi penetapan hasil uji kompetensi TKK dari LSP/BNSP"
-        templateFileName="template_laporan_ba_sertifikasi_tkk.csv"
+        subtitle="Unggah berkas rekapitulasi penetapan hasil uji kompetensi TKK dari LSP/BNSP (Dokumen BA dapat disusulkan)"
+        templateFileName="template_laporan_ba_sertifikasi_tkk.xlsx"
         expectedColumns={tkkBatchColumns}
         sampleRows={sampleBatchTkk}
+        template={TEMPLATE_LAPORAN_PELATIHAN}
         onCommit={handleBatchCommit}
       />
     </div>

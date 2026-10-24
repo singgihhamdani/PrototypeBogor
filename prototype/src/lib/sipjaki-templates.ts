@@ -1,6 +1,14 @@
 import { ExportColumn, DataDictionaryItem, formatRupiah, formatTanggalIndo } from "./export-utils";
 import { BatchColumnDef } from "@/components/common/batch-import-modal";
 
+export interface DocumentFieldDef {
+  key: string;           // e.g. "dokumenBAP", "dokumenRka"
+  label: string;         // e.g. "Berita Acara Pemeriksaan (BAP)"
+  accept?: string;       // e.g. ".pdf" (default)
+  maxSizeMb?: number;    // default 5
+  required?: boolean;    // apakah wajib diisi sebelum verifikasi
+}
+
 export interface SipjakiTemplate {
   id: string;
   moduleName: string;
@@ -12,6 +20,7 @@ export interface SipjakiTemplate {
   enumValidation: Record<string, string[]>;
   dictionaryItems: DataDictionaryItem[];
   instructions?: string[];
+  documentFields?: DocumentFieldDef[];
 }
 
 // ==========================================
@@ -865,6 +874,9 @@ export const TEMPLATE_PELAKSANAAN: SipjakiTemplate = {
       description: "Nama file atau nomor registrasi BAP resmi"
     }
   ],
+  documentFields: [
+    { key: "dokumenBAP", label: "Berita Acara Pemeriksaan (BAP)", accept: ".pdf", maxSizeMb: 5, required: true }
+  ],
   importColumns: [
     { key: "simakCode", label: "Kode SIMAK", required: true, example: "SIMAK 1a1" },
     { key: "namaObjek", label: "Objek Pengawasan", required: true, example: "Audit Kelayakan NIB & SBU Konstruksi" },
@@ -1032,6 +1044,244 @@ export const TEMPLATE_REKOMENDASI: SipjakiTemplate = {
 };
 
 // ==========================================
+// 7. TEMPLATE: LAPORAN PELATIHAN / BA
+// ==========================================
+export const TEMPLATE_LAPORAN_PELATIHAN: SipjakiTemplate = {
+  id: "laporan-pelatihan",
+  moduleName: "Laporan Pelatihan & Sertifikasi TKK",
+  exportFileName: "Laporan_Pelatihan_TKK_SIPJAKI",
+  sheetName: "LAPORAN PELATIHAN",
+  enumValidation: {
+    status: ["Terverifikasi", "Menunggu Verifikasi", "Ditolak"]
+  },
+  columns: [
+    { key: "nomorLaporan", label: "Nomor Berita Acara", sipjakiLabel: "nomor_ba", dataType: "String", description: "Nomor resmi BA hasil uji sertifikasi" },
+    { key: "namaKegiatan", label: "Nama Program Sertifikasi", sipjakiLabel: "nama_kegiatan", dataType: "String", description: "Nama program fasilitasi/uji kompetensi" },
+    { key: "tanggalSelesai", label: "Tanggal Pelaksanaan", sipjakiLabel: "tanggal_selesai", dataType: "Date (YYYY-MM-DD)", description: "Tanggal berakhirnya pelaksanaan uji" },
+    { key: "jumlahLulusan", label: "Jumlah Lulusan", sipjakiLabel: "jumlah_lulusan", dataType: "Integer", description: "Jumlah peserta yang dinyatakan kompeten" },
+    { key: "lembagaSertifikasi", label: "Lembaga Sertifikasi / LSP", sipjakiLabel: "lembaga_sertifikasi", dataType: "String", description: "Nama LSP terlisensi BNSP pelaksana uji" },
+    { key: "dokumenBa", label: "Berkas Berita Acara (BA)", sipjakiLabel: "dokumen_ba", dataType: "String", description: "Nama file berkas BA kelulusan" },
+    { key: "status", label: "Status Verifikasi", sipjakiLabel: "status_verifikasi", dataType: "Enum", allowedValues: ["Terverifikasi", "Menunggu Verifikasi", "Ditolak"], description: "Status pengesahan laporan" }
+  ],
+  documentFields: [
+    { key: "dokumenBa", label: "Berita Acara Kelulusan (BA)", accept: ".pdf", maxSizeMb: 5, required: true }
+  ],
+  importColumns: [
+    { key: "nomorLaporan", label: "Nomor Berita Acara", required: true, example: "029/BA-LSP-GATAKI/IX/2026" },
+    { key: "namaKegiatan", label: "Nama Program Sertifikasi", required: true, example: "Uji Kompetensi Mandor Perkerasan Jalan Madya" },
+    { key: "tanggalSelesai", label: "Tanggal Pelaksanaan", required: true, example: "2026-05-15" },
+    { key: "jumlahLulusan", label: "Jumlah Lulusan", required: true, example: "45" },
+    { key: "lembagaSertifikasi", label: "Lembaga LSP / Asesor", required: true, example: "LSP Gataki Karya Konstruksi" }
+  ],
+  sampleRows: [
+    { nomorLaporan: "030/BA-LSP-GATAKI/X/2026", namaKegiatan: "Sertifikasi Juru Ukur Gedung Angkatan II", tanggalSelesai: "2026-05-20", jumlahLulusan: 35, lembagaSertifikasi: "LSP Astekindo Jawa Barat" },
+    { nomorLaporan: "031/BA-LSP-K3/X/2026", namaKegiatan: "Bimtek & Uji Petugas K3 Konstruksi Batch III", tanggalSelesai: "2026-05-25", jumlahLulusan: 50, lembagaSertifikasi: "LSP Keselamatan Konstruksi Indonesia" }
+  ],
+  dictionaryItems: [
+    { field: "nomor_ba", label: "Nomor Berita Acara", type: "String", description: "Nomor Berita Acara resmi dari LSP", example: "029/BA-LSP/IX/2026" },
+    { field: "jumlah_lulusan", label: "Jumlah Lulusan", type: "Integer", description: "Jumlah peserta yang dinyatakan lulus uji kompetensi", example: "45" }
+  ]
+};
+
+// ==========================================
+// 8. TEMPLATE: PERENCANAAN SDM PENGAWAS
+// ==========================================
+export const TEMPLATE_PERENCANAAN_SDM: SipjakiTemplate = {
+  id: "perencanaan-sdm",
+  moduleName: "Perencanaan SDM Tim Pengawas Jakon",
+  exportFileName: "Perencanaan_SDM_Pengawas_SIPJAKI",
+  sheetName: "PERENCANAAN SDM",
+  enumValidation: {
+    status: ["Terverifikasi", "Menunggu Verifikasi", "Ditolak"]
+  },
+  columns: [
+    { key: "namaTim", label: "Nama Tim Pengawas", sipjakiLabel: "nama_tim", dataType: "String", description: "Nama gugus tugas atau tim pengawas teknis" },
+    { key: "wilayah", label: "Wilayah Penugasan", sipjakiLabel: "wilayah_tugas", dataType: "String", description: "Cakupan zona / kecamatan pengawasan" },
+    { key: "jumlahSdm", label: "Jumlah SDM (Orang)", sipjakiLabel: "jumlah_personel", dataType: "Integer", description: "Kekuatan personel auditor/pengawas" },
+    { key: "tahun", label: "Tahun Anggaran", sipjakiLabel: "tahun_anggaran", dataType: "Integer (YYYY)", description: "Tahun penugasan tim" },
+    { key: "dokumen", label: "SK Tim Pengawas", sipjakiLabel: "dokumen_sk", dataType: "String", description: "Nama file SK penetapan tim pengawas" },
+    { key: "status", label: "Status Verifikasi", sipjakiLabel: "status_verifikasi", dataType: "Enum", allowedValues: ["Terverifikasi", "Menunggu Verifikasi", "Ditolak"], description: "Status legalitas SK tim" }
+  ],
+  documentFields: [
+    { key: "dokumen", label: "SK Tim Pengawas (PDF)", accept: ".pdf", maxSizeMb: 5, required: true }
+  ],
+  importColumns: [
+    { key: "namaTim", label: "Nama Tim Pengawas", required: true, example: "Tim Pengawas Wilayah I (Cibinong - Citeureup)" },
+    { key: "wilayah", label: "Wilayah Penugasan", required: true, example: "Wilayah I - Cibinong & Citeureup" },
+    { key: "jumlahSdm", label: "Jumlah SDM", required: true, example: "8" },
+    { key: "tahun", label: "Tahun Anggaran", required: true, example: "2026" }
+  ],
+  sampleRows: [
+    { namaTim: "Tim Pengawas Wilayah Barat (Leuwiliang dsk)", wilayah: "Bogor Barat", jumlahSdm: 6, tahun: "2026" },
+    { namaTim: "Tim Pengawas Wilayah Timur (Cileungsi - Jonggol)", wilayah: "Bogor Timur", jumlahSdm: 7, tahun: "2026" }
+  ],
+  dictionaryItems: [
+    { field: "nama_tim", label: "Nama Tim Pengawas", type: "String", description: "Nama resmi tim pengawas jakon", example: "Tim Pengawas Wilayah I" },
+    { field: "jumlah_personel", label: "Jumlah Personel", type: "Integer", description: "Total anggota tim dalam SK", example: "8" }
+  ]
+};
+
+// ==========================================
+// 9. TEMPLATE: PERENCANAAN ANGGARAN
+// ==========================================
+export const TEMPLATE_PERENCANAAN_ANGGARAN: SipjakiTemplate = {
+  id: "perencanaan-anggaran",
+  moduleName: "Perencanaan Anggaran Pengawasan Jakon",
+  exportFileName: "Perencanaan_Anggaran_Pengawasan_SIPJAKI",
+  sheetName: "PERENCANAAN ANGGARAN",
+  enumValidation: {
+    sumberDana: ["APBD Kab. Bogor", "DAK Fisik", "Bantuan Keuangan Provinsi"],
+    status: ["Disetujui", "Revisi", "Usulan"]
+  },
+  columns: [
+    { key: "program", label: "Nama Program / Sub-Kegiatan", sipjakiLabel: "nama_subkegiatan", dataType: "String", description: "Uraian kegiatan pengawasan jakon" },
+    { key: "paguAnggaran", label: "Pagu Anggaran (Rp)", sipjakiLabel: "pagu_anggaran", dataType: "BigInt / Numerik", transform: (v) => formatRupiah(v), description: "Alokasi pagu anggaran tahun berjalan" },
+    { key: "realisasi", label: "Realisasi (Rp)", sipjakiLabel: "realisasi_anggaran", dataType: "BigInt / Numerik", transform: (v) => formatRupiah(v), description: "Penyerapan anggaran saat ini" },
+    { key: "sumberDana", label: "Sumber Dana", sipjakiLabel: "sumber_dana", dataType: "Enum", allowedValues: ["APBD Kab. Bogor", "DAK Fisik", "Bantuan Keuangan Provinsi"], description: "Asal sumber pembiayaan" },
+    { key: "tahun", label: "Tahun Anggaran", sipjakiLabel: "tahun_anggaran", dataType: "Integer (YYYY)", description: "Tahun penetapan RKA" },
+    { key: "dokumenRka", label: "Dokumen RKA", sipjakiLabel: "dokumen_rka", dataType: "String", description: "Nama file berkas RKA / DPA" },
+    { key: "status", label: "Status Usulan", sipjakiLabel: "status_usulan", dataType: "Enum", allowedValues: ["Disetujui", "Revisi", "Usulan"], description: "Status persetujuan penganggaran" }
+  ],
+  documentFields: [
+    { key: "dokumenRka", label: "Dokumen RKA Anggaran (PDF)", accept: ".pdf", maxSizeMb: 5, required: true }
+  ],
+  importColumns: [
+    { key: "program", label: "Nama Program / Kegiatan", required: true, example: "Pengawasan Tertib Usaha Jasa Konstruksi APBD 2026" },
+    { key: "paguAnggaran", label: "Pagu Anggaran (Rp)", required: true, example: "150000000" },
+    { key: "realisasi", label: "Realisasi Anggaran (Rp)", required: false, example: "0" },
+    { key: "sumberDana", label: "Sumber Dana", required: true, example: "APBD Kab. Bogor" },
+    { key: "tahun", label: "Tahun Anggaran", required: true, example: "2026" }
+  ],
+  sampleRows: [
+    { program: "Audit Kelaikan Bangunan Gedung Publik Wilayah Cibinong", paguAnggaran: 125000000, realisasi: 45000000, sumberDana: "APBD Kab. Bogor", tahun: "2026" },
+    { program: "Pengawasan Penerapan SMKK Paket Strategis Daerah", paguAnggaran: 180000000, realisasi: 0, sumberDana: "APBD Kab. Bogor", tahun: "2026" }
+  ],
+  dictionaryItems: [
+    { field: "pagu_anggaran", label: "Pagu Anggaran", type: "BigInt", description: "Nominal pagu anggaran dalam rupiah", example: "150000000" },
+    { field: "sumber_dana", label: "Sumber Dana", type: "Enum", description: "Sumber pendanaan kegiatan", example: "APBD Kab. Bogor" }
+  ]
+};
+
+// ==========================================
+// 10. TEMPLATE: PERENCANAAN TIMELINE
+// ==========================================
+export const TEMPLATE_PERENCANAAN_TIMELINE: SipjakiTemplate = {
+  id: "perencanaan-timeline",
+  moduleName: "Perencanaan Jadwal & Timeline Pengawasan",
+  exportFileName: "Perencanaan_Timeline_Pengawasan_SIPJAKI",
+  sheetName: "TIMELINE PENGAWASAN",
+  enumValidation: {
+    status: ["Terjadwal", "Berjalan", "Selesai"]
+  },
+  columns: [
+    { key: "kegiatan", label: "Nama Kegiatan Pengawasan", sipjakiLabel: "nama_kegiatan", dataType: "String", description: "Rencana jadwal audit/pengawasan" },
+    { key: "periode", label: "Periode Pelaksanaan", sipjakiLabel: "periode_waktu", dataType: "String", description: "Triwulan / rentang waktu" },
+    { key: "bulanMulai", label: "Bulan Mulai", sipjakiLabel: "bulan_mulai", dataType: "String", description: "Bulan awal penugasan" },
+    { key: "bulanSelesai", label: "Bulan Selesai", sipjakiLabel: "bulan_selesai", dataType: "String", description: "Bulan akhir penugasan" },
+    { key: "targetBujk", label: "Target Objek (BUJK/Proyek)", sipjakiLabel: "target_objek", dataType: "Integer", description: "Sasaran jumlah entitas yang diawasi" },
+    { key: "dokumenJadwal", label: "Dokumen KAK / Jadwal", sipjakiLabel: "dokumen_kak", dataType: "String", description: "Nama file berkas KAK jadwal" },
+    { key: "status", label: "Status Pelaksanaan", sipjakiLabel: "status_timeline", dataType: "Enum", allowedValues: ["Terjadwal", "Berjalan", "Selesai"], description: "Status progres jadwal kegiatan" }
+  ],
+  documentFields: [
+    { key: "dokumenJadwal", label: "Kerangka Jadwal / KAK (PDF)", accept: ".pdf", maxSizeMb: 5, required: true }
+  ],
+  importColumns: [
+    { key: "kegiatan", label: "Nama Kegiatan Pengawasan", required: true, example: "Inspeksi Lapangan Tertib Usaha BUJK Menengah" },
+    { key: "periode", label: "Periode", required: true, example: "Triwulan I (Jan - Mar 2026)" },
+    { key: "bulanMulai", label: "Bulan Mulai", required: true, example: "Januari 2026" },
+    { key: "bulanSelesai", label: "Bulan Selesai", required: true, example: "Maret 2026" },
+    { key: "targetBujk", label: "Target Jumlah Objek", required: true, example: "25" }
+  ],
+  sampleRows: [
+    { kegiatan: "Audit SIMAK Tertib Penyelenggaraan Proyek Jembatan", periode: "Triwulan II (Apr - Jun 2026)", bulanMulai: "April 2026", bulanSelesai: "Juni 2026", targetBujk: 15 },
+    { kegiatan: "Inspeksi Tertib Pemanfaatan Gedung Stadion & RSUD", periode: "Triwulan III (Jul - Sep 2026)", bulanMulai: "Juli 2026", bulanSelesai: "September 2026", targetBujk: 10 }
+  ],
+  dictionaryItems: [
+    { field: "target_objek", label: "Target Objek", type: "Integer", description: "Jumlah BUJK atau proyek sasaran", example: "25" }
+  ]
+};
+
+// ==========================================
+// 11. TEMPLATE: PERENCANAAN PELATIHAN
+// ==========================================
+export const TEMPLATE_PERENCANAAN_PELATIHAN: SipjakiTemplate = {
+  id: "perencanaan-pelatihan",
+  moduleName: "Perencanaan Program Pelatihan & SKK TKK",
+  exportFileName: "Perencanaan_Pelatihan_TKK_SIPJAKI",
+  sheetName: "PERENCANAAN PELATIHAN",
+  enumValidation: {
+    status: ["Terverifikasi", "Menunggu Verifikasi", "Ditolak"]
+  },
+  columns: [
+    { key: "namaPaket", label: "Nama Program / Paket Pelatihan", sipjakiLabel: "nama_program", dataType: "String", description: "Judul kegiatan bimtek/uji sertifikasi" },
+    { key: "tahun", label: "Tahun Anggaran", sipjakiLabel: "tahun_anggaran", dataType: "Integer (YYYY)", description: "Tahun penetapan program" },
+    { key: "targetPeserta", label: "Target Peserta (Orang)", sipjakiLabel: "target_peserta", dataType: "Integer", description: "Kapasitas kuota peserta pelatihan" },
+    { key: "anggaran", label: "Alokasi Anggaran (Rp)", sipjakiLabel: "alokasi_anggaran", dataType: "BigInt / Numerik", transform: (v) => formatRupiah(v), description: "Biaya pelaksanaan kegiatan" },
+    { key: "jadwal", label: "Jadwal Pelaksanaan", sipjakiLabel: "jadwal_pelaksanaan", dataType: "String", description: "Rentang waktu perkiraan pelaksanaan" },
+    { key: "dokumenKak", label: "Dokumen KAK", sipjakiLabel: "dokumen_kak", dataType: "String", description: "Nama file berkas KAK pelatihan" },
+    { key: "status", label: "Status Verifikasi", sipjakiLabel: "status_verifikasi", dataType: "Enum", allowedValues: ["Terverifikasi", "Menunggu Verifikasi", "Ditolak"], description: "Status pengesahan rencana kerja" }
+  ],
+  documentFields: [
+    { key: "dokumenKak", label: "Kerangka Acuan Kerja (KAK) PDF", accept: ".pdf", maxSizeMb: 5, required: true }
+  ],
+  importColumns: [
+    { key: "namaPaket", label: "Nama Paket Pelatihan", required: true, example: "Pelatihan & Fasilitasi Uji Sertifikasi Mandor Terampil" },
+    { key: "tahun", label: "Tahun Anggaran", required: true, example: "2026" },
+    { key: "targetPeserta", label: "Target Peserta", required: true, example: "150" },
+    { key: "anggaran", label: "Alokasi Anggaran (Rp)", required: true, example: "250000000" },
+    { key: "jadwal", label: "Jadwal Pelaksanaan", required: true, example: "Mei - Agustus 2026" }
+  ],
+  sampleRows: [
+    { namaPaket: "Pelatihan Pengawas Mutu Konstruksi Jalan & Jembatan", tahun: "2026", targetPeserta: 80, anggaran: 140000000, jadwal: "Juli - Agustus 2026" },
+    { namaPaket: "Bimtek Digital Construction & Pengenalan BIM Tingkat Dasar", tahun: "2026", targetPeserta: 60, anggaran: 95000000, jadwal: "Agustus - September 2026" }
+  ],
+  dictionaryItems: [
+    { field: "target_peserta", label: "Target Peserta", type: "Integer", description: "Kuota peserta target program", example: "150" },
+    { field: "alokasi_anggaran", label: "Alokasi Anggaran", type: "BigInt", description: "Anggaran kegiatan dalam rupiah", example: "250000000" }
+  ]
+};
+
+// ==========================================
+// 12. TEMPLATE: REGULASI & KEBIJAKAN JAKON
+// ==========================================
+export const TEMPLATE_REGULASI: SipjakiTemplate = {
+  id: "regulasi",
+  moduleName: "Katalog Regulasi & Kebijakan Jasa Konstruksi",
+  exportFileName: "Katalog_Regulasi_SIPJAKI_Kab_Bogor",
+  sheetName: "REGULASI JAKON",
+  enumValidation: {
+    status: ["Berlaku", "Diubah", "Dicabut"]
+  },
+  columns: [
+    { key: "category", label: "Kategori Regulasi", sipjakiLabel: "kategori_regulasi", dataType: "String", description: "Tingkatan/jenis peraturan perundangan" },
+    { key: "number", label: "Nomor Regulasi", sipjakiLabel: "nomor_peraturan", dataType: "String", description: "Nomor registrasi peraturan" },
+    { key: "year", label: "Tahun Penetapan", sipjakiLabel: "tahun_penetapan", dataType: "Integer (YYYY)", description: "Tahun peraturan diundangkan" },
+    { key: "title", label: "Judul Peraturan", sipjakiLabel: "tentang_peraturan", dataType: "String", description: "Perihal isi peraturan jakon" },
+    { key: "summary", label: "Ringkasan Kebijakan", sipjakiLabel: "ringkasan_materi", dataType: "String", description: "Intisari muatan aturan" },
+    { key: "status", label: "Status Hukum", sipjakiLabel: "status_keberlakuan", dataType: "Enum", allowedValues: ["Berlaku", "Diubah", "Dicabut"], description: "Keabsahan hukum regulasi saat ini" },
+    { key: "downloadUrl", label: "Berkas PDF Regulasi", sipjakiLabel: "berkas_regulasi", dataType: "String", description: "Nama atau tautan berkas dokumen resmi" }
+  ],
+  documentFields: [
+    { key: "downloadUrl", label: "Salinan Berkas PDF Peraturan", accept: ".pdf", maxSizeMb: 10, required: true }
+  ],
+  importColumns: [
+    { key: "category", label: "Kategori Regulasi", required: true, example: "Peraturan Menteri PUPR" },
+    { key: "number", label: "Nomor Peraturan", required: true, example: "Nomor 1 Tahun 2023" },
+    { key: "year", label: "Tahun Penetapan", required: true, example: "2023" },
+    { key: "title", label: "Judul Peraturan", required: true, example: "Pedoman Pengawasan Penyelenggaraan Jasa Konstruksi" },
+    { key: "summary", label: "Ringkasan Muatan", required: true, example: "Panduan teknis pengawasan tertib usaha, tertib penyelenggaraan, dan tertib pemanfaatan jakon di daerah." },
+    { key: "status", label: "Status Keberlakuan", required: false, example: "Berlaku" }
+  ],
+  sampleRows: [
+    { category: "Peraturan Daerah Kab. Bogor", number: "Nomor 4 Tahun 2024", year: 2024, title: "Penyelenggaraan Jasa Konstruksi di Kabupaten Bogor", summary: "Pengaturan pembinaan, sertifikasi TKK lokal, pengawasan kepatuhan BUJK, serta SMKK di Kabupaten Bogor.", status: "Berlaku" }
+  ],
+  dictionaryItems: [
+    { field: "nomor_peraturan", label: "Nomor Peraturan", type: "String", description: "Nomor dan tahun peraturan", example: "Nomor 1 Tahun 2023" },
+    { field: "status_keberlakuan", label: "Status Hukum", type: "Enum", description: "Status apakah masih berlaku", example: "Berlaku" }
+  ]
+};
+
+// ==========================================
 // REGISTRY TEMPLATE
 // ==========================================
 export const ALL_SIPJAKI_TEMPLATES: Record<string, SipjakiTemplate> = {
@@ -1040,7 +1290,13 @@ export const ALL_SIPJAKI_TEMPLATES: Record<string, SipjakiTemplate> = {
   bujk: TEMPLATE_BUJK,
   pelatihan: TEMPLATE_PELATIHAN,
   "pelaksanaan-simak": TEMPLATE_PELAKSANAAN,
-  rekomendasi: TEMPLATE_REKOMENDASI
+  rekomendasi: TEMPLATE_REKOMENDASI,
+  "laporan-pelatihan": TEMPLATE_LAPORAN_PELATIHAN,
+  "perencanaan-sdm": TEMPLATE_PERENCANAAN_SDM,
+  "perencanaan-anggaran": TEMPLATE_PERENCANAAN_ANGGARAN,
+  "perencanaan-timeline": TEMPLATE_PERENCANAAN_TIMELINE,
+  "perencanaan-pelatihan": TEMPLATE_PERENCANAAN_PELATIHAN,
+  regulasi: TEMPLATE_REGULASI
 };
 
 export function getSipjakiTemplate(id: string): SipjakiTemplate | undefined {

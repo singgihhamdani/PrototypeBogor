@@ -4,12 +4,18 @@ import {
   BookOpen, Search, Download, Calendar, FileText, 
   Plus, CheckCircle2, Eye, Trash2, ShieldCheck, 
   Layers, Filter, ArrowUpRight, Scale, ExternalLink,
-  CheckCircle, AlertCircle, Building2, HardHat
+  CheckCircle, AlertCircle, Building2, HardHat, FileSpreadsheet
 } from "lucide-react";
 import regulationsData from "@/data/regulations.json";
 import DataTableView, { ColumnDef } from "@/components/common/data-table-view";
 import ModalForm from "@/components/common/modal-form";
 import FileUploader from "@/components/common/file-uploader";
+import BatchImportModal from "@/components/common/batch-import-modal";
+import DocStatusBadge from "@/components/common/doc-status-badge";
+import DocumentUploadMiniModal from "@/components/common/document-upload-mini-modal";
+import DocCompletionBar from "@/components/common/doc-completion-bar";
+import { TEMPLATE_REGULASI } from "@/lib/sipjaki-templates";
+import { logDataActivity } from "@/lib/audit-log";
 import { useResponsive } from "@/lib/use-responsive";
 
 export interface RegulationItem {
@@ -25,11 +31,13 @@ export interface RegulationItem {
   dateEnacted: string;
   status: "Berlaku" | "Diubah" | "Dicabut";
   downloadUrl?: string;
+  _docStatus?: "complete" | "pending";
 }
 
 const initialRegulations: RegulationItem[] = (regulationsData as any[]).map((r) => ({
   ...r,
-  status: r.status || "Berlaku"
+  status: r.status || "Berlaku",
+  _docStatus: r.downloadUrl ? "complete" : "pending"
 }));
 
 const CATEGORIES = [
@@ -52,8 +60,11 @@ export default function RegulasiPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Semua");
   
-  // Modal states
+  // Modal states & Batch Import
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
+  const [docUploadTarget, setDocUploadTarget] = useState<RegulationItem | null>(null);
+  const [filterDocPending, setFilterDocPending] = useState(false);
   const [selectedReg, setSelectedReg] = useState<RegulationItem | null>(null);
 
   // Form State
@@ -81,8 +92,74 @@ export default function RegulasiPage() {
       (r.relatedModules && r.relatedModules.some(m => m.toLowerCase().includes(q)));
       
     const matchCat = category === "Semua" || r.category === category;
-    return matchSearch && matchCat;
+    const matchDoc = !filterDocPending || r._docStatus === "pending" || !r.downloadUrl;
+    return matchSearch && matchCat && matchDoc;
   });
+
+  // Filter for CMS
+  const filteredCms = regulations.filter((r) => {
+    const matchDoc = !filterDocPending || r._docStatus === "pending" || !r.downloadUrl;
+    return matchDoc;
+  });
+
+  const handleBatchCommit = (parsedRows: any[]) => {
+    const formatted: RegulationItem[] = parsedRows.map((row, idx) => ({
+      id: `REG-${String(regulations.length + idx + 1).padStart(3, "0")}`,
+      number: row.number || `Regulasi Baru No. ${idx + 1}`,
+      title: row.title || "Regulasi Jasa Konstruksi",
+      category: row.category || "Peraturan Daerah Kab. Bogor",
+      year: Number(row.year) || 2026,
+      dateEnacted: row.dateEnacted || new Date().toISOString().split("T")[0],
+      summary: row.summary || "Dasar regulasi dan kebijakan teknis jasa konstruksi.",
+      policyMandate: row.policyMandate || "Mandat pengawasan tertib jasa konstruksi.",
+      relatedModules: ["Pengawasan 3 Tertib"],
+      fileSize: "2.5 MB",
+      downloadUrl: row.downloadUrl || "",
+      status: (row.status as any) || "Berlaku",
+      _docStatus: row._docStatus || "pending"
+    }));
+    setRegulations([...formatted, ...regulations]);
+    logDataActivity({
+      action: "import",
+      module: "Regulasi & Kebijakan",
+      format: "xlsx",
+      recordCount: formatted.length,
+      user: "Bagian Hukum & Pembina Jakon",
+      status: "success",
+      fileName: `${TEMPLATE_REGULASI.exportFileName}.xlsx`,
+      details: `Impor batch ${formatted.length} regulasi kebijakan - dokumen naskah PDF dapat disusulkan`
+    });
+    alert(`Berhasil mengimpor ${formatted.length} data regulasi! Dokumen PDF lembaran resmi dapat diunggah menyusul.`);
+  };
+
+  const handleSaveUploadedDoc = (files: Record<string, File | null>, fileNames: Record<string, string>) => {
+    if (!docUploadTarget) return;
+    const newDocName = fileNames["downloadUrl"] || docUploadTarget.downloadUrl || `${docUploadTarget.number.replace(/[/\\?%*:|"<>]/g, "_")}.pdf`;
+    setRegulations((prev) =>
+      prev.map((item) => {
+        if (item.id === docUploadTarget.id) {
+          return {
+            ...item,
+            downloadUrl: newDocName,
+            _docStatus: "complete"
+          };
+        }
+        return item;
+      })
+    );
+    logDataActivity({
+      action: "doc_upload",
+      module: "Regulasi & Kebijakan",
+      format: "pdf",
+      recordCount: 1,
+      user: "Bagian Hukum & Pembina Jakon",
+      status: "success",
+      fileName: newDocName,
+      details: `Upload dokumen salinan PDF regulasi: ${docUploadTarget.number}`
+    });
+    alert(`Dokumen "${newDocName}" berhasil diunggah! Status kelengkapan regulasi diperbarui menjadi Lengkap.`);
+    setDocUploadTarget(null);
+  };
 
   // Download Handler
   const handleDownload = (reg: RegulationItem) => {
@@ -127,7 +204,9 @@ export default function RegulasiPage() {
       relatedModules: modulesList,
       fileSize: fileSizeFormatted,
       dateEnacted: formData.dateEnacted,
-      status: formData.status
+      status: formData.status,
+      downloadUrl: formData.uploadedFile ? formData.uploadedFile.name : "",
+      _docStatus: formData.uploadedFile ? "complete" : "pending"
     };
 
     setRegulations([newReg, ...regulations]);
@@ -194,14 +273,23 @@ export default function RegulasiPage() {
             </div>
           )}
           <div style={{ fontSize: "10px", color: "#64748B", marginTop: "4px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-            <span>Berkas: {row.fileSize}</span>
-            {row.downloadUrl && (
-              <span style={{ color: "#166534", fontWeight: 700, backgroundColor: "#DCFCE7", padding: "1px 6px", borderRadius: "4px" }}>
-                ✓ Berkas Resmi Tersedia
-              </span>
-            )}
+            <span>Ukuran: {row.fileSize}</span>
           </div>
         </div>
+      )
+    },
+    {
+      key: "downloadUrl",
+      label: "BERKAS SALINAN",
+      width: "160px",
+      align: "center",
+      render: (row) => (
+        <DocStatusBadge
+          status={row._docStatus || (row.downloadUrl ? "complete" : "pending")}
+          fileName={row.downloadUrl}
+          documentLabel="Naskah PDF"
+          onClick={() => setDocUploadTarget(row)}
+        />
       )
     },
     {
@@ -274,27 +362,51 @@ export default function RegulasiPage() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsUploadOpen(true)}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            backgroundColor: "#0F2E5C",
-            color: "#FFFFFF",
-            border: "none",
-            borderRadius: "10px",
-            padding: "10px 18px",
-            fontSize: "12px",
-            fontWeight: 800,
-            cursor: "pointer",
-            boxShadow: "0 2px 6px rgba(15, 46, 92, 0.25)"
-          }}
-        >
-          <Plus style={{ width: "16px", height: "16px", color: "#FFC000" }} />
-          <span>Unggah Regulasi Baru</span>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={() => setIsBatchImportOpen(true)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              backgroundColor: "#FFFFFF",
+              color: "#0F2E5C",
+              border: "1px solid #CBD5E1",
+              borderRadius: "10px",
+              padding: "10px 16px",
+              fontSize: "12px",
+              fontWeight: 800,
+              cursor: "pointer",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)"
+            }}
+          >
+            <FileSpreadsheet style={{ width: "16px", height: "16px", color: "#10B981" }} />
+            <span>Import Batch (Excel)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsUploadOpen(true)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              backgroundColor: "#0F2E5C",
+              color: "#FFFFFF",
+              border: "none",
+              borderRadius: "10px",
+              padding: "10px 18px",
+              fontSize: "12px",
+              fontWeight: 800,
+              cursor: "pointer",
+              boxShadow: "0 2px 6px rgba(15, 46, 92, 0.25)"
+            }}
+          >
+            <Plus style={{ width: "16px", height: "16px", color: "#FFC000" }} />
+            <span>Unggah Regulasi Baru</span>
+          </button>
+        </div>
       </div>
 
       {/* Tabs Navigation */}
@@ -548,7 +660,14 @@ export default function RegulasiPage() {
                     {reg.fileSize}
                   </span>
                   
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                    <DocStatusBadge
+                      status={reg._docStatus || (reg.downloadUrl ? "complete" : "pending")}
+                      fileName={reg.downloadUrl}
+                      documentLabel="Naskah PDF"
+                      onClick={() => setDocUploadTarget(reg)}
+                    />
+
                     <button
                       type="button"
                       onClick={() => setSelectedReg(reg)}
@@ -607,13 +726,22 @@ export default function RegulasiPage() {
 
       {/* Tab 2: CMS Management Table */}
       {activeTab === "cms" && (
-        <DataTableView<RegulationItem>
-          title="Tabel Master Regulasi Jasa Konstruksi Daerah & Nasional"
-          subtitle="Basis data perundang-undangan acuan tertib pembinaan & audit pengawasan SIMAK"
-          data={regulations}
-          columns={cmsColumns}
-          exportFileName="regulasi-jasa-konstruksi-bogor"
-          actionsHeader="AKSI KELOLA"
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {/* Indikator Kelengkapan Dokumen */}
+          <DocCompletionBar
+            records={regulations}
+            label="Kelengkapan Berkas Salinan Resmi Regulasi (PDF)"
+            filterActive={filterDocPending}
+            onToggleFilter={() => setFilterDocPending(!filterDocPending)}
+          />
+
+          <DataTableView<RegulationItem>
+            title={`Tabel Master Regulasi Jasa Konstruksi Daerah & Nasional (${filteredCms.length})`}
+            subtitle="Basis data perundang-undangan acuan tertib pembinaan & audit pengawasan SIMAK"
+            data={filteredCms}
+            columns={cmsColumns}
+            exportFileName="regulasi-jasa-konstruksi-bogor"
+            actionsHeader="AKSI KELOLA"
           actionsRender={(row) => (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
               <button
@@ -681,6 +809,7 @@ export default function RegulasiPage() {
             </div>
           )}
         />
+        </div>
       )}
 
       {/* Modal Unggah Regulasi Baru */}
@@ -1028,6 +1157,28 @@ export default function RegulasiPage() {
           </div>
         </ModalForm>
       )}
+
+      {/* Mini Modal Unggah Dokumen Susulan */}
+      {docUploadTarget && (
+        <DocumentUploadMiniModal
+          isOpen={!!docUploadTarget}
+          onClose={() => setDocUploadTarget(null)}
+          title={`Unggah Naskah Regulasi: ${docUploadTarget.number}`}
+          documentFields={TEMPLATE_REGULASI.documentFields || []}
+          existingDocuments={{
+            downloadUrl: docUploadTarget.downloadUrl
+          }}
+          onSave={handleSaveUploadedDoc}
+        />
+      )}
+
+      {/* Modal Batch Import Excel */}
+      <BatchImportModal
+        isOpen={isBatchImportOpen}
+        onClose={() => setIsBatchImportOpen(false)}
+        template={TEMPLATE_REGULASI}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }

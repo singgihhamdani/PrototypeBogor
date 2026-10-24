@@ -6,9 +6,12 @@ import { TertibType, TERTIB_CONFIGS } from "@/lib/tertib-config";
 import { mockSDMRecords, SDMRecord } from "@/data/tertib-mock-data";
 import { 
   StatusBadge, FileUploader, DataTableView, 
-  ModalForm, ColumnDef 
+  ModalForm, ColumnDef, BatchImportModal,
+  DocStatusBadge, DocumentUploadMiniModal, DocCompletionBar
 } from "@/components/common";
-import { Users, Plus, Download, FileText, Eye, Shield, CheckCircle2, Award } from "lucide-react";
+import { Users, Plus, Download, FileText, Eye, Shield, CheckCircle2, Award, FileSpreadsheet } from "lucide-react";
+import { TEMPLATE_PERENCANAAN_SDM } from "@/lib/sipjaki-templates";
+import { logDataActivity } from "@/lib/audit-log";
 
 interface PerencanaanSDMViewProps {
   tertibType: TertibType;
@@ -16,11 +19,17 @@ interface PerencanaanSDMViewProps {
 
 export default function PerencanaanSDMView({ tertibType }: PerencanaanSDMViewProps) {
   const config = TERTIB_CONFIGS[tertibType];
-  const [data, setData] = useState<SDMRecord[]>(
-    mockSDMRecords.filter((r) => r.tertibType === tertibType)
+  const [data, setData] = useState<SDMRecord[]>(() =>
+    mockSDMRecords.filter((r) => r.tertibType === tertibType).map((r) => ({
+      ...r,
+      _docStatus: r._docStatus || "complete"
+    }))
   );
   const [filterStatus, setFilterStatus] = useState("Semua");
+  const [filterDocPending, setFilterDocPending] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
+  const [docUploadTarget, setDocUploadTarget] = useState<SDMRecord | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form State
@@ -31,11 +40,66 @@ export default function PerencanaanSDMView({ tertibType }: PerencanaanSDMViewPro
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const filteredData = data.filter((item) => {
-    if (filterStatus === "Semua") return true;
-    return item.status === filterStatus;
+    const matchStatus = filterStatus === "Semua" || item.status === filterStatus;
+    const matchDoc = !filterDocPending || item._docStatus === "pending" || !item.dokumen;
+    return matchStatus && matchDoc;
   });
 
   const totalSDM = data.reduce((acc, curr) => acc + curr.jumlahSdm, 0);
+
+  const handleBatchCommit = (parsedRows: any[]) => {
+    const formatted: SDMRecord[] = parsedRows.map((row, idx) => ({
+      id: `SDM-${Date.now().toString().slice(-4)}-${idx + 1}`,
+      tertibType,
+      namaTim: row.namaTim || `Tim Pengawas ${row.wilayah || "Wilayah " + (idx + 1)}`,
+      wilayah: row.wilayah || "Kabupaten Bogor",
+      jumlahSdm: Number(row.jumlahSdm) || 6,
+      tahun: String(row.tahun || "2026"),
+      dokumen: row.dokumen || "",
+      status: "Menunggu Verifikasi",
+      _docStatus: row._docStatus || "pending"
+    }));
+    setData([...formatted, ...data]);
+    logDataActivity({
+      action: "import",
+      module: `Perencanaan SDM Pengawas (${config.shortTitle})`,
+      format: "xlsx",
+      recordCount: formatted.length,
+      user: "Admin Pembina Jakon",
+      status: "success",
+      fileName: `${TEMPLATE_PERENCANAAN_SDM.exportFileName}.xlsx`,
+      details: `Impor batch ${formatted.length} tim pengawas (${config.shortTitle}) - dokumen SK dapat disusulkan`
+    });
+    alert(`Berhasil mengimpor ${formatted.length} data tim pengawas! Dokumen SK dapat diunggah menyusul.`);
+  };
+
+  const handleSaveUploadedDoc = (files: Record<string, File | null>, fileNames: Record<string, string>) => {
+    if (!docUploadTarget) return;
+    const newDocName = fileNames["dokumen"] || docUploadTarget.dokumen || `SK_Tim_${docUploadTarget.tahun}_${docUploadTarget.id}.pdf`;
+    setData((prev) =>
+      prev.map((item) => {
+        if (item.id === docUploadTarget.id) {
+          return {
+            ...item,
+            dokumen: newDocName,
+            _docStatus: "complete"
+          };
+        }
+        return item;
+      })
+    );
+    logDataActivity({
+      action: "doc_upload",
+      module: `Perencanaan SDM Pengawas (${config.shortTitle})`,
+      format: "pdf",
+      recordCount: 1,
+      user: "Admin Pembina Jakon",
+      status: "success",
+      fileName: newDocName,
+      details: `Unggah SK Tim Pengawas susulan untuk: ${docUploadTarget.namaTim || docUploadTarget.wilayah}`
+    });
+    setDocUploadTarget(null);
+  };
 
   const handleAddSDM = (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,27 +192,12 @@ export default function PerencanaanSDMView({ tertibType }: PerencanaanSDMViewPro
       label: "DOKUMEN SK",
       sortable: false,
       render: (row) => (
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            alert(`Mengunduh berkas ${row.dokumen}...`);
-          }}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            fontSize: "11px",
-            fontWeight: 700,
-            color: "#2563EB",
-            textDecoration: "none"
-          }}
-        >
-          <FileText style={{ width: "13px", height: "13px" }} />
-          <span style={{ maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {row.dokumen}
-          </span>
-        </a>
+        <DocStatusBadge
+          status={row._docStatus || (row.dokumen ? "complete" : "pending")}
+          fileName={row.dokumen}
+          documentLabel="SK Tim Pengawas"
+          onClick={() => setDocUploadTarget(row)}
+        />
       )
     },
     {
@@ -175,6 +224,12 @@ export default function PerencanaanSDMView({ tertibType }: PerencanaanSDMViewPro
         description="Kelola alokasi tim personil, pengawas teknis bersertifikat, dan penetapan SK Bupati/Kadis untuk kegiatan pengawasan di Kabupaten Bogor."
         legalBasis={config.legalBasis}
         actionButtons={[
+          {
+            label: "Import Batch (Excel)",
+            icon: FileSpreadsheet,
+            variant: "outline",
+            onClick: () => setIsBatchImportOpen(true)
+          },
           {
             label: "Tambah SDM Pengawas",
             icon: Plus,
@@ -380,10 +435,23 @@ export default function PerencanaanSDMView({ tertibType }: PerencanaanSDMViewPro
         </div>
       </div>
 
+      {/* Doc Completion Progress Bar */}
+      <DocCompletionBar
+        total={data.length}
+        completed={data.filter((d) => d._docStatus === "complete" || Boolean(d.dokumen)).length}
+        label="Kelengkapan SK Tim Pengawas"
+        isFilterActive={filterDocPending}
+        onFilterPending={() => setFilterDocPending((prev) => !prev)}
+      />
+
       {/* Reusable DataTableView */}
       <DataTableView<SDMRecord>
         title={`Daftar Penugasan SDM Pengawas (${filteredData.length})`}
-        subtitle="Data personalia dan legalitas SK Tim Pengawas Teknis Kabupaten Bogor"
+        subtitle={
+          filterDocPending
+            ? "Menampilkan tim pengawas yang belum mengunggah salinan SK penetapan (dapat disusulkan)"
+            : "Data personalia dan legalitas SK Tim Pengawas Teknis Kabupaten Bogor"
+        }
         data={filteredData}
         columns={columns}
         defaultPageSize={5}
@@ -531,6 +599,34 @@ export default function PerencanaanSDMView({ tertibType }: PerencanaanSDMViewPro
           onFileSelect={(file) => setUploadedFile(file)}
         />
       </ModalForm>
+
+      {/* Mini Modal Upload Dokumen SK Susulan */}
+      {docUploadTarget && (
+        <DocumentUploadMiniModal
+          isOpen={Boolean(docUploadTarget)}
+          onClose={() => setDocUploadTarget(null)}
+          title={`Unggah SK Tim — ${docUploadTarget.namaTim || docUploadTarget.wilayah}`}
+          subtitle={`${docUploadTarget.wilayah} • Tahun ${docUploadTarget.tahun} • ${docUploadTarget.jumlahSdm} Personil`}
+          documentFields={TEMPLATE_PERENCANAAN_SDM.documentFields || [
+            { key: "dokumen", label: "SK Tim Pengawas (PDF)", accept: ".pdf", maxSizeMb: 5, required: true }
+          ]}
+          currentValues={{ dokumen: docUploadTarget.dokumen }}
+          onSave={handleSaveUploadedDoc}
+        />
+      )}
+
+      {/* Batch Import Modal */}
+      <BatchImportModal<SDMRecord>
+        isOpen={isBatchImportOpen}
+        onClose={() => setIsBatchImportOpen(false)}
+        title={`Import Batch SDM Pengawas (${config.shortTitle})`}
+        subtitle="Unggah spreadsheet data personil tim pengawas sekaligus (Dokumen SK dapat disusulkan)"
+        templateFileName={`${TEMPLATE_PERENCANAAN_SDM.exportFileName}_template.xlsx`}
+        expectedColumns={TEMPLATE_PERENCANAAN_SDM.importColumns}
+        sampleRows={TEMPLATE_PERENCANAAN_SDM.sampleRows}
+        template={TEMPLATE_PERENCANAAN_SDM}
+        onCommit={handleBatchCommit}
+      />
     </div>
   );
 }
