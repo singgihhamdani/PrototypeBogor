@@ -136,7 +136,7 @@ export default function RekapitulasiPelatihanPage() {
           { label: "Pelatihan & TKK", href: "/pelatihan" },
           { label: "Rekapitulasi TKK Pelatihan" }
         ]}
-        badgeText={dbStatus.source === "supabase" ? "Database Supabase: Pilar 5" : "Cache Lokal: Pilar 5"}
+        badgeText={dbStatus.source === "supabase" ? "Database PostgreSQL: Pilar 5" : "Cache Lokal: Pilar 5"}
         badgeBg={dbStatus.source === "supabase" ? "#DCFCE7" : "#FEF3C7"}
         badgeColor={dbStatus.source === "supabase" ? "#166534" : "#92400E"}
         title="Rekapitulasi TKK Pelatihan & Sertifikasi"

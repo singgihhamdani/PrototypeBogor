@@ -182,7 +182,7 @@ export default function DashboardPage() {
       label: "Total BUJK Terdaftar", 
       value: stats ? String(stats.bujk.total) : "10", 
       sub: stats ? `${stats.bujk.besar} Besar · ${stats.bujk.menengah} Menengah · ${stats.bujk.kecil} Kecil` : "3 Besar · 4 Menengah · 3 Kecil", 
-      badge: stats?.source === "supabase" ? "Supabase Live" : "Data Lokal",
+      badge: stats?.source === "supabase" ? "PostgreSQL (Live)" : "Data Lokal",
       badgeBg: "#ECFDF5",
       badgeColor: "#059669",
       isPositive: true,
@@ -281,7 +281,7 @@ export default function DashboardPage() {
             {/* Live Database Status Badge */}
             <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", backgroundColor: stats?.source === "supabase" ? "rgba(16, 185, 129, 0.2)" : "rgba(245, 158, 11, 0.2)", padding: "6px 12px", fontSize: "11px", fontWeight: 800, color: stats?.source === "supabase" ? "#A7F3D0" : "#FDE68A", border: `1px solid ${stats?.source === "supabase" ? "rgba(16, 185, 129, 0.4)" : "rgba(245, 158, 11, 0.4)"}` }}>
               <DbIcon style={{ width: "12px", height: "12px" }} />
-              <span>{stats?.source === "supabase" ? "PostgreSQL Supabase (Live)" : "Cache Lokal"}</span>
+              <span>{stats?.source === "supabase" ? "PostgreSQL (Live)" : "Cache Lokal"}</span>
             </div>
           </div>
 

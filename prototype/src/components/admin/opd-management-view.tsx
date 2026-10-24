@@ -85,6 +85,8 @@ export default function OpdManagementView() {
       });
       if (res.success && res.data) {
         setOpds([res.data, ...opds]);
+        showToast(`Satuan Kerja baru ${saved.kode} berhasil disimpan ke basis data PostgreSQL.`);
+      } else {
         const fallbackRecord: OpdRecord = {
           ...saved,
           kepalaOpd: saved.kepalaOpd || "",
@@ -207,7 +209,7 @@ export default function OpdManagementView() {
                 }}
               >
                 <DbIcon style={{ width: "11px", height: "11px" }} />
-                <span>{dataStatus.source === "supabase" ? "PostgreSQL Supabase (Live)" : "Cadangan Lokal"}</span>
+                <span>{dataStatus.source === "supabase" ? "PostgreSQL (Live)" : "Cadangan Lokal"}</span>
               </span>
             </div>
             <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>

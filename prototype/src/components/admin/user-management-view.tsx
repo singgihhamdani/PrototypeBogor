@@ -291,7 +291,7 @@ export default function UserManagementView() {
                     backgroundColor: isSupabase ? "#22C55E" : "#94A3B8",
                   }}
                 />
-                {isSupabase ? "Supabase Live Auth" : "Demo Mode Mock"}
+                {isSupabase ? "PostgreSQL Live Auth" : "Demo Mode Mock"}
               </span>
             </div>
             <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>

@@ -31,7 +31,7 @@ export async function fetchBUJKList(): Promise<{ data: BUJKItem[]; status: DataS
         if (!error && data && data.length > 0) {
           return {
             data,
-            status: { source: "supabase", message: "Live Supabase PostgreSQL Database" }
+            status: { source: "supabase", message: "Live PostgreSQL Database" }
           };
         }
       }
@@ -84,7 +84,7 @@ export async function createBUJK(item: BUJKInsert): Promise<{ success: boolean; 
       }
     } catch (err: any) {
       console.error("Error creating BUJK on Supabase:", err);
-      return { success: false, error: err.message || "Gagal menyimpan ke Supabase" };
+      return { success: false, error: err.message || "Gagal menyimpan ke basis data PostgreSQL" };
     }
   }
 
@@ -191,7 +191,7 @@ export async function fetchPaketList(): Promise<{ data: PaketItem[]; status: Dat
         if (!error && data && data.length > 0) {
           return {
             data: data as PaketItem[],
-            status: { source: "supabase", message: "Live Supabase PostgreSQL Database" }
+            status: { source: "supabase", message: "Live PostgreSQL Database" }
           };
         }
       }
@@ -250,7 +250,7 @@ export async function createPaket(item: PaketInsert): Promise<{ success: boolean
       }
     } catch (err: any) {
       console.error("Error creating Paket on Supabase:", err);
-      return { success: false, error: err.message || "Gagal menyimpan ke Supabase" };
+      return { success: false, error: err.message || "Gagal menyimpan ke basis data PostgreSQL" };
     }
   }
 
@@ -316,7 +316,7 @@ export async function fetchTKKList(): Promise<{ data: TKKItem[]; status: DataSou
         if (!error && data && data.length > 0) {
           return {
             data,
-            status: { source: "supabase", message: "Live Supabase PostgreSQL Database" }
+            status: { source: "supabase", message: "Live PostgreSQL Database" }
           };
         }
       }

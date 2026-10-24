@@ -219,7 +219,7 @@ export default function BUJKPage() {
               }}
             >
               <DbIcon style={{ width: "12px", height: "12px" }} />
-              {dataStatus.source === "supabase" ? "Supabase PostgreSQL (Live)" : "Mode Cadangan Lokal"}
+              {dataStatus.source === "supabase" ? "PostgreSQL (Live)" : "Mode Cadangan Lokal"}
             </span>
           </div>
 

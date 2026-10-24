@@ -156,7 +156,7 @@ export default function ProfilOpdPage() {
       setFormNama("");
       setFormKode("");
       setFormAlamat("");
-      alert(`Data OPD "${formNama}" berhasil didaftarkan ke Supabase & SIPJAKI Master!`);
+      alert(`Data OPD "${formNama}" berhasil didaftarkan ke basis data PostgreSQL & SIPJAKI Master!`);
     } catch (err: any) {
       setIsSubmitting(false);
       alert(`Gagal menyimpan OPD: ${err.message}`);

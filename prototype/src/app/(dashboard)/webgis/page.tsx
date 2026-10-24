@@ -128,7 +128,7 @@ export default function WebGISPage() {
               }}
             >
               <DbIcon style={{ width: "11px", height: "11px" }} />
-              <span>{dataStatus.source === "supabase" ? "PostgreSQL Supabase (Live)" : "Cadangan Lokal"}</span>
+              <span>{dataStatus.source === "supabase" ? "PostgreSQL (Live)" : "Cadangan Lokal"}</span>
             </span>
           </div>
           <h1 style={{ fontSize: isSmallScreen ? "20px" : "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
@@ -436,7 +436,7 @@ export default function WebGISPage() {
                   {selectedDistrict ? `Kecamatan ${currentDistrictName}` : "Semua Proyek"}
                 </h3>
                 <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>
-                  Menampilkan {filteredProjects.length} paket pekerjaan {dataStatus.source === "supabase" ? "Supabase Live" : "APBD 2026"}
+                  Menampilkan {filteredProjects.length} paket pekerjaan {dataStatus.source === "supabase" ? "PostgreSQL Live" : "APBD 2026"}
                 </p>
               </div>
               <span style={{ fontSize: "11px", fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "4px 10px", borderRadius: "8px" }}>

@@ -367,7 +367,7 @@ export default function PaketPekerjaanPage() {
               }}
             >
               <DbIcon style={{ width: "12px", height: "12px" }} />
-              {dataStatus.source === "supabase" ? "Supabase PostgreSQL (Live)" : "Mode Cadangan Lokal"}
+              {dataStatus.source === "supabase" ? "PostgreSQL (Live)" : "Mode Cadangan Lokal"}
             </span>
           </div>
           <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>

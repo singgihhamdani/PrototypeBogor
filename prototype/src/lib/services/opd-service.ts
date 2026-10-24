@@ -111,7 +111,7 @@ export async function fetchOpdList(): Promise<{ data: OpdRecord[]; status: DataS
 
           return {
             data: mapped,
-            status: { source: "supabase", message: "Live Supabase PostgreSQL Database" }
+            status: { source: "supabase", message: "Live PostgreSQL Database" }
           };
         }
       }

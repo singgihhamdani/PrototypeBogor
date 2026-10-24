@@ -66,7 +66,7 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
       icon: ShieldCheck,
       accentBg: "#FEF3C7",
       accentColor: "#92400E",
-      metric: `${pelaksanaanCount} Objek Terverifikasi (Supabase Live)`
+      metric: `${pelaksanaanCount} Objek Terverifikasi (PostgreSQL Live)`
     },
     {
       title: "3. Rekomendasi & Tindak Lanjut",
@@ -76,7 +76,7 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
       icon: AlertTriangle,
       accentBg: "#DCFCE7",
       accentColor: "#166534",
-      metric: `${rekomendasiCount} Rekomendasi Diterbitkan (Supabase Live)`
+      metric: `${rekomendasiCount} Rekomendasi Diterbitkan (PostgreSQL Live)`
     },
     {
       title: "4. Pelaporan Pengawasan",

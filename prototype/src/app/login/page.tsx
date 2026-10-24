@@ -389,7 +389,7 @@ export default function LoginPage() {
                     color: isSupabase ? "#4ADE80" : "#CBD5E1",
                     border: isSupabase ? "1px solid rgba(74, 222, 128, 0.3)" : "1px solid rgba(255,255,255,0.12)",
                   }}
-                  title={isSupabase ? "Terhubung ke Supabase PostgreSQL & Auth" : "Mode Simulasi Demo Tanpa Cloud"}
+                  title={isSupabase ? "Terhubung ke Basis Data PostgreSQL & Auth" : "Mode Simulasi Demo Tanpa Cloud"}
                 >
                   <span 
                     style={{ 
@@ -399,7 +399,7 @@ export default function LoginPage() {
                       backgroundColor: isSupabase ? "#22C55E" : "#94A3B8" 
                     }} 
                   />
-                  <span>{isSupabase ? "Supabase Cloud DB" : "Demo Mode DB"}</span>
+                  <span>{isSupabase ? "PostgreSQL (Live)" : "Demo Mode DB"}</span>
                 </div>
               </div>
 

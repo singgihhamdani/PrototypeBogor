@@ -177,7 +177,7 @@ export default function PelatihanPage() {
               border: `1px solid ${dbStatus.source === "supabase" ? "#A7F3D0" : "#FDE68A"}`
             }}>
               <DbIcon style={{ width: "11px", height: "11px" }} />
-              {dbStatus.source === "supabase" ? "Database Supabase (Live)" : "Cache Lokal"}
+              {dbStatus.source === "supabase" ? "Database PostgreSQL (Live)" : "Cache Lokal"}
             </span>
           </div>
           <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
@@ -390,7 +390,7 @@ export default function PelatihanPage() {
       {loading && (
         <div style={{ padding: "40px 20px", textAlign: "center", color: "#64748B", fontSize: "13px" }}>
           <RefreshCw style={{ width: "24px", height: "24px", margin: "0 auto 12px auto", animation: "spin 1s linear infinite", color: "#0F2E5C" }} />
-          <p style={{ margin: 0 }}>Menghubungkan ke database pelatihan Supabase...</p>
+          <p style={{ margin: 0 }}>Menghubungkan ke basis data PostgreSQL...</p>
         </div>
       )}
 

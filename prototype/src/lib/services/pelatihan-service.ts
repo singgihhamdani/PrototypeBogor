@@ -79,7 +79,7 @@ export async function fetchPelatihanList(): Promise<{ data: TrainingItem[]; stat
   if (!isSupabaseConfigured()) {
     return {
       data: fallbackTrainings,
-      status: { source: "fallback", message: "Supabase belum terkonfigurasi. Menggunakan cache lokal." }
+      status: { source: "fallback", message: "Basis data PostgreSQL belum terkonfigurasi. Menggunakan cache lokal." }
     };
   }
 
@@ -88,7 +88,7 @@ export async function fetchPelatihanList(): Promise<{ data: TrainingItem[]; stat
     if (!client) {
       return {
         data: fallbackTrainings,
-        status: { source: "fallback", message: "Klien Supabase tidak tersedia." }
+        status: { source: "fallback", message: "Klien basis data tidak tersedia." }
       };
     }
 
@@ -151,7 +151,7 @@ export async function fetchPelatihanList(): Promise<{ data: TrainingItem[]; stat
 
     return {
       data: mapped,
-      status: { source: "supabase", message: "Terhubung ke Supabase PostgreSQL (Pilar 5: Pelatihan TKK)." }
+      status: { source: "supabase", message: "Terhubung ke basis data PostgreSQL (Pilar 5: Pelatihan TKK)." }
     };
   } catch (err: any) {
     return {
@@ -256,7 +256,7 @@ export async function registerPesertaPelatihan(agendaId: string, participant: {
 
   try {
     const client = createClient();
-    if (!client) return { success: false, error: "Klien Supabase tidak tersedia." };
+    if (!client) return { success: false, error: "Klien basis data tidak tersedia." };
 
     const payload: PelatihanPesertaInsert = {
       agenda_id: agendaId,
@@ -336,7 +336,7 @@ export async function batchImportPelatihan(rawRows: Record<string, any>[]): Prom
   try {
     const client = createClient();
     if (!client) {
-      return { success: false, insertedCount: 0, error: "Klien Supabase tidak tersedia." };
+      return { success: false, insertedCount: 0, error: "Klien basis data tidak tersedia." };
     }
 
     const { error } = await (client.from("pelatihan_agenda") as any).upsert(newAgendas, { onConflict: "id" });
@@ -393,7 +393,7 @@ export async function fetchPerencanaanList(): Promise<{ data: PerencanaanItem[];
   try {
     const client = createClient();
     if (!client) {
-      return { data: defaultPerencanaan, status: { source: "fallback", message: "Klien Supabase tidak tersedia." } };
+      return { data: defaultPerencanaan, status: { source: "fallback", message: "Klien basis data tidak tersedia." } };
     }
 
     const { data, error } = await client
@@ -416,7 +416,7 @@ export async function fetchPerencanaanList(): Promise<{ data: PerencanaanItem[];
       status: r.status
     }));
 
-    return { data: mapped, status: { source: "supabase", message: "Terhubung ke Supabase." } };
+    return { data: mapped, status: { source: "supabase", message: "Terhubung ke basis data PostgreSQL." } };
   } catch (err: any) {
     return { data: defaultPerencanaan, status: { source: "fallback", message: err.message } };
   }
@@ -447,7 +447,7 @@ export async function createPerencanaanItem(item: {
 
   try {
     const client = createClient();
-    if (!client) return { success: false, error: "Klien Supabase tidak tersedia." };
+    if (!client) return { success: false, error: "Klien basis data tidak tersedia." };
 
     const payload: PelatihanPerencanaanInsert = {
       id: generatedId,
@@ -516,7 +516,7 @@ export async function fetchLaporanList(): Promise<{ data: LaporanItem[]; status:
   try {
     const client = createClient();
     if (!client) {
-      return { data: defaultLaporan, status: { source: "fallback", message: "Klien Supabase tidak tersedia." } };
+      return { data: defaultLaporan, status: { source: "fallback", message: "Klien basis data tidak tersedia." } };
     }
 
     const { data, error } = await client
@@ -540,7 +540,7 @@ export async function fetchLaporanList(): Promise<{ data: LaporanItem[]; status:
       _docStatus: "complete"
     }));
 
-    return { data: mapped, status: { source: "supabase", message: "Terhubung ke Supabase." } };
+    return { data: mapped, status: { source: "supabase", message: "Terhubung ke basis data PostgreSQL." } };
   } catch (err: any) {
     return { data: defaultLaporan, status: { source: "fallback", message: err.message } };
   }
@@ -572,7 +572,7 @@ export async function createLaporanItem(item: {
 
   try {
     const client = createClient();
-    if (!client) return { success: false, error: "Klien Supabase tidak tersedia." };
+    if (!client) return { success: false, error: "Klien basis data tidak tersedia." };
 
     const payload: PelatihanLaporanInsert = {
       id: generatedId,

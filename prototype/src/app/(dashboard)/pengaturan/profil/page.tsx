@@ -331,7 +331,7 @@ export default function ProfilPage() {
                   backgroundColor: isSupabase ? "#22C55E" : "#FFC000",
                 }}
               />
-              <span>{isSupabase ? "Database: Supabase Cloud (Live)" : "Database: Demo Mode"}</span>
+              <span>{isSupabase ? "Database: PostgreSQL (Live)" : "Database: Demo Mode"}</span>
             </div>
 
             <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.65)", fontWeight: 600 }}>

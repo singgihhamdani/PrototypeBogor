@@ -51,7 +51,7 @@ export async function fetchPelaksanaanList(tertibType: TertibType): Promise<{ da
 
           return {
             data: mapped,
-            status: { source: "supabase", message: "Live Supabase PostgreSQL Database" }
+            status: { source: "supabase", message: "Live PostgreSQL Database" }
           };
         }
       }
@@ -240,7 +240,7 @@ export async function fetchRekomendasiList(tertibType: TertibType): Promise<{ da
 
           return {
             data: mapped,
-            status: { source: "supabase", message: "Live Supabase PostgreSQL Database" }
+            status: { source: "supabase", message: "Live PostgreSQL Database" }
           };
         }
       }
@@ -314,7 +314,7 @@ export async function fetchSDMPerencanaanList(tertibType: TertibType): Promise<{
 
           return {
             data: mapped,
-            status: { source: "supabase", message: "Live Supabase PostgreSQL Database" }
+            status: { source: "supabase", message: "Live PostgreSQL Database" }
           };
         }
       }
