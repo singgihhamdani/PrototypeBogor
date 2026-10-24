@@ -16,54 +16,9 @@ import DocumentUploadMiniModal from "@/components/common/document-upload-mini-mo
 import DocCompletionBar from "@/components/common/doc-completion-bar";
 import { TEMPLATE_LAPORAN_PELATIHAN } from "@/lib/sipjaki-templates";
 import { logDataActivity } from "@/lib/audit-log";
+import { fetchLaporanList, createLaporanItem, LaporanItem } from "@/lib/services/pelatihan-service";
 
-interface LaporanPelatihanItem {
-  id: string;
-  nomorLaporan: string;
-  namaKegiatan: string;
-  tanggalSelesai: string;
-  jumlahLulusan: number;
-  lembagaSertifikasi: string;
-  dokumenBa: string;
-  status: "Terverifikasi" | "Menunggu Verifikasi" | "Ditolak";
-  _docStatus?: "complete" | "pending";
-}
-
-const mockLaporanPelatihan: LaporanPelatihanItem[] = [
-  {
-    id: "LAP-PEL-01",
-    nomorLaporan: "005/BA-LSP-GATAKI/VI/2026",
-    namaKegiatan: "Sertifikasi Uji Kompetensi Mandor Tukang Pasang Bata & Plesteran",
-    tanggalSelesai: "2026-03-28",
-    jumlahLulusan: 48,
-    lembagaSertifikasi: "LSP Gataki Karya Konstruksi",
-    dokumenBa: "BA_Kelulusan_Mandor_2026.pdf",
-    status: "Terverifikasi",
-    _docStatus: "complete"
-  },
-  {
-    id: "LAP-PEL-02",
-    nomorLaporan: "012/BA-LPK-BOGOR/V/2026",
-    namaKegiatan: "Bimtek & Uji Sertifikasi Petugas K3 Konstruksi Tingkat Muda",
-    tanggalSelesai: "2026-04-02",
-    jumlahLulusan: 62,
-    lembagaSertifikasi: "LSP Keselamatan Konstruksi Indonesia",
-    dokumenBa: "BA_Sertifikasi_K3_2026.pdf",
-    status: "Terverifikasi",
-    _docStatus: "complete"
-  },
-  {
-    id: "LAP-PEL-03",
-    nomorLaporan: "018/BA-LSP-ASTEKINDO/VII/2026",
-    namaKegiatan: "Fasilitasi Sertifikasi Juru Ukur (Surveyor) Berbasis SKK",
-    tanggalSelesai: "2026-04-10",
-    jumlahLulusan: 32,
-    lembagaSertifikasi: "LSP Astekindo Jawa Barat",
-    dokumenBa: "BA_Surveyor_2026.pdf",
-    status: "Menunggu Verifikasi",
-    _docStatus: "complete"
-  }
-];
+type LaporanPelatihanItem = LaporanItem;
 
 const tkkBatchColumns: BatchColumnDef[] = [
   { key: "nomorLaporan", label: "Nomor Berita Acara", required: true, example: "029/BA-LSP-GATAKI/IX/2026" },
@@ -79,7 +34,8 @@ const sampleBatchTkk = [
 ];
 
 export default function LaporanPelatihanPage() {
-  const [data, setData] = useState<LaporanPelatihanItem[]>(mockLaporanPelatihan);
+  const [data, setData] = useState<LaporanPelatihanItem[]>([]);
+  const [loading, setLoading] = useState(true);
   
   // Modals
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -98,6 +54,22 @@ export default function LaporanPelatihanPage() {
     lembagaSertifikasi: "LSP Gataki Karya Konstruksi",
     dokumenBa: "BA_Hasil_Uji_Kompetensi.pdf"
   });
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchLaporanList();
+      setData(res.data);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadData();
+  }, []);
 
   const handleBatchCommit = (parsedRows: any[]) => {
     const formatted: LaporanPelatihanItem[] = parsedRows.map((row, idx) => ({
@@ -155,27 +127,21 @@ export default function LaporanPelatihanPage() {
 
   const totalLulusan = data.reduce((acc, curr) => acc + curr.jumlahLulusan, 0);
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.namaKegiatan || !formData.nomorLaporan) {
       alert("Harap lengkapi nomor BA dan nama kegiatan sertifikasi!");
       return;
     }
 
-    const newId = `LAP-PEL-${String(data.length + 1).padStart(2, "0")}`;
-    const newItem: LaporanPelatihanItem = {
-      id: newId,
-      nomorLaporan: formData.nomorLaporan,
-      namaKegiatan: formData.namaKegiatan,
-      tanggalSelesai: formData.tanggalSelesai,
-      jumlahLulusan: Number(formData.jumlahLulusan) || 0,
-      lembagaSertifikasi: formData.lembagaSertifikasi,
-      dokumenBa: formData.dokumenBa,
-      status: "Menunggu Verifikasi"
-    };
-
-    setData([newItem, ...data]);
-    setIsCreateOpen(false);
+    const res = await createLaporanItem(formData);
+    if (res.success) {
+      alert("Laporan / Berita Acara berhasil disimpan ke database!");
+      setIsCreateOpen(false);
+      loadData();
+    } else {
+      alert(`Gagal menyimpan: ${res.error}`);
+    }
   };
 
   const handleConfirmVerify = (decision: "sesuai" | "tidak_sesuai", notes: string) => {

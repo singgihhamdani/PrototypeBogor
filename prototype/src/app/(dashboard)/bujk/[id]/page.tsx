@@ -1,17 +1,70 @@
 "use client";
-import { use } from "react";
-import { ArrowLeft, Building2, FileText, Award, Briefcase, MapPin, Phone, Mail, Calendar } from "lucide-react";
+import { use, useEffect, useState } from "react";
+import { ArrowLeft, Building2, FileText, Award, Briefcase, MapPin, Phone, Mail, Calendar, Loader2 } from "lucide-react";
 import Link from "next/link";
-import bujkData from "@/data/bujk.json";
 import { formatDate } from "@/lib/utils";
+import { fetchBUJKById } from "@/lib/services/master-data";
 
 export default function BUJKDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const bujk = bujkData.find((b) => b.id === id);
+  const [bujk, setBujk] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadDetail() {
+      setLoading(true);
+      try {
+        const item = await fetchBUJKById(id);
+        if (isMounted) {
+          if (item) {
+            setBujk({
+              id: item.id,
+              name: item.nama_badan_usaha,
+              type: item.bentuk_usaha,
+              nib: item.nib,
+              npwp: item.npwp,
+              leader: item.penanggung_jawab,
+              qualification: item.kualifikasi,
+              district: item.kecamatan,
+              districtId: item.kode_kecamatan || "01",
+              sbuCount: item.jumlah_sbu,
+              status: item.status_verifikasi,
+              phone: item.telepon || "-",
+              email: item.email || "-",
+              address: item.alamat,
+              sbuExpiry: item.tanggal_kedaluwarsa_sbu || "2027-12-31",
+              projectsActive: item.proyek_aktif_count
+            });
+          } else {
+            setBujk(null);
+          }
+        }
+      } catch (err) {
+        console.error("Gagal memuat detail BUJK:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadDetail();
+    return () => { isMounted = false; };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "50vh", gap: "12px" }}>
+        <Loader2 style={{ width: "28px", height: "28px", color: "#0F2E5C", animation: "spin 1s linear infinite" }} />
+        <p style={{ color: "#64748B", fontSize: "14px", fontWeight: 600 }}>Memuat profil Badan Usaha...</p>
+      </div>
+    );
+  }
 
   if (!bujk) return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "50vh" }}>
-      <p style={{ color: "#94A3B8", fontSize: "14px" }}>BUJK tidak ditemukan.</p>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "50vh", gap: "12px" }}>
+      <Building2 style={{ width: "40px", height: "40px", color: "#CBD5E1" }} />
+      <p style={{ color: "#94A3B8", fontSize: "14px", fontWeight: 600 }}>BUJK dengan ID {id} tidak ditemukan.</p>
+      <Link href="/bujk" style={{ fontSize: "12px", color: "#0F2E5C", fontWeight: 700 }}>Kembali ke Daftar BUJK</Link>
     </div>
   );
 

@@ -1,29 +1,51 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ModuleHeader from "@/components/layout/module-header";
 import { 
   GraduationCap, Download, Users, Award, 
-  Search, CheckCircle2, TrendingUp, Filter, Eye, BookOpen 
+  Search, CheckCircle2, TrendingUp, Filter, Eye, BookOpen, Database as DbIcon, RefreshCw
 } from "lucide-react";
-import trainingData from "@/data/training.json";
 import DataTableView, { ColumnDef } from "@/components/common/data-table-view";
 import ModalForm from "@/components/common/modal-form";
-
-type TrainingItem = typeof trainingData[0];
+import { fetchPelatihanList, TrainingItem, DataSourceStatus } from "@/lib/services/pelatihan-service";
 
 export default function RekapitulasiPelatihanPage() {
+  const [trainings, setTrainings] = useState<TrainingItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dbStatus, setDbStatus] = useState<DataSourceStatus>({
+    source: "supabase",
+    message: "Memuat data rekapitulasi..."
+  });
+
   const [selectedLevel, setSelectedLevel] = useState("Semua");
   const [selectedBatch, setSelectedBatch] = useState<TrainingItem | null>(null);
 
-  const totalQuota = trainingData.reduce((acc, curr) => acc + curr.quota, 0);
-  const totalRegistered = trainingData.reduce((acc, curr) => acc + curr.registered, 0);
-  const totalPassed = trainingData.reduce((acc, curr) => acc + curr.passed, 0);
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchPelatihanList();
+      setTrainings(res.data);
+      setDbStatus(res.status);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const totalQuota = trainings.reduce((acc, curr) => acc + (curr.quota || 0), 0);
+  const totalRegistered = trainings.reduce((acc, curr) => acc + (curr.registered || 0), 0);
+  const totalPassed = trainings.reduce((acc, curr) => acc + (curr.passed || 0), 0);
   const passRate = totalRegistered > 0 ? Math.round((totalPassed / totalRegistered) * 100) : 0;
 
   // Unique SKK Levels
-  const allLevels = ["Semua", ...Array.from(new Set(trainingData.map((t) => t.skkLevel)))];
+  const allLevels = ["Semua", ...Array.from(new Set(trainings.map((t) => t.skkLevel)))];
 
-  const filtered = trainingData.filter((t) => {
+  const filtered = trainings.filter((t) => {
     return selectedLevel === "Semua" || t.skkLevel === selectedLevel;
   });
 
@@ -114,13 +136,19 @@ export default function RekapitulasiPelatihanPage() {
           { label: "Pelatihan & TKK", href: "/pelatihan" },
           { label: "Rekapitulasi TKK Pelatihan" }
         ]}
-        badgeText="Pilar 5: Pelatihan & TKK"
-        badgeBg="#DCFCE7"
-        badgeColor="#166534"
+        badgeText={dbStatus.source === "supabase" ? "Database Supabase: Pilar 5" : "Cache Lokal: Pilar 5"}
+        badgeBg={dbStatus.source === "supabase" ? "#DCFCE7" : "#FEF3C7"}
+        badgeColor={dbStatus.source === "supabase" ? "#166534" : "#92400E"}
         title="Rekapitulasi TKK Pelatihan & Sertifikasi"
         description="Ringkasan agregat pencapaian sertifikasi kompetensi tenaga kerja konstruksi (TKK) per kualifikasi jenjang jabatan di Kabupaten Bogor."
         legalBasis="Permen PUPR No. 1/2023 & UU No. 2/2017"
         actionButtons={[
+          {
+            label: "Refresh Data",
+            icon: RefreshCw,
+            variant: "outline",
+            onClick: loadData
+          },
           {
             label: "Unduh Rekapitulasi (XLSX)",
             icon: Download,
@@ -141,7 +169,9 @@ export default function RekapitulasiPelatihanPage() {
         <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0" }}>
           <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Peserta Terdaftar</span>
           <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB", margin: "4px 0 2px 0" }}>{totalRegistered} Orang</h3>
-          <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>98.6% Kuota Terpenuhi</span>
+          <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 700 }}>
+            {totalQuota > 0 ? Math.round((totalRegistered / totalQuota) * 100) : 0}% Kuota Terpenuhi
+          </span>
         </div>
 
         <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", padding: "18px", border: "1px solid #E2E8F0" }}>
@@ -266,8 +296,8 @@ export default function RekapitulasiPelatihanPage() {
                         <div style={{ fontSize: "10px", color: "#64748B" }}>NIK: {p.nik} • {p.bujk}</div>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <span style={{ fontSize: "11px", fontWeight: 900, color: "#166534" }}>{p.score} (Lulus)</span>
-                        <div style={{ fontSize: "10px", fontFamily: "monospace", color: "#64748B" }}>{p.certNo}</div>
+                        <span style={{ fontSize: "11px", fontWeight: 900, color: "#166534" }}>{p.score !== undefined ? `${p.score} (Lulus)` : "Terdaftar"}</span>
+                        <div style={{ fontSize: "10px", fontFamily: "monospace", color: "#64748B" }}>{p.certNo || "-"}</div>
                       </div>
                     </div>
                   ))}

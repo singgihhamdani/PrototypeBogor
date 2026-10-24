@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Package, Search, Download, Plus, Eye, TrendingUp, 
   DollarSign, Calendar, CheckCircle2, Award, FileSpreadsheet,
-  UploadCloud, FileText, Check, AlertCircle
+  UploadCloud, FileText, Check, AlertCircle, Database as DbIcon, Loader2
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import projectsData from "@/data/projects.json";
@@ -15,6 +15,10 @@ import {
 import BatchImportModal, { BatchColumnDef } from "@/components/common/batch-import-modal";
 import { exportToSpreadsheet } from "@/lib/export-utils";
 import { TEMPLATE_PAKET_PEKERJAAN } from "@/lib/sipjaki-templates";
+import { 
+  fetchPaketList, createPaket, batchInsertPaket, 
+  DataSourceStatus, PaketInsert 
+} from "@/lib/services/master-data";
 
 const paketBatchColumns: BatchColumnDef[] = [
   { key: "id", label: "ID Paket", required: true, example: "P005" },
@@ -57,7 +61,12 @@ export interface ProjectItem {
 }
 
 export default function PaketPekerjaanPage() {
-  const [projects, setProjects] = useState<ProjectItem[]>(projectsData as ProjectItem[]);
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dataStatus, setDataStatus] = useState<DataSourceStatus>({ 
+    source: "fallback", 
+    message: "Menghubungkan ke basis data..." 
+  });
   const [search, setSearch] = useState("");
   const [filterSource, setFilterSource] = useState("Semua");
   const [filterStatus, setFilterStatus] = useState("Semua");
@@ -78,6 +87,48 @@ export default function PaketPekerjaanPage() {
   const [formStartDate, setFormStartDate] = useState("2026-04-01");
   const [formEndDate, setFormEndDate] = useState("2026-11-30");
 
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchPaketList();
+      const mapped: ProjectItem[] = res.data.map((p) => ({
+        id: p.id,
+        name: p.nama_paket,
+        fiscalYear: p.tahun_anggaran,
+        source: p.sumber_dana,
+        owner: p.nama_instansi,
+        contractor: p.nama_penyedia,
+        contractorId: p.bujk_id || "B001",
+        nib: p.nib_penyedia || "-",
+        contractValue: Number(p.nilai_kontrak),
+        status: p.status_pekerjaan,
+        contractType: p.jenis_kontrak || "Konstruksi",
+        contractChar: p.sifat_kontrak || "Harga Satuan",
+        startDate: p.tanggal_mulai,
+        endDate: p.tanggal_selesai,
+        physProgress: Number(p.progres_fisik),
+        physMonth: p.bulan_progres || "Agustus",
+        finProgress: Number(p.progres_keuangan),
+        finMonth: p.bulan_progres || "Agustus",
+        districtId: p.kode_kecamatan || "01",
+        lat: Number(p.lat) || -6.48,
+        lng: Number(p.lng) || 106.85,
+        planProgress: (p.kurva_s_rencana as number[]) || [0, 10, 30, 60, 85, 100],
+        realProgress: (p.kurva_s_realisasi as number[]) || [0, 5, 25, 55, 0, 0]
+      }));
+      setProjects(mapped);
+      setDataStatus(res.status);
+    } catch (err) {
+      console.error("Gagal memuat paket pekerjaan:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
   const filtered = projects.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
                         p.contractor.toLowerCase().includes(search.toLowerCase()) || 
@@ -92,38 +143,43 @@ export default function PaketPekerjaanPage() {
     ? Math.round(projects.reduce((acc, curr) => acc + curr.physProgress, 0) / projects.length)
     : 0;
 
-  const handleBatchCommit = (parsedData: Record<string, any>[]) => {
-    const newItems: ProjectItem[] = parsedData.map((d, i) => ({
-      id: d.id || `P00${projects.length + i + 1}`,
-      name: d.name || "Paket Baru",
-      fiscalYear: 2026,
-      source: d.source || "APBD",
-      owner: "DPU Kab. Bogor",
-      contractor: d.contractor || "PT Kontraktor Lokal",
-      contractorId: `B0${9 + i}`,
-      nib: "9876543210987",
-      contractValue: Number(String(d.contractValue).replace(/\D/g, "")) || 1000000000,
-      status: d.status || "Pelaksanaan",
-      contractType: "Konstruksi",
-      contractChar: "Harga Satuan",
-      startDate: "2026-04-15",
-      endDate: "2026-10-30",
-      physProgress: 15,
-      physMonth: "April",
-      finProgress: 20,
-      finMonth: "April",
-      districtId: "01",
-      lat: -6.48,
-      lng: 106.85,
-      planProgress: [0, 10, 25, 45, 65, 85, 100],
-      realProgress: [0, 15, 0, 0, 0, 0, 0]
-    }));
+  const handleBatchCommit = async (parsedData: Record<string, any>[]) => {
+    const dbPayloads: PaketInsert[] = parsedData.map((d, i) => {
+      const id = d.id || `P00${projects.length + i + 1}`;
+      const contractValue = Number(String(d.contractValue).replace(/\D/g, "")) || 1000000000;
+      return {
+        id,
+        nama_paket: d.name || "Paket Baru",
+        tahun_anggaran: 2026,
+        sumber_dana: (d.source as any) || "APBD",
+        nama_instansi: "DPU Kab. Bogor",
+        nama_penyedia: d.contractor || "PT Kontraktor Lokal",
+        nib_penyedia: "9876543210987",
+        nilai_kontrak: contractValue,
+        status_pekerjaan: (d.status as any) || "Pelaksanaan",
+        jenis_kontrak: "Konstruksi",
+        sifat_kontrak: "Harga Satuan",
+        tanggal_mulai: "2026-04-15",
+        tanggal_selesai: "2026-10-30",
+        progres_fisik: 15,
+        progres_keuangan: 20,
+        bulan_progres: "April",
+        kode_kecamatan: "01",
+        kecamatan: "Kabupaten Bogor",
+        lat: -6.48,
+        lng: 106.85,
+        kurva_s_rencana: [0, 10, 25, 45, 65, 85, 100],
+        kurva_s_realisasi: [0, 15, 0, 0, 0, 0, 0]
+      };
+    });
 
-    setProjects((prev) => [...newItems, ...prev]);
-    alert(`Berhasil mengimpor ${newItems.length} paket pekerjaan ke dalam sistem!`);
+    await batchInsertPaket(dbPayloads);
+    await loadData();
+    setShowImportModal(false);
+    alert(`Berhasil mengimpor ${dbPayloads.length} paket pekerjaan ke dalam sistem!`);
   };
 
-  const handleAddProject = (e: React.FormEvent) => {
+  const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName || !formContractor || !formValue) {
       alert("Mohon lengkapi Nama Paket, Kontraktor, dan Nilai Kontrak!");
@@ -137,41 +193,48 @@ export default function PaketPekerjaanPage() {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      const newProj: ProjectItem = {
+    try {
+      const payload: PaketInsert = {
         id: formId,
-        name: formName,
-        fiscalYear: 2026,
-        source: formSource,
-        owner: formOwner,
-        contractor: formContractor,
-        contractorId: `B${Date.now().toString().slice(-3)}`,
-        nib: formNib || "3201000000000",
-        contractValue: valNum,
-        status: "Pelaksanaan",
-        contractType: "Konstruksi",
-        contractChar: "Harga Satuan",
-        startDate: formStartDate,
-        endDate: formEndDate,
-        physProgress: 0,
-        physMonth: "Maret",
-        finProgress: 0,
-        finMonth: "Maret",
-        districtId: "01",
+        nama_paket: formName,
+        tahun_anggaran: 2026,
+        sumber_dana: formSource as any,
+        nama_instansi: formOwner,
+        nama_penyedia: formContractor,
+        nib_penyedia: formNib || "3201000000000",
+        nilai_kontrak: valNum,
+        status_pekerjaan: "Pelaksanaan",
+        jenis_kontrak: "Konstruksi",
+        sifat_kontrak: "Harga Satuan",
+        tanggal_mulai: formStartDate,
+        tanggal_selesai: formEndDate,
+        progres_fisik: 0,
+        progres_keuangan: 0,
+        bulan_progres: "Maret",
+        kode_kecamatan: "01",
+        kecamatan: "Kabupaten Bogor",
         lat: -6.48,
         lng: 106.85,
-        planProgress: [0, 15, 35, 60, 85, 100],
-        realProgress: [0, 0, 0, 0, 0, 0]
+        kurva_s_rencana: [0, 15, 35, 60, 85, 100],
+        kurva_s_realisasi: [0, 0, 0, 0, 0, 0]
       };
 
-      setProjects([newProj, ...projects]);
+      const res = await createPaket(payload);
+      if (res.success) {
+        setShowAddModal(false);
+        setFormName("");
+        setFormContractor("");
+        setFormValue("");
+        await loadData();
+        alert(`Paket Pekerjaan "${formName}" berhasil disimpan ke basis data!`);
+      } else {
+        alert(res.error || "Gagal menambahkan paket");
+      }
+    } catch (err: any) {
+      alert("Terjadi kesalahan: " + err.message);
+    } finally {
       setIsSubmitting(false);
-      setShowAddModal(false);
-      setFormName("");
-      setFormContractor("");
-      setFormValue("");
-      alert(`Paket Pekerjaan "${formName}" berhasil ditambahkan!`);
-    }, 600);
+    }
   };
 
   const columns: ColumnDef<ProjectItem>[] = [
@@ -267,9 +330,28 @@ export default function PaketPekerjaanPage() {
       {/* Header Bar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
             <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
               SIPJAKI Master Data • Pilar 2 Penyelenggaraan
+            </span>
+
+            {/* Indikator Status Database */}
+            <span 
+              style={{ 
+                display: "inline-flex", 
+                alignItems: "center", 
+                gap: "5px",
+                fontSize: "11px", 
+                fontWeight: 700, 
+                padding: "3px 10px", 
+                borderRadius: "9999px",
+                backgroundColor: dataStatus.source === "supabase" ? "#ECFDF5" : "#FFFBEB",
+                color: dataStatus.source === "supabase" ? "#065F46" : "#B45309",
+                border: `1px solid ${dataStatus.source === "supabase" ? "#A7F3D0" : "#FDE68A"}`
+              }}
+            >
+              <DbIcon style={{ width: "12px", height: "12px" }} />
+              {dataStatus.source === "supabase" ? "Supabase PostgreSQL (Live)" : "Mode Cadangan Lokal"}
             </span>
           </div>
           <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>

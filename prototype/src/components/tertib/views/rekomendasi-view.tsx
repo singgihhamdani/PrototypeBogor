@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ModuleHeader from "@/components/layout/module-header";
 import { TertibType, TERTIB_CONFIGS } from "@/lib/tertib-config";
 import { mockRekomendasiRecords, RekomendasiRecord } from "@/data/tertib-mock-data";
@@ -12,10 +12,14 @@ import FileUploader from "@/components/common/file-uploader";
 import { 
   AlertTriangle, Plus, Download, ShieldCheck, CheckCircle2, 
   Clock, AlertCircle, FileText, Printer, Trash2, Eye, 
-  Calendar, Building2, Send, Scale 
+  Calendar, Building2, Send, Scale, Database as DbIcon, Loader2
 } from "lucide-react";
 import { exportToSpreadsheet } from "@/lib/export-utils";
 import { TEMPLATE_REKOMENDASI } from "@/lib/sipjaki-templates";
+import { 
+  fetchRekomendasiList, updateTindakLanjutStatus, 
+  DataSourceStatus 
+} from "@/lib/services/pengawasan-service";
 
 interface RekomendasiViewProps {
   tertibType: TertibType;
@@ -23,9 +27,29 @@ interface RekomendasiViewProps {
 
 export default function RekomendasiView({ tertibType }: RekomendasiViewProps) {
   const config = TERTIB_CONFIGS[tertibType];
-  const [data, setData] = useState<RekomendasiRecord[]>(() =>
-    mockRekomendasiRecords.filter((r) => r.tertibType === tertibType)
-  );
+  const [data, setData] = useState<RekomendasiRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dataStatus, setDataStatus] = useState<DataSourceStatus>({
+    source: "fallback",
+    message: "Menghubungkan ke basis data..."
+  });
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchRekomendasiList(tertibType);
+      setData(res.data);
+      setDataStatus(res.status);
+    } catch (err) {
+      console.error("Gagal load rekomendasi:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [tertibType]);
 
   // Filter States
   const [filterTindakLanjut, setFilterTindakLanjut] = useState<string>("Semua");
@@ -106,28 +130,29 @@ export default function RekomendasiView({ tertibType }: RekomendasiViewProps) {
     setSelectedRecordForVerify(record);
   };
 
-  const handleConfirmVerify = (decision: "sesuai" | "tidak_sesuai", notes: string) => {
+  const handleConfirmVerify = async (decision: "sesuai" | "tidak_sesuai", notes: string) => {
     if (!selectedRecordForVerify) return;
     setIsVerifying(true);
 
-    setTimeout(() => {
-      const isApproved = decision === "sesuai";
-      setData((prev) =>
-        prev.map((r) =>
-          r.id === selectedRecordForVerify.id
-            ? {
-                ...r,
-                statusVerifikasi: isApproved ? "Terverifikasi" : "Ditolak",
-                statusTindakLanjut: isApproved ? "Selesai & Patuh" : "Diberi Sanksi",
-                catatanVerifikator: notes || (isApproved ? "Tindakan perbaikan diterima penuh." : "Dikenakan sanksi peringatan lanjutan.")
-              }
-            : r
-        )
-      );
+    const isApproved = decision === "sesuai";
+    const newStatusTL = isApproved ? "Selesai & Patuh" : "Diberi Sanksi";
+    await updateTindakLanjutStatus(selectedRecordForVerify.id, newStatusTL);
 
-      setIsVerifying(false);
-      setSelectedRecordForVerify(null);
-    }, 400);
+    setData((prev) =>
+      prev.map((r) =>
+        r.id === selectedRecordForVerify.id
+          ? {
+              ...r,
+              statusVerifikasi: isApproved ? "Terverifikasi" : "Ditolak",
+              statusTindakLanjut: newStatusTL,
+              catatanVerifikator: notes || (isApproved ? "Tindakan perbaikan diterima penuh." : "Dikenakan sanksi peringatan lanjutan.")
+            }
+          : r
+      )
+    );
+
+    setIsVerifying(false);
+    setSelectedRecordForVerify(null);
   };
 
   const handleDelete = (id: string) => {
@@ -208,6 +233,27 @@ export default function RekomendasiView({ tertibType }: RekomendasiViewProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      {/* Live Database Indicator Badge */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <span 
+          style={{ 
+            display: "inline-flex", 
+            alignItems: "center", 
+            gap: "5px",
+            fontSize: "11px", 
+            fontWeight: 700, 
+            padding: "3px 10px", 
+            borderRadius: "9999px",
+            backgroundColor: dataStatus.source === "supabase" ? "#ECFDF5" : "#FFFBEB",
+            color: dataStatus.source === "supabase" ? "#065F46" : "#B45309",
+            border: `1px solid ${dataStatus.source === "supabase" ? "#A7F3D0" : "#FDE68A"}`
+          }}
+        >
+          <DbIcon style={{ width: "12px", height: "12px" }} />
+          {dataStatus.source === "supabase" ? "Supabase PostgreSQL (Live)" : "Mode Cadangan Lokal"}
+        </span>
+      </div>
+
       {/* Module Header */}
       <ModuleHeader
         breadcrumbs={[

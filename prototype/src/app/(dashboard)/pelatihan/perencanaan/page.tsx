@@ -16,59 +16,13 @@ import DocumentUploadMiniModal from "@/components/common/document-upload-mini-mo
 import DocCompletionBar from "@/components/common/doc-completion-bar";
 import { TEMPLATE_PERENCANAAN_PELATIHAN } from "@/lib/sipjaki-templates";
 import { logDataActivity } from "@/lib/audit-log";
+import { fetchPerencanaanList, createPerencanaanItem, PerencanaanItem } from "@/lib/services/pelatihan-service";
 
-interface PerencanaanPelatihanItem {
-  id: string;
-  namaPaket: string;
-  tahun: string;
-  targetPeserta: number;
-  anggaran: number;
-  jadwal: string;
-  dokumenKak: string;
-  status: "Terverifikasi" | "Menunggu Verifikasi" | "Ditolak";
-  _docStatus?: "complete" | "pending";
-}
-
-const initialPelatihan: PerencanaanPelatihanItem[] = [
-  {
-    id: "PP-2026-01",
-    namaPaket: "Pelatihan & Fasilitasi Uji Sertifikasi SKK Tenaga Kerja Konstruksi Terampil",
-    tahun: "2026",
-    targetPeserta: 250,
-    anggaran: 380000000,
-    jadwal: "Maret - Juli 2026",
-    dokumenKak: "KAK_Fasilitasi_Sertifikasi_TKK_2026.pdf",
-    status: "Terverifikasi"
-  },
-  {
-    id: "PP-2026-02",
-    namaPaket: "Bimbingan Teknis Standar Keamanan, Keselamatan, Kesehatan dan Keberlanjutan (K4 SMKK)",
-    tahun: "2026",
-    targetPeserta: 120,
-    anggaran: 175000000,
-    jadwal: "April - Agustus 2026",
-    dokumenKak: "KAK_Bimtek_SMKK_2026.pdf",
-    status: "Terverifikasi"
-  },
-  {
-    id: "PP-2026-03",
-    namaPaket: "Mobile Training Unit (MTU) Pelatihan Vokasi Pekerja Lapangan Wilayah Bogor Barat",
-    tahun: "2026",
-    targetPeserta: 100,
-    anggaran: 150000000,
-    jadwal: "Juni - September 2026",
-    dokumenKak: "KAK_MTU_Bogor_Barat.pdf",
-    status: "Menunggu Verifikasi"
-  }
-];
+type PerencanaanPelatihanItem = PerencanaanItem;
 
 export default function PerencanaanPelatihanPage() {
-  const [data, setData] = useState<PerencanaanPelatihanItem[]>(() =>
-    initialPelatihan.map((r) => ({
-      ...r,
-      _docStatus: r._docStatus || "complete"
-    }))
-  );
+  const [data, setData] = useState<PerencanaanPelatihanItem[]>([]);
+  const [loading, setLoading] = useState(true);
   
   // Modals & Batch Import State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -87,6 +41,22 @@ export default function PerencanaanPelatihanPage() {
     jadwal: "Mei - Agustus 2026",
     dokumenKak: "KAK_Program_Pelatihan_Baru.pdf"
   });
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchPerencanaanList();
+      setData(res.data.map(d => ({ ...d, _docStatus: "complete" })));
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadData();
+  }, []);
 
   const filteredData = data.filter((item) => {
     const matchDoc = !filterDocPending || item._docStatus === "pending" || !item.dokumenKak;
@@ -151,28 +121,21 @@ export default function PerencanaanPelatihanPage() {
     setDocUploadTarget(null);
   };
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.namaPaket) {
       alert("Harap lengkapi nama paket pelatihan!");
       return;
     }
 
-    const newId = `PP-2026-${String(data.length + 1).padStart(2, "0")}`;
-    const newItem: PerencanaanPelatihanItem = {
-      id: newId,
-      namaPaket: formData.namaPaket,
-      tahun: formData.tahun,
-      targetPeserta: Number(formData.targetPeserta) || 10,
-      anggaran: Number(formData.anggaran) || 0,
-      jadwal: formData.jadwal,
-      dokumenKak: formData.dokumenKak,
-      status: "Menunggu Verifikasi",
-      _docStatus: "complete"
-    };
-
-    setData([newItem, ...data]);
-    setIsCreateOpen(false);
+    const res = await createPerencanaanItem(formData);
+    if (res.success) {
+      alert("Paket perencanaan pelatihan berhasil disimpan ke database!");
+      setIsCreateOpen(false);
+      loadData();
+    } else {
+      alert(`Gagal menyimpan: ${res.error}`);
+    }
   };
 
   const handleConfirmVerify = (decision: "sesuai" | "tidak_sesuai", notes: string) => {

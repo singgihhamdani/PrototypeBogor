@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import ModuleHeader from "@/components/layout/module-header";
 import { TertibType, TERTIB_CONFIGS } from "@/lib/tertib-config";
 import { mockPelaksanaanRecords, PelaksanaanRecord } from "@/data/tertib-mock-data";
@@ -8,7 +8,7 @@ import {
   Search, ShieldCheck, Filter, ArrowUpRight, Award, 
   AlertCircle, XCircle, Printer, Eye, Trash2, Calendar, 
   MapPin, Building2, HardHat, FileSpreadsheet, Sparkles, 
-  Check, X, RefreshCw
+  Check, X, RefreshCw, Database as DbIcon, Loader2
 } from "lucide-react";
 import DataTableView, { ColumnDef } from "@/components/common/data-table-view";
 import ModalForm from "@/components/common/modal-form";
@@ -22,6 +22,11 @@ import DocCompletionBar from "@/components/common/doc-completion-bar";
 import { exportToSpreadsheet } from "@/lib/export-utils";
 import { TEMPLATE_PELAKSANAAN } from "@/lib/sipjaki-templates";
 import { logDataActivity } from "@/lib/audit-log";
+import { 
+  fetchPelaksanaanList, createPelaksanaanAudit, 
+  updateAuditVerification, batchInsertPelaksanaan, 
+  DataSourceStatus, PengawasanSesiInsert 
+} from "@/lib/services/pengawasan-service";
 
 interface PelaksanaanViewProps {
   tertibType: TertibType;
@@ -31,12 +36,29 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
   const config = TERTIB_CONFIGS[tertibType];
   
   // State data utama
-  const [data, setData] = useState<PelaksanaanRecord[]>(() => 
-    mockPelaksanaanRecords.filter((r) => r.tertibType === tertibType).map((r) => ({
-      ...r,
-      _docStatus: r._docStatus || "complete"
-    }))
-  );
+  const [data, setData] = useState<PelaksanaanRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dataStatus, setDataStatus] = useState<DataSourceStatus>({
+    source: "fallback",
+    message: "Menghubungkan ke basis data..."
+  });
+  
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchPelaksanaanList(tertibType);
+      setData(res.data);
+      setDataStatus(res.status);
+    } catch (err) {
+      console.error("Gagal load data pengawasan:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [tertibType]);
   
   // Filter States
   const [activeVariant, setActiveVariant] = useState<string>("Semua");
@@ -135,18 +157,16 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
   const statRejected = data.filter((r) => r.statusVerifikasi === "Ditolak").length;
 
   // Handle Form Submission Audit Baru
-  const handleSaveAudit = (e: React.FormEvent) => {
+  const handleSaveAudit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auditForm.namaObjek || !auditForm.badanUsaha) {
       alert("Harap lengkapi nama objek pengawasan dan badan usaha / pelaksana!");
       return;
     }
 
-    const newId = `PEL-${tertibType === "tertib-usaha" ? "TU" : tertibType === "tertib-penyelenggaraan" ? "TP" : "TM"}-${String(data.length + 1).padStart(3, "0")}`;
-    const newRecord: PelaksanaanRecord = {
-      id: newId,
+    const res = await createPelaksanaanAudit({
       simakCode: auditForm.simakCode,
-      tertibType: tertibType,
+      tertibType,
       namaObjek: auditForm.namaObjek,
       badanUsaha: auditForm.badanUsaha,
       lokasi: auditForm.lokasi,
@@ -154,35 +174,39 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       pengawas: auditForm.pengawas,
       skorTertib: computedScore,
       kategoriHasil: computedKategori,
-      statusVerifikasi: "Draft",
-      dokumenBAP: auditForm.dokumenBapFile ? auditForm.dokumenBapFile.name : `BAP_${auditForm.simakCode.replace(/\s+/g, "_")}_${auditForm.badanUsaha.replace(/[^a-zA-Z0-9]/g, "")}.pdf`,
-      _docStatus: auditForm.dokumenBapFile ? "complete" : "pending"
-    };
-
-    setData([newRecord, ...data]);
-    setIsAuditModalOpen(false);
-
-    // Reset Form
-    setAuditForm({
-      simakCode: config.simakVariants[0]?.code || "SIMAK 1a1",
-      namaObjek: "",
-      badanUsaha: "",
-      lokasi: "Kecamatan Cibinong",
-      tanggalAudit: new Date().toISOString().split("T")[0],
-      pengawas: "Ir. Hendra Setiawan, S.T. (Tim Pembina Jakon)",
-      item1: true,
-      item2: true,
-      item3: false,
-      item4: true,
-      item5: true,
-      catatanTemuan: "",
-      rekomendasi: "",
-      dokumenBapFile: null
+      catatanTemuan: auditForm.catatanTemuan,
+      rekomendasi: auditForm.rekomendasi
     });
+
+    if (res.success && res.data) {
+      setData([res.data, ...data]);
+      setIsAuditModalOpen(false);
+
+      // Reset Form
+      setAuditForm({
+        simakCode: config.simakVariants[0]?.code || "SIMAK 1a1",
+        namaObjek: "",
+        badanUsaha: "",
+        lokasi: "Kecamatan Cibinong",
+        tanggalAudit: new Date().toISOString().split("T")[0],
+        pengawas: "Ir. Hendra Setiawan, S.T. (Tim Pembina Jakon)",
+        item1: true,
+        item2: true,
+        item3: false,
+        item4: true,
+        item5: true,
+        catatanTemuan: "",
+        rekomendasi: "",
+        dokumenBapFile: null
+      });
+      alert(`Audit SIMAK untuk ${res.data.badanUsaha} berhasil disimpan ke basis data!`);
+    } else {
+      alert(res.error || "Gagal menyimpan audit");
+    }
   };
 
   // Handle Batch Commit
-  const handleBatchCommit = (parsedRows: any[]) => {
+  const handleBatchCommit = async (parsedRows: any[]) => {
     const formatted: PelaksanaanRecord[] = parsedRows.map((row, idx) => ({
       id: `SIMAK-${Date.now().toString().slice(-4)}-${idx + 1}`,
       simakCode: row.simakCode || config.simakVariants[0]?.code || "SIMAK 1a1",
@@ -198,7 +222,25 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       dokumenBAP: row.dokumenBAP || "",
       _docStatus: row._docStatus || "pending"
     }));
-    setData([...formatted, ...data]);
+
+    const dbPayloads: PengawasanSesiInsert[] = formatted.map((f) => ({
+      id: f.id,
+      simak_code: f.simakCode,
+      tipe_tertib: f.tertibType,
+      nama_objek: f.namaObjek,
+      badan_usaha: f.badanUsaha,
+      lokasi: f.lokasi,
+      tanggal_audit: f.tanggalAudit,
+      pengawas: f.pengawas,
+      skor_tertib: f.skorTertib,
+      kategori_hasil: f.kategoriHasil,
+      status_verifikasi: f.statusVerifikasi,
+      dokumen_bap: f.dokumenBAP
+    }));
+
+    await batchInsertPelaksanaan(dbPayloads);
+    await loadData();
+    setIsBatchImportOpen(false);
     logDataActivity({
       action: "import",
       module: `Pelaksanaan Audit SIMAK (${config.shortTitle})`,
@@ -207,9 +249,9 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       user: "Auditor Pembina Jakon",
       status: "success",
       fileName: `${TEMPLATE_PELAKSANAAN.exportFileName}.xlsx`,
-      details: `Impor batch ${formatted.length} data audit SIMAK (${config.shortTitle}) - dokumen BAP dapat disusulkan`
+      details: `Impor batch ${formatted.length} data audit SIMAK (${config.shortTitle}) tersimpan ke database`
     });
-    alert(`Berhasil mengimpor ${formatted.length} data audit SIMAK! Dokumen BAP dapat diunggah menyusul per baris.`);
+    alert(`Berhasil mengimpor ${formatted.length} data audit SIMAK ke basis data!`);
   };
 
   const handleSaveUploadedDoc = (files: Record<string, File | null>, fileNames: Record<string, string>) => {
@@ -241,27 +283,28 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
   };
 
   // Handle Verification Confirm
-  const handleConfirmVerification = (decision: "sesuai" | "tidak_sesuai", notes: string) => {
+  const handleConfirmVerification = async (decision: "sesuai" | "tidak_sesuai", notes: string) => {
     if (!verifyTarget) return;
     setIsVerifying(true);
 
-    setTimeout(() => {
-      setData((prev) =>
-        prev.map((r) => {
-          if (r.id === verifyTarget.id) {
-            return {
-              ...r,
-              statusVerifikasi: decision === "sesuai" ? "Terverifikasi" : "Ditolak"
-            };
-          }
-          return r;
-        })
-      );
+    const targetStatus = decision === "sesuai" ? "Terverifikasi" : "Ditolak";
+    await updateAuditVerification(verifyTarget.id, targetStatus);
 
-      setIsVerifying(false);
-      setIsVerifyOpen(false);
-      setVerifyTarget(null);
-    }, 400);
+    setData((prev) =>
+      prev.map((r) => {
+        if (r.id === verifyTarget.id) {
+          return {
+            ...r,
+            statusVerifikasi: targetStatus
+          };
+        }
+        return r;
+      })
+    );
+
+    setIsVerifying(false);
+    setIsVerifyOpen(false);
+    setVerifyTarget(null);
   };
 
   const handleDelete = (id: string) => {
@@ -372,6 +415,27 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      {/* Live Database Indicator Badge */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <span 
+          style={{ 
+            display: "inline-flex", 
+            alignItems: "center", 
+            gap: "5px",
+            fontSize: "11px", 
+            fontWeight: 700, 
+            padding: "3px 10px", 
+            borderRadius: "9999px",
+            backgroundColor: dataStatus.source === "supabase" ? "#ECFDF5" : "#FFFBEB",
+            color: dataStatus.source === "supabase" ? "#065F46" : "#B45309",
+            border: `1px solid ${dataStatus.source === "supabase" ? "#A7F3D0" : "#FDE68A"}`
+          }}
+        >
+          <DbIcon style={{ width: "12px", height: "12px" }} />
+          {dataStatus.source === "supabase" ? "Supabase PostgreSQL (Live)" : "Mode Cadangan Lokal"}
+        </span>
+      </div>
+
       {/* Module Header */}
       <ModuleHeader
         breadcrumbs={[

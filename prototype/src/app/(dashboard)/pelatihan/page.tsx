@@ -1,19 +1,57 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   GraduationCap, Search, Calendar, Users, Award, Download, 
-  CheckCircle2, Clock, Plus, QrCode, FileCheck, Eye, X, FileSpreadsheet
+  CheckCircle2, Clock, Plus, QrCode, FileCheck, Eye, X, FileSpreadsheet,
+  Database as DbIcon, RefreshCw, AlertCircle, UserPlus
 } from "lucide-react";
-import trainingData from "@/data/training.json";
 import BatchImportModal from "@/components/common/batch-import-modal";
 import { TEMPLATE_PELATIHAN } from "@/lib/sipjaki-templates";
 import { exportToSpreadsheet } from "@/lib/export-utils";
+import { 
+  fetchPelatihanList, 
+  createPelatihanAgenda, 
+  registerPesertaPelatihan, 
+  batchImportPelatihan, 
+  TrainingItem, 
+  DataSourceStatus 
+} from "@/lib/services/pelatihan-service";
 
 export default function PelatihanPage() {
-  const [trainings, setTrainings] = useState(trainingData);
+  const [trainings, setTrainings] = useState<TrainingItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dbStatus, setDbStatus] = useState<DataSourceStatus>({
+    source: "supabase",
+    message: "Memuat data dari database..."
+  });
+
   const [activeTab, setActiveTab] = useState<"programs" | "tkk" | "cert">("programs");
   const [search, setSearch] = useState("");
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showRegisterParticipantModal, setShowRegisterParticipantModal] = useState<string | null>(null);
+
+  // New Training Form State
+  const [newTraining, setNewTraining] = useState({
+    title: "",
+    category: "K3 Konstruksi",
+    batch: "Angkatan I / 2026",
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date(Date.now() + 5 * 86400000).toISOString().split("T")[0],
+    location: "Auditorium DPU Kab. Bogor",
+    quota: 40,
+    skkLevel: "Jenjang 5 (Teknisi/Analis)",
+    organizer: "Bidang Jasa Konstruksi DPU Kab. Bogor",
+    instructor: ""
+  });
+
+  // Participant Form State
+  const [participantForm, setParticipantForm] = useState({
+    nik: "",
+    name: "",
+    bujk: ""
+  });
+
   const [selectedCert, setSelectedCert] = useState<{
     name: string;
     nik: string;
@@ -21,6 +59,23 @@ export default function PelatihanPage() {
     certNo: string;
     trainingTitle: string;
   } | null>(null);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchPelatihanList();
+      setTrainings(res.data);
+      setDbStatus(res.status);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   // Extract all participants across training
   const allTkk = trainings.flatMap(t => 
@@ -32,32 +87,68 @@ export default function PelatihanPage() {
     }))
   );
 
-  const handleBatchCommit = (parsedData: Record<string, any>[]) => {
-    const newItems = parsedData.map((d, i) => ({
-      id: d.id || `TR-2026-00${trainings.length + i + 1}`,
-      title: d.title || "Pelatihan Keahlian Konstruksi",
-      category: d.category || "Tata Kelola & Regulasi",
-      skkLevel: d.skkLevel || "Jenjang 5 (Teknisi/Analis)",
-      batch: d.batch || `Angkatan ${trainings.length + i + 1} / 2026`,
-      startDate: d.startDate || "2026-06-01",
-      endDate: d.endDate || "2026-06-05",
-      location: d.location || "Auditorium DPU Kab. Bogor",
-      quota: Number(d.quota) || 30,
-      registered: Number(d.registered) || 0,
-      passed: Number(d.passed) || 0,
-      status: d.status || "Pendaftaran Dibuka",
-      organizer: d.organizer || "DPU Kab. Bogor",
-      instructor: d.instructor || "Tim Pembina Jasa Konstruksi PUPR",
-      participants: []
-    }));
-    setTrainings((prev) => [...newItems, ...prev]);
-    alert(`Berhasil mengimpor ${newItems.length} kegiatan pelatihan ke dalam sistem!`);
+  const handleCreateTraining = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTraining.title.trim()) {
+      alert("Judul kegiatan wajib diisi!");
+      return;
+    }
+
+    const res = await createPelatihanAgenda(newTraining);
+    if (res.success) {
+      alert("Agenda pelatihan baru berhasil dibuat!");
+      setShowAddModal(false);
+      setNewTraining({
+        title: "",
+        category: "K3 Konstruksi",
+        batch: "Angkatan I / 2026",
+        startDate: new Date().toISOString().split("T")[0],
+        endDate: new Date(Date.now() + 5 * 86400000).toISOString().split("T")[0],
+        location: "Auditorium DPU Kab. Bogor",
+        quota: 40,
+        skkLevel: "Jenjang 5 (Teknisi/Analis)",
+        organizer: "Bidang Jasa Konstruksi DPU Kab. Bogor",
+        instructor: ""
+      });
+      loadData();
+    } else {
+      alert(`Gagal membuat agenda: ${res.error}`);
+    }
+  };
+
+  const handleRegisterParticipant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!showRegisterParticipantModal) return;
+    if (!participantForm.nik || !participantForm.name) {
+      alert("NIK dan Nama Peserta wajib diisi!");
+      return;
+    }
+
+    const res = await registerPesertaPelatihan(showRegisterParticipantModal, participantForm);
+    if (res.success) {
+      alert("Peserta berhasil didaftarkan ke kegiatan pelatihan!");
+      setShowRegisterParticipantModal(null);
+      setParticipantForm({ nik: "", name: "", bujk: "" });
+      loadData();
+    } else {
+      alert(`Gagal mendaftarkan peserta: ${res.error}`);
+    }
+  };
+
+  const handleBatchCommit = async (parsedData: Record<string, any>[]) => {
+    const res = await batchImportPelatihan(parsedData);
+    if (res.success) {
+      alert(`Berhasil mengimpor ${res.insertedCount} kegiatan pelatihan ke dalam database!`);
+      loadData();
+    } else {
+      alert(`Gagal impor batch: ${res.error}`);
+    }
   };
 
   const filteredTkk = allTkk.filter(t => 
-    t.name.toLowerCase().includes(search.toLowerCase()) ||
-    t.nik.includes(search) ||
-    t.bujk.toLowerCase().includes(search.toLowerCase())
+    (t.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (t.nik || "").includes(search) ||
+    (t.bujk || "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -65,12 +156,28 @@ export default function PelatihanPage() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
               <GraduationCap style={{ width: "12px", height: "12px" }} /> Pilar 5: Pengembangan SDM & TKK
             </span>
             <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", backgroundColor: "#F1F5F9", padding: "3px 10px", borderRadius: "9999px" }}>
               Integrasi: BNSP & SIPJAKI
+            </span>
+            {/* Live Database Badge */}
+            <span style={{
+              fontSize: "11px",
+              fontWeight: 800,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "5px",
+              padding: "3px 10px",
+              borderRadius: "9999px",
+              backgroundColor: dbStatus.source === "supabase" ? "#ECFDF5" : "#FFFBEB",
+              color: dbStatus.source === "supabase" ? "#065F46" : "#92400E",
+              border: `1px solid ${dbStatus.source === "supabase" ? "#A7F3D0" : "#FDE68A"}`
+            }}>
+              <DbIcon style={{ width: "11px", height: "11px" }} />
+              {dbStatus.source === "supabase" ? "Database Supabase (Live)" : "Cache Lokal"}
             </span>
           </div>
           <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
@@ -82,6 +189,28 @@ export default function PelatihanPage() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          {/* Refresh Data */}
+          <button
+            type="button"
+            onClick={loadData}
+            title="Muat Ulang Data"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              borderRadius: "12px",
+              backgroundColor: "#FFFFFF",
+              border: "1px solid #CBD5E1",
+              padding: "10px 14px",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#475569",
+              cursor: "pointer"
+            }}
+          >
+            <RefreshCw style={{ width: "14px", height: "14px", animation: loading ? "spin 1s linear infinite" : "none" }} />
+          </button>
+
           {/* Tombol Import Excel */}
           <button 
             type="button"
@@ -134,9 +263,11 @@ export default function PelatihanPage() {
           >
             <Download style={{ width: "15px", height: "15px" }} /> Export SIPJAKI
           </button>
+
+          {/* Tombol Buka Pelatihan Baru */}
           <button
             type="button"
-            onClick={() => alert("Membuka Formulir Pembukaan Pelatihan / Bimtek Baru...")}
+            onClick={() => setShowAddModal(true)}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -182,9 +313,9 @@ export default function PelatihanPage() {
           </div>
           <div>
             <p style={{ fontSize: "28px", fontWeight: 900, color: "#1E40AF", margin: 0, lineHeight: 1.1 }}>
-              {trainings.reduce((acc, t) => acc + t.registered, 0)}
+              {trainings.reduce((acc, t) => acc + (t.registered || 0), 0)}
             </p>
-            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Dari Kuota {trainings.reduce((acc, t) => acc + t.quota, 0)} Orang</p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>Dari Kuota {trainings.reduce((acc, t) => acc + (t.quota || 0), 0)} Orang</p>
           </div>
         </div>
 
@@ -197,7 +328,7 @@ export default function PelatihanPage() {
           </div>
           <div>
             <p style={{ fontSize: "28px", fontWeight: 900, color: "#059669", margin: 0, lineHeight: 1.1 }}>
-              {trainings.reduce((acc, t) => acc + t.passed, 0)}
+              {trainings.reduce((acc, t) => acc + (t.passed || 0), 0)}
             </p>
             <p style={{ fontSize: "11px", color: "#059669", fontWeight: 700, margin: "4px 0 0 0" }}>Tersertifikasi BNSP / SKK</p>
           </div>
@@ -213,7 +344,12 @@ export default function PelatihanPage() {
           <div>
             <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>500 <span style={{ fontSize: "14px", fontWeight: 600, color: "#64748B" }}>TKK</span></p>
             <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden", marginTop: "6px" }}>
-              <div style={{ width: "38%", height: "100%", backgroundColor: "#059669", borderRadius: "9999px" }} />
+              <div style={{ 
+                width: `${Math.min(100, Math.round((trainings.reduce((acc, t) => acc + (t.passed || 0), 0) / 500) * 100))}%`, 
+                height: "100%", 
+                backgroundColor: "#059669", 
+                borderRadius: "9999px" 
+              }} />
             </div>
           </div>
         </div>
@@ -223,7 +359,7 @@ export default function PelatihanPage() {
       <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "1px solid #E2E8F0", paddingBottom: "10px" }}>
         {[
           { id: "programs", label: "Program Pelatihan & Bimtek" },
-          { id: "tkk", label: "Database TKK Tersertifikasi" },
+          { id: "tkk", label: `Database TKK Tersertifikasi (${allTkk.length})` },
           { id: "cert", label: "Verifikasi e-Certificate QR" },
         ].map((tab) => {
           const isSel = activeTab === tab.id;
@@ -250,9 +386,17 @@ export default function PelatihanPage() {
         })}
       </div>
 
+      {/* Loading Skeleton */}
+      {loading && (
+        <div style={{ padding: "40px 20px", textAlign: "center", color: "#64748B", fontSize: "13px" }}>
+          <RefreshCw style={{ width: "24px", height: "24px", margin: "0 auto 12px auto", animation: "spin 1s linear infinite", color: "#0F2E5C" }} />
+          <p style={{ margin: 0 }}>Menghubungkan ke database pelatihan Supabase...</p>
+        </div>
+      )}
+
       {/* Tab 1: Programs */}
-      {activeTab === "programs" && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: "16px" }}>
+      {!loading && activeTab === "programs" && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))", gap: "16px" }}>
           {trainings.map((t) => (
             <div 
               key={t.id} 
@@ -350,19 +494,47 @@ export default function PelatihanPage() {
                 </div>
               </div>
 
-              <div style={{ paddingTop: "12px", borderTop: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", flexWrap: "wrap", gap: "6px" }}>
-                <div>
-                  <span style={{ color: "#64748B" }}>Kuota: </span>
-                  <span style={{ fontWeight: 800, color: "#0F172A" }}>{t.registered} / {t.quota} orang</span>
+              <div>
+                <div style={{ paddingTop: "12px", borderTop: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", flexWrap: "wrap", gap: "6px" }}>
+                  <div>
+                    <span style={{ color: "#64748B" }}>Kuota: </span>
+                    <span style={{ fontWeight: 800, color: "#0F172A" }}>{t.registered} / {t.quota} orang</span>
+                  </div>
+                  {t.passed > 0 ? (
+                    <span style={{ fontWeight: 800, color: "#059669", backgroundColor: "#ECFDF5", padding: "3px 10px", borderRadius: "6px", fontSize: "11px" }}>
+                      {t.passed} Peserta Lulus SKK
+                    </span>
+                  ) : (
+                    <span style={{ fontWeight: 700, color: t.status === "Pendaftaran Dibuka" ? "#D97706" : "#64748B", backgroundColor: t.status === "Pendaftaran Dibuka" ? "#FFFBEB" : "#F1F5F9", padding: "3px 8px", borderRadius: "6px", fontSize: "11px" }}>
+                      {t.status === "Pendaftaran Dibuka" ? "Pendaftaran Terbuka" : "Tahap Bimtek"}
+                    </span>
+                  )}
                 </div>
-                {t.passed > 0 ? (
-                  <span style={{ fontWeight: 800, color: "#059669", backgroundColor: "#ECFDF5", padding: "3px 10px", borderRadius: "6px", fontSize: "11px" }}>
-                    {t.passed} Peserta Lulus SKK
-                  </span>
-                ) : (
-                  <span style={{ fontWeight: 700, color: t.status === "Pendaftaran Dibuka" ? "#D97706" : "#64748B", backgroundColor: t.status === "Pendaftaran Dibuka" ? "#FFFBEB" : "#F1F5F9", padding: "3px 8px", borderRadius: "6px", fontSize: "11px" }}>
-                    {t.status === "Pendaftaran Dibuka" ? "Pendaftaran Terbuka" : "Tahap Bimtek"}
-                  </span>
+
+                {/* Tombol Daftarkan Peserta */}
+                {t.status !== "Selesai" && (
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterParticipantModal(t.id)}
+                    style={{
+                      width: "100%",
+                      marginTop: "12px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                      borderRadius: "10px",
+                      backgroundColor: "#F1F5F9",
+                      border: "1px solid #CBD5E1",
+                      padding: "8px 12px",
+                      fontSize: "12px",
+                      fontWeight: 800,
+                      color: "#0F2E5C",
+                      cursor: "pointer"
+                    }}
+                  >
+                    <UserPlus style={{ width: "14px", height: "14px" }} /> Daftarkan Peserta
+                  </button>
                 )}
               </div>
             </div>
@@ -371,7 +543,7 @@ export default function PelatihanPage() {
       )}
 
       {/* Tab 2: Database TKK */}
-      {activeTab === "tkk" && (
+      {!loading && activeTab === "tkk" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
           {/* Search bar */}
           <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
@@ -408,63 +580,87 @@ export default function PelatihanPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredTkk.map((tkk) => (
-                    <tr key={tkk.nik} style={{ borderBottom: "1px solid #F1F5F9", transition: "background-color 0.15s ease" }}>
-                      <td style={{ padding: "16px 18px" }}>
-                        <p style={{ fontWeight: 800, color: "#0F172A", margin: 0, fontSize: "13px" }}>{tkk.name}</p>
-                        <p style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", margin: "2px 0 0 0" }}>NIK: {tkk.nik}</p>
-                      </td>
-                      <td style={{ padding: "16px 18px", color: "#334155", fontWeight: 600 }}>
-                        {tkk.bujk}
-                      </td>
-                      <td style={{ padding: "16px 18px" }}>
-                        <p style={{ fontWeight: 700, color: "#0F172A", margin: 0 }}>{tkk.trainingTitle}</p>
-                        <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>Jenjang: {tkk.skkLevel}</p>
-                      </td>
-                      <td style={{ padding: "16px 18px" }}>
-                        <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 8px", borderRadius: "6px", fontSize: "11px" }}>
-                          {tkk.certNo}
-                        </span>
-                      </td>
-                      <td style={{ padding: "16px 18px", fontWeight: 800, color: "#0F172A", fontSize: "13px" }}>
-                        {tkk.score} <span style={{ fontSize: "11px", color: "#94A3B8" }}>/100</span>
-                      </td>
-                      <td style={{ padding: "16px 18px" }}>
-                        <span style={{ display: "inline-block", backgroundColor: "#ECFDF5", color: "#059669", padding: "3px 10px", borderRadius: "9999px", fontSize: "11px", fontWeight: 800 }}>
-                          {tkk.status}
-                        </span>
-                      </td>
-                      <td style={{ padding: "16px 18px", textAlign: "center" }}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedCert({
-                              name: tkk.name,
-                              nik: tkk.nik,
-                              bujk: tkk.bujk,
-                              certNo: tkk.certNo,
-                              trainingTitle: tkk.trainingTitle,
-                            });
-                          }}
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            borderRadius: "8px",
-                            backgroundColor: "#F1F5F9",
-                            color: "#0F2E5C",
-                            padding: "6px 12px",
-                            fontSize: "11px",
-                            fontWeight: 700,
-                            border: "1px solid #E2E8F0",
-                            cursor: "pointer"
-                          }}
-                        >
-                          <Eye style={{ width: "13px", height: "13px" }} /> Lihat
-                        </button>
+                  {filteredTkk.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ padding: "36px", textAlign: "center", color: "#64748B" }}>
+                        Belum ada peserta pelatihan yang terdaftar atau lulus.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredTkk.map((tkk, idx) => (
+                      <tr key={tkk.nik || idx} style={{ borderBottom: "1px solid #F1F5F9", transition: "background-color 0.15s ease" }}>
+                        <td style={{ padding: "16px 18px" }}>
+                          <p style={{ fontWeight: 800, color: "#0F172A", margin: 0, fontSize: "13px" }}>{tkk.name}</p>
+                          <p style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", margin: "2px 0 0 0" }}>NIK: {tkk.nik}</p>
+                        </td>
+                        <td style={{ padding: "16px 18px", color: "#334155", fontWeight: 600 }}>
+                          {tkk.bujk}
+                        </td>
+                        <td style={{ padding: "16px 18px" }}>
+                          <p style={{ fontWeight: 700, color: "#0F172A", margin: 0 }}>{tkk.trainingTitle}</p>
+                          <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>Jenjang: {tkk.skkLevel}</p>
+                        </td>
+                        <td style={{ padding: "16px 18px" }}>
+                          {tkk.certNo ? (
+                            <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 8px", borderRadius: "6px", fontSize: "11px" }}>
+                              {tkk.certNo}
+                            </span>
+                          ) : (
+                            <span style={{ color: "#94A3B8", fontStyle: "italic" }}>Belum terbit</span>
+                          )}
+                        </td>
+                        <td style={{ padding: "16px 18px", fontWeight: 800, color: "#0F172A", fontSize: "13px" }}>
+                          {tkk.score !== undefined ? `${tkk.score} / 100` : "-"}
+                        </td>
+                        <td style={{ padding: "16px 18px" }}>
+                          <span style={{ 
+                            display: "inline-block", 
+                            backgroundColor: tkk.status === "Lulus" ? "#ECFDF5" : "#EFF6FF", 
+                            color: tkk.status === "Lulus" ? "#059669" : "#1E40AF", 
+                            padding: "3px 10px", 
+                            borderRadius: "9999px", 
+                            fontSize: "11px", 
+                            fontWeight: 800 
+                          }}>
+                            {tkk.status || "Terdaftar"}
+                          </span>
+                        </td>
+                        <td style={{ padding: "16px 18px", textAlign: "center" }}>
+                          {tkk.status === "Lulus" ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedCert({
+                                  name: tkk.name,
+                                  nik: tkk.nik,
+                                  bujk: tkk.bujk,
+                                  certNo: tkk.certNo || "SKK-VERIFIED-2026",
+                                  trainingTitle: tkk.trainingTitle,
+                                });
+                              }}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                borderRadius: "8px",
+                                backgroundColor: "#F1F5F9",
+                                color: "#0F2E5C",
+                                padding: "6px 12px",
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                border: "1px solid #E2E8F0",
+                                cursor: "pointer"
+                              }}
+                            >
+                              <Eye style={{ width: "13px", height: "13px" }} /> Lihat
+                            </button>
+                          ) : (
+                            <span style={{ fontSize: "11px", color: "#94A3B8" }}>Proses Bimtek</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -492,7 +688,7 @@ export default function PelatihanPage() {
           <div style={{ display: "flex", gap: "10px", maxWidth: "460px", margin: "0 auto", width: "100%" }}>
             <input
               type="text"
-              placeholder="Masukkan No. Sertifikat (cth: SKK-2026-0012)"
+              placeholder="Masukkan No. Sertifikat (cth: SKK-2026-001)"
               style={{ flex: 1, borderRadius: "10px", border: "1px solid #CBD5E1", padding: "10px 14px", fontSize: "13px", outline: "none" }}
             />
             <button
@@ -502,6 +698,259 @@ export default function PelatihanPage() {
             >
               Cek Validasi
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Tambah Pelatihan Baru */}
+      {showAddModal && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: "20px", maxWidth: "580px", width: "100%", padding: "28px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: "18px", maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F1F5F9", paddingBottom: "14px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <GraduationCap style={{ width: "20px", height: "20px", color: "#0F2E5C" }} />
+                <h3 style={{ fontSize: "16px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
+                  Buka Kegiatan Pelatihan & Bimtek Baru
+                </h3>
+              </div>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B" }}
+              >
+                <X style={{ width: "20px", height: "20px" }} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTraining} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                  Judul Pelatihan / Bimtek *
+                </label>
+                <input 
+                  type="text"
+                  required
+                  placeholder="Contoh: Bimbingan Teknis K3 Konstruksi (SMKK)"
+                  value={newTraining.title}
+                  onChange={e => setNewTraining({ ...newTraining, title: e.target.value })}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                    Kategori Pelatihan
+                  </label>
+                  <select
+                    value={newTraining.category}
+                    onChange={e => setNewTraining({ ...newTraining, category: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", backgroundColor: "#FFFFFF" }}
+                  >
+                    <option value="K3 Konstruksi">K3 Konstruksi</option>
+                    <option value="Tenaga Terampil">Tenaga Terampil</option>
+                    <option value="Teknologi & Digitalisasi">Teknologi & Digitalisasi</option>
+                    <option value="Tata Kelola & Regulasi">Tata Kelola & Regulasi</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                    Angkatan / Batch
+                  </label>
+                  <input 
+                    type="text"
+                    value={newTraining.batch}
+                    onChange={e => setNewTraining({ ...newTraining, batch: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                    Tanggal Mulai
+                  </label>
+                  <input 
+                    type="date"
+                    required
+                    value={newTraining.startDate}
+                    onChange={e => setNewTraining({ ...newTraining, startDate: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                    Tanggal Selesai
+                  </label>
+                  <input 
+                    type="date"
+                    required
+                    value={newTraining.endDate}
+                    onChange={e => setNewTraining({ ...newTraining, endDate: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "12px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                    Lokasi Pelatihan
+                  </label>
+                  <input 
+                    type="text"
+                    value={newTraining.location}
+                    onChange={e => setNewTraining({ ...newTraining, location: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                    Kuota Peserta
+                  </label>
+                  <input 
+                    type="number"
+                    min="1"
+                    value={newTraining.quota}
+                    onChange={e => setNewTraining({ ...newTraining, quota: Number(e.target.value) })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                    Target Jenjang SKK
+                  </label>
+                  <select
+                    value={newTraining.skkLevel}
+                    onChange={e => setNewTraining({ ...newTraining, skkLevel: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", backgroundColor: "#FFFFFF" }}
+                  >
+                    <option value="Jenjang 1-2 (Operator/Tukang)">Jenjang 1-2 (Operator/Tukang)</option>
+                    <option value="Jenjang 3-4 (Teknisi Junior)">Jenjang 3-4 (Teknisi Junior)</option>
+                    <option value="Jenjang 5 (Teknisi/Analis)">Jenjang 5 (Teknisi/Analis)</option>
+                    <option value="Jenjang 6 (Ahli Muda)">Jenjang 6 (Ahli Muda)</option>
+                    <option value="Semua Jenjang">Semua Jenjang</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                    Instruktur / Asesor
+                  </label>
+                  <input 
+                    type="text"
+                    placeholder="Nama Instruktur & Gelar"
+                    value={newTraining.instructor}
+                    onChange={e => setNewTraining({ ...newTraining, instructor: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px", borderTop: "1px solid #F1F5F9", paddingTop: "14px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  style={{ padding: "10px 18px", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", fontSize: "12px", fontWeight: 700, color: "#475569", cursor: "pointer" }}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  style={{ padding: "10px 20px", borderRadius: "10px", border: "none", backgroundColor: "#0F2E5C", color: "#FFFFFF", fontSize: "12px", fontWeight: 800, cursor: "pointer", boxShadow: "0 2px 6px rgba(15,46,92,0.2)" }}
+                >
+                  Simpan Agenda Pelatihan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Pendaftaran Peserta */}
+      {showRegisterParticipantModal && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: "20px", maxWidth: "480px", width: "100%", padding: "26px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F1F5F9", paddingBottom: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <UserPlus style={{ width: "18px", height: "18px", color: "#0F2E5C" }} />
+                <h3 style={{ fontSize: "15px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
+                  Daftarkan Peserta TKK ({showRegisterParticipantModal})
+                </h3>
+              </div>
+              <button 
+                onClick={() => setShowRegisterParticipantModal(null)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B" }}
+              >
+                <X style={{ width: "18px", height: "18px" }} />
+              </button>
+            </div>
+
+            <form onSubmit={handleRegisterParticipant} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                  Nomor Induk Kependudukan (NIK) *
+                </label>
+                <input 
+                  type="text"
+                  required
+                  maxLength={16}
+                  placeholder="16 digit NIK peserta"
+                  value={participantForm.nik}
+                  onChange={e => setParticipantForm({ ...participantForm, nik: e.target.value })}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", fontFamily: "monospace" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                  Nama Lengkap Peserta *
+                </label>
+                <input 
+                  type="text"
+                  required
+                  placeholder="Nama sesuai KTP"
+                  value={participantForm.name}
+                  onChange={e => setParticipantForm({ ...participantForm, name: e.target.value })}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                  Asal Badan Usaha (BUJK) / Instansi
+                </label>
+                <input 
+                  type="text"
+                  placeholder="Contoh: PT Bangun Jaya Konstruksi atau Mandiri"
+                  value={participantForm.bujk}
+                  onChange={e => setParticipantForm({ ...participantForm, bujk: e.target.value })}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px", borderTop: "1px solid #F1F5F9", paddingTop: "14px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterParticipantModal(null)}
+                  style={{ padding: "8px 16px", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", fontSize: "12px", fontWeight: 700, color: "#475569", cursor: "pointer" }}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  style={{ padding: "8px 18px", borderRadius: "10px", border: "none", backgroundColor: "#0F2E5C", color: "#FFFFFF", fontSize: "12px", fontWeight: 800, cursor: "pointer" }}
+                >
+                  Daftarkan Peserta
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
