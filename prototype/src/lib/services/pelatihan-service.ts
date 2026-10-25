@@ -175,7 +175,7 @@ export async function createPelatihanAgenda(agenda: {
   instructor?: string;
   status?: "Pendaftaran Dibuka" | "Sedang Berjalan" | "Selesai" | "Dibatalkan";
 }): Promise<{ success: boolean; data?: TrainingItem; error?: string }> {
-  const generatedId = agenda.id || `TR-${new Date().getFullYear()}-${String(fallbackTrainings.length + 1).padStart(3, "0")}`;
+  const generatedId = agenda.id || `TR-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
 
   const newItem: TrainingItem = {
     id: generatedId,

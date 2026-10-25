@@ -53,6 +53,10 @@ venv/
 coverage/
 *.lcov
 .nyc_output/
+playwright-report/
+test-results/
+prototype/playwright-report/
+prototype/test-results/
 
 # ---- Logs ----
 logs/

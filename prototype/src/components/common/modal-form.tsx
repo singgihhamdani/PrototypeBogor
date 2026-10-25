@@ -86,6 +86,9 @@ export default function ModalForm({
       }}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        data-testid="modal-form"
         className="responsive-modal-container"
         style={{
           backgroundColor: "#FFFFFF",

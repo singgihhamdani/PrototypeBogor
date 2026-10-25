@@ -67,20 +67,27 @@ export function formatPercent(val: number | string | null | undefined): string {
 
 /**
  * Unduh Blob ke browser pengguna dengan penanganan nama berkas yang aman
- * dan kompatibel dengan Google Chrome, Edge, Firefox, dan Safari.
- * Menggunakan konstruktor File (bila didukung) agar nama berkas dan ekstensi terkunci pada objek Blob.
+ * dan kompatibel dengan Google Chrome, Microsoft Edge, Firefox, dan Safari.
+ * Mencegah issue Chromium/Edge di mana file tersimpan dengan nama UUID acak tanpa ekstensi
+ * akibat pembatalan Object URL yang terlalu dini atau penggunaan wrapper File.
  */
 export function triggerBrowserDownload(blob: Blob, fileName: string): void {
-  let fileOrBlob: Blob = blob;
-  try {
-    if (typeof File !== "undefined") {
-      fileOrBlob = new File([blob], fileName, { type: blob.type });
-    }
-  } catch {
-    fileOrBlob = blob;
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+
+  // 1. Dukungan API bawaan Microsoft Edge / IE lawas jika tersedia
+  const nav = window.navigator as any;
+  if (typeof nav.msSaveOrOpenBlob === "function") {
+    nav.msSaveOrOpenBlob(blob, fileName);
+    return;
+  }
+  if (typeof nav.msSaveBlob === "function") {
+    nav.msSaveBlob(blob, fileName);
+    return;
   }
 
-  const url = URL.createObjectURL(fileOrBlob);
+  // 2. Gunakan Blob murni (hindari konstruktor new File yang menyebabkan inkonsistensi
+  // pada download manager Chromium/Edge saat mengurai metadata nama berkas)
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.style.display = "none";
   link.href = url;
@@ -88,26 +95,53 @@ export function triggerBrowserDownload(blob: Blob, fileName: string): void {
   link.setAttribute("download", fileName);
 
   document.body.appendChild(link);
-  link.click();
 
-  // Berikan jeda 1,5 detik sebelum revoke & removeChild
-  // agar browser (khususnya Chromium) tidak kehilangan metadata nama berkas
+  // 3. Picu unduhan dengan event klik sintetis
+  if (typeof MouseEvent !== "undefined") {
+    const clickEvent = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+    });
+    link.dispatchEvent(clickEvent);
+  } else {
+    link.click();
+  }
+
+  // 4. Jeda waktu pelepasan Object URL diset ke 60 detik (60000ms),
+  // mengikuti best practice SheetJS dan FileSaver.js.
+  // Jeda 1-2 detik sering kali terputus saat Edge SmartScreen / Antivirus
+  // sedang memeriksa file, yang menyebabkan Edge kehilangan metadata nama berkas
+  // dan menyimpannya sebagai UUID URL acak tanpa ekstensi .xlsx / .csv.
   setTimeout(() => {
     try {
-      document.body.removeChild(link);
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
       URL.revokeObjectURL(url);
     } catch {
       // Abaikan jika sudah dibersihkan
     }
-  }, 1500);
+  }, 60000);
 }
 
 /**
  * Menyimpan workbook XLSX ke format buffer biner dan memicu unduhan di browser
  * dengan MIME type resmi Microsoft Excel OpenXML (.xlsx).
+ * Mengutamakan XLSX.writeFile bawaan SheetJS yang sudah teruji dan kompatibel
+ * dengan pipeline download browser modern (Chrome, Edge, Firefox, Safari).
  */
 export function saveWorkbookAsExcel(wb: XLSX.WorkBook, fileName: string): void {
   const finalName = fileName.endsWith(".xlsx") ? fileName : `${fileName}.xlsx`;
+  if (typeof window !== "undefined" && typeof document !== "undefined") {
+    try {
+      XLSX.writeFile(wb, finalName);
+      return;
+    } catch {
+      // Fallback ke manual blob download jika writeFile mengalami kendala
+    }
+  }
+
   const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
   const blob = new Blob([excelBuffer], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
