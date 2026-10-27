@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth, DEMO_USERS, RoleCode } from "@/lib/mock-auth";
+import { useAuth, DEMO_USERS, RoleCode, ROLE_CONFIGS } from "@/lib/mock-auth";
 import { 
   Eye, EyeOff, ShieldCheck, Building2, 
   ArrowRight, Key, Mail, Lock, Sparkles, UserCheck, Crown, ClipboardCheck,
-  ArrowLeft, Home, ShieldAlert
+  ArrowLeft, Home, ShieldAlert, ChevronDown, HardHat, GraduationCap
 } from "lucide-react";
 import Logo, { BrandIcon } from "@/components/ui/logo";
 import { useResponsive } from "@/lib/use-responsive";
@@ -19,6 +19,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [selectedDemoUser, setSelectedDemoUser] = useState("superadmin");
   const [redirectPath, setRedirectPath] = useState<string | null>(null);
+
+  const currentDemoUser = DEMO_USERS[selectedDemoUser];
+  const currentRoleConfig = currentDemoUser ? ROLE_CONFIGS[currentDemoUser.role] : null;
 
   // Fitur Lupa Kata Sandi
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
@@ -419,43 +422,71 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              {/* Role Highlights */}
+              {/* Role Highlights (5 Role Utama SIJAKON) */}
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <p style={{ fontSize: "11px", fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", margin: 0, letterSpacing: "0.5px" }}>
-                  Role Internal yang Didukung:
+                  5 Pilar Role Pengguna SIJAKON:
                 </p>
                 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-                  <div style={{ padding: "8px 10px", borderRadius: "10px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <Crown style={{ width: "14px", height: "14px", color: "#FFC000" }} />
-                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFFFFF" }}>Super Admin</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {/* 1. Super Admin */}
+                  <div style={{ padding: "6px 10px", borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <Crown style={{ width: "14px", height: "14px", color: "#FFC000", flexShrink: 0 }} />
+                      <div>
+                        <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFFFFF" }}>1. Super Admin</span>
+                        <p style={{ fontSize: "10px", color: "#94A3B8", margin: 0 }}>Full RBAC, master data & konfigurasi</p>
+                      </div>
                     </div>
-                    <p style={{ fontSize: "10px", color: "#94A3B8", margin: "2px 0 0 0" }}>Full RBAC & setting</p>
+                    <span style={{ fontSize: "9px", fontWeight: 700, color: "#FFC000", backgroundColor: "rgba(255,192,0,0.15)", padding: "2px 6px", borderRadius: "4px" }}>PUPR</span>
                   </div>
 
-                  <div style={{ padding: "8px 10px", borderRadius: "10px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <Building2 style={{ width: "14px", height: "14px", color: "#60A5FA" }} />
-                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFFFFF" }}>Admin Bidang</span>
+                  {/* 2. Admin Bidang & Asesor */}
+                  <div style={{ padding: "6px 10px", borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <Building2 style={{ width: "14px", height: "14px", color: "#60A5FA", flexShrink: 0 }} />
+                      <div>
+                        <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFFFFF" }}>2. Admin Bidang & Pengawas</span>
+                        <p style={{ fontSize: "10px", color: "#94A3B8", margin: 0 }}>Bina Konstruksi, Asesor & Pengawas SIMAK</p>
+                      </div>
                     </div>
-                    <p style={{ fontSize: "10px", color: "#94A3B8", margin: "2px 0 0 0" }}>Bina Konstruksi</p>
+                    <span style={{ fontSize: "9px", fontWeight: 700, color: "#93C5FD", backgroundColor: "rgba(59,130,246,0.15)", padding: "2px 6px", borderRadius: "4px" }}>Dinas</span>
                   </div>
 
-                  <div style={{ padding: "8px 10px", borderRadius: "10px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <ClipboardCheck style={{ width: "14px", height: "14px", color: "#38BDF8" }} />
-                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFFFFF" }}>Tim Pengawas</span>
+                  {/* 3. Eksekutif */}
+                  <div style={{ padding: "6px 10px", borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <ShieldCheck style={{ width: "14px", height: "14px", color: "#34D399", flexShrink: 0 }} />
+                      <div>
+                        <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFFFFF" }}>3. Eksekutif</span>
+                        <p style={{ fontSize: "10px", color: "#94A3B8", margin: 0 }}>Dashboard makro & laporan resmi Kadis</p>
+                      </div>
                     </div>
-                    <p style={{ fontSize: "10px", color: "#94A3B8", margin: "2px 0 0 0" }}>Asesor Lapangan</p>
+                    <span style={{ fontSize: "9px", fontWeight: 700, color: "#6EE7B7", backgroundColor: "rgba(16,185,129,0.15)", padding: "2px 6px", borderRadius: "4px" }}>Pimpinan</span>
                   </div>
 
-                  <div style={{ padding: "8px 10px", borderRadius: "10px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <ShieldCheck style={{ width: "14px", height: "14px", color: "#34D399" }} />
-                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFFFFF" }}>Eksekutif</span>
+                  {/* 4. Penyedia Jasa BUJK */}
+                  <div style={{ padding: "6px 10px", borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <HardHat style={{ width: "14px", height: "14px", color: "#FBBF24", flexShrink: 0 }} />
+                      <div>
+                        <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFFFFF" }}>4. Penyedia Jasa (BUJK)</span>
+                        <p style={{ fontSize: "10px", color: "#94A3B8", margin: 0 }}>Kontraktor rekanan: profil SBU, paket & SIMAK</p>
+                      </div>
                     </div>
-                    <p style={{ fontSize: "10px", color: "#94A3B8", margin: "2px 0 0 0" }}>Dashboard & Laporan</p>
+                    <span style={{ fontSize: "9px", fontWeight: 700, color: "#FCD34D", backgroundColor: "rgba(245,158,11,0.15)", padding: "2px 6px", borderRadius: "4px" }}>Rekanan</span>
+                  </div>
+
+                  {/* 5. Peserta TKK */}
+                  <div style={{ padding: "6px 10px", borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <GraduationCap style={{ width: "14px", height: "14px", color: "#C084FC", flexShrink: 0 }} />
+                      <div>
+                        <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFFFFF" }}>5. Peserta TKK</span>
+                        <p style={{ fontSize: "10px", color: "#94A3B8", margin: 0 }}>Tenaga kerja konstruksi: uji SKK & sertifikat</p>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: "9px", fontWeight: 700, color: "#D8B4FE", backgroundColor: "rgba(168,85,247,0.15)", padding: "2px 6px", borderRadius: "4px" }}>Tenaga Kerja</span>
                   </div>
                 </div>
               </div>
@@ -509,7 +540,7 @@ export default function LoginPage() {
                     marginBottom: "6px"
                   }}
                 >
-                  Portal Dinas Internal
+                  Portal Masuk Terpadu
                 </span>
                 <h3 
                   style={{
@@ -520,7 +551,7 @@ export default function LoginPage() {
                     margin: 0
                   }}
                 >
-                  Masuk Akun Petugas
+                  Masuk ke Sistem SIJAKON
                 </h3>
                 <p 
                   style={{
@@ -529,7 +560,7 @@ export default function LoginPage() {
                     margin: "2px 0 0 0"
                   }}
                 >
-                  Akses modul pembinaan, pengawasan SIMAK, dan pelaporan internal
+                  Akses terpadu 5 Role: Petugas Dinas, Rekanan BUJK, dan Peserta TKK
                 </p>
               </div>
 
@@ -555,58 +586,132 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {/* Demo Account Fast Selector */}
+              {/* Clean Demo Account Dropdown Selector */}
               <div 
                 style={{
                   borderRadius: "14px",
-                  border: "1px solid #E2E8F0",
+                  border: "1.5px solid #CBD5E1",
                   backgroundColor: "#F8FAFC",
-                  padding: "12px",
+                  padding: "12px 14px",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "8px"
+                  gap: "8px",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>
-                    <Key style={{ width: "14px", height: "14px", color: "#F59E0B" }} />
-                    <span>Pilih Akun Demo Internal (1-Klik):</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 800, color: "#0F2E5C" }}>
+                    <Sparkles style={{ width: "14px", height: "14px", color: "#F59E0B" }} />
+                    <span>Pilih Akun Demo (5 Role SIJAKON):</span>
                   </div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 600 }}>
+                    1-Klik Langsung Isi
+                  </span>
                 </div>
 
-                {/* 4 Internal Demo Role Buttons */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                  {[
-                    { key: "superadmin", label: "Super Admin", sub: "Ridwan, ST" },
-                    { key: "op_binkon", label: "Admin Bidang", sub: "Bayu Pratama" },
-                    { key: "op_pengawas", label: "Tim Pengawas", sub: "Ir. Supriyatna" },
-                    { key: "eksekutif", label: "Eksekutif", sub: "Kadis PUPR" },
-                  ].map((item) => {
-                    const isSelected = selectedDemoUser === item.key;
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => handleSelectDemo(item.key)}
+                {/* Dropdown Select Element */}
+                <div style={{ position: "relative" }}>
+                  <select
+                    id="demo-account-select"
+                    value={selectedDemoUser}
+                    onChange={(e) => handleSelectDemo(e.target.value)}
+                    style={{
+                      width: "100%",
+                      height: "42px",
+                      borderRadius: "10px",
+                      border: "1.5px solid #0F2E5C",
+                      backgroundColor: "#FFFFFF",
+                      padding: "0 38px 0 12px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      color: "#0F2E5C",
+                      cursor: "pointer",
+                      outline: "none",
+                      appearance: "none",
+                      boxShadow: "0 2px 4px rgba(15, 46, 92, 0.06)"
+                    }}
+                  >
+                    <optgroup label="── 1. SUPER ADMIN ──">
+                      <option value="superadmin">👑 Super Admin — Ir. H. Raden Ridwan, ST (Akses Penuh Sistem)</option>
+                    </optgroup>
+                    <optgroup label="── 2. ADMIN BIDANG & PENGAWAS ──">
+                      <option value="op_binkon">🏢 Admin Bidang — Bayu Pratama, S.Kom (Seksi Bina Konstruksi)</option>
+                      <option value="op_pengawas">📋 Tim Pengawas — Ir. Supriyatna, ST (Asesor & Pengawas SIMAK)</option>
+                    </optgroup>
+                    <optgroup label="── 3. EKSEKUTIF PIMPINAN ──">
+                      <option value="eksekutif">🛡️ Eksekutif — Drs. H. Suryanto Putra, M.Si (Kepala Dinas PUPR)</option>
+                    </optgroup>
+                    <optgroup label="── 4. PENYEDIA JASA (BUJK) ──">
+                      <option value="bujk_demo">🏗️ Penyedia Jasa (BUJK) — Budi Santoso, ST (PT Bangun Jaya Konstruksi)</option>
+                    </optgroup>
+                    <optgroup label="── 5. PESERTA PELATIHAN TKK ──">
+                      <option value="peserta_demo">🎓 Peserta TKK — Ahmad Fauzi, A.Md (Pelaksana Lapangan Gedung)</option>
+                    </optgroup>
+                  </select>
+                  <ChevronDown 
+                    style={{ 
+                      position: "absolute", 
+                      right: "12px", 
+                      top: "50%", 
+                      transform: "translateY(-50%)", 
+                      width: "18px", 
+                      height: "18px", 
+                      color: "#0F2E5C", 
+                      pointerEvents: "none" 
+                    }} 
+                  />
+                </div>
+
+                {/* Active Demo Profile Detail Pill */}
+                {currentDemoUser && (
+                  <div 
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "8px",
+                      backgroundColor: "#FFFFFF",
+                      border: "1px solid #E2E8F0",
+                      padding: "6px 10px",
+                      borderRadius: "8px",
+                      fontSize: "11px"
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, overflow: "hidden" }}>
+                      <span 
                         style={{
-                          textAlign: "left",
-                          padding: "6px 8px",
-                          borderRadius: "8px",
-                          border: isSelected ? "2px solid #0F2E5C" : "1px solid #CBD5E1",
-                          backgroundColor: isSelected ? "#EBF2FA" : "#FFFFFF",
-                          cursor: "pointer"
+                          backgroundColor: currentRoleConfig?.badgeBg || "#0F2E5C",
+                          color: currentRoleConfig?.badgeText || "#FFFFFF",
+                          padding: "2px 7px",
+                          borderRadius: "4px",
+                          fontWeight: 800,
+                          fontSize: "9px",
+                          textTransform: "uppercase",
+                          flexShrink: 0
                         }}
                       >
-                        <span style={{ display: "block", fontSize: "11px", fontWeight: 800, color: isSelected ? "#0F2E5C" : "#334155" }}>
-                          {item.label}
-                        </span>
-                        <span style={{ display: "block", fontSize: "9px", color: "#64748B" }}>
-                          {item.sub}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                        {currentDemoUser.roleLabel}
+                      </span>
+                      <span style={{ color: "#334155", fontWeight: 700, textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                        {currentDemoUser.name}
+                      </span>
+                    </div>
+                    <span 
+                      style={{ 
+                        fontSize: "10px", 
+                        color: "#2563EB", 
+                        fontWeight: 700, 
+                        flexShrink: 0, 
+                        fontFamily: "monospace",
+                        backgroundColor: "#EFF6FF",
+                        padding: "2px 6px",
+                        borderRadius: "4px"
+                      }}
+                    >
+                      ➔ {currentRoleConfig?.defaultRoute || "/dashboard"}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Form Inputs */}
@@ -823,38 +928,60 @@ export default function LoginPage() {
                     <span>Memverifikasi Hak Akses...</span>
                   ) : (
                     <>
-                      <span>Masuk ke Dashboard Dinas</span>
+                      <span>
+                        {selectedDemoUser === "bujk_demo" 
+                          ? "Masuk ke Portal Rekanan BUJK" 
+                          : selectedDemoUser === "peserta_demo" 
+                          ? "Masuk ke Portal Peserta TKK" 
+                          : "Masuk ke Dashboard Dinas"}
+                      </span>
                       <ArrowRight style={{ width: "16px", height: "16px", color: "#FFC000" }} />
                     </>
                   )}
                 </button>
               </form>
 
-              {/* Portal Mitra External Link */}
+              {/* Portal Mitra Direct Links */}
               <div 
                 style={{
                   paddingTop: "12px",
                   borderTop: "1px solid #F1F5F9",
-                  textAlign: "center"
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "10px",
+                  flexWrap: "wrap",
+                  fontSize: "11px",
+                  color: "#64748B"
                 }}
               >
-                <p style={{ fontSize: "11px", color: "#64748B", margin: 0 }}>
-                  Penyedia Jasa (BUJK) atau Peserta Pelatihan?
-                </p>
+                <span>Portal Khusus:</span>
                 <Link
-                  href="/portal/login"
+                  href="/portal/login?tab=bujk"
                   style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    fontSize: "11px",
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: "#D97706",
                     textDecoration: "none",
-                    marginTop: "2px"
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "2px"
                   }}
                 >
-                  Beralih ke Portal Mitra & Peserta <ArrowRight style={{ width: "12px", height: "12px" }} />
+                  Portal BUJK <ArrowRight style={{ width: "11px", height: "11px" }} />
+                </Link>
+                <span>•</span>
+                <Link
+                  href="/portal/login?tab=peserta"
+                  style={{
+                    fontWeight: 700,
+                    color: "#2563EB",
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "2px"
+                  }}
+                >
+                  Portal Peserta TKK <ArrowRight style={{ width: "11px", height: "11px" }} />
                 </Link>
               </div>
 
