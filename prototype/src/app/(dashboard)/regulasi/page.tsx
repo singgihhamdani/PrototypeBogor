@@ -741,6 +741,8 @@ export default function RegulasiPage() {
             data={filteredCms}
             columns={cmsColumns}
             exportFileName="regulasi-jasa-konstruksi-bogor"
+            sipjakiTemplate={TEMPLATE_REGULASI}
+            exportColumns={TEMPLATE_REGULASI.columns}
             actionsHeader="AKSI KELOLA"
           actionsRender={(row) => (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>

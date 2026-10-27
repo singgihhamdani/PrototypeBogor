@@ -14,6 +14,18 @@ import {
   FilterBarValues, ModalForm, ColumnDef 
 } from "@/components/common";
 import BatchImportModal, { BatchColumnDef } from "@/components/common/batch-import-modal";
+import { ExportColumn } from "@/lib/export-utils";
+
+const masterOpdExportColumns: ExportColumn[] = [
+  { key: "kodeOpd", label: "Kode Rekening OPD", sipjakiLabel: "kode_opd" },
+  { key: "namaOpd", label: "Nama Dinas / Lembaga", sipjakiLabel: "nama_opd" },
+  { key: "kabupatenKota", label: "Kabupaten/Kota", sipjakiLabel: "kabupaten_kota" },
+  { key: "provinsi", label: "Provinsi", sipjakiLabel: "provinsi" },
+  { key: "kepalaDinas", label: "Kepala Dinas / Pimpinan", sipjakiLabel: "kepala_dinas" },
+  { key: "tingkat", label: "Tingkat Pemerintahan", sipjakiLabel: "tingkat" },
+  { key: "jumlahTimPembina", label: "Jumlah Personil Tim", sipjakiLabel: "jumlah_tim_pembina" },
+  { key: "statusSinkronisasi", label: "Status Sinkronisasi", sipjakiLabel: "status" }
+];
 
 const opdBatchColumns: BatchColumnDef[] = [
   { key: "kodeOpd", label: "Kode Rekening OPD", required: true, example: "1.03.01.01.05" },
@@ -1028,6 +1040,7 @@ export default function ProfilOpdPage() {
             columns={masterColumns}
             defaultPageSize={5}
             exportFileName="Master_Data_OPD_SIPJAKI"
+            exportColumns={masterOpdExportColumns}
             actionsHeader="AKSI"
             actionsRender={(row) => (
               <button

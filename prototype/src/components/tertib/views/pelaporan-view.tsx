@@ -12,7 +12,17 @@ import DataTableView, { ColumnDef } from "@/components/common/data-table-view";
 import ModalForm from "@/components/common/modal-form";
 import FileUploader from "@/components/common/file-uploader";
 import StatusBadge from "@/components/common/status-badge";
-import { exportToSpreadsheet } from "@/lib/export-utils";
+import { exportToSpreadsheet, ExportColumn } from "@/lib/export-utils";
+
+const pelaporanExportColumns: ExportColumn[] = [
+  { key: "judulLaporan", label: "Judul Laporan Pengawasan", sipjakiLabel: "judul_laporan" },
+  { key: "periode", label: "Periode Pelaporan", sipjakiLabel: "periode" },
+  { key: "tahun", label: "Tahun Anggaran", sipjakiLabel: "tahun_anggaran" },
+  { key: "jumlahObjekDiperiksa", label: "Jumlah Objek Audit", sipjakiLabel: "jumlah_objek" },
+  { key: "tingkatKepatuhan", label: "Tingkat Kepatuhan (%)", sipjakiLabel: "tingkat_kepatuhan" },
+  { key: "statusSinkronisasiSipjaki", label: "Status SIPJAKI", sipjakiLabel: "status_sipjaki" },
+  { key: "tanggalKirim", label: "Tanggal Pengiriman", sipjakiLabel: "tanggal_kirim" }
+];
 
 interface PelaporanViewProps {
   tertibType: TertibType;
@@ -103,7 +113,7 @@ export default function PelaporanView({ tertibType }: PelaporanViewProps) {
   const tableColumns: ColumnDef<PelaporanRecord>[] = [
     {
       key: "judulLaporan",
-      label: "JUDUL LAPORAN PENGWASAN",
+      label: "JUDUL LAPORAN PENGAWASAN",
       render: (row) => (
         <div>
           <div style={{ fontSize: "13px", fontWeight: 800, color: "#0F172A", lineHeight: 1.35 }}>
@@ -487,6 +497,7 @@ export default function PelaporanView({ tertibType }: PelaporanViewProps) {
         data={data}
         columns={tableColumns}
         exportFileName={`Laporan_${tertibType}_SIPJAKI`}
+        exportColumns={pelaporanExportColumns}
         actionsHeader="BERKAS & AKSI"
         actionsRender={(row) => (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>

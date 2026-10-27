@@ -794,18 +794,6 @@ export default function PaketPekerjaanPage() {
         )}
       />
 
-      {/* Reusable Batch Import Modal */}
-      <BatchImportModal
-        isOpen={showImportModal}
-        onClose={() => setShowImportModal(false)}
-        title="Import Batch Paket Pekerjaan (Excel/CSV)"
-        subtitle="Unggah berkas rekapitulasi paket pekerjaan sesuai format standar SIPJAKI"
-        templateFileName="template_paket_pekerjaan_sipjaki.csv"
-        expectedColumns={paketBatchColumns}
-        sampleRows={sampleBatchPaket}
-        onCommit={handleBatchCommit}
-      />
-
       {/* Modal Form Tambah Paket Baru */}
       <ModalForm
         isOpen={showAddModal}

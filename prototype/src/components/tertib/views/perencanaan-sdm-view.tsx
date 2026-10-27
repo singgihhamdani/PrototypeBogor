@@ -456,6 +456,15 @@ export default function PerencanaanSDMView({ tertibType }: PerencanaanSDMViewPro
         columns={columns}
         defaultPageSize={5}
         exportFileName={`SDM_Pengawas_${tertibType}`}
+        sipjakiTemplate={TEMPLATE_PERENCANAAN_SDM}
+        exportColumns={[
+          { key: "namaTim", label: "Nama Tim Pengawas" },
+          { key: "wilayah", label: "Wilayah Penugasan" },
+          { key: "jumlahSdm", label: "Jumlah SDM" },
+          { key: "tahun", label: "Tahun Anggaran" },
+          { key: "dokumen", label: "Dokumen SK" },
+          { key: "status", label: "Status Verifikasi" }
+        ]}
         actionsHeader="AKSI"
         actionsRender={(row) => {
           const item = row;

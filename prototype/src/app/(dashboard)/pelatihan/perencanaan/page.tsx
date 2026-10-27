@@ -321,6 +321,8 @@ export default function PerencanaanPelatihanPage() {
         data={filteredData}
         columns={columns}
         exportFileName="Perencanaan_Pelatihan_Bogor"
+        sipjakiTemplate={TEMPLATE_PERENCANAAN_PELATIHAN}
+        exportColumns={TEMPLATE_PERENCANAAN_PELATIHAN.columns}
         actionsHeader="AKSI"
         actionsRender={(row) => (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>

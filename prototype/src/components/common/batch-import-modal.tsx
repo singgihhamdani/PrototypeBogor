@@ -32,6 +32,133 @@ export interface BatchImportModalProps<T> {
   existingRecords?: Map<string, ExistingRecordInfo>;
 }
 
+/**
+ * Mencocokkan kolom ekspektasi dengan header berkas (CSV / Excel) secara cerdas.
+ * Mendukung pencocokan persis, pencocokan dengan SipjakiTemplate (columns, sipjakiLabel),
+ * serta kamus alias komprehensif untuk seluruh modul SIJAKON.
+ */
+function resolveHeaderIndex(
+  rawHeaders: string[],
+  col: BatchColumnDef,
+  template?: SipjakiTemplate
+): number {
+  const colKey = col.key;
+  const colLabelNorm = col.label.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const colKeyNorm = col.key.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  // 1. Ambil varian label dari template.columns jika ada
+  const templateVariants: string[] = [];
+  if (template?.columns) {
+    const matchedExpCol = template.columns.find((c) => c.key === colKey);
+    if (matchedExpCol) {
+      if (matchedExpCol.label) templateVariants.push(matchedExpCol.label.toLowerCase().replace(/[^a-z0-9]/g, ""));
+      if (matchedExpCol.sipjakiLabel) templateVariants.push(matchedExpCol.sipjakiLabel.toLowerCase().replace(/[^a-z0-9]/g, ""));
+    }
+  }
+
+  // 2. Kamus Alias Spesifik per Key
+  const aliasMap: Record<string, string[]> = {
+    namaTim: ["namatim", "wilayahnamatim", "namagugus", "timpengawas", "namapersonil"],
+    wilayah: ["wilayahpenugasan", "wilayah", "wilayahnamatim", "kecamatan", "lokasiwilayah", "lokasikecamatan", "kecamatandomisili"],
+    jumlahSdm: ["jumlahsdm", "jumlahpersonel", "sdm", "personil", "jumlahtim", "personiltim"],
+    tahun: ["tahunanggaran", "tahun", "tahunpenetapan", "tahuntimeline"],
+    namaPaket: ["namapaket", "namaprogram", "namakegiatan", "namapaketkegiatan", "namapekerjaan", "kegiatan", "judul"],
+    targetPeserta: ["targetpeserta", "targettkk", "kuotapeserta", "pesertatarget", "kuota"],
+    anggaran: ["alokasianggaran", "paguanggaran", "anggaran", "nilaikontrak", "pagudpa", "nilaipagu"],
+    jadwal: ["jadwalpelaksanaan", "jadwal", "waktupelaksanaan", "periodewaktu", "periode"],
+    dokumenKak: ["dokumenkak", "kerangkaacuankerja", "kak", "naskahkak"],
+    category: ["kategori", "kategoriregulasi", "kategoribidang", "kategorikeahlian", "jenjang"],
+    number: ["nomor", "nomorperaturan", "nomorregulasi", "nomorlaporan", "kodelaporan", "id"],
+    title: ["judul", "judulperaturan", "tentangperaturan", "namakegiatan", "judullaporan", "namakegiatanpelatihan", "namapaket"],
+    summary: ["ringkasan", "ringkasanmuatan", "ringkasanmateri", "kebijakan", "deskripsi"],
+    projectName: ["namapekerjaan", "namaproyek", "paketpekerjaan", "namapekerjaanproyek", "proyek"],
+    contractor: ["kontraktor", "perusahaanpenyedia", "namapenyedia", "namakontraktor", "bujk", "pelaksana", "kontraktorpelaksana"],
+    district: ["kecamatan", "wilayah", "lokasiwilayah", "kecamatandomisili", "lokasikecamatan"],
+    date: ["tanggalkejadian", "tanggal", "tanggalinspeksi", "tanggalmulai", "tanggalaudit", "diundangkan"],
+    time: ["waktukejadian", "waktu", "jam"],
+    incidentType: ["jenisinsiden", "tipeinsiden", "kecelakaan", "kategoriinsiden"],
+    severity: ["tingkatkeparahan", "dampakkerugian", "keparahan", "tingkatkeparahankorban"],
+    chronology: ["kronologi", "kronologikejadian", "alurkejadian"],
+    correctiveAction: ["tindakanpenanganan", "penanganan", "tindakan", "upayapenanggulangan"],
+    kodeOpd: ["kodeopd", "koderekeningopd", "kode", "koderekening"],
+    namaOpd: ["namaopd", "namadinas", "namalembaga", "dinas", "namadinaslembaga"],
+    provinsi: ["provinsi"],
+    kabupatenKota: ["kabupatenkota", "kabupaten", "kota", "wilayahkabkota"],
+    kepalaDinas: ["kepaladinas", "pimpinan", "namakepala", "kepaladinaslembaga", "kepaladinasopd"],
+    tingkat: ["tingkat", "tingkatpemerintahan"],
+    jumlahTimPembina: ["jumlahtimpembina", "jumlahpersoniltim", "timpembina", "personiltim"],
+    simakCode: ["kodesimak", "kodeinstrumensimak", "simak", "kodeinstrumen"],
+    namaObjek: ["namaobjek", "namaobjekpengawasan", "objekpengawasan", "namaobjekaudit"],
+    badanUsaha: ["badanusaha", "badanushapengelola", "badanushapelaksana", "perusahaan"],
+    skorTertib: ["skortertib", "skorkepatuhan", "skor", "nilai"],
+    kategoriHasil: ["kategorihasil", "predikathasilaudit", "hasil", "hasilaudit"],
+    statusVerifikasi: ["statusverifikasi", "statusbap", "statusverifikasibap"],
+    dokumenBAP: ["dokumenbap", "beritaacara", "nomorberitaacara", "berkasbap"],
+    quota: ["kuota", "kuotapeserta", "targetkuota", "targetkuotapeserta"],
+    location: ["lokasi", "lokasipelaksanaan", "tempat"],
+    skkLevel: ["jenjangskk", "jenjangkualifikasi", "jenjangkualifikasiskk", "kualifikasiskk"],
+    passed: ["pesertalulus", "pesertaluluskompeten", "lulus"],
+    registered: ["pesertaterdaftar", "terdaftar", "kehadiran"],
+    batch: ["gelombang", "angkatan", "gelombangangkatan"]
+  };
+
+  const keyAliases = aliasMap[colKey] || [];
+
+  return rawHeaders.findIndex((h) => {
+    const hNorm = h.toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!hNorm) return false;
+
+    // Exact match dengan label atau key
+    if (hNorm === colLabelNorm || hNorm === colKeyNorm) return true;
+
+    // Match dengan varian dari template.columns
+    if (templateVariants.some((tv) => tv === hNorm || (tv.length >= 4 && (hNorm.includes(tv) || tv.includes(hNorm))))) {
+      return true;
+    }
+
+    // Match dengan kamus alias
+    if (keyAliases.some((alias) => hNorm === alias || (alias.length >= 4 && (hNorm.includes(alias) || alias.includes(hNorm))))) {
+      return true;
+    }
+
+    return false;
+  });
+}
+
+function applySmartRowFallbacks(rowObj: Record<string, any>) {
+  // 1. SDM: Tim & Wilayah reciprocal fallback
+  if (!rowObj.namaTim && rowObj.wilayah) rowObj.namaTim = rowObj.wilayah;
+  if (!rowObj.wilayah && rowObj.namaTim) rowObj.wilayah = rowObj.namaTim;
+
+  // 2. Pelatihan & Paket: Fallback title/nama
+  if (!rowObj.namaPaket && rowObj.title) rowObj.namaPaket = rowObj.title;
+  if (!rowObj.title && rowObj.namaPaket) rowObj.title = rowObj.namaPaket;
+  if (!rowObj.name && rowObj.namaPaket) rowObj.name = rowObj.namaPaket;
+  if (!rowObj.namaPaket && rowObj.name) rowObj.namaPaket = rowObj.name;
+
+  // 3. Tahun default
+  if (!rowObj.tahun && (rowObj.fiscalYear || rowObj.year)) {
+    rowObj.tahun = rowObj.fiscalYear || rowObj.year;
+  }
+  if (!rowObj.tahun && !rowObj.year) {
+    rowObj.tahun = 2026;
+  }
+
+  // 4. Regulasi: Nomor & Judul fallback
+  if (!rowObj.number && rowObj.id) rowObj.number = rowObj.id;
+  if (!rowObj.category && rowObj.tingkat) rowObj.category = rowObj.tingkat;
+  if (!rowObj.summary && rowObj.title) rowObj.summary = `Dokumen kebijakan tentang ${rowObj.title}`;
+
+  // 5. Kecelakaan: fallback deskripsi & tindakan
+  if (!rowObj.chronology && rowObj.incidentType) rowObj.chronology = `Kejadian ${rowObj.incidentType} di lokasi kerja.`;
+  if (!rowObj.correctiveAction) rowObj.correctiveAction = "Telah dilakukan penanganan medis pertama dan evaluasi K3.";
+
+  // 6. OPD: Fallback tingkat & provinsi
+  if (!rowObj.provinsi) rowObj.provinsi = "Jawa Barat";
+  if (!rowObj.kabupatenKota && rowObj.wilayah) rowObj.kabupatenKota = rowObj.wilayah;
+  if (!rowObj.tingkat) rowObj.tingkat = "Kabupaten/Kota";
+}
+
 export default function BatchImportModal<T extends Record<string, any>>({
   isOpen,
   onClose,
@@ -136,13 +263,14 @@ export default function BatchImportModal<T extends Record<string, any>>({
 
         const rowObj: any = {};
         actualExpectedColumns.forEach((col, idx) => {
-          const matchedHeaderIdx = headers.findIndex(
-            (h) => h.toLowerCase() === col.label.toLowerCase() || h.toLowerCase() === col.key.toLowerCase()
-          );
+          const matchedHeaderIdx = resolveHeaderIndex(headers, col, template);
           const valueIndex = matchedHeaderIdx !== -1 ? matchedHeaderIdx : idx;
-          rowObj[col.key] = rowValues[valueIndex] !== undefined ? rowValues[valueIndex] : col.example;
+          rowObj[col.key] = rowValues[valueIndex] !== undefined && rowValues[valueIndex] !== "" 
+            ? rowValues[valueIndex] 
+            : col.example || "";
         });
 
+        applySmartRowFallbacks(rowObj);
         result.push(rowObj);
       }
 
@@ -180,20 +308,14 @@ export default function BatchImportModal<T extends Record<string, any>>({
 
             const rowObj: any = {};
             actualExpectedColumns.forEach((col, idx) => {
-              // Cari header yang cocok berdasarkan label, key, atau sipjakiLabel
-              const matchedHeaderIdx = rawHeaders.findIndex((h) => {
-                const hNorm = h.toLowerCase().replace(/[^a-z0-9]/g, "");
-                const labelNorm = col.label.toLowerCase().replace(/[^a-z0-9]/g, "");
-                const keyNorm = col.key.toLowerCase().replace(/[^a-z0-9]/g, "");
-                return hNorm === labelNorm || hNorm === keyNorm;
-              });
-
+              const matchedHeaderIdx = resolveHeaderIndex(rawHeaders, col, template);
               const valIdx = matchedHeaderIdx !== -1 ? matchedHeaderIdx : idx;
               let val = rowValues[valIdx];
               if (val === undefined || val === null) val = "";
               rowObj[col.key] = val;
             });
 
+            applySmartRowFallbacks(rowObj);
             rows.push(rowObj);
           }
 

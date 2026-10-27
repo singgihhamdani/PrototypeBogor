@@ -638,6 +638,16 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
         columns={columns}
         defaultPageSize={5}
         exportFileName={`Anggaran_Pengawasan_${tertibType}`}
+        sipjakiTemplate={TEMPLATE_PERENCANAAN_ANGGARAN}
+        exportColumns={[
+          { key: "program", label: "Nama Program / Kegiatan" },
+          { key: "paguAnggaran", label: "Pagu Anggaran (Rp)" },
+          { key: "realisasi", label: "Realisasi (Rp)" },
+          { key: "sumberDana", label: "Sumber Dana" },
+          { key: "tahun", label: "Tahun Anggaran" },
+          { key: "dokumenRka", label: "Dokumen RKA" },
+          { key: "status", label: "Status Usulan" }
+        ]}
         actionsHeader="AKSI"
         actionsRender={(row) => (
           <button

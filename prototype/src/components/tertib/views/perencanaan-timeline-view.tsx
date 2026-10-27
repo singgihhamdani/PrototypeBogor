@@ -529,6 +529,16 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
         columns={columns}
         defaultPageSize={5}
         exportFileName={`Timeline_Pengawasan_${tertibType}`}
+        sipjakiTemplate={TEMPLATE_PERENCANAAN_TIMELINE}
+        exportColumns={[
+          { key: "kegiatan", label: "Nama Kegiatan Pengawasan" },
+          { key: "periode", label: "Periode" },
+          { key: "bulanMulai", label: "Bulan Mulai" },
+          { key: "bulanSelesai", label: "Bulan Selesai" },
+          { key: "targetBujk", label: "Target Jumlah Objek" },
+          { key: "dokumenJadwal", label: "Dokumen KAK / Jadwal" },
+          { key: "status", label: "Status Pelaksanaan" }
+        ]}
         actionsHeader="AKSI"
         actionsRender={(row) => (
           <button

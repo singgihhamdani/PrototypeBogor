@@ -314,6 +314,15 @@ export default function LaporanPelatihanPage() {
         data={filterDocPending ? data.filter((d) => d._docStatus === "pending" || !d.dokumenBa) : data}
         columns={columns}
         exportFileName="Laporan_Sertifikasi_TKK_Bogor"
+        exportColumns={[
+          { key: "nomorLaporan", label: "Nomor Berita Acara" },
+          { key: "namaKegiatan", label: "Nama Program Sertifikasi" },
+          { key: "tanggalSelesai", label: "Tanggal Pelaksanaan" },
+          { key: "jumlahLulusan", label: "Jumlah Lulusan" },
+          { key: "lembagaSertifikasi", label: "Lembaga LSP / Asesor" },
+          { key: "dokumenBa", label: "Berita Acara (BA)" },
+          { key: "status", label: "Status" }
+        ]}
         actionsHeader="AKSI"
         actionsRender={(row) => (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>

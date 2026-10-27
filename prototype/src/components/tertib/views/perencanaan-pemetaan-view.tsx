@@ -565,6 +565,14 @@ export default function PerencanaanPemetaanView({ tertibType }: PerencanaanPemet
         columns={columns}
         defaultPageSize={5}
         exportFileName={`Pemetaan_Objek_${tertibType}`}
+        exportColumns={[
+          { key: "namaObjek", label: "Nama Objek / Kegiatan" },
+          { key: "kategori", label: "Kategori Objek" },
+          { key: "kecamatan", label: "Kecamatan" },
+          { key: "lokasiSpesifik", label: "Alamat / Lokasi Spesifik" },
+          { key: "prioritas", label: "Prioritas Audit" },
+          { key: "statusAudit", label: "Status Audit" }
+        ]}
         actionsHeader="AKSI"
         actionsRender={(row) => (
           <div style={{ display: "inline-flex", gap: "6px" }}>
