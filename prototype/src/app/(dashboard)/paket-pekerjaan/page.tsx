@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { 
   Package, Search, Download, Plus, Eye, TrendingUp, 
@@ -159,40 +159,66 @@ export default function PaketPekerjaanPage() {
     ? Math.round(projects.reduce((acc, curr) => acc + curr.physProgress, 0) / projects.length)
     : 0;
 
+  const existingProjectsMap = useMemo(() => {
+    const map = new Map<string, { physProgress: number; name: string }>();
+    projects.forEach((p) => {
+      map.set(p.id.toUpperCase(), { physProgress: p.physProgress, name: p.name });
+    });
+    return map;
+  }, [projects]);
+
   const handleBatchCommit = async (parsedData: Record<string, any>[]) => {
+    let updateCount = 0;
+    let newCount = 0;
+
     const dbPayloads: PaketInsert[] = parsedData.map((d, i) => {
-      const id = d.id || `P00${projects.length + i + 1}`;
-      const contractValue = Number(String(d.contractValue).replace(/\D/g, "")) || 1000000000;
+      const candidateId = d.id || d.id_paket || d.kode_paket;
+      const existing = candidateId 
+        ? projects.find((p) => p.id.toUpperCase() === String(candidateId).toUpperCase().trim()) 
+        : null;
+
+      const id = candidateId ? String(candidateId).toUpperCase().trim() : `P00${projects.length + i + 1}`;
+      const contractValue = Number(String(d.contractValue || d.nilai_kontrak || "").replace(/\D/g, "")) || (existing?.contractValue || 1000000000);
+      const physProg = Number(d.physProgress ?? d.progress_fisik ?? d.progres_fisik ?? (existing?.physProgress || 0));
+      const finProg = Number(d.finProgress ?? d.progress_keuangan ?? d.progres_keuangan ?? (existing?.finProgress || 0));
+      const monthProg = d.physMonth || d.bulan_progres || existing?.physMonth || "Agustus";
+
+      if (existing) {
+        updateCount++;
+      } else {
+        newCount++;
+      }
+
       return {
         id,
-        nama_paket: d.name || "Paket Baru",
-        tahun_anggaran: 2026,
-        sumber_dana: (d.source as any) || "APBD",
-        nama_instansi: "DPU Kab. Bogor",
-        nama_penyedia: d.contractor || "PT Kontraktor Lokal",
-        nib_penyedia: "9876543210987",
+        nama_paket: d.name || d.nama_paket || existing?.name || "Paket Baru",
+        tahun_anggaran: Number(d.fiscalYear || d.tahun_anggaran) || existing?.fiscalYear || 2026,
+        sumber_dana: (d.source || d.sumber_dana || existing?.source || "APBD") as any,
+        nama_instansi: d.owner || d.nama_instansi || existing?.owner || "DPU Kab. Bogor",
+        nama_penyedia: d.contractor || d.nama_penyedia || existing?.contractor || "PT Kontraktor Lokal",
+        nib_penyedia: d.nib || d.nib_penyedia || existing?.nib || "9876543210987",
         nilai_kontrak: contractValue,
-        status_pekerjaan: (d.status as any) || "Pelaksanaan",
+        status_pekerjaan: (physProg >= 100 ? "Selesai" : (d.status || d.status_pekerjaan || existing?.status || "Pelaksanaan")) as any,
         jenis_kontrak: "Konstruksi",
         sifat_kontrak: "Harga Satuan",
-        tanggal_mulai: "2026-04-15",
-        tanggal_selesai: "2026-10-30",
-        progres_fisik: 15,
-        progres_keuangan: 20,
-        bulan_progres: "April",
-        kode_kecamatan: "01",
+        tanggal_mulai: d.startDate || d.tanggal_mulai || existing?.startDate || "2026-04-15",
+        tanggal_selesai: d.endDate || d.tanggal_selesai || existing?.endDate || "2026-10-30",
+        progres_fisik: physProg,
+        progres_keuangan: finProg,
+        bulan_progres: monthProg,
+        kode_kecamatan: d.districtId || d.kode_kecamatan || existing?.districtId || "01",
         kecamatan: "Kabupaten Bogor",
-        lat: -6.48,
-        lng: 106.85,
-        kurva_s_rencana: [0, 10, 25, 45, 65, 85, 100],
-        kurva_s_realisasi: [0, 15, 0, 0, 0, 0, 0]
+        lat: Number(d.lat) || existing?.lat || -6.48,
+        lng: Number(d.lng) || existing?.lng || 106.85,
+        kurva_s_rencana: existing?.planProgress || [0, 10, 25, 45, 65, 85, 100],
+        kurva_s_realisasi: existing?.realProgress || [0, physProg, 0, 0, 0, 0, 0]
       };
     });
 
     await batchInsertPaket(dbPayloads);
     await loadData();
     setShowImportModal(false);
-    alert(`Berhasil mengimpor ${dbPayloads.length} paket pekerjaan ke dalam sistem!`);
+    alert(`Berhasil memproses ${dbPayloads.length} paket pekerjaan!\n• ${updateCount} paket diperbarui progresnya\n• ${newCount} paket baru ditambahkan`);
   };
 
   const handleAddProject = async (e: React.FormEvent) => {
@@ -920,6 +946,7 @@ export default function PaketPekerjaanPage() {
         sampleRows={TEMPLATE_PAKET_PEKERJAAN.sampleRows}
         template={TEMPLATE_PAKET_PEKERJAAN}
         onCommit={handleBatchCommit}
+        existingRecords={existingProjectsMap}
       />
     </div>
   );

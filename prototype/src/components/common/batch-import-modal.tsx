@@ -9,7 +9,7 @@ import * as XLSX from "xlsx";
 import ModalForm from "./modal-form";
 import { SipjakiTemplate } from "@/lib/sipjaki-templates";
 import { downloadExcelTemplate, triggerBrowserDownload } from "@/lib/export-utils";
-import { validateImportBatch, BatchValidationSummary, RowValidation } from "@/lib/import-validators";
+import { validateImportBatch, BatchValidationSummary, RowValidation, ExistingRecordInfo } from "@/lib/import-validators";
 
 export interface BatchColumnDef {
   key: string;
@@ -29,6 +29,7 @@ export interface BatchImportModalProps<T> {
   template?: SipjakiTemplate;
   onCommit: (parsedData: T[]) => void;
   hasDocumentFields?: boolean;
+  existingRecords?: Map<string, ExistingRecordInfo>;
 }
 
 export default function BatchImportModal<T extends Record<string, any>>({
@@ -41,7 +42,8 @@ export default function BatchImportModal<T extends Record<string, any>>({
   sampleRows = [],
   template,
   onCommit,
-  hasDocumentFields = false
+  hasDocumentFields = false,
+  existingRecords
 }: BatchImportModalProps<T>) {
   const actualTitle = title || (template ? `Import Batch: ${template.moduleName}` : "Import Batch Data");
   const actualTemplateFileName = templateFileName || (template ? `${template.exportFileName}_template.xlsx` : "template.xlsx");
@@ -97,14 +99,9 @@ export default function BatchImportModal<T extends Record<string, any>>({
       return;
     }
 
-    if (template) {
-      const summary = validateImportBatch(rawRows, template);
-      setValidationResult(summary);
-      setPreviewData(rawRows as T[]);
-    } else {
-      setPreviewData(rawRows as T[]);
-      setValidationResult(null);
-    }
+    const summary = validateImportBatch(rawRows, template, existingRecords);
+    setValidationResult(summary);
+    setPreviewData(rawRows as T[]);
 
     setParseError(null);
     setActiveStep("preview");
@@ -521,24 +518,49 @@ export default function BatchImportModal<T extends Record<string, any>>({
                 </div>
               </div>
 
-              {/* Validation Badges */}
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+              {/* Validation & Smart Diff Badges */}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                 {validationResult ? (
                   <>
-                    <span style={{ fontSize: "11px", fontWeight: 800, color: "#166534", backgroundColor: "#DCFCE7", padding: "4px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 800, color: "#166534", backgroundColor: "#DCFCE7", padding: "4px 9px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                       <CheckCircle2 style={{ width: "12px", height: "12px" }} />
-                      {validationResult.validCount} Baris Valid
+                      {validationResult.validCount} Valid
                     </span>
 
+                    {validationResult.newCount > 0 && (
+                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "4px 9px", borderRadius: "9999px" }}>
+                        + {validationResult.newCount} Baru
+                      </span>
+                    )}
+
+                    {validationResult.updateCount > 0 && (
+                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#92400E", backgroundColor: "#FEF3C7", padding: "4px 9px", borderRadius: "9999px" }}>
+                        ↺ {validationResult.updateCount} Update
+                      </span>
+                    )}
+
+                    {validationResult.unchangedCount > 0 && (
+                      <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", backgroundColor: "#F1F5F9", padding: "4px 9px", borderRadius: "9999px" }}>
+                        — {validationResult.unchangedCount} Tetap
+                      </span>
+                    )}
+
+                    {validationResult.duplicateCount > 0 && (
+                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#991B1B", backgroundColor: "#FEE2E2", padding: "4px 9px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                        <AlertCircle style={{ width: "12px", height: "12px" }} />
+                        {validationResult.duplicateCount} Duplikat
+                      </span>
+                    )}
+
                     {validationResult.warningCount > 0 && (
-                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#854D0E", backgroundColor: "#FEF08A", padding: "4px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#854D0E", backgroundColor: "#FEF08A", padding: "4px 9px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                         <AlertTriangle style={{ width: "12px", height: "12px" }} />
                         {validationResult.warningCount} Peringatan
                       </span>
                     )}
 
                     {validationResult.errorCount > 0 && (
-                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#991B1B", backgroundColor: "#FEE2E2", padding: "4px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: 800, color: "#991B1B", backgroundColor: "#FEE2E2", padding: "4px 9px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                         <AlertCircle style={{ width: "12px", height: "12px" }} />
                         {validationResult.errorCount} Error
                       </span>
@@ -651,6 +673,9 @@ export default function BatchImportModal<T extends Record<string, any>>({
                   <tr style={{ borderBottom: "1px solid #CBD5E1" }}>
                     <th style={{ padding: "10px 12px", textAlign: "center", color: "#475569", width: "40px" }}>#</th>
                     <th style={{ padding: "10px 12px", textAlign: "center", color: "#475569", width: "70px" }}>STATUS</th>
+                    <th style={{ padding: "10px 12px", textAlign: "center", color: "#0F2E5C", fontWeight: 800, minWidth: "110px", whiteSpace: "nowrap" }}>
+                      AKSI / DIFF
+                    </th>
                     {requiresDocuments && (
                       <th style={{ padding: "10px 12px", textAlign: "center", color: "#0F2E5C", fontWeight: 800, whiteSpace: "nowrap" }}>
                         📎 DOKUMEN
@@ -721,6 +746,25 @@ export default function BatchImportModal<T extends Record<string, any>>({
                           ) : (
                             <span style={{ fontSize: "10px", fontWeight: 800, color: "#166534", backgroundColor: "#DCFCE7", padding: "2px 6px", borderRadius: "4px" }}>
                               ✓ Lolos
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
+                          {validation?.diffStatus === "DUPLICATE" ? (
+                            <span style={{ fontSize: "10px", fontWeight: 800, color: "#991B1B", backgroundColor: "#FEE2E2", padding: "2px 8px", borderRadius: "9999px" }}>
+                              ⚠️ ID Duplikat
+                            </span>
+                          ) : validation?.diffStatus === "UPDATE" ? (
+                            <span style={{ fontSize: "10px", fontWeight: 800, color: "#92400E", backgroundColor: "#FEF3C7", padding: "2px 8px", borderRadius: "9999px" }}>
+                              ↺ Update ({validation.previousProgress}% ➔ {row.physProgress ?? row.progres_fisik ?? row.progress_fisik ?? 0}%)
+                            </span>
+                          ) : validation?.diffStatus === "UNCHANGED" ? (
+                            <span style={{ fontSize: "10px", fontWeight: 700, color: "#64748B", backgroundColor: "#F1F5F9", padding: "2px 8px", borderRadius: "9999px" }}>
+                              — Tetap ({validation.previousProgress}%)
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: "10px", fontWeight: 800, color: "#166534", backgroundColor: "#DCFCE7", padding: "2px 8px", borderRadius: "9999px" }}>
+                              + Paket Baru
                             </span>
                           )}
                         </td>
@@ -807,7 +851,28 @@ export default function BatchImportModal<T extends Record<string, any>>({
                   Batal / Ganti Berkas
                 </button>
 
-                {validationResult && validationResult.errorCount > 0 ? (
+                {validationResult?.duplicateCount && validationResult.duplicateCount > 0 ? (
+                  <button
+                    type="button"
+                    disabled={true}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "9px 18px",
+                      borderRadius: "10px",
+                      backgroundColor: "#FEE2E2",
+                      color: "#991B1B",
+                      border: "1px solid #FECACA",
+                      fontSize: "12px",
+                      fontWeight: 800,
+                      cursor: "not-allowed"
+                    }}
+                  >
+                    <AlertCircle style={{ width: "14px", height: "14px" }} />
+                    <span>Perbaiki {validationResult.duplicateCount} ID Duplikat Dahulu</span>
+                  </button>
+                ) : validationResult && validationResult.errorCount > 0 ? (
                   <button
                     type="button"
                     onClick={() => handleCommitData(true)}

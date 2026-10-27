@@ -8,6 +8,8 @@ export interface CellError {
   severity: "error" | "warning";
 }
 
+export type RowDiffStatus = "NEW" | "UPDATE" | "UNCHANGED" | "DUPLICATE";
+
 export interface RowValidation {
   rowIndex: number; // 1-indexed for user display
   originalRow: Record<string, any>;
@@ -15,6 +17,17 @@ export interface RowValidation {
   isValid: boolean;
   hasWarning: boolean;
   errors: CellError[];
+  diffStatus: RowDiffStatus;
+  previousProgress: number | null;
+  progressDelta: number | null;
+  isRegression: boolean;
+}
+
+export interface ExistingRecordInfo {
+  physProgress?: number;
+  name?: string;
+  contractValue?: number;
+  status?: string;
 }
 
 export interface BatchValidationSummary {
@@ -22,6 +35,11 @@ export interface BatchValidationSummary {
   validCount: number;
   errorCount: number;
   warningCount: number;
+  newCount: number;
+  updateCount: number;
+  unchangedCount: number;
+  duplicateCount: number;
+  regressionCount: number;
   rowResults: RowValidation[];
   validRows: Record<string, any>[];
   invalidRows: RowValidation[];
@@ -68,23 +86,77 @@ export function sanitizeCurrency(val: any): number {
 }
 
 /**
- * Mesin validasi data impor batch berbasis template SIPJAKI
+ * Cari ID unik dari baris data
+ */
+function extractRowIdentifier(row: Record<string, any>): string | null {
+  const candidateKeys = ["id", "id_paket", "kode_paket", "kodePaket", "ID", "no_kontrak", "nomor_kontrak"];
+  for (const k of candidateKeys) {
+    if (row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== "") {
+      return String(row[k]).trim().toUpperCase();
+    }
+  }
+  return null;
+}
+
+/**
+ * Mesin validasi data impor batch berbasis template SIPJAKI dengan deteksi anti-redundansi
  */
 export function validateImportBatch(
   rows: Record<string, any>[],
-  template?: SipjakiTemplate
+  template?: SipjakiTemplate,
+  existingRecords?: Map<string, ExistingRecordInfo>
 ): BatchValidationSummary {
   const rowResults: RowValidation[] = [];
   const validRows: Record<string, any>[] = [];
   const invalidRows: RowValidation[] = [];
+
+  // 1. Pre-scan: Pengecekan Baris Ganda (Duplicate ID) dalam berkas spreadsheet yang sama
+  const idToRowIndices = new Map<string, number[]>();
+  rows.forEach((row, idx) => {
+    const id = extractRowIdentifier(row);
+    if (id) {
+      const list = idToRowIndices.get(id) || [];
+      list.push(idx + 1);
+      idToRowIndices.set(id, list);
+    }
+  });
+
+  let newCount = 0;
+  let updateCount = 0;
+  let unchangedCount = 0;
+  let duplicateCount = 0;
+  let regressionCount = 0;
 
   rows.forEach((row, index) => {
     const rowIndex = index + 1;
     const errors: CellError[] = [];
     const sanitizedRow: Record<string, any> = { ...row };
 
+    const rowId = extractRowIdentifier(row);
+
+    // Deteksi duplikasi internal dalam spreadsheet
+    let diffStatus: RowDiffStatus = "NEW";
+    let isInternalDuplicate = false;
+
+    if (rowId) {
+      const occurrences = idToRowIndices.get(rowId) || [];
+      if (occurrences.length > 1) {
+        isInternalDuplicate = true;
+        diffStatus = "DUPLICATE";
+        duplicateCount++;
+        const otherRows = occurrences.filter((r) => r !== rowIndex);
+        errors.push({
+          columnKey: "id",
+          columnLabel: "ID Unik",
+          value: rowId,
+          message: `ID "${rowId}" duplikat di dalam berkas ini (ditemukan juga pada baris ${otherRows.join(", ")}).`,
+          severity: "error"
+        });
+      }
+    }
+
     if (template) {
-      // 1. Periksa kolom wajib isi (required) dari template.importColumns
+      // 1. Periksa kolom wajib isi (required)
       template.importColumns.forEach((colDef) => {
         const val = row[colDef.key];
         const isEmpty = val === undefined || val === null || String(val).trim() === "";
@@ -118,7 +190,6 @@ export function validateImportBatch(
               severity: "error"
             });
           } else {
-            // Normalkan kapitalisasi sesuai enum resmi
             const canonical = allowedValues.find(
               (opt) => opt.toLowerCase() === strVal.toLowerCase()
             );
@@ -127,7 +198,7 @@ export function validateImportBatch(
         }
       });
 
-      // 3. Validasi NIB jika ada kolom NIB
+      // 3. Validasi NIB
       const nibKeys = ["nib", "nib_penyedia", "nibPenyedia"];
       nibKeys.forEach((key) => {
         if (row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== "") {
@@ -137,7 +208,7 @@ export function validateImportBatch(
               columnKey: key,
               columnLabel: "NIB Penyedia",
               value: rawNib,
-              message: `NIB "${rawNib}" harus terdiri dari 13 digit angka (saat ini ${rawNib.length} karakter).`,
+              message: `NIB "${rawNib}" harus 13 digit angka numerik.`,
               severity: "error"
             });
           }
@@ -154,14 +225,14 @@ export function validateImportBatch(
               columnKey: key,
               columnLabel: key,
               value: rawDate,
-              message: `Format tanggal "${rawDate}" tidak valid. Gunakan format YYYY-MM-DD.`,
+              message: `Format tanggal "${rawDate}" tidak valid. Gunakan YYYY-MM-DD.`,
               severity: "warning"
             });
           }
         }
       });
 
-      // 5. Normalisasi Nilai Kontrak / Keuangan
+      // 5. Normalisasi Nilai Rupiah
       const currencyKeys = ["contractValue", "nilai_kontrak", "paguAnggaran", "realisasi", "anggaran"];
       currencyKeys.forEach((key) => {
         if (row[key] !== undefined && row[key] !== null) {
@@ -171,7 +242,7 @@ export function validateImportBatch(
       });
 
       // 6. Validasi Rentang Progres Fisik & Keuangan (0 - 100%)
-      const progressKeys = ["physProgress", "finProgress", "progress_fisik", "progress_keuangan"];
+      const progressKeys = ["physProgress", "finProgress", "progress_fisik", "progress_keuangan", "progres_fisik", "progres_keuangan"];
       progressKeys.forEach((key) => {
         if (row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== "") {
           const num = Number(String(row[key]).replace(/[^\d.-]/g, ""));
@@ -190,6 +261,53 @@ export function validateImportBatch(
       });
     }
 
+    // 7. Smart Diff Matching dengan Database Eksisting
+    let previousProgress: number | null = null;
+    let progressDelta: number | null = null;
+    let isRegression = false;
+
+    if (!isInternalDuplicate && rowId && existingRecords) {
+      const existing = existingRecords.get(rowId);
+      if (existing) {
+        const rawNewProg = sanitizedRow.physProgress ?? sanitizedRow.progres_fisik ?? sanitizedRow.progress_fisik;
+        const newProg = rawNewProg !== undefined ? Number(rawNewProg) : null;
+        previousProgress = existing.physProgress !== undefined ? Number(existing.physProgress) : null;
+
+        if (newProg !== null && previousProgress !== null) {
+          progressDelta = newProg - previousProgress;
+
+          if (progressDelta === 0) {
+            diffStatus = "UNCHANGED";
+            unchangedCount++;
+          } else if (progressDelta < 0) {
+            diffStatus = "UPDATE";
+            isRegression = true;
+            regressionCount++;
+            updateCount++;
+            errors.push({
+              columnKey: "progres_fisik",
+              columnLabel: "Progres Fisik",
+              value: newProg,
+              message: `Peringatan: Progres di berkas (${newProg}%) lebih kecil dari database (${previousProgress}%). Selisih: ${progressDelta}%.`,
+              severity: "warning"
+            });
+          } else {
+            diffStatus = "UPDATE";
+            updateCount++;
+          }
+        } else {
+          diffStatus = "UPDATE";
+          updateCount++;
+        }
+      } else {
+        diffStatus = "NEW";
+        newCount++;
+      }
+    } else if (!isInternalDuplicate) {
+      diffStatus = "NEW";
+      newCount++;
+    }
+
     const hasErrors = errors.some((e) => e.severity === "error");
     const hasWarning = errors.some((e) => e.severity === "warning");
     const isValid = !hasErrors;
@@ -200,7 +318,11 @@ export function validateImportBatch(
       sanitizedRow,
       isValid,
       hasWarning,
-      errors
+      errors,
+      diffStatus,
+      previousProgress,
+      progressDelta,
+      isRegression
     };
 
     rowResults.push(rowVal);
@@ -217,6 +339,11 @@ export function validateImportBatch(
     validCount: validRows.length,
     errorCount: invalidRows.length,
     warningCount: rowResults.filter((r) => r.hasWarning).length,
+    newCount,
+    updateCount,
+    unchangedCount,
+    duplicateCount,
+    regressionCount,
     rowResults,
     validRows,
     invalidRows
