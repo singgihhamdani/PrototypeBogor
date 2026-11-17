@@ -1,0 +1,3006 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entity Relationship Diagram (ERD) — SIJAKON BOGOR TA 2026</title>
+  
+  <!-- Typography & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM: SIJAKON DINAS PUPR KABUPATEN BOGOR (PREMIUM EXECUTIVE)
+       ========================================================================== */
+    :root {
+      --navy-950: #07182E;
+      --navy-900: #0B2244;
+      --navy-800: #0F2E5C; /* Primary PUPR Navy */
+      --navy-700: #163B75;
+      --navy-600: #1E4E96;
+      --navy-100: #EBF2FA;
+      --navy-50:  #F4F8FC;
+
+      --gold-600: #B45309;
+      --gold-500: #D97706; /* PUPR Gold Accent */
+      --gold-400: #F59E0B;
+      --gold-300: #FCD34D;
+      --gold-100: #FEF3C7;
+      --gold-50:  #FFFBEB;
+
+      --cyan-700: #0369A1;
+      --cyan-600: #0284C7;
+      --cyan-500: #0EA5E9;
+      --cyan-100: #E0F2FE;
+      --cyan-50:  #F0F9FF;
+
+      --emerald-700: #047857;
+      --emerald-600: #059669;
+      --emerald-500: #10B981;
+      --emerald-100: #D1FAE5;
+      --emerald-50:  #ECFDF5;
+
+      --purple-700: #6D28D9;
+      --purple-600: #7C3AED;
+      --purple-100: #EDE9FE;
+
+      --rose-600: #E11D48;
+      --rose-500: #F43F5E;
+      --rose-100: #FFE4E6;
+
+      --slate-900: #0F172A;
+      --slate-800: #1E293B;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748B;
+      --slate-400: #94A3B8;
+      --slate-300: #CBD5E1;
+      --slate-200: #E2E8F0;
+      --slate-100: #F1F5F9;
+      --slate-50:  #F8FAFC;
+      --white:     #FFFFFF;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(15, 46, 92, 0.08), 0 2px 4px -2px rgba(15, 46, 92, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(15, 46, 92, 0.1), 0 4px 6px -4px rgba(15, 46, 92, 0.06);
+      --shadow-xl: 0 20px 25px -5px rgba(15, 46, 92, 0.12), 0 8px 10px -6px rgba(15, 46, 92, 0.06);
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F8FAFC;
+      color: var(--slate-800);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==========================================================================
+       TOP NAVIGATION BAR & CONTROLS
+       ========================================================================== */
+    .top-header {
+      height: 60px;
+      min-height: 60px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--slate-200);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      z-index: 50;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-badge {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--navy-800), var(--navy-950));
+      border: 2px solid var(--gold-400);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-400);
+      font-size: 18px;
+      font-weight: 800;
+      box-shadow: 0 2px 6px rgba(15, 46, 92, 0.25);
+    }
+
+    .brand-title {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title h1 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--navy-950);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-title span {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--slate-500);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    /* Center Mode Tabs */
+    .view-mode-tabs {
+      display: flex;
+      background: var(--slate-100);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--slate-200);
+      gap: 4px;
+    }
+
+    .mode-tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-600);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .mode-tab-btn:hover {
+      color: var(--navy-800);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .mode-tab-btn.active {
+      background: var(--white);
+      color: var(--navy-900);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .mode-tab-btn .badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: var(--navy-100);
+      color: var(--navy-800);
+    }
+
+    /* Actions / Presentation utilities */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--slate-300);
+      background: var(--white);
+      color: var(--slate-700);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn-action:hover {
+      background: var(--slate-50);
+      border-color: var(--slate-400);
+      color: var(--navy-950);
+    }
+
+    .btn-action.btn-primary {
+      background: var(--navy-800);
+      border-color: var(--navy-800);
+      color: var(--white);
+    }
+
+    .btn-action.btn-primary:hover {
+      background: var(--navy-900);
+    }
+
+    /* Global Progress Bar for Slides */
+    .slide-progress-track {
+      width: 100%;
+      height: 3px;
+      background: var(--slate-200);
+      position: relative;
+    }
+
+    .slide-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--navy-800), var(--gold-500), var(--cyan-600));
+      width: 12.5%;
+      transition: width 0.3s ease;
+    }
+
+    /* ==========================================================================
+       CONTAINER WRAPPER FOR MODES
+       ========================================================================== */
+    .view-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      height: calc(100vh - 63px);
+      overflow: hidden;
+    }
+
+    .view-container {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .view-container.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==========================================================================
+       MODE 1: PRESENTATION SLIDE DECK
+       ========================================================================== */
+    #mode-presentation {
+      background: #FFFFFF;
+      position: relative;
+    }
+
+    .presentation-stage {
+      flex: 1;
+      display: flex;
+      position: relative;
+      width: 100%;
+      height: calc(100% - 58px);
+    }
+
+    .slide-item {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 24px 44px 30px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(30px);
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .slide-item.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      z-index: 2;
+    }
+
+    .slide-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--navy-50);
+      color: var(--navy-800);
+      border: 1px solid var(--navy-100);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      align-self: flex-start;
+    }
+
+    .slide-tag.tag-gold {
+      background: var(--gold-50);
+      color: var(--gold-600);
+      border-color: var(--gold-100);
+    }
+
+    .slide-tag.tag-emerald {
+      background: var(--emerald-50);
+      color: var(--emerald-700);
+      border-color: var(--emerald-100);
+    }
+
+    .slide-tag.tag-cyan {
+      background: var(--cyan-50);
+      color: var(--cyan-700);
+      border-color: var(--cyan-100);
+    }
+
+    .slide-tag.tag-purple {
+      background: var(--purple-100);
+      color: var(--purple-700);
+      border-color: #DDD6FE;
+    }
+
+    .slide-header {
+      margin-bottom: 16px;
+    }
+
+    .slide-header h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy-950);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 4px;
+    }
+
+    .slide-header h2 span.highlight {
+      color: var(--gold-600);
+    }
+
+    .slide-header p {
+      font-size: 13px;
+      color: var(--slate-600);
+      max-width: 950px;
+      line-height: 1.5;
+    }
+
+    /* Slide Footer Navigation */
+    .presentation-controls-bar {
+      height: 58px;
+      min-height: 58px;
+      border-top: 1px solid var(--slate-200);
+      background: var(--white);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .nav-hints {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--slate-500);
+    }
+
+    .nav-hints kbd {
+      padding: 2px 7px;
+      background: var(--slate-100);
+      border: 1px solid var(--slate-300);
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--slate-700);
+    }
+
+    .slide-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy-950);
+    }
+
+    .slide-nav-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-slide-nav {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--slate-300);
+      background: var(--white);
+      color: var(--slate-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-slide-nav:hover:not(:disabled) {
+      background: var(--navy-800);
+      color: var(--white);
+      border-color: var(--navy-800);
+    }
+
+    .btn-slide-nav:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    /* Slide Grids & Content Cards */
+    .metric-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .metric-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--navy-600);
+      transform: translateY(-2px);
+    }
+
+    .metric-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--slate-500);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metric-card-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy-950);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-card-sub {
+      font-size: 11px;
+      color: var(--slate-600);
+      line-height: 1.4;
+    }
+
+    .slide-body-split {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .card-panel {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-panel h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--navy-950);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cluster-banner {
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      border-left: 5px solid;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .cluster-banner.c-rbac {
+      background: #F5F3FF;
+      border-color: var(--purple-600);
+    }
+
+    .cluster-banner.c-bujk {
+      background: var(--navy-50);
+      border-color: var(--navy-800);
+    }
+
+    .cluster-banner.c-gis {
+      background: var(--cyan-50);
+      border-color: var(--cyan-600);
+    }
+
+    .cluster-banner.c-audit {
+      background: var(--gold-50);
+      border-color: var(--gold-500);
+    }
+
+    .cluster-banner.c-tkk {
+      background: var(--emerald-50);
+      border-color: var(--emerald-600);
+    }
+
+    .cluster-banner-title {
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--navy-950);
+    }
+
+    .cluster-banner-desc {
+      font-size: 11px;
+      color: var(--slate-600);
+      margin-top: 2px;
+    }
+
+    /* Compact Slide Table Presentation */
+    .mini-erd-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .mini-erd-table th {
+      background: var(--slate-100);
+      padding: 7px 10px;
+      font-weight: 700;
+      color: var(--slate-700);
+      border-bottom: 2px solid var(--slate-200);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .mini-erd-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--slate-200);
+      vertical-align: middle;
+    }
+
+    .mini-erd-table tr:hover td {
+      background: var(--slate-50);
+    }
+
+    /* Key Badges */
+    .col-pk {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #FEF3C7;
+      color: #92400E;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      border: 1px solid #FDE68A;
+    }
+
+    .col-fk {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #E0F2FE;
+      color: #0369A1;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      border: 1px solid #BAE6FD;
+    }
+
+    .col-geom {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #D1FAE5;
+      color: #065F46;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      border: 1px solid #A7F3D0;
+    }
+
+    .type-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--slate-700);
+      background: var(--slate-100);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* ==========================================================================
+       MODE 2: INTERACTIVE ERD CANVAS EXPLORER (CLEAN DEDICATED SUB-HEADER)
+       ========================================================================== */
+    #mode-canvas {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background: #0B1329; /* Dark blueprint canvas */
+      overflow: hidden;
+      display: none;
+    }
+
+    #mode-canvas.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Clean Sub-header toolbar for canvas - NON OVERLAPPING */
+    .canvas-sub-header {
+      height: 52px;
+      min-height: 52px;
+      background: #071022;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 25;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .canvas-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--slate-300);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--white);
+    }
+
+    .filter-btn.active {
+      background: var(--navy-800);
+      color: var(--white);
+      border-color: var(--gold-500);
+    }
+
+    .filter-btn.c-rbac.active { background: #6D28D9; border-color: #A78BFA; }
+    .filter-btn.c-bujk.active { background: #1E3A8A; border-color: #60A5FA; }
+    .filter-btn.c-gis.active { background: #0369A1; border-color: #38BDF8; }
+    .filter-btn.c-audit.active { background: #B45309; border-color: #FBBF24; }
+    .filter-btn.c-tkk.active { background: #047857; border-color: #34D399; }
+
+    .canvas-search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      width: 250px;
+      color: var(--white);
+    }
+
+    .canvas-search-box input {
+      background: transparent;
+      border: none;
+      color: var(--white);
+      font-size: 12px;
+      width: 100%;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .canvas-search-box input::placeholder {
+      color: var(--slate-400);
+    }
+
+    .canvas-view-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-zoom {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-sm);
+      color: var(--slate-200);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn-zoom:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--gold-400);
+    }
+
+    /* Stage wrapper for the SVG */
+    .canvas-stage-wrapper {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 52px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* The actual SVG taking FULL remaining area */
+    .svg-viewport {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .svg-viewport:active {
+      cursor: grabbing;
+    }
+
+    /* Floating Legend (Bottom Left) */
+    .canvas-legend {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 20;
+      background: rgba(7, 16, 34, 0.88);
+      backdrop-filter: blur(8px);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      pointer-events: none;
+    }
+
+    .canvas-legend h4 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--slate-400);
+      margin-bottom: 2px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--slate-200);
+    }
+
+    .legend-color-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    /* Drawer Inspector on Canvas Table Click */
+    .table-inspector-drawer {
+      position: absolute;
+      top: 0;
+      right: -480px;
+      width: 440px;
+      height: 100%;
+      background: var(--white);
+      box-shadow: -10px 0 25px rgba(0, 0, 0, 0.35);
+      z-index: 30;
+      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .table-inspector-drawer.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      padding: 16px 20px;
+      background: var(--navy-900);
+      color: var(--white);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      border-bottom: 3px solid var(--gold-400);
+    }
+
+    .drawer-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--gold-300);
+    }
+
+    .drawer-header p {
+      font-size: 11px;
+      color: var(--slate-300);
+      margin-top: 3px;
+    }
+
+    .btn-close-drawer {
+      background: transparent;
+      border: none;
+      color: var(--slate-400);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .btn-close-drawer:hover {
+      color: var(--white);
+    }
+
+    .drawer-content {
+      padding: 18px 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* ==========================================================================
+       MODE 3: DATA DICTIONARY EXPLORER (SEARCHABLE TABLE)
+       ========================================================================== */
+    #mode-dictionary {
+      padding: 24px 40px 60px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-y: auto;
+    }
+
+    .dict-filter-header {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .dict-search-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .dict-search-input {
+      flex: 1;
+      padding: 9px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--slate-300);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.15s ease;
+    }
+
+    .dict-search-input:focus {
+      border-color: var(--navy-800);
+      box-shadow: 0 0 0 3px rgba(15, 46, 92, 0.1);
+    }
+
+    .dict-cluster-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .dict-pill-btn {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid var(--slate-300);
+      background: var(--slate-50);
+      color: var(--slate-700);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .dict-pill-btn:hover {
+      background: var(--slate-100);
+      border-color: var(--slate-400);
+    }
+
+    .dict-pill-btn.active {
+      background: var(--navy-800);
+      color: var(--white);
+      border-color: var(--navy-800);
+    }
+
+    .table-dictionary-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      margin-bottom: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .table-dictionary-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--navy-600);
+    }
+
+    .table-dict-header {
+      padding: 14px 20px;
+      background: var(--slate-50);
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-dict-header h3 {
+      font-size: 15px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--navy-950);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-dict-header .table-module-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .table-dict-desc {
+      padding: 10px 20px;
+      font-size: 12px;
+      color: var(--slate-600);
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-100);
+    }
+
+    .dict-data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .dict-data-table th {
+      background: var(--slate-100);
+      padding: 8px 16px;
+      font-weight: 700;
+      color: var(--slate-700);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .dict-data-table td {
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--slate-200);
+      vertical-align: middle;
+    }
+
+    .dict-data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .dict-data-table tr:hover td {
+      background: var(--navy-50);
+    }
+
+    .col-name-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--navy-950);
+    }
+
+    /* Print styling */
+    @media print {
+      .top-header, .presentation-controls-bar, .canvas-sub-header, .canvas-legend {
+        display: none !important;
+      }
+      body {
+        background: white;
+      }
+      .slide-item {
+        position: relative !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        page-break-after: always;
+        height: auto !important;
+        padding: 20px !important;
+      }
+      .table-dictionary-card {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Global Header -->
+  <header class="top-header">
+    <div class="brand-block">
+      <div class="brand-logo-badge">🏛️</div>
+      <div class="brand-title">
+        <h1>SIJAKON BOGOR — Entity Relationship Diagram (ERD)</h1>
+        <span>SISTEM INFORMASI JASA KONSTRUKSI • DINAS PUPR KABUPATEN BOGOR</span>
+      </div>
+    </div>
+
+    <!-- Mode Selector Tabs -->
+    <div class="view-mode-tabs">
+      <button class="mode-tab-btn active" onclick="switchViewMode('presentation')">
+        <span>📽️ Slide Presentasi</span>
+        <span class="badge">8 Slide</span>
+      </button>
+      <button class="mode-tab-btn" onclick="switchViewMode('canvas')">
+        <span>🗺️ Visual ERD Canvas</span>
+        <span class="badge">Interaktif</span>
+      </button>
+      <button class="mode-tab-btn" onclick="switchViewMode('dictionary')">
+        <span>📖 Kamus Data Lengkap</span>
+        <span class="badge">18 Tabel</span>
+      </button>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-action" onclick="toggleFullscreen()" title="Layar Penuh (Tekan F)">
+        <span>⛶</span> Fullscreen
+      </button>
+      <button class="btn-action btn-primary" onclick="window.print()" title="Cetak atau Simpan PDF">
+        <span>🖨️</span> Cetak / PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Global Slide Progress Indicator (Deck Mode) -->
+  <div class="slide-progress-track" id="slide-progress-track">
+    <div class="slide-progress-bar" id="slide-progress-bar"></div>
+  </div>
+
+  <div class="view-wrapper">
+
+    <!-- ========================================================================
+         VIEW 1: MODE PRESENTASI SLIDE DECK (EXECUTIVE READY)
+         ======================================================================== -->
+    <div id="mode-presentation" class="view-container active">
+      <div class="presentation-stage">
+
+        <!-- SLIDE 1: COVER & EXECUTIVE OVERVIEW -->
+        <section class="slide-item active" data-slide="1">
+          <div class="slide-tag tag-gold">Eksekutif Overview • Arsitektur Database</div>
+          <div class="slide-header">
+            <h2>Blueprint Basis Data Relasional & Geospasial <span class="highlight">SIJAKON Kabupaten Bogor</span></h2>
+            <p>Model struktur basis data terintegrasi yang mendukung 5 pilar pembinaan jasa konstruksi, pelaporan SIPJAKI Kementerian PUPR, pemetaan spasial 40 kecamatan, dan otomasi audit kepatuhan (Permen PUPR 1/2023).</p>
+          </div>
+
+          <div class="metric-grid-4">
+            <div class="metric-card">
+              <span class="metric-card-title">Katalog Tabel Sistem</span>
+              <span class="metric-card-val">18 Tabel</span>
+              <span class="metric-card-sub">Relasional termutakhirkan & siap pakai produksi</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card-title">Kluster Fungsional</span>
+              <span class="metric-card-val">6 Domain</span>
+              <span class="metric-card-sub">RBAC, BUJK, WebGIS, Audit, TKK, CMS</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card-title">Engine Database</span>
+              <span class="metric-card-val">PG 16 + PostGIS</span>
+              <span class="metric-card-sub">Sistem koordinat WGS 84 (EPSG:4326)</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card-title">SLA Query Response</span>
+              <span class="metric-card-val">&lt; 50 ms</span>
+              <span class="metric-card-sub">Optimalisasi Spatial GiST & Composite Index</span>
+            </div>
+          </div>
+
+          <div class="slide-body-split">
+            <div class="card-panel">
+              <h3>🎯 Tujuan Desain Skema Basis Data</h3>
+              <ul style="padding-left: 18px; line-height: 1.6; font-size: 12px; color: var(--slate-700);">
+                <li><strong>Integritas Multi-Tenant Terisolasi:</strong> Akun kontraktor (<code>OPERATOR_BUJK</code>) secara otomatis dibatasi hanya dapat mengakses rekaman data BUJK miliknya sendiri via kolom <code>bujk_id</code>.</li>
+                <li><strong>Ketertelusuran Spasial (WebGIS):</strong> Menyimpan poligon batas administrasi 40 kecamatan (<code>districts</code>) dan titik lokasi proyek/kantor BUJK menggunakan tipe spasial PostGIS bawaan.</li>
+                <li><strong>Otomasi Penilaian SIMAK 3 Pilar:</strong> Menyimpan kalkulasi pembobotan audit tertib usaha (40%), penyelenggaraan (35%), dan pemanfaatan (25%) sesuai Permen PUPR No. 1/2023.</li>
+                <li><strong>Anti-Pemalsuan e-Sertifikat:</strong> Penerbitan sertifikat pelatihan TKK dilengkapi nomor registrasi unik dan hash token keamanan QR (<code>qr_token</code>).</li>
+              </ul>
+            </div>
+
+            <div class="card-panel">
+              <h3>📜 Dasar Regulasi & Standar Kepatuhan</h3>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="background: var(--slate-50); padding: 8px 12px; border-radius: 6px; border-left: 4px solid var(--navy-800);">
+                  <strong style="font-size: 12px; color: var(--navy-950);">UU No. 2 Tahun 2017 & PP No. 14 Tahun 2021</strong>
+                  <p style="font-size: 11px; color: var(--slate-600);">Kewenangan Pemerintah Daerah Kabupaten/Kota dalam pengawasan tertib usaha dan pembinaan tenaga kerja konstruksi.</p>
+                </div>
+                <div style="background: var(--slate-50); padding: 8px 12px; border-radius: 6px; border-left: 4px solid var(--gold-500);">
+                  <strong style="font-size: 12px; color: var(--navy-950);">Permen PUPR No. 1 Tahun 2023</strong>
+                  <p style="font-size: 11px; color: var(--slate-600);">Pedoman pengawasan penyelenggaraan jasa konstruksi dengan standar instrumen digital SIMAK.</p>
+                </div>
+                <div style="background: var(--slate-50); padding: 8px 12px; border-radius: 6px; border-left: 4px solid var(--emerald-600);">
+                  <strong style="font-size: 12px; color: var(--navy-950);">Perda Kab. Bogor No. 2 Tahun 2020</strong>
+                  <p style="font-size: 11px; color: var(--slate-600);">Pemberdayaan dan optimalisasi pelaku jasa konstruksi lokal di 40 Kecamatan se-Kabupaten Bogor.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 2: TOPOLOGI GLOBAL 6 KLUSTER -->
+        <section class="slide-item" data-slide="2">
+          <div class="slide-tag tag-cyan">Arsitektur Makro • Blueprint Topologi</div>
+          <div class="slide-header">
+            <h2>Peta Relasi Antar 6 Kluster Fungsional</h2>
+            <p>Struktur relasi kardinalitas (1:1, 1:N, N:M) yang menghubungkan entitas pengguna, kontraktor, proyek infrastruktur, pengawasan, pelatihan, dan keterbukaan informasi publik.</p>
+          </div>
+
+          <div style="background: var(--slate-900); padding: 18px; border-radius: var(--radius-lg); color: var(--white); margin-bottom: 16px; box-shadow: var(--shadow-md);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+              <span style="font-size: 12px; font-weight: 700; color: var(--gold-300); text-transform: uppercase; letter-spacing: 0.05em;">🔗 Diagram Alir Data Antar-Modul</span>
+              <span style="font-size: 11px; color: var(--slate-400);">Engine: PostgreSQL 16 + Foreign Key Strict Constraint</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+              <div style="background: rgba(255,255,255,0.06); padding: 12px; border-radius: 6px; border-top: 3px solid #8B5CF6;">
+                <div style="font-weight: 800; font-size: 13px; color: #C4B5FD; margin-bottom: 4px;">1. Autentikasi & RBAC</div>
+                <p style="font-size: 11px; color: var(--slate-300); line-height: 1.4;">Menetapkan identitas akun (<code>users</code>), matriks hak akses 5 peran (<code>roles</code>, <code>role_permissions</code>), serta jejak audit digital (<code>audit_logs</code>).</p>
+                <div style="margin-top: 6px; font-size: 10px; color: #DDD6FE; font-family: monospace;">users.bujk_id ──► bujk_master.id</div>
+              </div>
+
+              <div style="background: rgba(255,255,255,0.06); padding: 12px; border-radius: 6px; border-top: 3px solid #3B82F6;">
+                <div style="font-weight: 800; font-size: 13px; color: #93C5FD; margin-bottom: 4px;">2. Master BUJK & Wilayah</div>
+                <p style="font-size: 11px; color: var(--slate-300); line-height: 1.4;">Basis data kontraktor (<code>bujk_master</code>), sertifikat subklasifikasi (<code>bujk_sbu</code>), pengalaman (<code>bujk_experiences</code>), dan 40 kecamatan (<code>districts</code>).</p>
+                <div style="margin-top: 6px; font-size: 10px; color: #BFDBFE; font-family: monospace;">districts.id ──► bujk_master.district_id</div>
+              </div>
+
+              <div style="background: rgba(255,255,255,0.06); padding: 12px; border-radius: 6px; border-top: 3px solid #06B6D4;">
+                <div style="font-weight: 800; font-size: 13px; color: #67E8F9; margin-bottom: 4px;">3. WebGIS & Monitoring Proyek</div>
+                <p style="font-size: 11px; color: var(--slate-300); line-height: 1.4;">Paket konstruksi APBD/DAK (<code>bujk_projects</code>) dengan titik/poligon spasial, serta kurva S mingguan (<code>project_progress_logs</code>).</p>
+                <div style="margin-top: 6px; font-size: 10px; color: #A5F3FC; font-family: monospace;">bujk_projects.id ──► progress_logs.project_id</div>
+              </div>
+
+              <div style="background: rgba(255,255,255,0.06); padding: 12px; border-radius: 6px; border-top: 3px solid #F59E0B;">
+                <div style="font-weight: 800; font-size: 13px; color: #FCD34D; margin-bottom: 4px;">4. Pengawasan Tertib Konstruksi</div>
+                <p style="font-size: 11px; color: var(--slate-300); line-height: 1.4;">Jadwal audit (<code>supervision_schedules</code>), berkas instrumen SIMAK (<code>supervision_files</code>), dan hasil audit skor komposit (<code>supervision_inspections</code>).</p>
+                <div style="margin-top: 6px; font-size: 10px; color: #FDE68A; font-family: monospace;">supervision_inspections ──► bujk_master & projects</div>
+              </div>
+
+              <div style="background: rgba(255,255,255,0.06); padding: 12px; border-radius: 6px; border-top: 3px solid #10B981;">
+                <div style="font-weight: 800; font-size: 13px; color: #6EE7B7; margin-bottom: 4px;">5. Pembinaan & Sertifikasi TKK</div>
+                <p style="font-size: 11px; color: var(--slate-300); line-height: 1.4;">Program bimtek/SKK (<code>training_packages</code>), calon peserta NIK (<code>applicants</code>), dan e-sertifikat ber-QR (<code>training_participants</code>).</p>
+                <div style="margin-top: 6px; font-size: 10px; color: #A7F3D0; font-family: monospace;">training_participants ──► packages & applicants</div>
+              </div>
+
+              <div style="background: rgba(255,255,255,0.06); padding: 12px; border-radius: 6px; border-top: 3px solid #94A3B8;">
+                <div style="font-weight: 800; font-size: 13px; color: #E2E8F0; margin-bottom: 4px;">6. CMS & Keterbukaan Publik</div>
+                <p style="font-size: 11px; color: var(--slate-300); line-height: 1.4;">Katalog dasar hukum & regulasi terindeks (<code>regulations</code>) dan publikasi portal berita jasa konstruksi (<code>news_articles</code>).</p>
+                <div style="margin-top: 6px; font-size: 10px; color: #F1F5F9; font-family: monospace;">news_articles.author_id ──► users.id</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-panel">
+            <h3>🛡️ Prinsip Integritas Referensial (Foreign Key Rules)</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 11px;">
+              <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 3px solid var(--rose-500);">
+                <strong>ON DELETE RESTRICT</strong>
+                <p style="color: var(--slate-600); margin-top: 3px;">Mencegah penghapusan BUJK atau Wilayah yang sudah memiliki riwayat proyek aktif atau rekaman audit kepatuhan.</p>
+              </div>
+              <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 3px solid var(--gold-500);">
+                <strong>ON DELETE CASCADE</strong>
+                <p style="color: var(--slate-600); margin-top: 3px;">Menghapus otomatis seluruh child entitas bawaan: SBU BUJK, riwayat kurva S mingguan, dan entri peserta pelatihan.</p>
+              </div>
+              <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 3px solid var(--cyan-600);">
+                <strong>ON DELETE SET NULL</strong>
+                <p style="color: var(--slate-600); margin-top: 3px;">Mempertahankan data audit logs dan inspeksi jika pengguna dinas pembuat mutasi dinonaktifkan dari sistem.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 3: KLUSTER 1 - RBAC & KEAMANAN -->
+        <section class="slide-item" data-slide="3">
+          <div class="slide-tag tag-purple">Kluster 1 • Autentikasi & Keamanan</div>
+          <div class="slide-header">
+            <h2>Role-Based Access Control (RBAC) & Audit Trail</h2>
+            <p>Manajemen autentikasi berstandar enterprise dengan 5 tingkatan peran login, isolasi tenant mandiri untuk kontraktor, dan pencatatan riwayat setiap aksi mutasi data.</p>
+          </div>
+
+          <div class="slide-body-split">
+            <div class="card-panel">
+              <div class="cluster-banner c-rbac">
+                <div>
+                  <div class="cluster-banner-title">Tabel: roles, role_permissions, users, audit_logs</div>
+                  <div class="cluster-banner-desc">Fondasi otentikasi JWT, password hashing Argon2id, dan granular permission</div>
+                </div>
+                <span class="col-pk">4 Tabel</span>
+              </div>
+
+              <table class="mini-erd-table">
+                <thead>
+                  <tr>
+                    <th>Entitas / Kolom</th>
+                    <th>Tipe Data</th>
+                    <th>Constraint</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="col-pk">roles.id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>PK</td>
+                    <td>Identifier unik peran</td>
+                  </tr>
+                  <tr>
+                    <td><strong>roles.code</strong></td>
+                    <td><span class="type-badge">VARCHAR(30)</span></td>
+                    <td>UNIQUE, NOT NULL</td>
+                    <td>SUPER_ADMIN, EKSEKUTIF, dll.</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">users.role_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK -> roles.id</td>
+                    <td>Peran hierarki pengguna</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">users.bujk_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK -> bujk_master.id</td>
+                    <td>Nullable (Scoping Operator BUJK)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>users.password_hash</strong></td>
+                    <td><span class="type-badge">VARCHAR(255)</span></td>
+                    <td>NOT NULL</td>
+                    <td>Argon2id / Bcrypt salt hash</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">audit_logs.user_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK -> users.id</td>
+                    <td>Pelaku aktivitas transaksi</td>
+                  </tr>
+                  <tr>
+                    <td><strong>audit_logs.old_values / new_values</strong></td>
+                    <td><span class="type-badge">JSONB</span></td>
+                    <td>NULLABLE</td>
+                    <td>Snapshot perubahan sebelum & sesudah</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-panel">
+              <h3>👥 Matriks 5 Peran Kedinasan Resmi</h3>
+              <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
+                <div style="padding: 7px 10px; background: var(--slate-50); border-radius: 6px; display: flex; justify-content: space-between;">
+                  <strong style="color: var(--purple-700);">SUPER_ADMIN</strong>
+                  <span style="color: var(--slate-600);">Full access seluruh modul, kelola user & audit log</span>
+                </div>
+                <div style="padding: 7px 10px; background: var(--slate-50); border-radius: 6px; display: flex; justify-content: space-between;">
+                  <strong style="color: var(--navy-800);">ADMIN_BIDANG</strong>
+                  <span style="color: var(--slate-600);">Operator Dinas PUPR (Bina Konstruksi / Pelatihan / Pengawas)</span>
+                </div>
+                <div style="padding: 7px 10px; background: var(--slate-50); border-radius: 6px; display: flex; justify-content: space-between;">
+                  <strong style="color: var(--gold-600);">EKSEKUTIF</strong>
+                  <span style="color: var(--slate-600);">Read-only pimpinan (Bupati, Sekda, Kepala Dinas)</span>
+                </div>
+                <div style="padding: 7px 10px; background: var(--slate-50); border-radius: 6px; display: flex; justify-content: space-between;">
+                  <strong style="color: var(--cyan-700);">OPERATOR_BUJK</strong>
+                  <span style="color: var(--slate-600);">Portal mandiri kontraktor terisolasi sesuai <code>bujk_id</code></span>
+                </div>
+                <div style="padding: 7px 10px; background: var(--slate-50); border-radius: 6px; display: flex; justify-content: space-between;">
+                  <strong style="color: var(--emerald-700);">PESERTA_TKK</strong>
+                  <span style="color: var(--slate-600);">Pendaftaran bimtek & unduh e-sertifikat mandiri</span>
+                </div>
+              </div>
+
+              <div style="margin-top: 8px; background: #FEF3C7; padding: 10px; border-radius: 6px; font-size: 11px; color: #92400E; border: 1px solid #FDE68A;">
+                <strong>⚡ Jaminan Keamanan Audit Trail:</strong> Seluruh operasi <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> dicatat secara realtime ke tabel <code>audit_logs</code> lengkap dengan IP address dan payload JSONB.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 4: KLUSTER 2 - MASTER WILAYAH & BUJK -->
+        <section class="slide-item" data-slide="4">
+          <div class="slide-tag tag-gold">Kluster 2 • Master Data & Legalitas</div>
+          <div class="slide-header">
+            <h2>Profil Induk BUJK, Sertifikasi SBU & 40 Kecamatan</h2>
+            <p>Database terpusat kontraktor dan konsultan konstruksi di Kabupaten Bogor, terhubung langsung dengan batas wilayah spasial kecamatan dan validasi masa berlaku izin usaha.</p>
+          </div>
+
+          <div class="slide-body-split">
+            <div class="card-panel">
+              <div class="cluster-banner c-bujk">
+                <div>
+                  <div class="cluster-banner-title">Tabel: districts, bujk_master, bujk_sbu, bujk_experiences</div>
+                  <div class="cluster-banner-desc">Pemetaan lokasi kantor, masa berlaku sertifikat LSBU, dan rekam jejak BAST</div>
+                </div>
+                <span class="col-pk">4 Tabel</span>
+              </div>
+
+              <table class="mini-erd-table">
+                <thead>
+                  <tr>
+                    <th>Entitas / Kolom</th>
+                    <th>Tipe Data</th>
+                    <th>Constraint</th>
+                    <th>Deskripsi Bisnis</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="col-pk">districts.id</span></td>
+                    <td><span class="type-badge">INTEGER</span></td>
+                    <td>PK</td>
+                    <td>Kode Wilayah Resmi BPS / Kemendagri</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-geom">districts.geom_boundary</span></td>
+                    <td><span class="type-badge">MultiPolygon</span></td>
+                    <td>SRID: 4326</td>
+                    <td>Poligon batas administratif 40 Kecamatan</td>
+                  </tr>
+                  <tr>
+                    <td><strong>bujk_master.nib</strong></td>
+                    <td><span class="type-badge">VARCHAR(13)</span></td>
+                    <td>UNIQUE, NOT NULL</td>
+                    <td>13 Digit NIB OSS RBA</td>
+                  </tr>
+                  <tr>
+                    <td><strong>bujk_master.npwp</strong></td>
+                    <td><span class="type-badge">VARCHAR(20)</span></td>
+                    <td>UNIQUE, NOT NULL</td>
+                    <td>Nomor Pokok Wajib Pajak Badan</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">bujk_master.district_id</span></td>
+                    <td><span class="type-badge">INTEGER</span></td>
+                    <td>FK -> districts.id</td>
+                    <td>Kecamatan domisili kantor</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-geom">bujk_master.geom_location</span></td>
+                    <td><span class="type-badge">Point</span></td>
+                    <td>SRID: 4326</td>
+                    <td>Koordinat latitude/longitude kantor</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">bujk_sbu.bujk_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK ON CASCADE</td>
+                    <td>Kepemilikan subklasifikasi SBU</td>
+                  </tr>
+                  <tr>
+                    <td><strong>bujk_sbu.valid_until</strong></td>
+                    <td><span class="type-badge">DATE</span></td>
+                    <td>NOT NULL</td>
+                    <td>Masa aktif sertifikat (Index B-Tree)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-panel">
+              <h3>🔍 Validasi & Siklus Hidup Verifikasi BUJK</h3>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+                <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 4px solid var(--gold-500);">
+                  <strong style="color: var(--navy-950);">Status Alur Registrasi:</strong>
+                  <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+                    <span style="background:#E2E8F0; padding:2px 6px; border-radius:4px; font-weight:700;">DRAFT</span> ➔
+                    <span style="background:#FEF3C7; color:#92400E; padding:2px 6px; border-radius:4px; font-weight:700;">PENDING_VERIF</span> ➔
+                    <span style="background:#D1FAE5; color:#065F46; padding:2px 6px; border-radius:4px; font-weight:700;">APPROVED</span> /
+                    <span style="background:#FFE4E6; color:#9F1239; padding:2px 6px; border-radius:4px; font-weight:700;">REJECTED</span>
+                  </div>
+                </div>
+
+                <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 4px solid var(--navy-800);">
+                  <strong style="color: var(--navy-950);">Klasifikasi KBLI & Kualifikasi Usaha:</strong>
+                  <p style="color: var(--slate-600); margin-top: 3px;">Pencatatan kode KBLI 5-digit (misal: <code>41011</code> Konstruksi Gedung, <code>42101</code> Konstruksi Jalan) serta kualifikasi (Kecil, Menengah, Besar).</p>
+                </div>
+
+                <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 4px solid var(--emerald-600);">
+                  <strong style="color: var(--navy-950);">Portofolio & Serah Terima Pekerjaan (PHO/FHO):</strong>
+                  <p style="color: var(--slate-600); margin-top: 3px;">Tabel <code>bujk_experiences</code> merekam nilai kontrak lampau, tahun anggaran, serta tautan dokumen BAST resmi.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 5: KLUSTER 3 - WEBGIS & MONITORING PROYEK -->
+        <section class="slide-item" data-slide="5">
+          <div class="slide-tag tag-cyan">Kluster 3 • Geospasial & Monitoring</div>
+          <div class="slide-header">
+            <h2>Pemantauan Proyek Konstruksi & Kurva-S Mingguan</h2>
+            <p>Pencatatan real-time paket pekerjaan fisik se-Kabupaten Bogor dengan penanda koordinat WebGIS dan komparasi otomatis deviasi target vs realisasi mingguan.</p>
+          </div>
+
+          <div class="slide-body-split">
+            <div class="card-panel">
+              <div class="cluster-banner c-gis">
+                <div>
+                  <div class="cluster-banner-title">Tabel: bujk_projects, project_progress_logs</div>
+                  <div class="cluster-banner-desc">Integrasi spasial GIS titik/poligon pekerjaan dan pelaporan kurva S terotomasi</div>
+                </div>
+                <span class="col-pk">2 Tabel</span>
+              </div>
+
+              <table class="mini-erd-table">
+                <thead>
+                  <tr>
+                    <th>Kolom Proyek</th>
+                    <th>Tipe Data</th>
+                    <th>Constraint</th>
+                    <th>Fungsi Sistem</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="col-pk">bujk_projects.id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>PK</td>
+                    <td>UUID unik paket pekerjaan</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">bujk_projects.bujk_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK ON RESTRICT</td>
+                    <td>Kontraktor pelaksana</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">bujk_projects.district_id</span></td>
+                    <td><span class="type-badge">INTEGER</span></td>
+                    <td>FK ON RESTRICT</td>
+                    <td>Lokasi kecamatan proyek</td>
+                  </tr>
+                  <tr>
+                    <td><strong>contract_value</strong></td>
+                    <td><span class="type-badge">NUMERIC(18,2)</span></td>
+                    <td>NOT NULL</td>
+                    <td>Pagu nilai kontrak rupiah</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-geom">geom_location / geom_area</span></td>
+                    <td><span class="type-badge">Point / Polygon</span></td>
+                    <td>SRID: 4326</td>
+                    <td>Titik sebaran & delineasi pekerjaan</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">progress_logs.project_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK ON CASCADE</td>
+                    <td>Relasi ke induk proyek</td>
+                  </tr>
+                  <tr>
+                    <td><strong>report_week</strong></td>
+                    <td><span class="type-badge">INTEGER</span></td>
+                    <td>NOT NULL</td>
+                    <td>Minggu progres ke- (1 s.d. 52)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>deviation</strong></td>
+                    <td><span class="type-badge">NUMERIC(5,2)</span></td>
+                    <td>GENERATED STORED</td>
+                    <td>Otomatis: (actual_pct - plan_pct)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-panel">
+              <h3>📈 Logika Kurva S & Deteksi Keterlambatan Kritis</h3>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+                <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 4px solid var(--cyan-600);">
+                  <strong style="color: var(--navy-950);">Kolom Terhitung (Generated Column):</strong>
+                  <p style="color: var(--slate-600); margin-top: 3px;">Kolom <code>deviation</code> dihitung otomatis di level database tanpa logic tambahan di backend: <code>deviation = actual_pct - plan_pct</code>.</p>
+                </div>
+
+                <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 4px solid var(--rose-500);">
+                  <strong style="color: var(--navy-950);">Peringatan Dini Keterlambatan Kritis (SCM):</strong>
+                  <p style="color: var(--slate-600); margin-top: 3px;">Jika <code>deviation &lt; -10%</code>, status proyek otomatis masuk ke level waspada (<code>CRITICAL_DELAY</code>).</p>
+                </div>
+
+                <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 4px solid var(--emerald-600);">
+                  <strong style="color: var(--navy-950);">Efisiensi Query Spasial PostGIS:</strong>
+                  <p style="color: var(--slate-600); margin-top: 3px;">Indeks <code>idx_bujk_projects_geom_location</code> bertipe GiST memungkinkan filter radius 5 KM atau agregasi per kecamatan.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 6: KLUSTER 4 - PENGAWASAN TERTIB KONSTRUKSI -->
+        <section class="slide-item" data-slide="6">
+          <div class="slide-tag tag-gold">Kluster 4 • Pengawasan & Audit Dinas</div>
+          <div class="slide-header">
+            <h2>Pengawasan Tertib Konstruksi (Permen PUPR 1/2023)</h2>
+            <p>Arsitektur basis data untuk jadwal pengawasan dinas, unggahan dokumen bukti instrumen SIMAK, dan formula kalkulasi skor kepatuhan 3 pilar pengawasan.</p>
+          </div>
+
+          <div class="slide-body-split">
+            <div class="card-panel">
+              <div class="cluster-banner c-audit">
+                <div>
+                  <div class="cluster-banner-title">Tabel: supervision_schedules, supervision_files, supervision_inspections</div>
+                  <div class="cluster-banner-desc">Formula otomatis pembobotan: Usaha (40%), Penyelenggaraan (35%), Pemanfaatan (25%)</div>
+                </div>
+                <span class="col-pk">3 Tabel</span>
+              </div>
+
+              <table class="mini-erd-table">
+                <thead>
+                  <tr>
+                    <th>Kolom Audit</th>
+                    <th>Tipe Data</th>
+                    <th>Bobot / Constraint</th>
+                    <th>Uraian Komponen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="col-pk">inspections.id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>PK</td>
+                    <td>ID unik berkas inspeksi</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">inspections.schedule_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK ON RESTRICT</td>
+                    <td>Periode agenda pengawasan</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">inspections.bujk_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK ON RESTRICT</td>
+                    <td>Badan usaha yang diaudit</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">inspections.inspector_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK -> users.id</td>
+                    <td>Petugas Asesor Pengawas Dinas</td>
+                  </tr>
+                  <tr>
+                    <td><strong>business_order_score</strong></td>
+                    <td><span class="type-badge">NUMERIC(5,2)</span></td>
+                    <td>Bobot 40%</td>
+                    <td>Skor Kepatuhan Tertib Usaha</td>
+                  </tr>
+                  <tr>
+                    <td><strong>execution_order_score</strong></td>
+                    <td><span class="type-badge">NUMERIC(5,2)</span></td>
+                    <td>Bobot 35%</td>
+                    <td>Skor Kepatuhan Tertib Penyelenggaraan</td>
+                  </tr>
+                  <tr>
+                    <td><strong>utilization_order_score</strong></td>
+                    <td><span class="type-badge">NUMERIC(5,2)</span></td>
+                    <td>Bobot 25%</td>
+                    <td>Skor Kepatuhan Tertib Pemanfaatan</td>
+                  </tr>
+                  <tr>
+                    <td><strong>final_score</strong></td>
+                    <td><span class="type-badge">NUMERIC(5,2)</span></td>
+                    <td>Skor Komposit (0-100)</td>
+                    <td>(Usaha*0.4) + (Penyelenggaraan*0.35) + (Pemanfaatan*0.25)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-panel">
+              <h3>⚖️ Batas Predikat Kepatuhan Resmi</h3>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+                <div style="padding: 10px; background: #ECFDF5; border-radius: 6px; border-left: 4px solid var(--emerald-600); display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="color: #065F46; font-size: 12px;">TERTIB (Skor ≥ 80.00)</strong>
+                    <p style="color: #047857; margin-top: 2px;">Memenuhi seluruh instrumen legalitas, SMKK, keselamatan dan standar operasional.</p>
+                  </div>
+                  <span style="font-weight: 800; font-size: 14px; color: #065F46;">Hijau</span>
+                </div>
+
+                <div style="padding: 10px; background: #FFFBEB; border-radius: 6px; border-left: 4px solid var(--gold-500); display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="color: #92400E; font-size: 12px;">CUKUP TERTIB (Skor 60.00 - 79.99)</strong>
+                    <p style="color: #B45309; margin-top: 2px;">Kelalaian minor administratif, rekomendasi perbaikan 30 hari.</p>
+                  </div>
+                  <span style="font-weight: 800; font-size: 14px; color: #92400E;">Kuning</span>
+                </div>
+
+                <div style="padding: 10px; background: #FEF2F2; border-radius: 6px; border-left: 4px solid var(--rose-600); display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="color: #991B1B; font-size: 12px;">KURANG TERTIB (Skor &lt; 60.00)</strong>
+                    <p style="color: #B91C1C; margin-top: 2px;">Pelanggaran berat penyelenggaraan, diterbitkan Berita Acara Teguran Resmi.</p>
+                  </div>
+                  <span style="font-weight: 800; font-size: 14px; color: #991B1B;">Merah</span>
+                </div>
+              </div>
+
+              <div style="margin-top: 6px; background: var(--slate-100); padding: 8px 10px; border-radius: 6px; font-size: 11px; color: var(--slate-700);">
+                <strong>Ekspor SIPJAKI KemenPUPR:</strong> Format penilaian ini secara native selaras dengan kolom API SIPJAKI Nasional.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 7: KLUSTER 5 & 6 - TKK & INFORMASI PUBLIK -->
+        <section class="slide-item" data-slide="7">
+          <div class="slide-tag tag-emerald">Kluster 5 & 6 • Pembinaan SDM & Publik</div>
+          <div class="slide-header">
+            <h2>Sertifikasi Tenaga Kerja (TKK) & Keterbukaan Publik</h2>
+            <p>Arsitektur penerbitan e-Sertifikat terverifikasi QR Code, integrasi data pendaftar NIK se-Kabupaten Bogor, serta repositori regulasi dan warta kegiatan kedinasan.</p>
+          </div>
+
+          <div class="slide-body-split">
+            <div class="card-panel">
+              <div class="cluster-banner c-tkk">
+                <div>
+                  <div class="cluster-banner-title">Tabel: training_packages, applicants, training_participants</div>
+                  <div class="cluster-banner-desc">Validasi NIK kependudukan, pelacakan kehadiran, dan hash token QR anti-pemalsuan</div>
+                </div>
+                <span class="col-pk">3 Tabel TKK</span>
+              </div>
+
+              <table class="mini-erd-table">
+                <thead>
+                  <tr>
+                    <th>Kolom Entitas</th>
+                    <th>Tipe Data</th>
+                    <th>Constraint</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>applicants.nik</strong></td>
+                    <td><span class="type-badge">VARCHAR(16)</span></td>
+                    <td>UNIQUE, NOT NULL</td>
+                    <td>16 Digit NIK KTP Valid</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">applicants.district_id</span></td>
+                    <td><span class="type-badge">INTEGER</span></td>
+                    <td>FK -> districts.id</td>
+                    <td>Domisili kecamatan peserta</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">participants.package_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK ON CASCADE</td>
+                    <td>Paket bimbingan teknis</td>
+                  </tr>
+                  <tr>
+                    <td><strong>participants.cert_number</strong></td>
+                    <td><span class="type-badge">VARCHAR(100)</span></td>
+                    <td>UNIQUE, NULLABLE</td>
+                    <td>No. Registrasi e-Sertifikat Resmi</td>
+                  </tr>
+                  <tr>
+                    <td><strong>participants.qr_token</strong></td>
+                    <td><span class="type-badge">VARCHAR(64)</span></td>
+                    <td>UNIQUE, INDEXED</td>
+                    <td>Hash token SHA-256 verifikasi publik</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-panel">
+              <div class="cluster-banner" style="background: #F1F5F9; border-color: var(--slate-700);">
+                <div>
+                  <div class="cluster-banner-title">Tabel: regulations, news_articles</div>
+                  <div class="cluster-banner-desc">Dokumentasi dasar hukum dan warta agenda konstruksi daerah</div>
+                </div>
+                <span class="col-pk">2 Tabel CMS</span>
+              </div>
+
+              <table class="mini-erd-table">
+                <thead>
+                  <tr>
+                    <th>Kolom CMS</th>
+                    <th>Tipe Data</th>
+                    <th>Fitur Khusus</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>regulations.type</strong></td>
+                    <td><span class="type-badge">VARCHAR(50)</span></td>
+                    <td>UU, PP, PERMEN, PERDA_BOGOR, PERBUP</td>
+                  </tr>
+                  <tr>
+                    <td><strong>regulations.title</strong></td>
+                    <td><span class="type-badge">VARCHAR(300)</span></td>
+                    <td>Terindeks Full-Text Search (GIN)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>news_articles.slug</strong></td>
+                    <td><span class="type-badge">VARCHAR(255)</span></td>
+                    <td>UNIQUE (SEO URL Friendly)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-fk">news_articles.author_id</span></td>
+                    <td><span class="type-badge">VARCHAR(36)</span></td>
+                    <td>FK -> users.id (Penulis Kedinasan)</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="margin-top: 8px; background: #ECFDF5; padding: 8px 10px; border-radius: 6px; font-size: 11px; color: #065F46;">
+                <strong>Verifikasi Publik QR e-Sertifikat:</strong> Setiap warga atau instansi dapat melakukan scan QR pada sertifikat fisik untuk membuka halaman validasi publik tanpa harus login.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 8: INDEXING & OPTIMALISASI KINERJA SPASIAL -->
+        <section class="slide-item" data-slide="8">
+          <div class="slide-tag tag-purple">Optimasi & SLA • High Performance Engine</div>
+          <div class="slide-header">
+            <h2>Spatial GiST, Composite Indexing & Security</h2>
+            <p>Konfigurasi optimasi PostgreSQL untuk menjamin latensi query di bawah 50 milidetik saat melayani ribuan pengguna simultan dan kalkulasi geospasial berat.</p>
+          </div>
+
+          <div class="slide-body-split">
+            <div class="card-panel">
+              <h3>⚡ 3 Pilar Indexing Strategis</h3>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+                <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 4px solid var(--emerald-600);">
+                  <strong style="color: var(--navy-950);">1. Spatial GiST Indexes (PostGIS Engine):</strong>
+                  <pre style="margin-top: 4px; background: #0F172A; color: #38BDF8; padding: 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px;">CREATE INDEX idx_districts_geom ON districts USING GIST (geom_boundary);
+CREATE INDEX idx_bujk_projects_geom ON bujk_projects USING GIST (geom_location);</pre>
+                </div>
+
+                <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 4px solid var(--navy-800);">
+                  <strong style="color: var(--navy-950);">2. B-Tree Indexes untuk Filter Cepat & Relasi:</strong>
+                  <pre style="margin-top: 4px; background: #0F172A; color: #A7F3D0; padding: 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px;">CREATE INDEX idx_bujk_projects_filter ON bujk_projects (fiscal_year, budget_source);
+CREATE INDEX idx_sbu_validity ON bujk_sbu (valid_until);</pre>
+                </div>
+
+                <div style="background: var(--slate-50); padding: 10px; border-radius: 6px; border-left: 4px solid var(--gold-500);">
+                  <strong style="color: var(--navy-950);">3. Full-Text Search GIN Index (Bahasa Indonesia):</strong>
+                  <pre style="margin-top: 4px; background: #0F172A; color: #FDE68A; padding: 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px;">CREATE INDEX idx_regulations_fts ON regulations 
+USING GIN (to_tsvector('indonesian', title || ' ' || number));</pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-panel">
+              <h3>🔒 Skema Keamanan & Kesiapan Produksi</h3>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+                <div style="padding: 10px; background: var(--slate-50); border-radius: 6px; border-left: 4px solid var(--purple-600);">
+                  <strong style="color: var(--navy-950);">Row Level Security (RLS) Ready:</strong>
+                  <p style="color: var(--slate-600); margin-top: 3px;">Skema memfasilitasi isolasi RLS PostgreSQL untuk mencegah kebocoran data antar kontraktor.</p>
+                </div>
+
+                <div style="padding: 10px; background: var(--slate-50); border-radius: 6px; border-left: 4px solid var(--cyan-600);">
+                  <strong style="color: var(--navy-950);">Prisma ORM & Migration Alignment:</strong>
+                  <p style="color: var(--slate-600); margin-top: 3px;">Telah diuji dan disinkronisasikan 100% dengan file schema <code>backend/prisma/schema.prisma</code>.</p>
+                </div>
+
+                <div style="padding: 10px; background: var(--slate-50); border-radius: 6px; border-left: 4px solid var(--emerald-600);">
+                  <strong style="color: var(--navy-950);">Backup Otomatis & Recovery:</strong>
+                  <p style="color: var(--slate-600); margin-top: 3px;">Penyimpanan berkas fisik (PDF, Foto) ke S3 Object Storage membuat dump database tetap ramping.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Slide Deck Footer Controls -->
+      <footer class="presentation-controls-bar">
+        <div class="nav-hints">
+          <span>Navigasi: <kbd>←</kbd> <kbd>→</kbd> atau <kbd>Spasi</kbd></span>
+          <span>Layar Penuh: <kbd>F</kbd></span>
+        </div>
+
+        <div class="slide-counter" id="slide-counter-display">
+          Slide 1 dari 8
+        </div>
+
+        <div class="slide-nav-btns">
+          <button class="btn-slide-nav" id="btn-prev-slide" onclick="changeSlide(-1)" title="Slide Sebelumnya (Panah Kiri)">‹</button>
+          <button class="btn-slide-nav" id="btn-next-slide" onclick="changeSlide(1)" title="Slide Berikutnya (Panah Kanan)">›</button>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ========================================================================
+         VIEW 2: MODE INTERACTIVE ERD CANVAS (ZOOM, PAN, HOVER, INSPECT)
+         ======================================================================== -->
+    <div id="mode-canvas" class="view-container">
+      
+      <!-- Clean Dedicated Sub-Header Bar (No Overlapping Cards!) -->
+      <div class="canvas-sub-header">
+        <div class="canvas-filter-bar">
+          <button class="filter-btn active" onclick="filterCanvasCluster('all')">Semua Kluster</button>
+          <button class="filter-btn c-rbac" onclick="filterCanvasCluster('rbac')">🛡️ RBAC</button>
+          <button class="filter-btn c-bujk" onclick="filterCanvasCluster('bujk')">🏢 Master BUJK</button>
+          <button class="filter-btn c-gis" onclick="filterCanvasCluster('gis')">🗺️ WebGIS</button>
+          <button class="filter-btn c-audit" onclick="filterCanvasCluster('audit')">⚖️ Pengawasan</button>
+          <button class="filter-btn c-tkk" onclick="filterCanvasCluster('tkk')">🎓 TKK & CMS</button>
+        </div>
+
+        <div class="canvas-search-box">
+          <span>🔍</span>
+          <input type="text" id="canvas-search-input" placeholder="Cari tabel di kanvas (mis: bujk, project)..." onkeyup="searchCanvasTable(this.value)">
+        </div>
+
+        <div class="canvas-view-actions">
+          <button class="btn-zoom" onclick="canvasZoom(1.2)" title="Perbesar (+)"><span>+</span> Zoom</button>
+          <button class="btn-zoom" onclick="canvasZoom(0.8)" title="Perkecil (-)"><span>−</span> Zoom</button>
+          <button class="btn-zoom" onclick="canvasFit()" title="Paskan Seluruh Diagram ke Layar"><span>⤢</span> Paskan Layar</button>
+          <button class="btn-zoom" onclick="canvasResetZoom()" title="Reset Tampilan (100%)"><span>↺</span> Reset</button>
+        </div>
+      </div>
+
+      <!-- Stage Wrapper with Full Area Relative Container -->
+      <div class="canvas-stage-wrapper" id="canvas-stage-wrapper">
+        
+        <!-- Interactive SVG Canvas Drawing filling 100% of stage -->
+        <svg id="erd-svg-canvas" class="svg-viewport" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Grid Background Pattern -->
+            <pattern id="blueprint-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1"/>
+              <circle cx="0" cy="0" r="1.5" fill="rgba(255, 255, 255, 0.1)"/>
+            </pattern>
+            
+            <!-- Shadow filters for table nodes -->
+            <filter id="node-shadow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000000" flood-opacity="0.6"/>
+            </filter>
+
+            <!-- Arrow markers for relationships -->
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748B" />
+            </marker>
+            <marker id="arrow-gold" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#F59E0B" />
+            </marker>
+            <marker id="arrow-cyan" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#06B6D4" />
+            </marker>
+            <marker id="arrow-emerald" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981" />
+            </marker>
+          </defs>
+
+          <!-- Background grid -->
+          <rect width="100%" height="100%" fill="url(#blueprint-grid)" />
+
+          <!-- Transform Pan/Zoom Group Container -->
+          <g id="canvas-transform-group" transform="translate(40, 20) scale(0.85)">
+
+            <!-- ================= RELATIONSHIP CONNECTOR PATHS ================= -->
+            <g id="relationship-lines" stroke="#475569" stroke-width="2" fill="none" stroke-linejoin="round" opacity="0.8">
+              <!-- roles -> role_permissions -->
+              <path id="rel-roles-perms" d="M 260 120 L 310 120" marker-end="url(#arrow)"/>
+              <!-- roles -> users -->
+              <path id="rel-roles-users" d="M 150 200 L 150 250" marker-end="url(#arrow)"/>
+              <!-- users -> audit_logs -->
+              <path id="rel-users-audit" d="M 260 320 L 310 320" marker-end="url(#arrow)"/>
+              
+              <!-- users -> bujk_master -->
+              <path id="rel-users-bujk" d="M 260 280 C 400 280, 480 280, 590 280" stroke="#F59E0B" stroke-dasharray="4,4" marker-end="url(#arrow-gold)"/>
+
+              <!-- districts -> bujk_master -->
+              <path id="rel-dist-bujk" d="M 710 200 L 710 250" marker-end="url(#arrow)"/>
+              <!-- districts -> bujk_projects -->
+              <path id="rel-dist-proj" d="M 830 130 L 890 150" stroke="#06B6D4" marker-end="url(#arrow-cyan)"/>
+              <!-- districts -> applicants -->
+              <path id="rel-dist-app" d="M 710 60 C 710 15, 1610 15, 1610 60" stroke="#10B981" stroke-dasharray="4,4" marker-end="url(#arrow-emerald)"/>
+
+              <!-- bujk_master -> bujk_sbu -->
+              <path id="rel-bujk-sbu" d="M 650 430 L 650 480" marker-end="url(#arrow)"/>
+              <!-- bujk_master -> bujk_experiences -->
+              <path id="rel-bujk-exp" d="M 770 430 L 770 660" marker-end="url(#arrow)"/>
+              <!-- bujk_master -> bujk_projects -->
+              <path id="rel-bujk-proj" d="M 830 300 L 890 240" stroke="#06B6D4" marker-end="url(#arrow-cyan)"/>
+
+              <!-- bujk_projects -> project_progress_logs -->
+              <path id="rel-proj-logs" d="M 1015 310 L 1015 360" stroke="#06B6D4" marker-end="url(#arrow-cyan)"/>
+
+              <!-- bujk_master -> supervision_inspections -->
+              <path id="rel-bujk-audit" d="M 830 380 C 1000 380, 1100 480, 1190 480" stroke="#F59E0B" marker-end="url(#arrow-gold)"/>
+              <!-- supervision_schedules -> supervision_files -->
+              <path id="rel-sched-files" d="M 1315 190 L 1315 240" marker-end="url(#arrow)"/>
+              <!-- supervision_schedules -> supervision_inspections -->
+              <path id="rel-sched-insp" d="M 1250 190 C 1250 220, 1220 380, 1220 420" marker-end="url(#arrow)"/>
+
+              <!-- training_packages -> training_participants -->
+              <path id="rel-train-part" d="M 1650 400 L 1650 450" stroke="#10B981" marker-end="url(#arrow-emerald)"/>
+              <!-- applicants -> training_participants -->
+              <path id="rel-app-part" d="M 1550 210 C 1550 300, 1530 400, 1530 450" stroke="#10B981" marker-end="url(#arrow-emerald)"/>
+
+              <!-- users -> news_articles -->
+              <path id="rel-user-news" d="M 150 410 L 150 460" stroke="#94A3B8" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+              <!-- news_articles -> regulations -->
+              <path id="rel-news-reg" d="M 150 590 L 150 630" stroke="#94A3B8" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+            </g>
+
+            <!-- ================= NODE CARDS (18 TABLES IN 6 COLUMNS) ================= -->
+
+            <!-- ===== COLUMN 1: RBAC & CMS (X = 40) ===== -->
+            
+            <!-- 1. ROLES -->
+            <g id="node-roles" class="table-node cluster-rbac" transform="translate(40, 60)" onclick="openTableDetails('roles')" cursor="pointer">
+              <rect width="220" height="140" rx="8" fill="#1E1B4B" stroke="#8B5CF6" stroke-width="2" filter="url(#node-shadow)"/>
+              <rect width="220" height="32" rx="8" fill="#4C1D95"/>
+              <text x="14" y="21" fill="#EDE9FE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">🛡️ roles</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#E2E8F0" font-size="11" font-family="'JetBrains Mono', monospace">⭐ code: VARCHAR(30) [UK]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">name: VARCHAR(100)</text>
+              <text x="14" y="114" fill="#CBD5E1" font-size="11">is_system: BOOLEAN</text>
+            </g>
+
+            <!-- 2. USERS -->
+            <g id="node-users" class="table-node cluster-rbac" transform="translate(40, 250)" onclick="openTableDetails('users')" cursor="pointer">
+              <rect width="220" height="160" rx="8" fill="#1E1B4B" stroke="#8B5CF6" stroke-width="2" filter="url(#node-shadow)"/>
+              <rect width="220" height="32" rx="8" fill="#4C1D95"/>
+              <text x="14" y="21" fill="#EDE9FE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">👤 users</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 role_id [FK]</text>
+              <text x="14" y="94" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 bujk_id [FK, Null]</text>
+              <text x="14" y="114" fill="#CBD5E1" font-size="11">username: VARCHAR(50) [UK]</text>
+              <text x="14" y="134" fill="#CBD5E1" font-size="11">password_hash: VARCHAR</text>
+            </g>
+
+            <!-- 3. NEWS_ARTICLES -->
+            <g id="node-news_articles" class="table-node cluster-cms" transform="translate(40, 460)" onclick="openTableDetails('news_articles')" cursor="pointer">
+              <rect width="220" height="130" rx="8" fill="#1E293B" stroke="#94A3B8" stroke-width="1.5" filter="url(#node-shadow)"/>
+              <rect width="220" height="32" rx="8" fill="#334155"/>
+              <text x="14" y="21" fill="#F1F5F9" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">📰 news_articles</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 author_id [FK -> users]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">slug: VARCHAR [UK]</text>
+              <text x="14" y="114" fill="#CBD5E1" font-size="11">is_published: BOOLEAN</text>
+            </g>
+
+            <!-- 4. REGULATIONS -->
+            <g id="node-regulations" class="table-node cluster-cms" transform="translate(40, 630)" onclick="openTableDetails('regulations')" cursor="pointer">
+              <rect width="220" height="130" rx="8" fill="#1E293B" stroke="#94A3B8" stroke-width="1.5" filter="url(#node-shadow)"/>
+              <rect width="220" height="32" rx="8" fill="#334155"/>
+              <text x="14" y="21" fill="#F1F5F9" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">⚖️ regulations</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#CBD5E1" font-size="11">type: UU, PP, PERMEN..</text>
+              <text x="14" y="94" fill="#FCD34D" font-size="11">title [GIN FTS Index]</text>
+              <text x="14" y="114" fill="#CBD5E1" font-size="11">download_count: INTEGER</text>
+            </g>
+
+            <!-- ===== COLUMN 2: RBAC MATRIX & AUDIT (X = 310) ===== -->
+
+            <!-- 5. ROLE_PERMISSIONS -->
+            <g id="node-role_permissions" class="table-node cluster-rbac" transform="translate(310, 60)" onclick="openTableDetails('role_permissions')" cursor="pointer">
+              <rect width="230" height="140" rx="8" fill="#1E1B4B" stroke="#8B5CF6" stroke-width="1.5" filter="url(#node-shadow)"/>
+              <rect width="230" height="32" rx="8" fill="#3B0764"/>
+              <text x="14" y="21" fill="#EDE9FE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">🛡️ role_permissions</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 role_id [FK Cascade]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">resource: VARCHAR(50)</text>
+              <text x="14" y="114" fill="#CBD5E1" font-size="11">action: VARCHAR(30)</text>
+            </g>
+
+            <!-- 6. AUDIT_LOGS -->
+            <g id="node-audit_logs" class="table-node cluster-rbac" transform="translate(310, 250)" onclick="openTableDetails('audit_logs')" cursor="pointer">
+              <rect width="230" height="150" rx="8" fill="#1E1B4B" stroke="#8B5CF6" stroke-width="1.5" filter="url(#node-shadow)"/>
+              <rect width="230" height="32" rx="8" fill="#3B0764"/>
+              <text x="14" y="21" fill="#EDE9FE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">📋 audit_logs</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: BIGSERIAL [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 user_id [FK SetNull]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">action: VARCHAR(20)</text>
+              <text x="14" y="114" fill="#A5F3FC" font-size="11">old_values/new_values [JSONB]</text>
+              <text x="14" y="134" fill="#CBD5E1" font-size="11">ip_address: INET</text>
+            </g>
+
+            <!-- ===== COLUMN 3: MASTER WILAYAH & BUJK (X = 590) ===== -->
+
+            <!-- 7. DISTRICTS -->
+            <g id="node-districts" class="table-node cluster-bujk" transform="translate(590, 60)" onclick="openTableDetails('districts')" cursor="pointer">
+              <rect width="240" height="140" rx="8" fill="#0C2340" stroke="#38BDF8" stroke-width="2" filter="url(#node-shadow)"/>
+              <rect width="240" height="32" rx="8" fill="#075985"/>
+              <text x="14" y="21" fill="#E0F2FE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">🗺️ districts (40 Kec)</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: INTEGER [PK BPS]</text>
+              <text x="14" y="74" fill="#CBD5E1" font-size="11">name: VARCHAR(100)</text>
+              <text x="14" y="94" fill="#6EE7B7" font-size="11" font-family="'JetBrains Mono', monospace">🌐 geom_boundary [MultiPoly]</text>
+              <text x="14" y="114" fill="#6EE7B7" font-size="11" font-family="'JetBrains Mono', monospace">📍 centroid [Point 4326]</text>
+            </g>
+
+            <!-- 8. BUJK_MASTER -->
+            <g id="node-bujk_master" class="table-node cluster-bujk" transform="translate(590, 250)" onclick="openTableDetails('bujk_master')" cursor="pointer">
+              <rect width="240" height="180" rx="8" fill="#0C2340" stroke="#3B82F6" stroke-width="2.5" filter="url(#node-shadow)"/>
+              <rect width="240" height="32" rx="8" fill="#1E40AF"/>
+              <text x="14" y="21" fill="#DBEAFE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">🏢 bujk_master</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#CBD5E1" font-size="11">name: VARCHAR(255)</text>
+              <text x="14" y="94" fill="#E2E8F0" font-size="11">nib: VARCHAR(13) [UK]</text>
+              <text x="14" y="114" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 district_id [FK]</text>
+              <text x="14" y="134" fill="#6EE7B7" font-size="11" font-family="'JetBrains Mono', monospace">📍 geom_location [Point 4326]</text>
+              <text x="14" y="154" fill="#FCD34D" font-size="11">status: ENUM (DRAFT..)</text>
+            </g>
+
+            <!-- 9. BUJK_SBU -->
+            <g id="node-bujk_sbu" class="table-node cluster-bujk" transform="translate(590, 480)" onclick="openTableDetails('bujk_sbu')" cursor="pointer">
+              <rect width="240" height="140" rx="8" fill="#0C2340" stroke="#38BDF8" stroke-width="1.5" filter="url(#node-shadow)"/>
+              <rect width="240" height="32" rx="8" fill="#0369A1"/>
+              <text x="14" y="21" fill="#E0F2FE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">📜 bujk_sbu</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 bujk_id [FK Cascade]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">kbli_code: VARCHAR(10)</text>
+              <text x="14" y="114" fill="#FCD34D" font-size="11">valid_until: DATE (Indexed)</text>
+            </g>
+
+            <!-- 10. BUJK_EXPERIENCES -->
+            <g id="node-bujk_experiences" class="table-node cluster-bujk" transform="translate(590, 660)" onclick="openTableDetails('bujk_experiences')" cursor="pointer">
+              <rect width="240" height="140" rx="8" fill="#0C2340" stroke="#38BDF8" stroke-width="1.5" filter="url(#node-shadow)"/>
+              <rect width="240" height="32" rx="8" fill="#0369A1"/>
+              <text x="14" y="21" fill="#E0F2FE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">📁 bujk_experiences</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 bujk_id [FK Cascade]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">project_name: VARCHAR</text>
+              <text x="14" y="114" fill="#CBD5E1" font-size="11">contract_value: NUMERIC</text>
+            </g>
+
+            <!-- ===== COLUMN 4: WEBGIS & KURVA-S (X = 890) ===== -->
+
+            <!-- 11. BUJK_PROJECTS -->
+            <g id="node-bujk_projects" class="table-node cluster-gis" transform="translate(890, 120)" onclick="openTableDetails('bujk_projects')" cursor="pointer">
+              <rect width="250" height="190" rx="8" fill="#042F2E" stroke="#06B6D4" stroke-width="2.5" filter="url(#node-shadow)"/>
+              <rect width="250" height="32" rx="8" fill="#0E7490"/>
+              <text x="14" y="21" fill="#CFFAFE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">🏗️ bujk_projects</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 bujk_id [FK Restrict]</text>
+              <text x="14" y="94" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 district_id [FK Restrict]</text>
+              <text x="14" y="114" fill="#CBD5E1" font-size="11">contract_value: NUMERIC</text>
+              <text x="14" y="134" fill="#6EE7B7" font-size="11" font-family="'JetBrains Mono', monospace">📍 geom_location [Point 4326]</text>
+              <text x="14" y="154" fill="#6EE7B7" font-size="11" font-family="'JetBrains Mono', monospace">🌐 geom_area [Polygon 4326]</text>
+              <text x="14" y="174" fill="#FCD34D" font-size="11">status: ON_PROGRESS..</text>
+            </g>
+
+            <!-- 12. PROJECT_PROGRESS_LOGS -->
+            <g id="node-project_progress_logs" class="table-node cluster-gis" transform="translate(890, 360)" onclick="openTableDetails('project_progress_logs')" cursor="pointer">
+              <rect width="250" height="140" rx="8" fill="#042F2E" stroke="#06B6D4" stroke-width="1.5" filter="url(#node-shadow)"/>
+              <rect width="250" height="32" rx="8" fill="#155E75"/>
+              <text x="14" y="21" fill="#CFFAFE" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">📈 project_progress_logs</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 project_id [FK Cascade]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">report_week: INTEGER (1-52)</text>
+              <text x="14" y="114" fill="#FCA5A5" font-size="11">deviation: GENERATED (-/+)</text>
+            </g>
+
+            <!-- ===== COLUMN 5: PENGAWASAN SIMAK PERMEN 1/2023 (X = 1190) ===== -->
+
+            <!-- 13. SUPERVISION_SCHEDULES -->
+            <g id="node-supervision_schedules" class="table-node cluster-audit" transform="translate(1190, 60)" onclick="openTableDetails('supervision_schedules')" cursor="pointer">
+              <rect width="250" height="130" rx="8" fill="#451A03" stroke="#F59E0B" stroke-width="2" filter="url(#node-shadow)"/>
+              <rect width="250" height="32" rx="8" fill="#92400E"/>
+              <text x="14" y="21" fill="#FEF3C7" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">📅 supervision_schedules</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#CBD5E1" font-size="11">schedule_name: VARCHAR</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">scope: TERTIB_USAHA..</text>
+              <text x="14" y="114" fill="#FCD34D" font-size="11">status: OPEN / CLOSED</text>
+            </g>
+
+            <!-- 14. SUPERVISION_FILES -->
+            <g id="node-supervision_files" class="table-node cluster-audit" transform="translate(1190, 240)" onclick="openTableDetails('supervision_files')" cursor="pointer">
+              <rect width="250" height="130" rx="8" fill="#451A03" stroke="#F59E0B" stroke-width="1.5" filter="url(#node-shadow)"/>
+              <rect width="250" height="32" rx="8" fill="#78350F"/>
+              <text x="14" y="21" fill="#FEF3C7" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">📂 supervision_files</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 schedule_id / bujk_id [FK]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">file_type: SIMAK_EXCEL</text>
+              <text x="14" y="114" fill="#CBD5E1" font-size="11">file_url: VARCHAR(500)</text>
+            </g>
+
+            <!-- 15. SUPERVISION_INSPECTIONS -->
+            <g id="node-supervision_inspections" class="table-node cluster-audit" transform="translate(1190, 420)" onclick="openTableDetails('supervision_inspections')" cursor="pointer">
+              <rect width="250" height="170" rx="8" fill="#451A03" stroke="#F59E0B" stroke-width="2.5" filter="url(#node-shadow)"/>
+              <rect width="250" height="32" rx="8" fill="#B45309"/>
+              <text x="14" y="21" fill="#FEF3C7" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">⚖️ supervision_inspections</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 schedule_id / bujk_id [FK]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">scores: Usaha (40%), Proy (35%)</text>
+              <text x="14" y="114" fill="#FCD34D" font-size="11">final_score: NUMERIC (0-100)</text>
+              <text x="14" y="134" fill="#A7F3D0" font-size="11">compliance_status: ENUM</text>
+            </g>
+
+            <!-- ===== COLUMN 6: PELATIHAN & SERTIFIKASI TKK (X = 1490) ===== -->
+
+            <!-- 16. APPLICANTS -->
+            <g id="node-applicants" class="table-node cluster-tkk" transform="translate(1490, 60)" onclick="openTableDetails('applicants')" cursor="pointer">
+              <rect width="240" height="150" rx="8" fill="#064E3B" stroke="#10B981" stroke-width="2" filter="url(#node-shadow)"/>
+              <rect width="240" height="32" rx="8" fill="#047857"/>
+              <text x="14" y="21" fill="#D1FAE5" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">👷 applicants (Calon TKK)</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#E2E8F0" font-size="11">nik: VARCHAR(16) [UK]</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">full_name: VARCHAR(150)</text>
+              <text x="14" y="114" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 district_id [FK]</text>
+              <text x="14" y="134" fill="#CBD5E1" font-size="11">ktp_file_url: VARCHAR</text>
+            </g>
+
+            <!-- 17. TRAINING_PACKAGES -->
+            <g id="node-training_packages" class="table-node cluster-tkk" transform="translate(1490, 260)" onclick="openTableDetails('training_packages')" cursor="pointer">
+              <rect width="240" height="140" rx="8" fill="#064E3B" stroke="#10B981" stroke-width="2" filter="url(#node-shadow)"/>
+              <rect width="240" height="32" rx="8" fill="#065F46"/>
+              <text x="14" y="21" fill="#D1FAE5" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">🎓 training_packages</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#CBD5E1" font-size="11">name: VARCHAR(255)</text>
+              <text x="14" y="94" fill="#CBD5E1" font-size="11">kkni_level: INTEGER (1-9)</text>
+              <text x="14" y="114" fill="#FCD34D" font-size="11">status: REGISTRATION_OPEN..</text>
+            </g>
+
+            <!-- 18. TRAINING_PARTICIPANTS -->
+            <g id="node-training_participants" class="table-node cluster-tkk" transform="translate(1490, 450)" onclick="openTableDetails('training_participants')" cursor="pointer">
+              <rect width="240" height="170" rx="8" fill="#064E3B" stroke="#10B981" stroke-width="2.5" filter="url(#node-shadow)"/>
+              <rect width="240" height="32" rx="8" fill="#047857"/>
+              <text x="14" y="21" fill="#D1FAE5" font-size="12" font-weight="bold" font-family="'JetBrains Mono', monospace">📜 training_participants</text>
+              <text x="14" y="54" fill="#FDE68A" font-size="11" font-family="'JetBrains Mono', monospace">🔑 id: VARCHAR(36) [PK]</text>
+              <text x="14" y="74" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 package_id [FK Cascade]</text>
+              <text x="14" y="94" fill="#93C5FD" font-size="11" font-family="'JetBrains Mono', monospace">🔗 applicant_id [FK Restrict]</text>
+              <text x="14" y="114" fill="#FCD34D" font-size="11">cert_number [UK, Null]</text>
+              <text x="14" y="134" fill="#6EE7B7" font-size="11" font-family="'JetBrains Mono', monospace">🛡️ qr_token [UK SHA256]</text>
+              <text x="14" y="154" fill="#CBD5E1" font-size="11">is_passed: BOOLEAN</text>
+            </g>
+
+          </g>
+        </svg>
+
+        <!-- Floating Legend (Bottom Left) -->
+        <div class="canvas-legend">
+          <h4>Kluster Warna Entitas</h4>
+          <div class="legend-item"><div class="legend-color-dot" style="background: #A78BFA;"></div> RBAC & Keamanan (4)</div>
+          <div class="legend-item"><div class="legend-color-dot" style="background: #60A5FA;"></div> Master Wilayah & BUJK (4)</div>
+          <div class="legend-item"><div class="legend-color-dot" style="background: #38BDF8;"></div> WebGIS & Monitoring (2)</div>
+          <div class="legend-item"><div class="legend-color-dot" style="background: #FBBF24;"></div> Pengawasan Tertib (3)</div>
+          <div class="legend-item"><div class="legend-color-dot" style="background: #34D399;"></div> Pembinaan TKK (3)</div>
+          <div class="legend-item"><div class="legend-color-dot" style="background: #E2E8F0;"></div> CMS & Regulasi (2)</div>
+        </div>
+
+        <!-- Slide-in Drawer Table Inspector on Node Click -->
+        <aside id="table-inspector" class="table-inspector-drawer">
+          <div class="drawer-header">
+            <div>
+              <h3 id="drawer-table-name">TABLE_NAME</h3>
+              <p id="drawer-table-cluster">Kluster Fungsional</p>
+            </div>
+            <button class="btn-close-drawer" onclick="closeTableDrawer()" title="Tutup Drawer">✕</button>
+          </div>
+          <div class="drawer-content" id="drawer-body">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </aside>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================================================
+         VIEW 3: KAMUS DATA LENGKAP (DATA DICTIONARY TABULAR)
+         ======================================================================== -->
+    <div id="mode-dictionary" class="view-container">
+      
+      <div class="dict-filter-header">
+        <div class="dict-search-row">
+          <input type="text" id="dict-search-input" class="dict-search-input" placeholder="Ketik nama tabel atau nama kolom untuk memfilter (mis: nib, geom, password, score)..." onkeyup="filterDataDictionary(this.value)">
+        </div>
+        <div class="dict-cluster-pills">
+          <button class="dict-pill-btn active" onclick="filterDictByCluster('all', this)">Semua (18 Tabel)</button>
+          <button class="dict-pill-btn" onclick="filterDictByCluster('rbac', this)">🛡️ RBAC & Keamanan (4)</button>
+          <button class="dict-pill-btn" onclick="filterDictByCluster('bujk', this)">🏢 Master Wilayah & BUJK (4)</button>
+          <button class="dict-pill-btn" onclick="filterDictByCluster('gis', this)">🗺️ WebGIS & Monitoring (2)</button>
+          <button class="dict-pill-btn" onclick="filterDictByCluster('audit', this)">⚖️ Pengawasan Tertib (3)</button>
+          <button class="dict-pill-btn" onclick="filterDictByCluster('tkk', this)">🎓 Pelatihan TKK (3)</button>
+          <button class="dict-pill-btn" onclick="filterDictByCluster('cms', this)">📰 CMS & Regulasi (2)</button>
+        </div>
+      </div>
+
+      <div id="dict-tables-container">
+        <!-- Rendered dynamically via JS from comprehensive schema object -->
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================
+       JAVASCRIPT LOGIC & INTERACTIVITY ENGINE
+       ======================================================================== -->
+  <script>
+    /* ==========================================================================
+       DATABASE DICTIONARY REPOSITORY (18 PRODUCTION TABLES)
+       ========================================================================== */
+    const DB_SCHEMA = {
+      // 1. RBAC
+      roles: {
+        cluster: 'rbac',
+        clusterLabel: 'Autentikasi & Keamanan',
+        desc: 'Menyimpan tingkatan peran utama dalam sistem (5 peran login kedinasan + publik).',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 / CUID primer' },
+          { name: 'code', type: 'VARCHAR(30)', key: 'UK', desc: 'SUPER_ADMIN, ADMIN_BIDANG, EKSEKUTIF, OPERATOR_BUJK, PESERTA_TKK' },
+          { name: 'name', type: 'VARCHAR(100)', key: '', desc: 'Nama resmi tampilan peran kedinasan' },
+          { name: 'description', type: 'VARCHAR(255)', key: '', desc: 'Uraian batasan wewenang teknis peran' },
+          { name: 'is_system', type: 'BOOLEAN', key: '', desc: 'TRUE jika peran bawaan sistem yang tidak boleh dihapus' },
+          { name: 'created_at', type: 'TIMESTAMPTZ', key: '', desc: 'Waktu pembuatan entri' },
+          { name: 'updated_at', type: 'TIMESTAMPTZ', key: '', desc: 'Waktu pembaruan profil peran' }
+        ]
+      },
+      role_permissions: {
+        cluster: 'rbac',
+        clusterLabel: 'Autentikasi & Keamanan',
+        desc: 'Matriks izin granular per peran per aksi terhadap entitas sistem.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 identifikasi entri hak akses' },
+          { name: 'role_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke roles(id) ON DELETE CASCADE' },
+          { name: 'resource', type: 'VARCHAR(50)', key: '', desc: 'Target modul: BUJK, PROJECT, SUPERVISION, TRAINING, USER' },
+          { name: 'action', type: 'VARCHAR(30)', key: '', desc: 'Aksi yang diizinkan: CREATE, READ, UPDATE, DELETE, VERIFY, EXPORT' },
+          { name: 'is_granted', type: 'BOOLEAN', key: '', desc: 'Status aktif hak akses (DEFAULT TRUE)' }
+        ]
+      },
+      users: {
+        cluster: 'rbac',
+        clusterLabel: 'Autentikasi & Keamanan',
+        desc: 'Akun terdaftar aparatur dinas, PPK, pengawas, dan operator kontraktor.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 identitas pengguna' },
+          { name: 'role_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke roles(id) ON DELETE RESTRICT' },
+          { name: 'bujk_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke bujk_master(id), Nullable jika bukan OPERATOR_BUJK' },
+          { name: 'username', type: 'VARCHAR(50)', key: 'UK', desc: 'Nama pengguna untuk otentikasi login' },
+          { name: 'email', type: 'VARCHAR(100)', key: 'UK', desc: 'Alamat surel resmi aktif' },
+          { name: 'password_hash', type: 'VARCHAR(255)', key: '', desc: 'Hash password aman (Argon2id / Bcrypt)' },
+          { name: 'full_name', type: 'VARCHAR(150)', key: '', desc: 'Nama lengkap beserta gelar kedinasan' },
+          { name: 'phone_number', type: 'VARCHAR(20)', key: '', desc: 'Nomor WhatsApp untuk notifikasi berkas' },
+          { name: 'is_active', type: 'BOOLEAN', key: '', desc: 'Status aktifasi akun (DEFAULT TRUE)' },
+          { name: 'last_login_at', type: 'TIMESTAMPTZ', key: '', desc: 'Jejak waktu login terakhir' }
+        ]
+      },
+      audit_logs: {
+        cluster: 'rbac',
+        clusterLabel: 'Autentikasi & Keamanan',
+        desc: 'Pencatatan riwayat setiap aksi mutasi data untuk pemenuhan audit Inspektorat & BPK.',
+        columns: [
+          { name: 'id', type: 'BIGSERIAL', key: 'PK', desc: 'Auto-increment sequence rekaman log' },
+          { name: 'user_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke users(id) ON DELETE SET NULL' },
+          { name: 'action', type: 'VARCHAR(20)', key: '', desc: 'Tipe mutasi: CREATE, UPDATE, DELETE, LOGIN, EXPORT' },
+          { name: 'module', type: 'VARCHAR(50)', key: '', desc: 'Modul target: BUJK, SUPERVISION, PROJECT, dll.' },
+          { name: 'record_id', type: 'VARCHAR(100)', key: '', desc: 'ID unik baris data yang mengalami mutasi' },
+          { name: 'old_values', type: 'JSONB', key: '', desc: 'Payload sebelum dimutasi' },
+          { name: 'new_values', type: 'JSONB', key: '', desc: 'Payload setelah dimutasi' },
+          { name: 'ip_address', type: 'INET', key: '', desc: 'Alamat IP koneksi klien' },
+          { name: 'user_agent', type: 'VARCHAR(255)', key: '', desc: 'Informasi sistem operasi & browser perangkat' }
+        ]
+      },
+
+      // 2. MASTER WILAYAH & BUJK
+      districts: {
+        cluster: 'bujk',
+        clusterLabel: 'Master Wilayah & BUJK',
+        desc: 'Batas wilayah administratif spasial 40 Kecamatan di Kabupaten Bogor.',
+        columns: [
+          { name: 'id', type: 'INTEGER', key: 'PK', desc: 'Kode wilayah resmi BPS / Kemendagri' },
+          { name: 'name', type: 'VARCHAR(100)', key: '', desc: 'Nama Kecamatan (misal: Cibinong, Babakan Madang)' },
+          { name: 'code', type: 'VARCHAR(10)', key: 'UK', desc: 'Kode unik akronim wilayah' },
+          { name: 'geom_boundary', type: 'geometry(MultiPolygon, 4326)', key: 'GEOM', desc: 'Poligon delineasi spasial batas kecamatan' },
+          { name: 'centroid', type: 'geometry(Point, 4326)', key: 'GEOM', desc: 'Titik pusat koordinat kecamatan' }
+        ]
+      },
+      bujk_master: {
+        cluster: 'bujk',
+        clusterLabel: 'Master Wilayah & BUJK',
+        desc: 'Data profil induk Badan Usaha Jasa Konstruksi (kontraktor & konsultan).',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 primer perusahaan' },
+          { name: 'name', type: 'VARCHAR(255)', key: '', desc: 'Nama resmi badan usaha (PT / CV / Koperasi)' },
+          { name: 'entity_type', type: 'VARCHAR(20)', key: '', desc: 'Bentuk usaha: PT, CV, PO, KOPERASI, PERUMDA' },
+          { name: 'nib', type: 'VARCHAR(13)', key: 'UK', desc: 'Nomor Induk Berusaha 13 digit OSS' },
+          { name: 'npwp', type: 'VARCHAR(20)', key: 'UK', desc: 'Nomor Pokok Wajib Pajak Perusahaan' },
+          { name: 'leader_name', type: 'VARCHAR(150)', key: '', desc: 'Nama Direktur Utama / Penanggung Jawab' },
+          { name: 'pjt_name', type: 'VARCHAR(150)', key: '', desc: 'Nama Penanggung Jawab Teknis (PJT)' },
+          { name: 'pjsk_name', type: 'VARCHAR(150)', key: '', desc: 'Nama Penanggung Jawab Subklasifikasi (PJSK)' },
+          { name: 'district_id', type: 'INTEGER', key: 'FK', desc: 'Relasi ke districts(id) lokasi kantor' },
+          { name: 'address', type: 'TEXT', key: '', desc: 'Alamat lengkap domisili kantor' },
+          { name: 'geom_location', type: 'geometry(Point, 4326)', key: 'GEOM', desc: 'Titik koordinat GPS kantor (Lat/Long)' },
+          { name: 'status', type: 'VARCHAR(30)', key: '', desc: 'DRAFT, PENDING_VERIFICATION, APPROVED, REJECTED, SUSPENDED' },
+          { name: 'verified_by', type: 'VARCHAR(36)', key: 'FK', desc: 'Petugas dinas verifikator akun' }
+        ]
+      },
+      bujk_sbu: {
+        cluster: 'bujk',
+        clusterLabel: 'Master Wilayah & BUJK',
+        desc: 'Sertifikat Badan Usaha resmi terbitan Lembaga Sertifikasi (LSBU).',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 SBU' },
+          { name: 'bujk_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke bujk_master(id) ON DELETE CASCADE' },
+          { name: 'cert_number', type: 'VARCHAR(100)', key: '', desc: 'Nomor registrasi SBU LPJK' },
+          { name: 'issuer', type: 'VARCHAR(150)', key: '', desc: 'Nama Lembaga Sertifikasi Badan Usaha (LSBU)' },
+          { name: 'kbli_code', type: 'VARCHAR(10)', key: '', desc: 'Kode KBLI 5 digit (misal: 41011, 42101)' },
+          { name: 'subclassification', type: 'VARCHAR(255)', key: '', desc: 'Uraian subklasifikasi pekerjaan konstruksi' },
+          { name: 'qualification', type: 'VARCHAR(20)', key: '', desc: 'Kualifikasi: KECIL, MENENGAH, BESAR' },
+          { name: 'issued_date', type: 'DATE', key: '', desc: 'Tanggal terbit sertifikat' },
+          { name: 'valid_until', type: 'DATE', key: '', desc: 'Tanggal habis masa berlaku sertifikat (Indexed)' },
+          { name: 'file_url', type: 'VARCHAR(500)', key: '', desc: 'URL dokumen PDF di Object Storage' }
+        ]
+      },
+      bujk_experiences: {
+        cluster: 'bujk',
+        clusterLabel: 'Master Wilayah & BUJK',
+        desc: 'Rekam jejak pengalaman kerja proyek dan serah terima pekerjaan (PHO/FHO).',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 pengalaman' },
+          { name: 'bujk_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke bujk_master(id) ON DELETE CASCADE' },
+          { name: 'project_name', type: 'VARCHAR(255)', key: '', desc: 'Nama paket pekerjaan lampau' },
+          { name: 'owner_name', type: 'VARCHAR(150)', key: '', desc: 'Pemilik pekerjaan (Dinas/Swasta/BUMN)' },
+          { name: 'contract_number', type: 'VARCHAR(100)', key: '', desc: 'Nomor kontrak resmi pekerjaan' },
+          { name: 'contract_value', type: 'NUMERIC(18,2)', key: '', desc: 'Nilai total kontrak rupiah' },
+          { name: 'fiscal_year', type: 'INTEGER', key: '', desc: 'Tahun anggaran pengerjaan' },
+          { name: 'bast_file_url', type: 'VARCHAR(500)', key: '', desc: 'URL dokumen BAST / PHO' }
+        ]
+      },
+
+      // 3. WEBGIS & MONITORING PROYEK
+      bujk_projects: {
+        cluster: 'gis',
+        clusterLabel: 'WebGIS & Monitoring Proyek',
+        desc: 'Paket pekerjaan konstruksi aktif yang sedang berjalan di Kabupaten Bogor.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 paket proyek' },
+          { name: 'bujk_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke bujk_master(id) Kontraktor Pelaksana' },
+          { name: 'district_id', type: 'INTEGER', key: 'FK', desc: 'Relasi ke districts(id) lokasi pekerjaan' },
+          { name: 'project_name', type: 'VARCHAR(255)', key: '', desc: 'Nama paket pekerjaan konstruksi fisik' },
+          { name: 'fiscal_year', type: 'INTEGER', key: '', desc: 'Tahun anggaran berjalan (misal: 2026)' },
+          { name: 'budget_source', type: 'VARCHAR(50)', key: '', desc: 'Sumber dana: APBD_KAB, APBD_PROV, APBN, DAK, SWASTA' },
+          { name: 'contract_value', type: 'NUMERIC(18,2)', key: '', desc: 'Nilai kontrak pekerjaan (Rupiah)' },
+          { name: 'physical_progress', type: 'NUMERIC(5,2)', key: '', desc: 'Realisasi fisik terakhir (%)' },
+          { name: 'financial_progress', type: 'NUMERIC(5,2)', key: '', desc: 'Realisasi penyerapan keuangan (%)' },
+          { name: 'geom_location', type: 'geometry(Point, 4326)', key: 'GEOM', desc: 'Koordinat titik proyek (Lat/Long WebGIS)' },
+          { name: 'geom_area', type: 'geometry(Polygon, 4326)', key: 'GEOM', desc: 'Delineasi poligon area tapak proyek' },
+          { name: 'status', type: 'VARCHAR(30)', key: '', desc: 'ON_PROGRESS, COMPLETED, CRITICAL_DELAY, TERMINATED' }
+        ]
+      },
+      project_progress_logs: {
+        cluster: 'gis',
+        clusterLabel: 'WebGIS & Monitoring Proyek',
+        desc: 'Riwayat data kurva S mingguan dan dokumentasi visual berkala.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 log mingguan' },
+          { name: 'project_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke bujk_projects(id) ON DELETE CASCADE' },
+          { name: 'report_week', type: 'INTEGER', key: '', desc: 'Minggu pelaporan ke- (1 s.d. 52)' },
+          { name: 'report_date', type: 'DATE', key: '', desc: 'Tanggal berkas laporan mingguan' },
+          { name: 'plan_pct', type: 'NUMERIC(5,2)', key: '', desc: 'Target rencana kumulatif Kurva S (%)' },
+          { name: 'actual_pct', type: 'NUMERIC(5,2)', key: '', desc: 'Realisasi progres fisik kumulatif (%)' },
+          { name: 'deviation', type: 'NUMERIC(5,2)', key: 'GEN', desc: 'GENERATED STORED: (actual_pct - plan_pct)' },
+          { name: 'documentation_url', type: 'VARCHAR(500)', key: '', desc: 'URL foto dokumentasi fisik lapangan' }
+        ]
+      },
+
+      // 4. PENGAWASAN TERTIB KONSTRUKSI
+      supervision_schedules: {
+        cluster: 'audit',
+        clusterLabel: 'Pengawasan Tertib Konstruksi',
+        desc: 'Agenda jadwal audit pengawasan berkala oleh Tim Pengawas Dinas PUPR.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 jadwal audit' },
+          { name: 'fiscal_year', type: 'INTEGER', key: '', desc: 'Tahun anggaran pengawasan' },
+          { name: 'schedule_name', type: 'VARCHAR(200)', key: '', desc: 'Nama agenda (misal: Pengawasan Semester I TA 2026)' },
+          { name: 'start_date', type: 'DATE', key: '', desc: 'Tanggal mulai agenda audit lapangan' },
+          { name: 'end_date', type: 'DATE', key: '', desc: 'Tanggal penutupan agenda audit' },
+          { name: 'scope', type: 'VARCHAR(50)', key: '', desc: 'TERTIB_USAHA, TERTIB_PENYELENGGARAAN, TERTIB_PEMANFAATAN, GABUNGAN' },
+          { name: 'status', type: 'VARCHAR(30)', key: '', desc: 'DRAFT, OPEN, IN_INSPECTION, COMPLETED, CLOSED' }
+        ]
+      },
+      supervision_files: {
+        cluster: 'audit',
+        clusterLabel: 'Pengawasan Tertib Konstruksi',
+        desc: 'Unggahan berkas instrumen digital SIMAK dan bukti dukung per BUJK.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 berkas instrumen' },
+          { name: 'schedule_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke supervision_schedules(id)' },
+          { name: 'bujk_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke bujk_master(id) yang diaudit' },
+          { name: 'file_type', type: 'VARCHAR(50)', key: '', desc: 'SIMAK_EXCEL, BUKTI_DUKUNG_PDF' },
+          { name: 'file_url', type: 'VARCHAR(500)', key: '', desc: 'URL berkas di Object Storage' },
+          { name: 'uploaded_by', type: 'VARCHAR(36)', key: 'FK', desc: 'User pengunggah berkas' }
+        ]
+      },
+      supervision_inspections: {
+        cluster: 'audit',
+        clusterLabel: 'Pengawasan Tertib Konstruksi',
+        desc: 'Hasil rekapitulasi penilaian kepatuhan pengawasan sesuai Permen PUPR 1/2023.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 rekaman inspeksi' },
+          { name: 'schedule_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke supervision_schedules(id)' },
+          { name: 'bujk_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke bujk_master(id)' },
+          { name: 'project_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke bujk_projects(id), Nullable' },
+          { name: 'inspector_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Asesor Pengawas Dinas relasi ke users(id)' },
+          { name: 'business_order_score', type: 'NUMERIC(5,2)', key: '', desc: 'Skor Tertib Usaha (Bobot 40%)' },
+          { name: 'execution_order_score', type: 'NUMERIC(5,2)', key: '', desc: 'Skor Tertib Penyelenggaraan (Bobot 35%)' },
+          { name: 'utilization_order_score', type: 'NUMERIC(5,2)', key: '', desc: 'Skor Tertib Pemanfaatan (Bobot 25%)' },
+          { name: 'final_score', type: 'NUMERIC(5,2)', key: '', desc: 'Skor Komposit Akhir (0.00 s.d. 100.00)' },
+          { name: 'compliance_status', type: 'VARCHAR(30)', key: '', desc: 'TERTIB (>=80), CUKUP_TERTIB (60-79.9), KURANG_TERTIB (<60)' },
+          { name: 'official_memo', type: 'TEXT', key: '', desc: 'Rekomendasi teguran atau catatan dinas' }
+        ]
+      },
+
+      // 5. PEMBINAAN & SERTIFIKASI TKK
+      training_packages: {
+        cluster: 'tkk',
+        clusterLabel: 'Pelatihan & Sertifikasi TKK',
+        desc: 'Paket bimbingan teknis & sertifikasi Tenaga Kerja Konstruksi.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 paket bimtek' },
+          { name: 'name', type: 'VARCHAR(255)', key: '', desc: 'Nama Pelatihan (e.g. Bimtek Petugas SMKK)' },
+          { name: 'fiscal_year', type: 'INTEGER', key: '', desc: 'Tahun Anggaran pelaksanaan' },
+          { name: 'funding_source', type: 'VARCHAR(50)', key: '', desc: 'Sumber dana: APBD_KAB, APBN, CSR' },
+          { name: 'kkni_level', type: 'INTEGER', key: '', desc: 'Jenjang Kualifikasi KKNI (1 s.d. 9)' },
+          { name: 'quota', type: 'INTEGER', key: '', desc: 'Jumlah kapasitas kuota peserta' },
+          { name: 'method', type: 'VARCHAR(20)', key: '', desc: 'Metode: OFFLINE, ONLINE, HYBRID' },
+          { name: 'status', type: 'VARCHAR(30)', key: '', desc: 'DRAFT, REGISTRATION_OPEN, ONGOING, COMPLETED' }
+        ]
+      },
+      applicants: {
+        cluster: 'tkk',
+        clusterLabel: 'Pelatihan & Sertifikasi TKK',
+        desc: 'Data pendaftar calon peserta pelatihan terverifikasi NIK kependudukan.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 pendaftar' },
+          { name: 'nik', type: 'VARCHAR(16)', key: 'UK', desc: '16 Digit NIK KTP Valid' },
+          { name: 'full_name', type: 'VARCHAR(150)', key: '', desc: 'Nama lengkap peserta' },
+          { name: 'phone', type: 'VARCHAR(20)', key: '', desc: 'Nomor WhatsApp kontak peserta' },
+          { name: 'email', type: 'VARCHAR(100)', key: '', desc: 'Alamat surel pendaftar' },
+          { name: 'district_id', type: 'INTEGER', key: 'FK', desc: 'Relasi ke districts(id) domisili kecamatan' },
+          { name: 'ktp_file_url', type: 'VARCHAR(500)', key: '', desc: 'Berkas KTP (Object Storage)' }
+        ]
+      },
+      training_participants: {
+        cluster: 'tkk',
+        clusterLabel: 'Pelatihan & Sertifikasi TKK',
+        desc: 'Peserta yang lolos kurasi dan penerbitan e-Certificate resmi ber-QR Code.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 kepesertaan' },
+          { name: 'package_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke training_packages(id) ON DELETE CASCADE' },
+          { name: 'applicant_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke applicants(id) ON DELETE RESTRICT' },
+          { name: 'attendance_score', type: 'NUMERIC(5,2)', key: '', desc: 'Nilai kehadiran persentase (%)' },
+          { name: 'exam_score', type: 'NUMERIC(5,2)', key: '', desc: 'Nilai ujian kelulusan teknis' },
+          { name: 'is_passed', type: 'BOOLEAN', key: '', desc: 'Status kelulusan kelayakan kompetensi' },
+          { name: 'cert_number', type: 'VARCHAR(100)', key: 'UK', desc: 'Nomor registrasi resmi sertifikat dinas' },
+          { name: 'qr_token', type: 'VARCHAR(64)', key: 'UK', desc: 'Hash token SHA-256 untuk verifikasi instan publik' }
+        ]
+      },
+
+      // 6. CMS & KETERBUKAAN INFORMASI
+      regulations: {
+        cluster: 'cms',
+        clusterLabel: 'CMS & Dokumen Publik',
+        desc: 'Katalog regulasi dan dasar hukum jasa konstruksi terindeks Full-Text Search.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 regulasi' },
+          { name: 'type', type: 'VARCHAR(50)', key: '', desc: 'UU, PP, PERMEN, PERDA_JABAR, PERBUP_BOGOR, SE_KEPMEN' },
+          { name: 'number', type: 'VARCHAR(100)', key: '', desc: 'Nomor peraturan (misal: Nomor 1 Tahun 2023)' },
+          { name: 'year', type: 'INTEGER', key: '', desc: 'Tahun penetapan peraturan' },
+          { name: 'title', type: 'VARCHAR(300)', key: '', desc: 'Judul lengkap peraturan (GIN FTS Index)' },
+          { name: 'file_url', type: 'VARCHAR(500)', key: '', desc: 'URL berkas PDF dokumen hukum' }
+        ]
+      },
+      news_articles: {
+        cluster: 'cms',
+        clusterLabel: 'CMS & Dokumen Publik',
+        desc: 'Artikel warta kegiatan, siaran pers dan agenda pembinaan jasa konstruksi.',
+        columns: [
+          { name: 'id', type: 'VARCHAR(36)', key: 'PK', desc: 'UUID v4 berita' },
+          { name: 'title', type: 'VARCHAR(255)', key: '', desc: 'Judul berita publik' },
+          { name: 'slug', type: 'VARCHAR(255)', key: 'UK', desc: 'URL slug ramah mesin pencari (SEO)' },
+          { name: 'category', type: 'VARCHAR(50)', key: '', desc: 'BERITA, AGENDA, PENGUMUMAN, PROFIL_JAKON' },
+          { name: 'author_id', type: 'VARCHAR(36)', key: 'FK', desc: 'Relasi ke users(id) penulis aparatur dinas' },
+          { name: 'is_published', type: 'BOOLEAN', key: '', desc: 'Status tayang portal publik' }
+        ]
+      }
+    };
+
+    /* ==========================================================================
+       VIEW SWITCHING LOGIC (SLIDE DECK / CANVAS / DICTIONARY)
+       ========================================================================== */
+    function switchViewMode(mode) {
+      document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.mode-tab-btn').forEach(el => el.classList.remove('active'));
+
+      const targetView = document.getElementById(`mode-${mode}`);
+      if (targetView) targetView.classList.add('active');
+
+      const activeBtn = Array.from(document.querySelectorAll('.mode-tab-btn')).find(b => b.getAttribute('onclick').includes(mode));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const progressBar = document.getElementById('slide-progress-track');
+      if (mode === 'presentation') {
+        progressBar.style.display = 'block';
+        updateSlideUI();
+      } else {
+        progressBar.style.display = 'none';
+      }
+
+      if (mode === 'canvas') {
+        // Auto fit canvas smoothly on tab switch
+        setTimeout(() => {
+          canvasFit();
+        }, 50);
+      }
+
+      if (mode === 'dictionary') {
+        renderDataDictionary('all');
+      }
+    }
+
+    /* ==========================================================================
+       SLIDE DECK CONTROLLER (MODE PRESENTATION)
+       ========================================================================== */
+    let currentSlide = 1;
+    const totalSlides = 8;
+
+    function updateSlideUI() {
+      const slides = document.querySelectorAll('.slide-item');
+      slides.forEach(slide => {
+        const slideNum = parseInt(slide.getAttribute('data-slide'));
+        if (slideNum === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+
+      document.getElementById('slide-counter-display').textContent = `Slide ${currentSlide} dari ${totalSlides}`;
+      document.getElementById('btn-prev-slide').disabled = (currentSlide === 1);
+      document.getElementById('btn-next-slide').disabled = (currentSlide === totalSlides);
+
+      const progressPct = (currentSlide / totalSlides) * 100;
+      document.getElementById('slide-progress-bar').style.width = `${progressPct}%`;
+    }
+
+    function changeSlide(direction) {
+      const nextSlide = currentSlide + direction;
+      if (nextSlide >= 1 && nextSlide <= totalSlides) {
+        currentSlide = nextSlide;
+        updateSlideUI();
+      }
+    }
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      const presentationModeActive = document.getElementById('mode-presentation').classList.contains('active');
+      
+      if (e.key === 'f' || e.key === 'F') {
+        if (!e.target.matches('input, textarea')) {
+          e.preventDefault();
+          toggleFullscreen();
+        }
+      }
+
+      if (presentationModeActive) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+          e.preventDefault();
+          changeSlide(1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          e.preventDefault();
+          changeSlide(-1);
+        }
+      }
+
+      if (e.key === 'Escape') {
+        closeTableDrawer();
+      }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    /* ==========================================================================
+       CANVAS PAN & ZOOM ENGINE (PRECISE AUTO-FIT & RESIZING)
+       ========================================================================== */
+    let canvasScale = 0.85;
+    let canvasTranslateX = 40;
+    let canvasTranslateY = 20;
+    let isPanning = false;
+    let startX = 0;
+    let startY = 0;
+
+    const svgCanvas = document.getElementById('erd-svg-canvas');
+    const transformGroup = document.getElementById('canvas-transform-group');
+
+    function applyCanvasTransform() {
+      transformGroup.setAttribute('transform', `translate(${canvasTranslateX}, ${canvasTranslateY}) scale(${canvasScale})`);
+    }
+
+    function canvasZoom(factor) {
+      canvasScale = Math.min(Math.max(canvasScale * factor, 0.35), 2.8);
+      applyCanvasTransform();
+    }
+
+    function canvasResetZoom() {
+      canvasScale = 0.85;
+      canvasTranslateX = 40;
+      canvasTranslateY = 20;
+      applyCanvasTransform();
+    }
+
+    function canvasFit() {
+      const stageWrapper = document.getElementById('canvas-stage-wrapper');
+      if (!stageWrapper) return;
+
+      const rect = stageWrapper.getBoundingClientRect();
+      const viewportW = rect.width || window.innerWidth;
+      const viewportH = rect.height || (window.innerHeight - 115);
+
+      // Total diagram logical bounding box (Width ~ 1760px, Height ~ 820px)
+      const diagramW = 1760;
+      const diagramH = 820;
+
+      // Scale to fit available stage with clean 30px padding
+      const scaleX = (viewportW - 60) / diagramW;
+      const scaleY = (viewportH - 60) / diagramH;
+      
+      canvasScale = Math.min(scaleX, scaleY);
+      canvasScale = Math.min(Math.max(canvasScale, 0.40), 1.05);
+
+      // Center in viewport
+      canvasTranslateX = Math.max(20, (viewportW - (diagramW * canvasScale)) / 2);
+      canvasTranslateY = Math.max(20, (viewportH - (diagramH * canvasScale)) / 2);
+
+      applyCanvasTransform();
+    }
+
+    // SVG Drag-to-Pan Logic
+    svgCanvas.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.table-node')) return; // Allow node clicking
+      isPanning = true;
+      startX = e.clientX - canvasTranslateX;
+      startY = e.clientY - canvasTranslateY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isPanning) return;
+      canvasTranslateX = e.clientX - startX;
+      canvasTranslateY = e.clientY - startY;
+      applyCanvasTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isPanning = false;
+    });
+
+    // Scroll Wheel Zoom
+    svgCanvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+      canvasZoom(zoomFactor);
+    }, { passive: false });
+
+    // Window Resize listener to update fit
+    window.addEventListener('resize', () => {
+      if (document.getElementById('mode-canvas').classList.contains('active')) {
+        canvasFit();
+      }
+    });
+
+    // Filter Canvas Tables by Cluster
+    function filterCanvasCluster(cluster) {
+      document.querySelectorAll('.canvas-filter-bar .filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const allNodes = document.querySelectorAll('.table-node');
+      const allLines = document.getElementById('relationship-lines');
+
+      if (cluster === 'all') {
+        allNodes.forEach(node => {
+          node.style.opacity = '1';
+          node.style.filter = 'url(#node-shadow)';
+        });
+        allLines.style.opacity = '0.8';
+      } else {
+        allNodes.forEach(node => {
+          if (node.classList.contains(`cluster-${cluster}`)) {
+            node.style.opacity = '1';
+            node.style.filter = 'url(#node-shadow) drop-shadow(0 0 10px rgba(255, 192, 0, 0.4))';
+          } else {
+            node.style.opacity = '0.15';
+            node.style.filter = 'none';
+          }
+        });
+        allLines.style.opacity = '0.15';
+      }
+    }
+
+    function searchCanvasTable(query) {
+      const q = query.trim().toLowerCase();
+      const allNodes = document.querySelectorAll('.table-node');
+
+      if (!q) {
+        allNodes.forEach(node => node.style.opacity = '1');
+        return;
+      }
+
+      allNodes.forEach(node => {
+        const id = node.id.replace('node-', '').toLowerCase();
+        if (id.includes(q)) {
+          node.style.opacity = '1';
+        } else {
+          node.style.opacity = '0.15';
+        }
+      });
+    }
+
+    /* ==========================================================================
+       CANVAS NODE INSPECTOR DRAWER
+       ========================================================================== */
+    function openTableDetails(tableName) {
+      const meta = DB_SCHEMA[tableName];
+      if (!meta) return;
+
+      document.getElementById('drawer-table-name').textContent = tableName;
+      document.getElementById('drawer-table-cluster').textContent = `${meta.clusterLabel} (${meta.columns.length} Kolom)`;
+
+      let colRowsHtml = meta.columns.map(c => {
+        let badgeHtml = '';
+        if (c.key === 'PK') badgeHtml = '<span class="col-pk">PK</span> ';
+        else if (c.key === 'FK') badgeHtml = '<span class="col-fk">FK</span> ';
+        else if (c.key === 'UK') badgeHtml = '<span class="col-pk" style="background:#E0E7FF; color:#3730A3; border-color:#C7D2FE;">UK</span> ';
+        else if (c.key === 'GEOM') badgeHtml = '<span class="col-geom">GEOM</span> ';
+        else if (c.key === 'GEN') badgeHtml = '<span class="col-pk" style="background:#FFE4E6; color:#9F1239; border-color:#FECDD3;">CALC</span> ';
+
+        return `
+          <tr style="border-bottom: 1px solid var(--slate-200);">
+            <td style="padding: 8px 6px;">
+              ${badgeHtml}<strong style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--navy-950);">${c.name}</strong>
+            </td>
+            <td style="padding: 8px 6px;">
+              <span class="type-badge">${c.type}</span>
+            </td>
+            <td style="padding: 8px 6px; font-size:11px; color:var(--slate-600); line-height:1.4;">
+              ${c.desc}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('drawer-body').innerHTML = `
+        <div style="background:var(--slate-50); padding:10px 12px; border-radius:8px; border:1px solid var(--slate-200); margin-bottom:14px;">
+          <p style="font-size:12px; color:var(--slate-700); line-height:1.5;">${meta.desc}</p>
+        </div>
+
+        <h4 style="font-size:11px; text-transform:uppercase; color:var(--slate-500); letter-spacing:0.04em; margin-bottom:8px;">Daftar Struktur Kolom</h4>
+        <table style="width:100%; border-collapse:collapse; text-align:left;">
+          <thead>
+            <tr style="border-bottom:2px solid var(--slate-300); font-size:10px; text-transform:uppercase; color:var(--slate-700);">
+              <th style="padding:6px;">Kolom</th>
+              <th style="padding:6px;">Tipe</th>
+              <th style="padding:6px;">Deskripsi</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${colRowsHtml}
+          </tbody>
+        </table>
+
+        <div style="margin-top:16px;">
+          <button class="btn-action" style="width:100%; justify-content:center;" onclick="copyTablePrisma('${tableName}')">
+            📋 Salin Informasi Model ${tableName}
+          </button>
+        </div>
+      `;
+
+      document.getElementById('table-inspector').classList.add('open');
+    }
+
+    function closeTableDrawer() {
+      document.getElementById('table-inspector').classList.remove('open');
+    }
+
+    function copyTablePrisma(tableName) {
+      const meta = DB_SCHEMA[tableName];
+      if (!meta) return;
+      const text = `// Prisma model for ${tableName}\n// Refer to backend/prisma/schema.prisma`;
+      navigator.clipboard.writeText(text);
+      alert(`Model ${tableName} disalin ke clipboard!`);
+    }
+
+    /* ==========================================================================
+       DATA DICTIONARY TABULAR RENDERER
+       ========================================================================== */
+    function renderDataDictionary(clusterFilter = 'all', searchQuery = '') {
+      const container = document.getElementById('dict-tables-container');
+      const q = searchQuery.trim().toLowerCase();
+
+      let html = '';
+
+      for (const [tableName, meta] of Object.entries(DB_SCHEMA)) {
+        if (clusterFilter !== 'all' && meta.cluster !== clusterFilter) {
+          continue;
+        }
+
+        // Search in table name or column names
+        if (q) {
+          const matchTable = tableName.toLowerCase().includes(q);
+          const matchDesc = meta.desc.toLowerCase().includes(q);
+          const matchCols = meta.columns.some(c => c.name.toLowerCase().includes(q) || c.type.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q));
+          if (!matchTable && !matchDesc && !matchCols) continue;
+        }
+
+        let moduleBadgeStyle = '';
+        if (meta.cluster === 'rbac') moduleBadgeStyle = 'background:#EDE9FE; color:#6D28D9; border:1px solid #DDD6FE;';
+        else if (meta.cluster === 'bujk') moduleBadgeStyle = 'background:#E0F2FE; color:#0369A1; border:1px solid #BAE6FD;';
+        else if (meta.cluster === 'gis') moduleBadgeStyle = 'background:#CFFAFE; color:#0891B2; border:1px solid #A5F3FC;';
+        else if (meta.cluster === 'audit') moduleBadgeStyle = 'background:#FEF3C7; color:#B45309; border:1px solid #FDE68A;';
+        else if (meta.cluster === 'tkk') moduleBadgeStyle = 'background:#D1FAE5; color:#047857; border:1px solid #A7F3D0;';
+        else moduleBadgeStyle = 'background:#F1F5F9; color:#475569; border:1px solid #E2E8F0;';
+
+        const rowsHtml = meta.columns.map(c => {
+          let badgeHtml = '';
+          if (c.key === 'PK') badgeHtml = '<span class="col-pk">PK</span>';
+          else if (c.key === 'FK') badgeHtml = '<span class="col-fk">FK</span>';
+          else if (c.key === 'UK') badgeHtml = '<span class="col-pk" style="background:#E0E7FF; color:#3730A3; border-color:#C7D2FE;">UK</span>';
+          else if (c.key === 'GEOM') badgeHtml = '<span class="col-geom">GEOM</span>';
+          else if (c.key === 'GEN') badgeHtml = '<span class="col-pk" style="background:#FFE4E6; color:#9F1239; border-color:#FECDD3;">CALC</span>';
+
+          return `
+            <tr>
+              <td style="width: 220px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  ${badgeHtml}
+                  <span class="col-name-mono">${c.name}</span>
+                </div>
+              </td>
+              <td style="width: 200px;">
+                <span class="type-badge">${c.type}</span>
+              </td>
+              <td>${c.desc}</td>
+            </tr>
+          `;
+        }).join('');
+
+        html += `
+          <div class="table-dictionary-card" data-table="${tableName}">
+            <div class="table-dict-header">
+              <h3>
+                <span>📦</span>
+                <span>public.${tableName}</span>
+              </h3>
+              <span class="table-module-badge" style="${moduleBadgeStyle}">${meta.clusterLabel}</span>
+            </div>
+            <div class="table-dict-desc">
+              ${meta.desc}
+            </div>
+            <table class="dict-data-table">
+              <thead>
+                <tr>
+                  <th>Nama Kolom</th>
+                  <th>Tipe Data PostgreSQL</th>
+                  <th>Keterangan Bisnis & Constraint</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      if (!html) {
+        html = `
+          <div style="text-align:center; padding:50px 20px; background:white; border-radius:12px; border:1px solid var(--slate-200);">
+            <div style="font-size:32px; margin-bottom:8px;">🔍</div>
+            <h3 style="color:var(--navy-950); margin-bottom:4px;">Tidak ada tabel atau kolom yang cocok</h3>
+            <p style="color:var(--slate-500); font-size:12px;">Coba gunakan kata kunci pencarian lain atau pilih kluster 'Semua'.</p>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    let currentDictCluster = 'all';
+
+    function filterDictByCluster(cluster, btnElement) {
+      currentDictCluster = cluster;
+      document.querySelectorAll('.dict-pill-btn').forEach(b => b.classList.remove('active'));
+      btnElement.classList.add('active');
+      const searchVal = document.getElementById('dict-search-input').value;
+      renderDataDictionary(currentDictCluster, searchVal);
+    }
+
+    function filterDataDictionary(val) {
+      renderDataDictionary(currentDictCluster, val);
+    }
+
+    // Initial Startup
+    document.addEventListener('DOMContentLoaded', () => {
+      updateSlideUI();
+      renderDataDictionary('all');
+    });
+  </script>
+</body>
+</html>

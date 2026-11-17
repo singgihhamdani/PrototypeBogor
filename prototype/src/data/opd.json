@@ -2,11 +2,27 @@
   "agencyName": "Dinas Pekerjaan Umum (DPU)",
   "government": "Pemerintah Kabupaten Bogor",
   "province": "Jawa Barat",
-  "division": "Bidang Bina Konstruksi / Jasa Konstruksi",
+  "division": "Bidang Bina Konstruksi",
+  "section": "Sub-Koordinator Kelembagaan dan Jasa Konstruksi",
+  "tipeOpd": "Dinas Teknis Pekerjaan Umum",
+  "kategori": "Pemerintah Kabupaten",
+  "levelSuburusan": "Bidang Mandiri (Eselon III)",
   "address": "Jl. Bersih No. 1, Komplek Perkantoran Pemkab Bogor, Kel. Tengah, Kec. Cibinong, Kab. Bogor 16914",
   "phone": "(021) 8753545",
   "email": "dpu@bogorkab.go.id",
   "website": "https://dpu.bogorkab.go.id",
+  "personnel": {
+    "pns": 14,
+    "manajerial": 3,
+    "fungsional": 8,
+    "p3k": 5,
+    "nonAsn": 6,
+    "total": 25,
+    "functionalSupervisors": 12,
+    "certifiedInspectors": 8,
+    "adminStaff": 6,
+    "contractStaff": 4
+  },
   "headOfAgency": {
     "name": "Iwan Setiawan, ST, MT",
     "nip": "197204151998031005",
@@ -16,6 +32,7 @@
     "name": "H. Raden Ridwan, ST, M.Si",
     "nip": "198006122005011008",
     "position": "Kepala Bidang Jasa Konstruksi",
+    "eselon": "Eselon III.b",
     "phone": "081298765432",
     "email": "ridwan.jakon@bogorkab.go.id"
   },
@@ -23,42 +40,60 @@
     "name": "Bayu Pratama, S.Kom",
     "nip": "199103252019031004",
     "position": "Pengelola Sistem Informasi Jasa Konstruksi",
+    "skAdmin": "SK Penetapan Administrator SIPJAKI Daerah Kab. Bogor",
+    "noSkAdmin": "SK.BUPATI/800/104/Kpts/DPU/2025",
     "phone": "085712345678",
     "email": "bayu.sipjaki@bogorkab.go.id"
   },
-  "personnel": {
-    "functionalSupervisors": 12,
-    "certifiedInspectors": 8,
-    "adminStaff": 6,
-    "contractStaff": 4
+  "regulation": {
+    "sotk": "Peraturan Bupati Bogor tentang SOTK Dinas Pekerjaan Umum",
+    "noSotk": "Perbup No. 67 Tahun 2021",
+    "perdaJakon": "Peraturan Daerah Kabupaten Bogor tentang Penyelenggaraan Jasa Konstruksi",
+    "noPerdaJakon": "Perda No. 2 Tahun 2024",
+    "skTpjk": "SK Pembentukan Tim Pembina Jasa Konstruksi (TPJK) Kabupaten Bogor",
+    "noSkTpjk": "SK.BUPATI/600/215/Kpts/DPU/2026",
+    "noSprintKadis": "800.1.11.1/092-Bid.Jakon/2026",
+    "docBaganSotkUrl": "/documents/Bagan_SOTK_DPU_2026.pdf",
+    "docSkAdminUrl": "/documents/SK_Admin_SIPJAKI_2026.pdf",
+    "docSprintUrl": "/documents/Surat_Perintah_Tugas_Pengawasan_2026.pdf"
   },
-  "budget2026": {
-    "paguTotal": 4850000000,
-    "realization": 2650000000,
-    "activities": [
-      {"name": "Pengawasan Tertib Usaha, Penyelenggaraan & Pemanfaatan", "pagu": 1750000000, "realisasi": 1100000000},
-      {"name": "Pelatihan dan Fasilitasi Sertifikasi SKK Tenaga Kerja", "pagu": 1850000000, "realisasi": 980000000},
-      {"name": "Pengembangan Sistem Informasi Jasa Konstruksi (SIJAKON)", "pagu": 750000000, "realisasi": 420000000},
-      {"name": "Penyusunan Rantai Pasok & Standar Biaya Satuan", "pagu": 500000000, "realisasi": 150000000}
-    ]
+  "budget": {
+    "yearCurrent": 2026,
+    "yearNext": 2027,
+    "anggaranJakonN": 4850000000,
+    "anggaranFisikN": 650000000000,
+    "anggaranJakonN1": 5200000000,
+    "anggaranFisikN1": 710000000000
   },
-  "decree": {
-    "number": "SK.BUPATI/600/215/Kpts/DPU/2026",
-    "date": "2026-01-15",
-    "about": "Pembentukan Tim Pembina dan Pengawas Penyelenggaraan Jasa Konstruksi Kabupaten Bogor Tahun Anggaran 2026",
-    "documentUrl": "/documents/SK_Tim_Pembina_Jakon_2026.pdf",
-    "status": "Aktif / Terverifikasi Kementerian PUPR"
+  "tkkPelatihan": {
+    "cakupanTugasUtama": "Penyelenggaraan pembinaan dan pengawasan tertib usaha, tertib penyelenggaraan, dan tertib pemanfaatan produk jasa konstruksi serta fasilitasi pelatihan dan sertifikasi tenaga kerja konstruksi (TKK) tingkat terampil dan ahli di wilayah Kabupaten Bogor.",
+    "jmlPelatihanTkk": 6,
+    "jmlTkkTerlatih": 240,
+    "jmlTkkTersertifikasi": 215,
+    "targetRpjmdPelatihan": 300,
+    "targetRpjmdSertifikasi": 250
+  },
+  "rantaiPasokWilayah": {
+    "jmlBadanUsaha": 428,
+    "jmlSbuBerlaku": 385,
+    "jmlTkkWilayah": 1850,
+    "jmlSkkBerlaku": 1420
+  },
+  "targetRpjmdPengawasan": {
+    "tertibUsaha": 50,
+    "tertibPenyelenggaraan": 40,
+    "tertibPemanfaatan": 30
   },
   "sipjakiStatus": {
     "accountStatus": "Terhubung (Active Sync)",
-    "lastSync": "2026-09-16 10:30:22 WIB",
-    "completenessScore": 96,
+    "lastSync": "2026-11-16 11:30:22 WIB",
+    "completenessScore": 98,
     "pillarScores": {
-      "tertibUsaha": 85,
-      "tertibPenyelenggaraan": 78,
-      "tertibPemanfaatan": 72,
-      "sipjakiReporting": 95,
-      "pelatihanTkk": 90
+      "tertibUsaha": 92,
+      "tertibPenyelenggaraan": 88,
+      "tertibPemanfaatan": 85,
+      "sipjakiReporting": 98,
+      "pelatihanTkk": 95
     }
   }
 }

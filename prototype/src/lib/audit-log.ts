@@ -2,13 +2,13 @@ export interface DataActivityLog {
   id: string;
   timestamp: string;
   formattedDate: string;
-  action: "export" | "import" | "doc_upload";
+  action: "export" | "import" | "doc_upload" | "create" | "update" | "delete";
   module: string;
-  format: "xlsx" | "csv" | "pdf";
+  format: "xlsx" | "csv" | "pdf" | "db";
   recordCount: number;
   user: string;
   status: "success" | "warning" | "failed";
-  fileName: string;
+  fileName?: string;
   details?: string;
 }
 
@@ -98,6 +98,7 @@ export function logDataActivity(
   const formattedDate = `${now.toLocaleDateString("id-ID", options)} WIB`;
 
   const newLog: DataActivityLog = {
+    fileName: entry.fileName || "-",
     ...entry,
     id: `LOG-2026-${Math.floor(1000 + Math.random() * 9000)}`,
     timestamp: now.toISOString(),

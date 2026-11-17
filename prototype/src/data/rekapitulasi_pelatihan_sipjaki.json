@@ -1,0 +1,190 @@
+[
+  {
+    "id": "REK-PEL-2026-002",
+    "tahun": "2026",
+    "wilayah": "JAWA BARAT, KABUPATEN BOGOR",
+    "kab_kota": "KABUPATEN BOGOR",
+    "propinsi": "JAWA BARAT",
+    "target": 4,
+    "terpenuhi": 3,
+    "total_tkk": 85,
+    "satuan_target": "Pelaksanaan",
+    "satuan_tkk": "Orang",
+    "capaian_pct": 75.0,
+    "dokumen_rekap_url": "Rekap_Realisasi_Pelatihan_TKK_2026_S2.pdf",
+    "status": "Terverifikasi",
+    "catatan_verifikasi": "Rekapitulasi progres pelatihan fisik & sertifikasi TKK Kabupaten Bogor Semester II TA 2026.",
+    "rincian_kegiatan": [
+      {
+        "nomor_ba": "045/BA-LSP-K3/VIII/2026",
+        "nama_kegiatan": "Bimtek Keselamatan Konstruksi (K3) Tingkat Lanjut",
+        "tanggal": "2026-08-14",
+        "jumlah_tkk": 35,
+        "satuan": "Orang",
+        "lsp": "LSP Keselamatan Konstruksi Indonesia",
+        "status": "Terverifikasi"
+      },
+      {
+        "nomor_ba": "049/BA-LSP-GATAKI/IX/2026",
+        "nama_kegiatan": "Fasilitasi Sertifikasi Juru Gambar Bangunan Gedung",
+        "tanggal": "2026-09-10",
+        "jumlah_tkk": 50,
+        "satuan": "Orang",
+        "lsp": "LSP Gataki Karya Konstruksi",
+        "status": "Terverifikasi"
+      }
+    ],
+    "created_at": "2026-08-15T09:00:00.000Z",
+    "updated_at": "2026-09-12T14:20:00.000Z"
+  },
+  {
+    "id": "REK-PEL-2026-001",
+    "tahun": "2026",
+    "wilayah": "JAWA BARAT, KABUPATEN BOGOR",
+    "kab_kota": "KABUPATEN BOGOR",
+    "propinsi": "JAWA BARAT",
+    "target": 3,
+    "terpenuhi": 3,
+    "total_tkk": 90,
+    "satuan_target": "Pelaksanaan",
+    "satuan_tkk": "Orang",
+    "capaian_pct": 100.0,
+    "dokumen_rekap_url": "Rekap_Realisasi_Pelatihan_TKK_2026.pdf",
+    "status": "Menunggu Verifikasi",
+    "catatan_verifikasi": "Rekapitulasi 3 paket pelatihan fisik Kabupaten Bogor TA 2026 (Pelaksana Jalan Madya, Bimtek K3, dan MTU Bata) dengan total 90 TKK lulus uji sertifikasi BNSP.",
+    "rincian_kegiatan": [
+      {
+        "nomor_ba": "028/BA-LSP-GATAKI/V/2026",
+        "nama_kegiatan": "Pelatihan dan Fasilitasi Uji Sertifikasi Pelaksana Lapangan Pekerjaan Jalan Madya",
+        "tanggal": "2026-05-15",
+        "jumlah_tkk": 30,
+        "satuan": "Orang",
+        "lsp": "LSP Gataki Karya Konstruksi",
+        "status": "Menunggu Verifikasi"
+      },
+      {
+        "nomor_ba": "024/BA-LSP-K3/IV/2026",
+        "nama_kegiatan": "Bimbingan Teknis & Sertifikasi Petugas Keselamatan Konstruksi (K3) Angkatan I",
+        "tanggal": "2026-04-22",
+        "jumlah_tkk": 30,
+        "satuan": "Orang",
+        "lsp": "LSP Keselamatan Konstruksi Indonesia",
+        "status": "Menunggu Verifikasi"
+      },
+      {
+        "nomor_ba": "019/BA-MTU-DPUPR/III/2026",
+        "nama_kegiatan": "Pelatihan Vokasi Mobile Training Unit (MTU) Juru Pasang Bata & Plesteran",
+        "tanggal": "2026-03-10",
+        "jumlah_tkk": 30,
+        "satuan": "Orang",
+        "lsp": "Balai Jasa Konstruksi Wilayah III Jakarta",
+        "status": "Menunggu Verifikasi"
+      }
+    ],
+    "created_at": "2026-05-18T10:00:00.000Z",
+    "updated_at": "2026-05-18T15:30:00.000Z"
+  },
+  {
+    "id": "REK-PEL-2025-001",
+    "tahun": "2025",
+    "wilayah": "JAWA BARAT, KABUPATEN BOGOR",
+    "kab_kota": "KABUPATEN BOGOR",
+    "propinsi": "JAWA BARAT",
+    "target": 5,
+    "terpenuhi": 5,
+    "total_tkk": 150,
+    "satuan_target": "Pelaksanaan",
+    "satuan_tkk": "Orang",
+    "capaian_pct": 100.0,
+    "dokumen_rekap_url": "Rekap_Realisasi_Pelatihan_TKK_2025.pdf",
+    "status": "Terverifikasi",
+    "catatan_verifikasi": "Realisasi penuh 5 paket pelatihan vokasi dan fasilitasi sertifikasi TKK Kabupaten Bogor TA 2025 telah diverifikasi oleh Tim Pembina Jasa Konstruksi Provinsi Jawa Barat.",
+    "rincian_kegiatan": [
+      {
+        "nomor_ba": "112/BA-LSP-ASTEKINDO/XI/2025",
+        "nama_kegiatan": "Fasilitasi Sertifikasi Tenaga Kerja Terampil Konstruksi Gedung Angkatan II",
+        "tanggal": "2025-11-20",
+        "jumlah_tkk": 50,
+        "satuan": "Orang",
+        "lsp": "LSP Astekindo Jawa Barat",
+        "status": "Terverifikasi"
+      },
+      {
+        "nomor_ba": "098/BA-LSP-GATAKI/IX/2025",
+        "nama_kegiatan": "Pelatihan & Sertifikasi Juru Ukur (Surveyor) Lapangan Pekerjaan Jalan",
+        "tanggal": "2025-09-15",
+        "jumlah_tkk": 40,
+        "satuan": "Orang",
+        "lsp": "LSP Gataki Karya Konstruksi",
+        "status": "Terverifikasi"
+      },
+      {
+        "nomor_ba": "075/BA-LSP-K3/VII/2025",
+        "nama_kegiatan": "Bimtek & Uji Kompetensi Petugas K3 Konstruksi Batch II",
+        "tanggal": "2025-07-28",
+        "jumlah_tkk": 30,
+        "satuan": "Orang",
+        "lsp": "LSP Keselamatan Konstruksi Indonesia",
+        "status": "Terverifikasi"
+      },
+      {
+        "nomor_ba": "054/BA-MTU-DPUPR/V/2025",
+        "nama_kegiatan": "Pelatihan Vokasi MTU Tukang Besi Beton & Pembesian Jalan",
+        "tanggal": "2025-05-12",
+        "jumlah_tkk": 15,
+        "satuan": "Orang",
+        "lsp": "Balai Jasa Konstruksi Wilayah III Jakarta",
+        "status": "Terverifikasi"
+      },
+      {
+        "nomor_ba": "033/BA-MTU-DPUPR/III/2025",
+        "nama_kegiatan": "Pelatihan Vokasi MTU Tukang Kayu Konstruksi Bangunan Gedung",
+        "tanggal": "2025-03-24",
+        "jumlah_tkk": 15,
+        "satuan": "Orang",
+        "lsp": "Balai Jasa Konstruksi Wilayah III Jakarta",
+        "status": "Terverifikasi"
+      }
+    ],
+    "created_at": "2025-12-10T09:00:00.000Z",
+    "updated_at": "2025-12-20T15:30:00.000Z"
+  },
+  {
+    "id": "REK-PEL-2024-001",
+    "tahun": "2024",
+    "wilayah": "JAWA BARAT, KABUPATEN BOGOR",
+    "kab_kota": "KABUPATEN BOGOR",
+    "propinsi": "JAWA BARAT",
+    "target": 4,
+    "terpenuhi": 4,
+    "total_tkk": 120,
+    "satuan_target": "Pelaksanaan",
+    "satuan_tkk": "Orang",
+    "capaian_pct": 100.0,
+    "dokumen_rekap_url": "Rekap_Realisasi_Pelatihan_TKK_2024.pdf",
+    "status": "Terverifikasi",
+    "catatan_verifikasi": "Rekapitulasi pelaksanaan 4 program pelatihan tenaga kerja terampil Kabupaten Bogor TA 2024.",
+    "rincian_kegiatan": [
+      {
+        "nomor_ba": "088/BA-LSP-GATAKI/XI/2024",
+        "nama_kegiatan": "Pelatihan Pelaksana Lapangan Perkerasan Jalan Beton",
+        "tanggal": "2024-11-15",
+        "jumlah_tkk": 40,
+        "satuan": "Orang",
+        "lsp": "LSP Gataki Karya Konstruksi",
+        "status": "Terverifikasi"
+      },
+      {
+        "nomor_ba": "062/BA-LSP-K3/VIII/2024",
+        "nama_kegiatan": "Pelatihan Keselamatan Konstruksi Petugas K3",
+        "tanggal": "2024-08-20",
+        "jumlah_tkk": 30,
+        "satuan": "Orang",
+        "lsp": "LSP Keselamatan Konstruksi Indonesia",
+        "status": "Terverifikasi"
+      }
+    ],
+    "created_at": "2024-12-05T09:00:00.000Z",
+    "updated_at": "2024-12-18T11:00:00.000Z"
+  }
+]

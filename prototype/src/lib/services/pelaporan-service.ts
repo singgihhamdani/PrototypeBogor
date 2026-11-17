@@ -12,6 +12,8 @@ import {
 } from "../sipjaki-templates";
 import incidentsData from "@/data/incidents.json";
 import trainingData from "@/data/training.json";
+import { mockPelaporanRecords, PelaporanRecord } from "@/data/tertib-mock-data";
+import { TertibType } from "../tertib-config";
 
 export interface ExecutiveReportMetrics {
   totalBujk: number;
@@ -49,7 +51,7 @@ export async function getExecutiveReportMetrics(): Promise<ExecutiveReportMetric
   const kurangTertibCount = allAudits.filter((a) => a.kategoriHasil === "Kurang Tertib").length;
 
   const avgKepatuhan = totalAudit > 0 
-    ? Math.round(allAudits.reduce((acc, curr) => acc + curr.skorTertib, 0) / totalAudit)
+    ? Math.round(allAudits.reduce((acc, curr) => acc + (curr.skorTertib ?? (curr.statusKepatuhan === "Patuh" ? 90 : 60)), 0) / totalAudit)
     : 84;
 
   const totalNilai = paketRes.data.reduce((acc, curr) => acc + Number(curr.nilai_kontrak), 0);
@@ -161,4 +163,191 @@ export async function exportAllSipjakiBundle() {
   setTimeout(async () => {
     await exportReportByModule("LAP-TM-2026-S1");
   }, 800);
+}
+
+// =============================================================================
+// OPERASI DATA PELAPORAN RESMI (STANDAR FORMAT 8 KOLOM SIPJAKI)
+// =============================================================================
+
+export interface PelaporanServiceResponse {
+  data: PelaporanRecord[];
+  status: {
+    source: "supabase" | "fallback";
+    message: string;
+  };
+}
+
+/**
+ * Mengambil daftar arsip pelaporan pengawasan berkala dari Supabase (dengan fallback ke mock data)
+ */
+export async function fetchPelaporanList(tertibType: TertibType): Promise<PelaporanServiceResponse> {
+  if (isSupabaseConfigured()) {
+    try {
+      const client = createClient();
+      if (client) {
+        const { data, error } = await (client.from("pengawasan_pelaporan") as any)
+          .select("*")
+          .eq("tertib_type", tertibType)
+          .order("created_at", { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          const mapped: PelaporanRecord[] = data.map((d: any) => ({
+            id: d.id,
+            tertibType: d.tertib_type,
+            jenisLaporan: d.jenis_laporan,
+            namaLaporan: d.nama_laporan,
+            tahun: d.tahun,
+            propinsi: d.propinsi || "Jawa Barat",
+            kabKota: d.kab_kota || "Kabupaten Bogor",
+            wilayah: d.wilayah || `${d.propinsi || "Jawa Barat"} / ${d.kab_kota || "Kabupaten Bogor"}`,
+            dokumen: d.dokumen_nama || "Laporan_Pengawasan.pdf",
+            dokumenUrl: d.dokumen_url,
+            status: d.status,
+            jumlahObjekDiperiksa: Number(d.jumlah_objek) || 0,
+            tingkatKepatuhan: Number(d.tingkat_kepatuhan) || 0,
+            tanggalKirim: d.tanggal_kirim || "-",
+            nomorSurat: d.nomor_surat,
+            catatan: d.catatan,
+            _docStatus: d.dokumen_url ? "complete" : "pending",
+            // Backwards compatibility
+            judulLaporan: d.nama_laporan,
+            periode: d.jenis_laporan,
+            statusSinkronisasiSipjaki: d.status === "Terverifikasi" ? "Tersinkronisasi" : d.status === "Menunggu Verifikasi" ? "Menunggu Verifikasi Pusat" : "Draft Lokal",
+            filePdf: d.dokumen_nama || "Laporan_Pengawasan.pdf",
+            fileExcel: `Rekap_${d.tertib_type}_${d.tahun}.xlsx`
+          }));
+
+          return {
+            data: mapped,
+            status: { source: "supabase", message: "Live PostgreSQL Supabase" }
+          };
+        }
+      }
+    } catch (err) {
+      console.warn("Gagal terhubung ke Supabase pengawasan_pelaporan:", err);
+    }
+  }
+
+  // Fallback
+  const fallback = mockPelaporanRecords.filter((r) => r.tertibType === tertibType);
+  return {
+    data: fallback,
+    status: { source: "fallback", message: "Data Cadangan Lokal (Offline/Fallback Mode)" }
+  };
+}
+
+/**
+ * Menyimpan data pelaporan pengawasan baru ke Supabase
+ */
+export async function createPelaporanRecord(
+  payload: Partial<PelaporanRecord>
+): Promise<{ success: boolean; data?: PelaporanRecord; error?: string }> {
+  if (isSupabaseConfigured()) {
+    try {
+      const client = createClient();
+      if (client) {
+        const dbPayload = {
+          id: payload.id,
+          tertib_type: payload.tertibType,
+          jenis_laporan: payload.jenisLaporan,
+          nama_laporan: payload.namaLaporan,
+          tahun: payload.tahun,
+          propinsi: payload.propinsi || "Jawa Barat",
+          kab_kota: payload.kabKota || "Kabupaten Bogor",
+          wilayah: payload.wilayah || `${payload.propinsi || "Jawa Barat"} / ${payload.kabKota || "Kabupaten Bogor"}`,
+          dokumen_nama: payload.dokumen || payload.filePdf || "Laporan_Pengawasan.pdf",
+          dokumen_url: payload.dokumenUrl || null,
+          status: payload.status || "Menunggu Verifikasi",
+          jumlah_objek: payload.jumlahObjekDiperiksa || 0,
+          tingkat_kepatuhan: payload.tingkatKepatuhan || 0,
+          tanggal_kirim: payload.tanggalKirim || "-",
+          nomor_surat: payload.nomorSurat || null,
+          catatan: payload.catatan || null
+        };
+
+        const { data, error } = await (client.from("pengawasan_pelaporan") as any)
+          .insert(dbPayload)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { success: true, data: payload as PelaporanRecord };
+      }
+    } catch (err: any) {
+      console.error("Gagal simpan ke Supabase pengawasan_pelaporan:", err);
+      return { success: false, error: err.message };
+    }
+  }
+
+  return { success: true, data: payload as PelaporanRecord };
+}
+
+/**
+ * Memperbarui data pelaporan pengawasan yang sudah ada
+ */
+export async function updatePelaporanRecord(
+  id: string,
+  payload: Partial<PelaporanRecord>
+): Promise<{ success: boolean; error?: string }> {
+  if (isSupabaseConfigured()) {
+    try {
+      const client = createClient();
+      if (client) {
+        const updatePayload: Record<string, any> = {
+          updated_at: new Date().toISOString()
+        };
+
+        if (payload.jenisLaporan !== undefined) updatePayload.jenis_laporan = payload.jenisLaporan;
+        if (payload.namaLaporan !== undefined) updatePayload.nama_laporan = payload.namaLaporan;
+        if (payload.tahun !== undefined) updatePayload.tahun = payload.tahun;
+        if (payload.propinsi !== undefined) updatePayload.propinsi = payload.propinsi;
+        if (payload.kabKota !== undefined) updatePayload.kab_kota = payload.kabKota;
+        if (payload.wilayah !== undefined) updatePayload.wilayah = payload.wilayah;
+        if (payload.dokumen !== undefined) updatePayload.dokumen_nama = payload.dokumen;
+        if (payload.dokumenUrl !== undefined) updatePayload.dokumen_url = payload.dokumenUrl;
+        if (payload.status !== undefined) updatePayload.status = payload.status;
+        if (payload.jumlahObjekDiperiksa !== undefined) updatePayload.jumlah_objek = payload.jumlahObjekDiperiksa;
+        if (payload.tingkatKepatuhan !== undefined) updatePayload.tingkat_kepatuhan = payload.tingkatKepatuhan;
+        if (payload.tanggalKirim !== undefined) updatePayload.tanggal_kirim = payload.tanggalKirim;
+        if (payload.nomorSurat !== undefined) updatePayload.nomor_surat = payload.nomorSurat;
+        if (payload.catatan !== undefined) updatePayload.catatan = payload.catatan;
+
+        const { error } = await (client.from("pengawasan_pelaporan") as any)
+          .update(updatePayload)
+          .eq("id", id);
+
+        if (error) throw error;
+        return { success: true };
+      }
+    } catch (err: any) {
+      console.error("Gagal update data pengawasan_pelaporan:", err);
+      return { success: false, error: err.message };
+    }
+  }
+
+  return { success: true };
+}
+
+/**
+ * Menghapus arsip pelaporan pengawasan dari Supabase
+ */
+export async function deletePelaporanRecord(id: string): Promise<{ success: boolean; error?: string }> {
+  if (isSupabaseConfigured()) {
+    try {
+      const client = createClient();
+      if (client) {
+        const { error } = await (client.from("pengawasan_pelaporan") as any)
+          .delete()
+          .eq("id", id);
+
+        if (error) throw error;
+        return { success: true };
+      }
+    } catch (err: any) {
+      console.error("Gagal hapus data pengawasan_pelaporan:", err);
+      return { success: false, error: err.message };
+    }
+  }
+
+  return { success: true };
 }

@@ -56,7 +56,7 @@ const NAV_LINKS = [
     label: "Layanan", href: "#", dropdown: [
       { label: "Dashboard Analitik", href: "/dashboard", desc: "Monitoring progres proyek fisik & keuangan 40 kecamatan" },
       { label: "WebGIS Geospasial", href: "/webgis", desc: "Peta sebaran titik proyek & konsentrasi BUJK daerah" },
-      { label: "Audit Pengawasan SIMAK", href: "/pengawasan", desc: "Pemeriksaan tertib usaha, rantai pasok, dan pemanfaatan" },
+      { label: "Audit Pengawasan SIMAK", href: "/pengawasan/tertib-usaha/pelaksanaan", desc: "Pemeriksaan tertib usaha, rantai pasok, dan pemanfaatan" },
       { label: "Pelatihan & Sertifikasi SKK", href: "/pelatihan", desc: "Fasilitasi bimtek SMKK & pembinaan tenaga kerja konstruksi" },
       { label: "Direktori 416 BUJK", href: "/bujk", desc: "Pangkalan data badan usaha berlisensi NIB dan SBU aktif" },
       { label: "Paket Pekerjaan Konstruksi", href: "/paket-pekerjaan", desc: "Informasi kontrak, spesifikasi teknis, dan lelang APBD" },
@@ -65,7 +65,7 @@ const NAV_LINKS = [
   {
     label: "Data Jakon", href: "#", dropdown: [
       { label: "Profil 40 OPD", href: "/profil-opd", desc: "Kepatuhan pengawasan OPD pelaksana teknis se-Kabupaten" },
-      { label: "Pelaporan SIPJAKI PUPR", href: "/pelaporan", desc: "Sinkronisasi 5 pilar pembinaan ke Kementerian PUPR" },
+      { label: "Rekapitulasi Pelatihan TKK", href: "/pelatihan-rekapitulasi", desc: "Kompilasi capaian target pembinaan & sertifikasi TKK daerah" },
       { label: "Pencatatan K3 Konstruksi", href: "/kecelakaan", desc: "Monitoring zero fatal accident & kepatuhan SMKK daerah" },
       { label: "Regulasi & Dasar Hukum", href: "/regulasi", desc: "UU No. 2/2017 jo. UU 6/2023, PP 22/2020, Permen PUPR 1/2023, Perda Jabar 6/2024 & SE Dirjen 299/2025" },
     ]
@@ -1238,7 +1238,7 @@ export default function HomePage() {
                 {[
                   { label: "Bimtek & Pelatihan SMKK", href: "/pelatihan" },
                   { label: "Pencatatan Insiden K3", href: "/kecelakaan" },
-                  { label: "Audit SIMAK Lapangan", href: "/pengawasan" },
+                  { label: "Audit SIMAK Lapangan", href: "/pengawasan/tertib-usaha/pelaksanaan" },
                   { label: "Database 416 BUJK", href: "/bujk" },
                   { label: "Pusat Bantuan & FAQ", href: "/dashboard" },
                 ].map((item, i) => (

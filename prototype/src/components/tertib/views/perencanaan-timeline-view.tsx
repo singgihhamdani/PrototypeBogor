@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ModuleHeader from "@/components/layout/module-header";
 import PerencanaanSubtabNav from "@/components/tertib/perencanaan-subtab-nav";
 import { TertibType, TERTIB_CONFIGS } from "@/lib/tertib-config";
@@ -9,9 +9,14 @@ import {
   ModalForm, ColumnDef, BatchImportModal,
   DocStatusBadge, DocumentUploadMiniModal, DocCompletionBar
 } from "@/components/common";
-import { Calendar, Plus, Download, FileText, Clock, CheckCircle2, AlertCircle, Filter, Eye, TrendingUp, FileSpreadsheet } from "lucide-react";
+import { 
+  Calendar, Plus, Download, FileText, Clock, 
+  CheckCircle2, AlertCircle, Filter, Eye, TrendingUp, 
+  FileSpreadsheet, Pencil, Trash2, MapPin, AlertTriangle, X
+} from "lucide-react";
 import { TEMPLATE_PERENCANAAN_TIMELINE } from "@/lib/sipjaki-templates";
 import { logDataActivity } from "@/lib/audit-log";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 interface PerencanaanTimelineViewProps {
   tertibType: TertibType;
@@ -22,6 +27,8 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
   const [data, setData] = useState<TimelineRecord[]>(() =>
     mockTimelineRecords.filter((r) => r.tertibType === tertibType).map((r) => ({
       ...r,
+      wilayah: r.wilayah || "Kabupaten Bogor (40 Kecamatan)",
+      tahun: r.tahun || "2026",
       _docStatus: r._docStatus || "complete"
     }))
   );
@@ -33,8 +40,29 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
   const [docUploadTarget, setDocUploadTarget] = useState<TimelineRecord | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form State
+  // Detail Modal State
+  const [detailRecord, setDetailRecord] = useState<TimelineRecord | null>(null);
+
+  // Edit Modal State
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<TimelineRecord | null>(null);
+  const [editKegiatan, setEditKegiatan] = useState("");
+  const [editWilayah, setEditWilayah] = useState("");
+  const [editTahun, setEditTahun] = useState("2026");
+  const [editPeriode, setEditPeriode] = useState("");
+  const [editBulanMulai, setEditBulanMulai] = useState("");
+  const [editBulanSelesai, setEditBulanSelesai] = useState("");
+  const [editTargetBujk, setEditTargetBujk] = useState("");
+  const [editStatus, setEditStatus] = useState<"Terjadwal" | "Berjalan" | "Selesai">("Terjadwal");
+
+  // Delete Confirmation State
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingRecord, setDeletingRecord] = useState<TimelineRecord | null>(null);
+
+  // Form State Tambah
   const [formKegiatan, setFormKegiatan] = useState("");
+  const [formWilayah, setFormWilayah] = useState("Kabupaten Bogor (40 Kecamatan)");
+  const [formTahun, setFormTahun] = useState("2026");
   const [formPeriode, setFormPeriode] = useState("Triwulan I (Jan - Mar 2026)");
   const [formBulanMulai, setFormBulanMulai] = useState("Januari 2026");
   const [formBulanSelesai, setFormBulanSelesai] = useState("Maret 2026");
@@ -42,10 +70,47 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
   const [formStatus, setFormStatus] = useState<"Terjadwal" | "Berjalan" | "Selesai">("Terjadwal");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
+  // Hybrid Dual-Engine: Cek apakah Supabase terhubung
+  useEffect(() => {
+    async function loadSupabaseData() {
+      if (!isSupabaseConfigured()) return;
+      try {
+        const supabase = createClient();
+        if (!supabase) return;
+        const { data: dbData, error } = await supabase
+          .from("pengawasan_timeline_perencanaan")
+          .select("*")
+          .eq("tertib_type", tertibType);
+
+        if (!error && dbData && dbData.length > 0) {
+          const mapped: TimelineRecord[] = dbData.map((row: any) => ({
+            id: row.id,
+            tertibType: row.tertib_type,
+            wilayah: row.wilayah,
+            tahun: row.tahun,
+            kegiatan: row.kegiatan,
+            periode: row.periode,
+            bulanMulai: row.bulan_mulai,
+            bulanSelesai: row.bulan_selesai,
+            targetBujk: row.target_bujk,
+            status: row.status,
+            dokumenJadwal: row.dokumen_jadwal || "",
+            _docStatus: row.dokumen_jadwal ? "complete" : "pending"
+          }));
+          setData(mapped);
+        }
+      } catch (err) {
+        console.warn("Supabase query fallback to mock data:", err);
+      }
+    }
+    loadSupabaseData();
+  }, [tertibType]);
+
   const filteredData = data.filter((item) => {
     const matchStatus = filterStatus === "Semua" || item.status === filterStatus;
     const matchSearch = item.kegiatan.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        item.periode.toLowerCase().includes(searchQuery.toLowerCase());
+                        item.periode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (item.wilayah && item.wilayah.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchDoc = !filterDocPending || item._docStatus === "pending" || !item.dokumenJadwal;
     return matchStatus && matchSearch && matchDoc;
   });
@@ -58,6 +123,8 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
     const formatted: TimelineRecord[] = parsedRows.map((row, idx) => ({
       id: `TIME-${Date.now().toString().slice(-4)}-${idx + 1}`,
       tertibType,
+      wilayah: row.wilayah || "Kabupaten Bogor (40 Kecamatan)",
+      tahun: String(row.tahun || "2026"),
       kegiatan: row.kegiatan || "Agenda Pengawasan Lapangan",
       periode: row.periode || "Triwulan I (Jan - Mar 2026)",
       bulanMulai: row.bulanMulai || "Januari 2026",
@@ -110,6 +177,7 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
     setDocUploadTarget(null);
   };
 
+  // Handler Tambah Jadwal Baru
   const handleAddTimeline = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formKegiatan || !formTargetBujk) {
@@ -122,6 +190,8 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
       const newRecord: TimelineRecord = {
         id: `TIME-${Date.now().toString().slice(-4)}`,
         tertibType,
+        wilayah: formWilayah || "Kabupaten Bogor (40 Kecamatan)",
+        tahun: formTahun || "2026",
         kegiatan: formKegiatan,
         periode: formPeriode,
         bulanMulai: formBulanMulai,
@@ -138,15 +208,117 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
       setFormKegiatan("");
       setFormTargetBujk("");
       setUploadedFile(null);
+
+      logDataActivity({
+        action: "create",
+        module: `Perencanaan Timeline (${config.shortTitle})`,
+        format: "db",
+        fileName: "pengawasan_timeline_perencanaan",
+        recordCount: 1,
+        user: "Admin Perencanaan Jakon",
+        status: "success",
+        details: `Menambahkan agenda baru "${formKegiatan}" (Target: ${formTargetBujk} Objek, Wilayah: ${formWilayah})`
+      });
+
       alert(`Jadwal kegiatan "${formKegiatan}" berhasil ditambahkan ke rencana pengawasan!`);
-    }, 600);
+    }, 500);
   };
 
+  // Handler Buka Modal Edit
+  const handleOpenEdit = (row: TimelineRecord) => {
+    setEditingRecord(row);
+    setEditKegiatan(row.kegiatan);
+    setEditWilayah(row.wilayah || "Kabupaten Bogor (40 Kecamatan)");
+    setEditTahun(row.tahun || "2026");
+    setEditPeriode(row.periode);
+    setEditBulanMulai(row.bulanMulai);
+    setEditBulanSelesai(row.bulanSelesai);
+    setEditTargetBujk(String(row.targetBujk));
+    setEditStatus(row.status);
+    setShowEditModal(true);
+  };
+
+  // Handler Simpan Perubahan Edit
+  const handleSaveEditTimeline = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRecord || !editKegiatan || !editTargetBujk) {
+      alert("Mohon lengkapi Nama Kegiatan dan Target Jumlah Objek!");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setData((prev) =>
+        prev.map((item) => {
+          if (item.id === editingRecord.id) {
+            return {
+              ...item,
+              kegiatan: editKegiatan,
+              wilayah: editWilayah,
+              tahun: editTahun,
+              periode: editPeriode,
+              bulanMulai: editBulanMulai,
+              bulanSelesai: editBulanSelesai,
+              targetBujk: parseInt(editTargetBujk, 10),
+              status: editStatus
+            };
+          }
+          return item;
+        })
+      );
+
+      logDataActivity({
+        action: "update",
+        module: `Perencanaan Timeline (${config.shortTitle})`,
+        format: "db",
+        fileName: "pengawasan_timeline_perencanaan",
+        recordCount: 1,
+        user: "Admin Perencanaan Jakon",
+        status: "success",
+        details: `Memperbarui jadwal "${editKegiatan}" (Target: ${editTargetBujk} Objek, Wilayah: ${editWilayah}, TA: ${editTahun})`
+      });
+
+      setIsSubmitting(false);
+      setShowEditModal(false);
+      setEditingRecord(null);
+      alert(`Jadwal pengawasan "${editKegiatan}" berhasil diperbarui!`);
+    }, 500);
+  };
+
+  // Handler Buka Dialog Konfirmasi Hapus
+  const handleOpenDelete = (row: TimelineRecord) => {
+    setDeletingRecord(row);
+    setShowDeleteConfirm(true);
+  };
+
+  // Handler Eksekusi Hapus Data
+  const handleConfirmDelete = () => {
+    if (!deletingRecord) return;
+
+    setData((prev) => prev.filter((item) => item.id !== deletingRecord.id));
+
+    logDataActivity({
+      action: "delete",
+      module: `Perencanaan Timeline (${config.shortTitle})`,
+      format: "db",
+      fileName: "pengawasan_timeline_perencanaan",
+      recordCount: 1,
+      user: "Admin Perencanaan Jakon",
+      status: "success",
+      details: `Menghapus jadwal pengawasan "${deletingRecord.kegiatan}" (ID: ${deletingRecord.id})`
+    });
+
+    setShowDeleteConfirm(false);
+    setDeletingRecord(null);
+    alert(`Jadwal pengawasan berhasil dihapus dari perencanaan.`);
+  };
+
+  // Kolom Tabel Harmonisasi SIPJAKI & SIJAKON
   const columns: ColumnDef<TimelineRecord>[] = [
     {
       key: "no",
       label: "NO",
-      width: "50px",
+      width: "45px",
       sortable: false,
       render: (_, idx) => <span style={{ fontWeight: 700, color: "#64748B" }}>{idx + 1}</span>
     },
@@ -160,7 +332,23 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
             {row.kegiatan}
           </span>
           <span style={{ fontSize: "11px", color: "#64748B", marginTop: "2px" }}>
-            Pelaksanaan: {row.bulanMulai} s/d {row.bulanSelesai}
+            Rentang Waktu: {row.bulanMulai} s/d {row.bulanSelesai}
+          </span>
+        </div>
+      )
+    },
+    {
+      key: "wilayah",
+      label: "WILAYAH & TAHUN",
+      sortable: true,
+      render: (row) => (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontSize: "12px", fontWeight: 700, color: "#1E293B", display: "flex", alignItems: "center", gap: "4px" }}>
+            <MapPin style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
+            {row.wilayah || "Kabupaten Bogor"}
+          </span>
+          <span style={{ fontSize: "11px", color: "#64748B", marginTop: "2px" }}>
+            Tahun Anggaran {row.tahun || "2026"}
           </span>
         </div>
       )
@@ -188,7 +376,8 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
             color: "#0F2E5C",
             backgroundColor: "#F1F5F9",
             padding: "4px 10px",
-            borderRadius: "8px"
+            borderRadius: "8px",
+            whiteSpace: "nowrap"
           }}
         >
           {row.targetBujk} Objek
@@ -344,7 +533,7 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
               <span style={{ fontSize: "11px", color: "#64748B" }}>
-                Target kumulatif siklus
+                Target kumulatif 3 Tertib
               </span>
             </div>
           </div>
@@ -391,7 +580,7 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
             <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
               <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#D97706" }} />
               <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>
-                Aktivitas lapangan aktif
+                Aktivitas audit aktif
               </span>
             </div>
           </div>
@@ -497,7 +686,7 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
         <div style={{ width: "100%", maxWidth: "260px" }}>
           <input
             type="text"
-            placeholder="Cari kegiatan..."
+            placeholder="Cari kegiatan atau wilayah..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -521,7 +710,7 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
         onToggleFilter={() => setFilterDocPending(!filterDocPending)}
       />
 
-      {/* Reusable DataTableView */}
+      {/* Reusable DataTableView dengan Aksi Detail, Edit, dan Hapus (Paritas SIPJAKI) */}
       <DataTableView<TimelineRecord>
         title={`Matriks Jadwal & Siklus Pengawasan (${filteredData.length})`}
         subtitle="Rincian tahapan operasional audit kepatuhan lapangan berdasar Permen PUPR No. 1 Tahun 2023"
@@ -531,6 +720,8 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
         exportFileName={`Timeline_Pengawasan_${tertibType}`}
         sipjakiTemplate={TEMPLATE_PERENCANAAN_TIMELINE}
         exportColumns={[
+          { key: "wilayah", label: "Wilayah Penugasan" },
+          { key: "tahun", label: "Tahun Anggaran" },
           { key: "kegiatan", label: "Nama Kegiatan Pengawasan" },
           { key: "periode", label: "Periode" },
           { key: "bulanMulai", label: "Bulan Mulai" },
@@ -541,26 +732,76 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
         ]}
         actionsHeader="AKSI"
         actionsRender={(row) => (
-          <button
-            type="button"
-            onClick={() => alert(`Detail Kegiatan: "${row.kegiatan}"\nPeriode: ${row.periode}\nTarget: ${row.targetBujk} Objek`)}
-            style={{
-              backgroundColor: "#EBF2FA",
-              color: "#0F2E5C",
-              border: "none",
-              borderRadius: "6px",
-              padding: "5px 12px",
-              fontSize: "11px",
-              fontWeight: 800,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "4px"
-            }}
-          >
-            <Eye style={{ width: "12px", height: "12px" }} />
-            <span>Detail</span>
-          </button>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+            {/* 1. Tombol Detail */}
+            <button
+              type="button"
+              title="Lihat Detail Agenda"
+              onClick={() => setDetailRecord(row)}
+              style={{
+                backgroundColor: "#EBF2FA",
+                color: "#0F2E5C",
+                border: "none",
+                borderRadius: "6px",
+                padding: "5px 8px",
+                fontSize: "11px",
+                fontWeight: 800,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              <Eye style={{ width: "12px", height: "12px" }} />
+              <span className="hidden sm:inline">Detail</span>
+            </button>
+
+            {/* 2. Tombol Edit (Standar SIPJAKI) */}
+            <button
+              type="button"
+              title="Ubah Jadwal Pengawasan"
+              onClick={() => handleOpenEdit(row)}
+              style={{
+                backgroundColor: "#FEF3C7",
+                color: "#B45309",
+                border: "none",
+                borderRadius: "6px",
+                padding: "5px 8px",
+                fontSize: "11px",
+                fontWeight: 800,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              <Pencil style={{ width: "12px", height: "12px" }} />
+              <span className="hidden sm:inline">Edit</span>
+            </button>
+
+            {/* 3. Tombol Hapus (Standar SIPJAKI) */}
+            <button
+              type="button"
+              title="Hapus Jadwal Pengawasan"
+              onClick={() => handleOpenDelete(row)}
+              style={{
+                backgroundColor: "#FEE2E2",
+                color: "#DC2626",
+                border: "none",
+                borderRadius: "6px",
+                padding: "5px 8px",
+                fontSize: "11px",
+                fontWeight: 800,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              <Trash2 style={{ width: "12px", height: "12px" }} />
+              <span className="hidden sm:inline">Hapus</span>
+            </button>
+          </div>
         )}
       />
 
@@ -597,6 +838,53 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
                 outline: "none"
               }}
             />
+          </div>
+
+          {/* Grid Wilayah & Tahun (Standar SIPJAKI) */}
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Wilayah Penugasan <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Contoh: Kabupaten Bogor (40 Kecamatan)"
+                value={formWilayah}
+                onChange={(e) => setFormWilayah(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Tahun Anggaran <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="2026"
+                value={formTahun}
+                onChange={(e) => setFormTahun(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
           </div>
 
           {/* Grid Periode & Target */}
@@ -732,6 +1020,425 @@ export default function PerencanaanTimelineView({ tertibType }: PerencanaanTimel
           />
         </div>
       </ModalForm>
+
+      {/* Modal Form Edit Jadwal (Standar SIPJAKI: Fitur Edit) */}
+      <ModalForm
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingRecord(null);
+        }}
+        title="Ubah Jadwal Pelaksanaan Pengawasan"
+        subtitle={`Perbarui data rencana agenda untuk ${editingRecord?.kegiatan || ""}`}
+        onSubmit={handleSaveEditTimeline}
+        submitLabel="Simpan Perubahan Jadwal"
+        isLoading={isSubmitting}
+        size="lg"
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {/* Nama Kegiatan */}
+          <div>
+            <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+              Nama Kegiatan Pengawasan <span style={{ color: "#EF4444" }}>*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={editKegiatan}
+              onChange={(e) => setEditKegiatan(e.target.value)}
+              style={{
+                width: "100%",
+                height: "38px",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                padding: "0 12px",
+                fontSize: "12px",
+                outline: "none"
+              }}
+            />
+          </div>
+
+          {/* Grid Wilayah & Tahun (Standar SIPJAKI) */}
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Wilayah Penugasan <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={editWilayah}
+                onChange={(e) => setEditWilayah(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Tahun Anggaran <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={editTahun}
+                onChange={(e) => setEditTahun(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Grid Periode & Target */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Siklus Periode
+              </label>
+              <select
+                value={editPeriode}
+                onChange={(e) => setEditPeriode(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 10px",
+                  fontSize: "12px",
+                  outline: "none",
+                  backgroundColor: "#FFFFFF"
+                }}
+              >
+                <option value="Triwulan I (Jan - Mar 2026)">Triwulan I (Jan - Mar 2026)</option>
+                <option value="Triwulan II (Apr - Jun 2026)">Triwulan II (Apr - Jun 2026)</option>
+                <option value="Triwulan III (Jul - Sep 2026)">Triwulan III (Jul - Sep 2026)</option>
+                <option value="Triwulan IV (Okt - Des 2026)">Triwulan IV (Okt - Des 2026)</option>
+                <option value="Semester I 2026">Semester I 2026</option>
+                <option value="Semester II 2026">Semester II 2026</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Target Jumlah Objek <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="number"
+                required
+                min="1"
+                value={editTargetBujk}
+                onChange={(e) => setEditTargetBujk(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Grid Bulan Mulai & Selesai */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Bulan Mulai
+              </label>
+              <input
+                type="text"
+                value={editBulanMulai}
+                onChange={(e) => setEditBulanMulai(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Bulan Selesai
+              </label>
+              <input
+                type="text"
+                value={editBulanSelesai}
+                onChange={(e) => setEditBulanSelesai(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Status Pelaksanaan */}
+          <div>
+            <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+              Status Pelaksanaan
+            </label>
+            <select
+              value={editStatus}
+              onChange={(e) => setEditStatus(e.target.value as "Terjadwal" | "Berjalan" | "Selesai")}
+              style={{
+                width: "100%",
+                height: "38px",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                padding: "0 10px",
+                fontSize: "12px",
+                outline: "none",
+                backgroundColor: "#FFFFFF"
+              }}
+            >
+              <option value="Terjadwal">Terjadwal</option>
+              <option value="Berjalan">Berjalan</option>
+              <option value="Selesai">Selesai</option>
+            </select>
+          </div>
+        </div>
+      </ModalForm>
+
+      {/* Modal Dialog Detail Kegiatan */}
+      {detailRecord && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: "rgba(15, 23, 42, 0.6)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px"
+          }}
+          onClick={() => setDetailRecord(null)}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: "16px",
+              maxWidth: "520px",
+              width: "100%",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)",
+              overflow: "hidden"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ backgroundColor: "#0F2E5C", padding: "18px 20px", color: "#FFFFFF", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#93C5FD", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  Detail Rencana Pengawasan
+                </span>
+                <h3 style={{ fontSize: "16px", fontWeight: 800, margin: 0, color: "#FFFFFF" }}>
+                  {detailRecord.kegiatan}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDetailRecord(null)}
+                style={{ background: "none", border: "none", color: "#FFFFFF", cursor: "pointer", padding: "4px" }}
+              >
+                <X style={{ width: "20px", height: "20px" }} />
+              </button>
+            </div>
+
+            <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Wilayah Penugasan</span>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#1E293B" }}>{detailRecord.wilayah || "Kabupaten Bogor"}</span>
+                </div>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Tahun Anggaran</span>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#1E293B" }}>TA {detailRecord.tahun || "2026"}</span>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Periode / Siklus</span>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#1E293B" }}>{detailRecord.periode}</span>
+                </div>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Target Objek</span>
+                  <span style={{ fontSize: "13px", fontWeight: 800, color: "#2563EB" }}>{detailRecord.targetBujk} Objek Pengawasan</span>
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px" }}>
+                <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Jadwal Rentang Bulan</span>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "#1E293B" }}>{detailRecord.bulanMulai} s/d {detailRecord.bulanSelesai}</span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "6px" }}>
+                <div>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block", marginBottom: "4px" }}>Status Pelaksanaan</span>
+                  <StatusBadge status={detailRecord.status} size="sm" showDot />
+                </div>
+                <div>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block", marginBottom: "4px" }}>Dokumen Jadwal</span>
+                  <DocStatusBadge
+                    status={detailRecord._docStatus || (detailRecord.dokumenJadwal ? "complete" : "pending")}
+                    fileName={detailRecord.dokumenJadwal}
+                    documentLabel="Kerangka Jadwal / KAK"
+                    onClick={() => {
+                      const tgt = detailRecord;
+                      setDetailRecord(null);
+                      setDocUploadTarget(tgt);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ padding: "12px 20px", backgroundColor: "#F1F5F9", display: "flex", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                onClick={() => setDetailRecord(null)}
+                style={{
+                  backgroundColor: "#0F2E5C",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "8px 16px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  cursor: "pointer"
+                }}
+              >
+                Tutup Jendela
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Dialog Konfirmasi Hapus (Standar SIPJAKI: Fitur Hapus) */}
+      {showDeleteConfirm && deletingRecord && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: "rgba(15, 23, 42, 0.6)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px"
+          }}
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: "16px",
+              maxWidth: "460px",
+              width: "100%",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)",
+              overflow: "hidden"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ padding: "24px 20px", display: "flex", gap: "16px" }}>
+              <div
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "12px",
+                  backgroundColor: "#FEE2E2",
+                  color: "#DC2626",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}
+              >
+                <AlertTriangle style={{ width: "24px", height: "24px" }} />
+              </div>
+              <div>
+                <h4 style={{ fontSize: "16px", fontWeight: 800, color: "#1E293B", margin: "0 0 6px 0" }}>
+                  Konfirmasi Hapus Jadwal
+                </h4>
+                <p style={{ fontSize: "13px", color: "#64748B", margin: 0, lineHeight: 1.5 }}>
+                  Apakah Anda yakin ingin menghapus agenda pengawasan:  
+                  <strong style={{ color: "#0F2E5C", display: "block", marginTop: "4px" }}>
+                    &ldquo;{deletingRecord.kegiatan}&rdquo;
+                  </strong>  
+                  Tindakan ini akan dicatat ke dalam audit log dan menghapus data dari rencana pengawasan.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ padding: "12px 20px", backgroundColor: "#F8FAFC", display: "flex", justifyContent: "flex-end", gap: "10px", borderTop: "1px solid #E2E8F0" }}>
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  color: "#64748B",
+                  border: "1px solid #CBD5E1",
+                  borderRadius: "8px",
+                  padding: "8px 14px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  cursor: "pointer"
+                }}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                style={{
+                  backgroundColor: "#DC2626",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "8px 16px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+              >
+                <Trash2 style={{ width: "14px", height: "14px" }} />
+                <span>Ya, Hapus Agenda</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mini Modal Unggah Dokumen Susulan */}
       {docUploadTarget && (

@@ -926,6 +926,360 @@ export const TEMPLATE_PELAKSANAAN: SipjakiTemplate = {
 };
 
 // ==========================================
+// 5b. PENGAWASAN SIMAK 2 (TERTIB PENYELENGGARAAN - STANDAR SIPJAKI)
+// ==========================================
+export const TEMPLATE_PELAKSANAAN_SIMAK2: SipjakiTemplate = {
+  id: "pelaksanaan-simak2",
+  moduleName: "Pengawasan Tertib Penyelenggaraan SIMAK 2 (Standar SIPJAKI)",
+  exportFileName: "Pengawasan_SIMAK2_Tertib_Penyelenggaraan_Kab_Bogor_SIPJAKI",
+  sheetName: "SIMAK 2 PENYELENGGARAAN",
+  enumValidation: {
+    statusKepatuhan: ["Patuh", "Tidak Patuh"],
+    statusVerifikasi: ["Draft", "Terverifikasi", "Ditolak"]
+  },
+  columns: [
+    {
+      key: "namaProyek",
+      label: "Nama Proyek",
+      sipjakiLabel: "nama_proyek",
+      dataType: "String",
+      description: "Nama paket pekerjaan konstruksi yang diawasi"
+    },
+    {
+      key: "nilaiProyek",
+      label: "Nilai Proyek",
+      sipjakiLabel: "nilai_proyek",
+      dataType: "Number",
+      description: "Nilai kontrak pekerjaan konstruksi dalam Rupiah"
+    },
+    {
+      key: "nomorPerjanjian",
+      label: "Nomor Perjanjian",
+      sipjakiLabel: "nomor_perjanjian",
+      dataType: "String",
+      description: "Nomor SPK / Surat Perjanjian Kontrak"
+    },
+    {
+      key: "waktuPelaksanaan",
+      label: "Waktu Pelaksanaan",
+      sipjakiLabel: "waktu_pelaksanaan",
+      dataType: "String",
+      description: "Jangka waktu pelaksanaan kontrak pekerjaan"
+    },
+    {
+      key: "penyediaJasa",
+      label: "Penyedia Jasa",
+      sipjakiLabel: "penyedia_jasa",
+      dataType: "String",
+      description: "Nama kontraktor / penyedia jasa pelaksana proyek"
+    },
+    {
+      key: "namaPemilikPekerjaan",
+      label: "Nama Pemilik Pekerjaan",
+      sipjakiLabel: "nama_pemilik_pekerjaan",
+      dataType: "String",
+      description: "Pengguna Jasa / PPK / Dinas Penyelenggara"
+    },
+    {
+      key: "waktuPengawasan",
+      label: "Waktu Pengawasan",
+      sipjakiLabel: "waktu_pengawasan",
+      dataType: "Date (YYYY-MM-DD)",
+      description: "Tanggal inspeksi pengawasan lapangan oleh Tim Pembina Jakon"
+    },
+    {
+      key: "propinsi",
+      label: "Propinsi",
+      sipjakiLabel: "propinsi",
+      dataType: "String",
+      description: "Provinsi lokasi pengawasan (Default: Jawa Barat)"
+    },
+    {
+      key: "kabKota",
+      label: "Kab/Kota",
+      sipjakiLabel: "kab_kota",
+      dataType: "String",
+      description: "Kabupaten/Kota (Default: Kabupaten Bogor)"
+    },
+    {
+      key: "statusKepatuhan",
+      label: "Status Kepatuhan",
+      sipjakiLabel: "status_kepatuhan",
+      dataType: "Enum",
+      allowedValues: ["Patuh", "Tidak Patuh"],
+      description: "Hasil evaluasi kepatuhan SIMAK 2 (Patuh / Tidak Patuh)"
+    },
+    {
+      key: "dokumen",
+      label: "Dokumen",
+      sipjakiLabel: "dokumen",
+      dataType: "String",
+      description: "Nama file dokumen hasil pengawasan PDF"
+    },
+    {
+      key: "statusVerifikasi",
+      label: "Status",
+      sipjakiLabel: "status",
+      dataType: "Enum",
+      allowedValues: ["Draft", "Terverifikasi", "Ditolak"],
+      description: "Status validasi dokumen hasil pengawasan"
+    }
+  ],
+  documentFields: [
+    { key: "dokumen", label: "Dokumen Pengawasan SIMAK 2", accept: ".pdf", maxSizeMb: 10, required: true }
+  ],
+  importColumns: [
+    { key: "namaProyek", label: "Nama Proyek", required: true, example: "Peningkatan Jalan Poros Bojonggede - Kemang" },
+    { key: "nilaiProyek", label: "Nilai Proyek", required: true, example: "14850000000" },
+    { key: "nomorPerjanjian", label: "Nomor Perjanjian", required: true, example: "602.1/045/SPK-KTR/DPUPR/2026" },
+    { key: "waktuPelaksanaan", label: "Waktu Pelaksanaan", required: true, example: "180 Hari Kalender" },
+    { key: "penyediaJasa", label: "Penyedia Jasa", required: true, example: "PT. Samudra Beton Persada" },
+    { key: "namaPemilikPekerjaan", label: "Nama Pemilik Pekerjaan", required: true, example: "Dinas PUPR Kab. Bogor / PPK Bidang Jalan" },
+    { key: "waktuPengawasan", label: "Waktu Pengawasan", required: true, example: "2026-03-26" },
+    { key: "propinsi", label: "Propinsi", required: false, example: "Jawa Barat" },
+    { key: "kabKota", label: "Kab/Kota", required: false, example: "Kabupaten Bogor" },
+    { key: "statusKepatuhan", label: "Status Kepatuhan", required: true, example: "Patuh" },
+    { key: "dokumen", label: "Dokumen", required: false, example: "Dokumen_SIMAK2_JalanBomang.pdf" },
+    { key: "statusVerifikasi", label: "Status", required: false, example: "Terverifikasi" }
+  ],
+  sampleRows: [
+    {
+      namaProyek: "Peningkatan Jalan Poros Bojonggede - Kemang (Jl. Bomang)",
+      nilaiProyek: 14850000000,
+      nomorPerjanjian: "602.1/045/SPK-KTR/DPUPR/2026",
+      waktuPelaksanaan: "180 Hari Kalender",
+      penyediaJasa: "PT. Samudra Beton Persada",
+      namaPemilikPekerjaan: "Dinas PUPR Kab. Bogor / PPK Bidang Jalan",
+      waktuPengawasan: "2026-03-26",
+      propinsi: "Jawa Barat",
+      kabKota: "Kabupaten Bogor",
+      statusKepatuhan: "Patuh",
+      dokumen: "Dokumen_SIMAK2_JalanBomang.pdf",
+      statusVerifikasi: "Terverifikasi"
+    }
+  ],
+  dictionaryItems: [
+    {
+      field: "nama_proyek",
+      label: "Nama Proyek",
+      type: "String",
+      description: "Nama paket pekerjaan konstruksi yang diawasi (Standar SIPJAKI SIMAK 2)"
+    },
+    {
+      field: "nilai_proyek",
+      label: "Nilai Proyek",
+      type: "Number",
+      description: "Nilai kontrak pekerjaan konstruksi dalam Rupiah"
+    },
+    {
+      field: "nomor_perjanjian",
+      label: "Nomor Perjanjian",
+      type: "String",
+      description: "Nomor SPK / Surat Perjanjian Kontrak"
+    },
+    {
+      field: "waktu_pelaksanaan",
+      label: "Waktu Pelaksanaan",
+      type: "String",
+      description: "Durasi hari kalender pelaksanaan pekerjaan"
+    },
+    {
+      field: "penyedia_jasa",
+      label: "Penyedia Jasa",
+      type: "String",
+      description: "Nama kontraktor / penyedia jasa"
+    },
+    {
+      field: "nama_pemilik_pekerjaan",
+      label: "Nama Pemilik Pekerjaan",
+      type: "String",
+      description: "PPK / Instansi Pengguna Jasa"
+    },
+    {
+      field: "waktu_pengawasan",
+      label: "Waktu Pengawasan",
+      type: "Date",
+      description: "Tanggal kegiatan pengawasan lapangan"
+    },
+    {
+      field: "status_kepatuhan",
+      label: "Status Kepatuhan",
+      type: "Enum",
+      description: "Evaluasi kepatuhan teknis pengawasan (Patuh / Tidak Patuh)",
+      allowedValues: ["Patuh", "Tidak Patuh"]
+    }
+  ]
+};
+
+// ==========================================
+// 5c. PENGAWASAN SIMAK 3 (TERTIB PEMANFAATAN - STANDAR SIPJAKI)
+// ==========================================
+export const TEMPLATE_PELAKSANAAN_SIMAK3: SipjakiTemplate = {
+  id: "pelaksanaan-simak3",
+  moduleName: "Pengawasan Tertib Pemanfaatan SIMAK 3 (Standar SIPJAKI)",
+  exportFileName: "Pengawasan_SIMAK3_Tertib_Pemanfaatan_Kab_Bogor_SIPJAKI",
+  sheetName: "SIMAK 3 PEMANFAATAN",
+  enumValidation: {
+    statusKepatuhan: ["Patuh", "Tidak Patuh"],
+    statusVerifikasi: ["Draft", "Terverifikasi", "Ditolak"]
+  },
+  columns: [
+    {
+      key: "namaBangunan",
+      label: "Nama Bangunan",
+      sipjakiLabel: "nama_bangunan",
+      dataType: "String",
+      description: "Nama gedung atau infrastruktur terbangun yang diawasi"
+    },
+    {
+      key: "lokasi",
+      label: "Lokasi",
+      sipjakiLabel: "lokasi",
+      dataType: "String",
+      description: "Alamat fisik atau titik lokasi bangunan/infrastruktur"
+    },
+    {
+      key: "namaPemilik",
+      label: "Nama Pemilik",
+      sipjakiLabel: "nama_pemilik",
+      dataType: "String",
+      description: "Entitas pemilik aset gedung atau infrastruktur"
+    },
+    {
+      key: "namaPengelola",
+      label: "Nama Pengelola",
+      sipjakiLabel: "nama_pengelola",
+      dataType: "String",
+      description: "Unit / badan / operator pengelola pemeliharaan dan perawatan"
+    },
+    {
+      key: "waktuPengawasan",
+      label: "Waktu Pengawasan",
+      sipjakiLabel: "waktu_pengawasan",
+      dataType: "Date (YYYY-MM-DD)",
+      description: "Tanggal inspeksi kelaikan dan pemeliharaan lapangan"
+    },
+    {
+      key: "propinsi",
+      label: "Propinsi",
+      sipjakiLabel: "propinsi",
+      dataType: "String",
+      description: "Provinsi lokasi pengawasan (Default: Jawa Barat)"
+    },
+    {
+      key: "kabKota",
+      label: "Kab/Kota",
+      sipjakiLabel: "kab_kota",
+      dataType: "String",
+      description: "Kabupaten/Kota (Default: Kabupaten Bogor)"
+    },
+    {
+      key: "statusKepatuhan",
+      label: "Status Kepatuhan",
+      sipjakiLabel: "status_kepatuhan",
+      dataType: "Enum",
+      allowedValues: ["Patuh", "Tidak Patuh"],
+      description: "Hasil evaluasi kepatuhan SIMAK 3 (Patuh / Tidak Patuh)"
+    },
+    {
+      key: "dokumen",
+      label: "Dokumen",
+      sipjakiLabel: "dokumen",
+      dataType: "String",
+      description: "Nama berkas dokumen BAP pengawasan PDF"
+    },
+    {
+      key: "statusVerifikasi",
+      label: "Status",
+      sipjakiLabel: "status",
+      dataType: "Enum",
+      allowedValues: ["Draft", "Terverifikasi", "Ditolak"],
+      description: "Status validasi dokumen hasil pengawasan"
+    }
+  ],
+  documentFields: [
+    { key: "dokumen", label: "Dokumen Pengawasan SIMAK 3", accept: ".pdf", maxSizeMb: 10, required: true }
+  ],
+  importColumns: [
+    { key: "namaBangunan", label: "Nama Bangunan", required: true, example: "Gedung RSUD Leuwiliang" },
+    { key: "lokasi", label: "Lokasi", required: true, example: "Jl. Raya Cibeber No. 1, Leuwiliang" },
+    { key: "namaPemilik", label: "Nama Pemilik", required: true, example: "Pemerintah Kabupaten Bogor / BPKAD" },
+    { key: "namaPengelola", label: "Nama Pengelola", required: true, example: "Dinas Kesehatan / Manajemen RSUD" },
+    { key: "waktuPengawasan", label: "Waktu Pengawasan", required: true, example: "2026-03-28" },
+    { key: "propinsi", label: "Propinsi", required: false, example: "Jawa Barat" },
+    { key: "kabKota", label: "Kab/Kota", required: false, example: "Kabupaten Bogor" },
+    { key: "statusKepatuhan", label: "Status Kepatuhan", required: true, example: "Patuh" },
+    { key: "dokumen", label: "Dokumen", required: false, example: "BAP_SIMAK3_RSUD_Leuwiliang.pdf" },
+    { key: "statusVerifikasi", label: "Status", required: false, example: "Terverifikasi" }
+  ],
+  sampleRows: [
+    {
+      namaBangunan: "Gedung Rawat Inap Terpadu 5 Lantai RSUD Leuwiliang",
+      lokasi: "Jl. Raya Cibeber No. 1, Leuwiliang",
+      namaPemilik: "Pemerintah Kabupaten Bogor / BPKAD",
+      namaPengelola: "Dinas Kesehatan / Manajemen RSUD",
+      waktuPengawasan: "2026-03-28",
+      propinsi: "Jawa Barat",
+      kabKota: "Kabupaten Bogor",
+      statusKepatuhan: "Patuh",
+      dokumen: "BAP_SIMAK3_RSUD_Leuwiliang.pdf",
+      statusVerifikasi: "Terverifikasi"
+    },
+    {
+      namaBangunan: "Stadion Utama Pakansari Cibinong",
+      lokasi: "Jl. Kolonel Edy Yoso Martadipura, Pakansari, Cibinong",
+      namaPemilik: "Pemerintah Kabupaten Bogor / BPKAD",
+      namaPengelola: "Dispora Kab. Bogor",
+      waktuPengawasan: "2026-03-24",
+      propinsi: "Jawa Barat",
+      kabKota: "Kabupaten Bogor",
+      statusKepatuhan: "Patuh",
+      dokumen: "BAP_SIMAK3_StadionPakansari.pdf",
+      statusVerifikasi: "Terverifikasi"
+    }
+  ],
+  dictionaryItems: [
+    {
+      field: "nama_bangunan",
+      label: "Nama Bangunan",
+      type: "String",
+      description: "Nama gedung atau infrastruktur terbangun yang diawasi (Standar SIPJAKI SIMAK 3)"
+    },
+    {
+      field: "lokasi",
+      label: "Lokasi",
+      type: "String",
+      description: "Alamat fisik atau wilayah letak objek bangunan"
+    },
+    {
+      field: "nama_pemilik",
+      label: "Nama Pemilik",
+      type: "String",
+      description: "Pemilik aset gedung / infrastruktur"
+    },
+    {
+      field: "nama_pengelola",
+      label: "Nama Pengelola",
+      type: "String",
+      description: "Unit / pengelola pemeliharaan gedung"
+    },
+    {
+      field: "waktu_pengawasan",
+      label: "Waktu Pengawasan",
+      type: "Date",
+      description: "Tanggal kegiatan pengawasan lapangan SIMAK 3"
+    },
+    {
+      field: "status_kepatuhan",
+      label: "Status Kepatuhan",
+      type: "Enum",
+      description: "Evaluasi kepatuhan pemanfaatan dan kelaikan fungsi (Patuh / Tidak Patuh)",
+      allowedValues: ["Patuh", "Tidak Patuh"]
+    }
+  ]
+};
+
+// ==========================================
 // 6. TEMPLATE: REKOMENDASI & TINDAK LANJUT
 // ==========================================
 export const TEMPLATE_REKOMENDASI: SipjakiTemplate = {
@@ -1099,11 +1453,11 @@ export const TEMPLATE_PERENCANAAN_SDM: SipjakiTemplate = {
     { key: "wilayah", label: "Wilayah Penugasan", sipjakiLabel: "wilayah_tugas", dataType: "String", description: "Cakupan zona / kecamatan pengawasan" },
     { key: "jumlahSdm", label: "Jumlah SDM (Orang)", sipjakiLabel: "jumlah_personel", dataType: "Integer", description: "Kekuatan personel auditor/pengawas" },
     { key: "tahun", label: "Tahun Anggaran", sipjakiLabel: "tahun_anggaran", dataType: "Integer (YYYY)", description: "Tahun penugasan tim" },
-    { key: "dokumen", label: "SK Tim Pengawas", sipjakiLabel: "dokumen_sk", dataType: "String", description: "Nama file SK penetapan tim pengawas" },
-    { key: "status", label: "Status Verifikasi", sipjakiLabel: "status_verifikasi", dataType: "Enum", allowedValues: ["Terverifikasi", "Menunggu Verifikasi", "Ditolak"], description: "Status legalitas SK tim" }
+    { key: "dokumen", label: "Dokumen Surat Tugas", sipjakiLabel: "dokumen_surat_tugas", dataType: "String", description: "Nama file dokumen surat tugas tim pengawas" },
+    { key: "status", label: "Status Verifikasi", sipjakiLabel: "status_verifikasi", dataType: "Enum", allowedValues: ["Terverifikasi", "Menunggu Verifikasi", "Ditolak"], description: "Status legalitas penugasan tim" }
   ],
   documentFields: [
-    { key: "dokumen", label: "SK Tim Pengawas (PDF)", accept: ".pdf", maxSizeMb: 5, required: true }
+    { key: "dokumen", label: "Dokumen Surat Tugas (PDF)", accept: ".pdf", maxSizeMb: 5, required: true }
   ],
   importColumns: [
     { key: "namaTim", label: "Nama Tim Pengawas", required: true, example: "Tim Pengawas Wilayah I (Cibinong - Citeureup)" },
@@ -1290,6 +1644,8 @@ export const ALL_SIPJAKI_TEMPLATES: Record<string, SipjakiTemplate> = {
   bujk: TEMPLATE_BUJK,
   pelatihan: TEMPLATE_PELATIHAN,
   "pelaksanaan-simak": TEMPLATE_PELAKSANAAN,
+  "pelaksanaan-simak2": TEMPLATE_PELAKSANAAN_SIMAK2,
+  "pelaksanaan-simak3": TEMPLATE_PELAKSANAAN_SIMAK3,
   rekomendasi: TEMPLATE_REKOMENDASI,
   "laporan-pelatihan": TEMPLATE_LAPORAN_PELATIHAN,
   "perencanaan-sdm": TEMPLATE_PERENCANAAN_SDM,

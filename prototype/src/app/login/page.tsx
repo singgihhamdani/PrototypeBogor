@@ -46,7 +46,7 @@ export default function LoginPage() {
   const getPageTitleFromPath = (path: string) => {
     if (path.includes("/regulasi")) return "Regulasi & Dasar Hukum";
     if (path.includes("/profil-opd")) return "Profil 40 OPD";
-    if (path.includes("/pelaporan")) return "Pelaporan SIPJAKI PUPR";
+    if (path.includes("/pelatihan-rekapitulasi")) return "Rekapitulasi Pelatihan TKK";
     if (path.includes("/kecelakaan")) return "Pencatatan K3 Konstruksi";
     if (path.includes("/webgis")) return "WebGIS Geospasial";
     if (path.includes("/pengawasan")) return "Audit Pengawasan SIMAK";

@@ -68,10 +68,10 @@ export default function PerencanaanCardGrid({ tertibType, stats }: PerencanaanCa
       slug: "target",
       cat: "Target & Sasaran",
       title: "Target Pengawasan",
-      desc: "Penetapan target kuantitatif dan kualitatif pencapaian pengawasan sesuai target IKU Dinas PUPR.",
+      desc: "Penetapan target sasaran kuantitatif tahunan pengawasan standar SIPJAKI Kementerian PUPR.",
       icon: Target,
-      metric: stats?.targetPercent ? `${stats.targetPercent}% Capaian Sasaran` : "68% Capaian Sasaran",
-      status: "Target On-Track",
+      metric: "Target Tahunan Terjadwal",
+      status: "Perencanaan Disahkan",
       accentBg: "#FCE7F3",
       accentColor: "#9D174D"
     }

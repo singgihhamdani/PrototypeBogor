@@ -13,11 +13,47 @@
     "status": "Selesai",
     "organizer": "Bidang Jasa Konstruksi DPU bekerjasama dengan Balai Jasa Konstruksi Wilayah III",
     "instructor": "Ir. Budi Santoso, MT (Asesor BNSP)",
-    "skkLevel": "Jenjang 5 (Teknisi/Analis)",
+    "skkLevel": "Jenjang 5",
     "participants": [
-      {"nik": "3201011203900001", "name": "Ahmad Fauzi", "bujk": "PT Bangun Jaya Konstruksi", "score": 88, "certNo": "SKK-SMKK-2026-001", "status": "Lulus"},
-      {"nik": "3201021508880004", "name": "Rian Hidayat", "bujk": "CV Karya Mandiri Utama", "score": 92, "certNo": "SKK-SMKK-2026-002", "status": "Lulus"},
-      {"nik": "3201032104920002", "name": "Deni Setiawan", "bujk": "PT Mitra Pembangunan Nusantara", "score": 85, "certNo": "SKK-SMKK-2026-003", "status": "Lulus"}
+      {
+        "id": "PST-001",
+        "nik": "3201011203900001",
+        "name": "Ahmad Fauzi, A.Md",
+        "bujk": "PT Bangun Jaya Konstruksi",
+        "skkLevel": "Jenjang 5",
+        "score": 88.5,
+        "certNoDpu": "2026/DPU-K3/0001",
+        "certNoLpjk": "REG-2026-LPJK-88219",
+        "isValidated": true,
+        "status": "Lulus",
+        "updatedAt": "2026-04-14T15:30:00Z"
+      },
+      {
+        "id": "PST-002",
+        "nik": "3201021508880004",
+        "name": "Rian Hidayat, ST",
+        "bujk": "CV Karya Mandiri Utama",
+        "skkLevel": "Jenjang 5",
+        "score": 92.0,
+        "certNoDpu": "2026/DPU-K3/0002",
+        "certNoLpjk": "REG-2026-LPJK-88220",
+        "isValidated": true,
+        "status": "Lulus",
+        "updatedAt": "2026-04-14T14:45:00Z"
+      },
+      {
+        "id": "PST-003",
+        "nik": "3201032104920002",
+        "name": "Deni Setiawan",
+        "bujk": "PT Mitra Pembangunan Nusantara",
+        "skkLevel": "Jenjang 5",
+        "score": 85.0,
+        "certNoDpu": "2026/DPU-K3/0003",
+        "certNoLpjk": "REG-2026-LPJK-88221",
+        "isValidated": true,
+        "status": "Lulus",
+        "updatedAt": "2026-04-14T14:10:00Z"
+      }
     ]
   },
   {
@@ -34,10 +70,47 @@
     "status": "Selesai",
     "organizer": "Bidang Jasa Konstruksi bekerjasama dengan LSP Gataki Konstruksi Mandiri",
     "instructor": "Supriyanto, ST (Master Asesor)",
-    "skkLevel": "Jenjang 1-2 (Operator/Tukang)",
+    "skkLevel": "Jenjang 2",
     "participants": [
-      {"nik": "3201050801850003", "name": "Mamat Rahmat", "bujk": "CV Teknik Sejahtera", "score": 89, "certNo": "SKK-TUK-2026-041", "status": "Lulus"},
-      {"nik": "3201061907870005", "name": "Ujang Sulaeman", "bujk": "CV Anugerah Konstruksi", "score": 91, "certNo": "SKK-TUK-2026-042", "status": "Lulus"}
+      {
+        "id": "PST-004",
+        "nik": "3201050801850003",
+        "name": "Mamat Rahmat",
+        "bujk": "CV Teknik Sejahtera",
+        "skkLevel": "Jenjang 2",
+        "score": 89.0,
+        "certNoDpu": "2026/DPU-TKK/0041",
+        "certNoLpjk": "SKK-TUK-2026-041",
+        "isValidated": true,
+        "status": "Lulus",
+        "updatedAt": "2026-05-20T16:00:00Z"
+      },
+      {
+        "id": "PST-005",
+        "nik": "3201061907870005",
+        "name": "Ujang Sulaeman",
+        "bujk": "CV Anugerah Konstruksi",
+        "skkLevel": "Jenjang 2",
+        "score": 91.0,
+        "certNoDpu": "2026/DPU-TKK/0042",
+        "certNoLpjk": "SKK-TUK-2026-042",
+        "isValidated": true,
+        "status": "Lulus",
+        "updatedAt": "2026-05-20T15:20:00Z"
+      },
+      {
+        "id": "PST-006",
+        "nik": "3201072504890008",
+        "name": "Asep Saepullah",
+        "bujk": "CV Mandiri Perkasa",
+        "skkLevel": "Jenjang 1",
+        "score": 82.5,
+        "certNoDpu": "2026/DPU-TKK/0043",
+        "certNoLpjk": "",
+        "isValidated": true,
+        "status": "Lulus",
+        "updatedAt": "2026-05-20T14:00:00Z"
+      }
     ]
   },
   {
@@ -54,16 +127,87 @@
     "status": "Sedang Berjalan",
     "organizer": "Bidang Jasa Konstruksi DPU Kab. Bogor",
     "instructor": "Radityo Prabowo, ST, M.Sc (BIM Specialist)",
-    "skkLevel": "Jenjang 6 (Ahli Muda)",
-    "participants": []
+    "skkLevel": "Jenjang 6",
+    "participants": [
+      {
+        "id": "PST-007",
+        "nik": "3201081109930006",
+        "name": "Hendri Gunawan, ST",
+        "bujk": "PT Bumi Cipta Mandiri",
+        "skkLevel": "Jenjang 6",
+        "score": 78.0,
+        "certNoDpu": "2026/DPU-BIM/0007",
+        "certNoLpjk": "",
+        "isValidated": true,
+        "status": "Proses Bimtek",
+        "updatedAt": "2026-08-27T10:15:00Z"
+      },
+      {
+        "id": "PST-008",
+        "nik": "3201091512950002",
+        "name": "Siti Nurhaliza, ST",
+        "bujk": "PT Graha Rekayasa Utama",
+        "skkLevel": "Jenjang 6",
+        "score": 0,
+        "certNoDpu": "",
+        "certNoLpjk": "",
+        "isValidated": false,
+        "status": "Terdaftar",
+        "updatedAt": "2026-08-26T09:00:00Z"
+      }
+    ]
   },
   {
     "id": "TR-2026-004",
+    "title": "Bimbingan Teknis Pelaksana Lapangan Pekerjaan Jalan & Jembatan",
+    "category": "Tenaga Terampil",
+    "batch": "Angkatan III / 2026",
+    "startDate": "2026-09-15",
+    "endDate": "2026-09-18",
+    "location": "Balai Diklat PUPR Wilayah Cibinong",
+    "quota": 45,
+    "registered": 42,
+    "passed": 0,
+    "status": "Sedang Berjalan",
+    "organizer": "Bidang Jasa Konstruksi DPU Kab. Bogor",
+    "instructor": "Ir. Herman Wijaya, MT (Praktisi Jalan)",
+    "skkLevel": "Jenjang 4",
+    "participants": [
+      {
+        "id": "PST-009",
+        "nik": "3201100203910007",
+        "name": "Bambang Triatmojo",
+        "bujk": "PT Bogor Sarana Marga",
+        "skkLevel": "Jenjang 4",
+        "score": 86.0,
+        "certNoDpu": "2026/DPU-JALAN/0009",
+        "certNoLpjk": "REG-2026-LPJK-77112",
+        "isValidated": true,
+        "status": "Lulus",
+        "updatedAt": "2026-09-18T16:00:00Z"
+      },
+      {
+        "id": "PST-010",
+        "nik": "3201111406940003",
+        "name": "Joko Susilo",
+        "bujk": "CV Konstruksi Jaya",
+        "skkLevel": "Jenjang 3",
+        "score": 84.0,
+        "certNoDpu": "2026/DPU-JALAN/0010",
+        "certNoLpjk": "",
+        "isValidated": true,
+        "status": "Lulus",
+        "updatedAt": "2026-09-18T15:30:00Z"
+      }
+    ]
+  },
+  {
+    "id": "TR-2026-005",
     "title": "Sosialisasi Tertib Penyelenggaraan Jasa Konstruksi & Regulasi Terbaru",
     "category": "Tata Kelola & Regulasi",
     "batch": "Tahap III / 2026",
-    "startDate": "2026-09-22",
-    "endDate": "2026-09-22",
+    "startDate": "2026-10-12",
+    "endDate": "2026-10-12",
     "location": "Hotel Lorin Sentul, Babakan Madang",
     "quota": 100,
     "registered": 74,
@@ -71,7 +215,7 @@
     "status": "Pendaftaran Dibuka",
     "organizer": "DPU Kab. Bogor",
     "instructor": "Tim Pembina Jasa Konstruksi Ditjen Bina Konstruksi Kementerian PUPR",
-    "skkLevel": "Semua Jenjang",
+    "skkLevel": "Jenjang 3",
     "participants": []
   }
 ]

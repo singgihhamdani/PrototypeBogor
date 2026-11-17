@@ -69,7 +69,62 @@ export async function fetchBUJKList(): Promise<{ data: BUJKItem[]; status: DataS
   };
 }
 
+export async function checkNIBExists(
+  nib: string, 
+  currentId?: string
+): Promise<{ exists: boolean; bujkName?: string; id?: string }> {
+  const cleanNib = (nib || "").trim();
+  if (!cleanNib) return { exists: false };
+
+  if (isSupabaseConfigured()) {
+    try {
+      const client = createClient();
+      if (client) {
+        let query = (client.from("bujk") as any).select("id, nama_badan_usaha, nib").eq("nib", cleanNib);
+        if (currentId) {
+          query = query.neq("id", currentId);
+        }
+        const { data, error } = await query.maybeSingle();
+        if (!error && data) {
+          const row = data as { id: string; nama_badan_usaha: string; nib: string };
+          return {
+            exists: true,
+            bujkName: row.nama_badan_usaha,
+            id: row.id
+          };
+        }
+      }
+    } catch (err) {
+      console.warn("Gagal mengecek keunikan NIB di Supabase:", err);
+    }
+  }
+
+  // Fallback pengecekan lokal
+  const found = bujkFallback.find(
+    (b) => b.nib.trim() === cleanNib && (!currentId || b.id !== currentId)
+  );
+
+  if (found) {
+    return {
+      exists: true,
+      bujkName: found.name,
+      id: found.id
+    };
+  }
+
+  return { exists: false };
+}
+
 export async function createBUJK(item: BUJKInsert): Promise<{ success: boolean; data?: BUJKItem; error?: string }> {
+  // 1. Validasi Keunikan NIB (Standar OSS-RBA & PP No. 5/2021)
+  const nibCheck = await checkNIBExists(item.nib);
+  if (nibCheck.exists) {
+    return {
+      success: false,
+      error: `Nomor NIB ${item.nib} sudah terdaftar atas nama "${nibCheck.bujkName}". Berdasarkan regulasi OSS-RBA, NIB bersifat tunggal/unik dan tidak boleh ganda.`
+    };
+  }
+
   if (isSupabaseConfigured()) {
     try {
       const client = createClient();
@@ -186,7 +241,7 @@ export async function fetchPaketList(): Promise<{ data: PaketItem[]; status: Dat
         const { data, error } = await client
           .from("paket_pekerjaan")
           .select("*")
-          .order("id", { ascending: true });
+          .order("updated_at", { ascending: false });
 
         if (!error && data && data.length > 0) {
           return {
@@ -200,8 +255,14 @@ export async function fetchPaketList(): Promise<{ data: PaketItem[]; status: Dat
     }
   }
 
-  // Fallback ke local projects.json
-  const mappedFallback: PaketItem[] = projectsFallback.map((p) => ({
+  // Fallback ke local projects.json (Diurutkan dari pembaruan terkini)
+  const sortedFallback = [...projectsFallback].sort((a: any, b: any) => {
+    const timeA = new Date(a.updatedAt || a.startDate || 0).getTime();
+    const timeB = new Date(b.updatedAt || b.startDate || 0).getTime();
+    return timeB - timeA;
+  });
+
+  const mappedFallback: PaketItem[] = sortedFallback.map((p: any) => ({
     id: p.id,
     nama_paket: p.name,
     tahun_anggaran: p.fiscalYear,
@@ -211,13 +272,17 @@ export async function fetchPaketList(): Promise<{ data: PaketItem[]; status: Dat
     nama_penyedia: p.contractor,
     nib_penyedia: p.nib,
     nilai_kontrak: p.contractValue,
-    jenis_kontrak: p.contractType,
-    sifat_kontrak: p.contractChar,
+    jenis_kontrak: p.contractType || "Harga Satuan",
+    sifat_kontrak: p.contractChar || "Tahun Tunggal",
+    karakteristik_kontrak: p.contractChar || "Tahun Tunggal",
+    propinsi: p.province || "Jawa Barat",
+    kab_kota: p.city || "Kabupaten Bogor",
     tanggal_mulai: p.startDate,
     tanggal_selesai: p.endDate,
     progres_fisik: p.physProgress,
     progres_keuangan: p.finProgress,
-    bulan_progres: p.physMonth,
+    bulan_progres: p.physMonth || "Agustus",
+    bulan_progres_keuangan: p.finMonth || p.physMonth || "Agustus",
     status_pekerjaan: (p.status as any) || "Pelaksanaan",
     kode_kecamatan: p.districtId,
     kecamatan: "Kabupaten Bogor",
@@ -225,12 +290,119 @@ export async function fetchPaketList(): Promise<{ data: PaketItem[]; status: Dat
     lng: p.lng,
     kurva_s_rencana: p.planProgress,
     kurva_s_realisasi: p.realProgress,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    created_at: p.updatedAt || new Date().toISOString(),
+    updated_at: p.updatedAt || new Date().toISOString()
   }));
 
   return {
     data: mappedFallback,
+    status: { source: "fallback", message: "Data Cadangan Lokal (Offline/Fallback Mode)" }
+  };
+}
+
+export async function fetchPaketListByBUJK(
+  bujkId?: string,
+  nib?: string,
+  bujkName?: string
+): Promise<{ data: PaketItem[]; status: DataSourceStatus }> {
+  // 1. Coba ambil dari Supabase jika terkonfigurasi
+  if (isSupabaseConfigured()) {
+    try {
+      const client = createClient();
+      if (client) {
+        let query = client.from("paket_pekerjaan").select("*");
+
+        if (bujkId && nib) {
+          query = query.or(`bujk_id.eq.${bujkId},nib_penyedia.eq.${nib}`);
+        } else if (bujkId) {
+          query = query.eq("bujk_id", bujkId);
+        } else if (nib) {
+          query = query.eq("nib_penyedia", nib);
+        }
+
+        // Setting Default Filter: Urutan awal diambil dari pekerjaan terakhir (DESC)
+        query = query
+          .order("tanggal_mulai", { ascending: false, nullsFirst: false })
+          .order("tahun_anggaran", { ascending: false })
+          .order("updated_at", { ascending: false });
+
+        const { data, error } = await query;
+        if (!error && data && data.length > 0) {
+          return {
+            data: data as PaketItem[],
+            status: { source: "supabase", message: "Live PostgreSQL Database" }
+          };
+        }
+      }
+    } catch (err) {
+      console.warn("Gagal terhubung ke Supabase paket_pekerjaan by BUJK, fallback:", err);
+    }
+  }
+
+  // 2. Fallback dari projectsFallback
+  const cleanNib = (nib || "").trim();
+  const cleanId = (bujkId || "").trim();
+  const cleanName = (bujkName || "").toLowerCase().trim();
+
+  let filtered = projectsFallback.filter((p: any) => {
+    if (cleanNib && p.nib && p.nib.trim() === cleanNib) return true;
+    if (cleanId && p.contractorId && p.contractorId.trim() === cleanId) return true;
+    if (cleanName && p.contractor && p.contractor.toLowerCase().includes(cleanName)) return true;
+    return false;
+  });
+
+  // Jika tidak ditemukan secara spesifik, tetap berikan data representatif B001 jika diminta B001
+  if (filtered.length === 0 && (cleanId === "B001" || cleanNib === "1234567890123")) {
+    filtered = projectsFallback.filter((p: any) => p.contractorId === "B001" || p.nib === "1234567890123");
+  }
+
+  // Setting Default Filter: Kronologis Terbalik (Pekerjaan Terakhir / Mutakhir di Urutan Paling Atas)
+  const sorted = [...filtered].sort((a: any, b: any) => {
+    if ((b.fiscalYear || 0) !== (a.fiscalYear || 0)) {
+      return (b.fiscalYear || 0) - (a.fiscalYear || 0);
+    }
+    const dateA = new Date(a.startDate || 0).getTime();
+    const dateB = new Date(b.startDate || 0).getTime();
+    if (dateB !== dateA) return dateB - dateA;
+    const timeA = new Date(a.updatedAt || 0).getTime();
+    const timeB = new Date(b.updatedAt || 0).getTime();
+    return timeB - timeA;
+  });
+
+  const mapped: PaketItem[] = sorted.map((p: any) => ({
+    id: p.id,
+    nama_paket: p.name,
+    tahun_anggaran: p.fiscalYear,
+    sumber_dana: (p.source as any) || "APBD",
+    nama_instansi: p.owner,
+    bujk_id: p.contractorId,
+    nama_penyedia: p.contractor,
+    nib_penyedia: p.nib,
+    nilai_kontrak: p.contractValue,
+    jenis_kontrak: p.contractType || "Harga Satuan",
+    sifat_kontrak: p.contractChar || "Tahun Tunggal",
+    karakteristik_kontrak: p.contractChar || "Tahun Tunggal",
+    propinsi: p.province || "Jawa Barat",
+    kab_kota: p.city || "Kabupaten Bogor",
+    tanggal_mulai: p.startDate,
+    tanggal_selesai: p.endDate,
+    progres_fisik: p.physProgress,
+    progres_keuangan: p.finProgress,
+    bulan_progres: p.physMonth || "Agustus",
+    bulan_progres_keuangan: p.finMonth || p.physMonth || "Agustus",
+    status_pekerjaan: (p.status as any) || "Pelaksanaan",
+    kode_kecamatan: p.districtId,
+    kecamatan: "Kabupaten Bogor",
+    lat: p.lat,
+    lng: p.lng,
+    kurva_s_rencana: p.planProgress,
+    kurva_s_realisasi: p.realProgress,
+    created_at: p.updatedAt || new Date().toISOString(),
+    updated_at: p.updatedAt || new Date().toISOString()
+  }));
+
+  return {
+    data: mapped,
     status: { source: "fallback", message: "Data Cadangan Lokal (Offline/Fallback Mode)" }
   };
 }
@@ -260,14 +432,18 @@ export async function createPaket(item: PaketInsert): Promise<{ success: boolean
       ...item,
       bujk_id: item.bujk_id || null,
       nib_penyedia: item.nib_penyedia || null,
-      jenis_kontrak: item.jenis_kontrak || "Konstruksi",
-      sifat_kontrak: item.sifat_kontrak || "Harga Satuan",
+      jenis_kontrak: item.jenis_kontrak || "Harga Satuan",
+      sifat_kontrak: item.sifat_kontrak || "Tahun Tunggal",
+      karakteristik_kontrak: item.karakteristik_kontrak || "Tahun Tunggal",
+      propinsi: item.propinsi || "Jawa Barat",
+      kab_kota: item.kab_kota || "Kabupaten Bogor",
       progres_fisik: item.progres_fisik || 0,
       progres_keuangan: item.progres_keuangan || 0,
-      bulan_progres: item.bulan_progres || null,
+      bulan_progres: item.bulan_progres || "Agustus",
+      bulan_progres_keuangan: item.bulan_progres_keuangan || "Agustus",
       status_pekerjaan: item.status_pekerjaan || "Pelaksanaan",
       kode_kecamatan: item.kode_kecamatan || null,
-      kecamatan: item.kecamatan || null,
+      kecamatan: item.kecamatan || "Kabupaten Bogor",
       lat: item.lat || null,
       lng: item.lng || null,
       kurva_s_rencana: item.kurva_s_rencana || [],
@@ -276,6 +452,57 @@ export async function createPaket(item: PaketInsert): Promise<{ success: boolean
       updated_at: new Date().toISOString()
     }
   };
+}
+
+export async function updatePaket(
+  id: string,
+  payload: Partial<PaketInsert>
+): Promise<{ success: boolean; data?: PaketItem; error?: string }> {
+  if (isSupabaseConfigured()) {
+    try {
+      const client = createClient();
+      if (client) {
+        const updatePayload = {
+          ...payload,
+          updated_at: new Date().toISOString()
+        };
+        const { data, error } = await (client.from("paket_pekerjaan") as any)
+          .update(updatePayload)
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { success: true, data: data as PaketItem };
+      }
+    } catch (err: any) {
+      console.error("Error updating Paket on Supabase:", err);
+      return { success: false, error: err.message || "Gagal memperbarui paket pekerjaan" };
+    }
+  }
+
+  return { success: true };
+}
+
+export async function deletePaket(id: string): Promise<{ success: boolean; error?: string }> {
+  if (isSupabaseConfigured()) {
+    try {
+      const client = createClient();
+      if (client) {
+        const { error } = await (client.from("paket_pekerjaan") as any)
+          .delete()
+          .eq("id", id);
+
+        if (error) throw error;
+        return { success: true };
+      }
+    } catch (err: any) {
+      console.error("Error deleting Paket on Supabase:", err);
+      return { success: false, error: err.message || "Gagal menghapus paket pekerjaan" };
+    }
+  }
+
+  return { success: true };
 }
 
 export async function batchInsertPaket(items: PaketInsert[]): Promise<{ success: boolean; count: number; error?: string }> {
@@ -418,7 +645,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     { label: "Tertib Usaha", value: 85, desc: "Kesesuaian Izin, NIB & SBU", status: "Sangat Baik", color: "#0F2E5C" },
     { label: "Tertib Penyelenggaraan", value: 78, desc: "Kontrak Kerja & K3 SMKK", status: "Baik", color: "#1E40AF" },
     { label: "Tertib Pemanfaatan", value: 72, desc: "Fungsi & Umur Konstruksi", status: "Baik", color: "#D97706" },
-    { label: "Pelaporan SIPJAKI", value: 90, desc: "Sinkronisasi Terjadwal", status: "Sangat Baik", color: "#059669" },
+    { label: "Kepatuhan Pengawasan", value: 90, desc: "Keterpaduan Audit SIMAK", status: "Sangat Baik", color: "#059669" },
     { label: "Fasilitasi SDM / TKK", value: 82, desc: "Sertifikasi SKK BNSP", status: "Baik", color: "#0F2E5C" },
   ];
 

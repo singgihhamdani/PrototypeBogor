@@ -60,7 +60,7 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
     },
     {
       title: "2. Pelaksanaan Pengawasan",
-      desc: "Audit kepatuhan teknis berbasis form SIMAK elektronik, berita acara pemeriksaan lapangan, dan skoring tertib.",
+      desc: "Pengawasan kepatuhan teknis berbasis form SIMAK elektronik, dokumen pengawasan lapangan, dan penetapan status kepatuhan (Patuh/Tidak Patuh).",
       href: `${config.basePath}/pelaksanaan`,
       badge: `${config.simakVariants.length} Varian SIMAK`,
       icon: ShieldCheck,
@@ -105,7 +105,7 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
         legalBasis={config.legalBasis}
         actionButtons={[
           {
-            label: "Mulai Audit SIMAK",
+            label: "Mulai Pengawasan SIMAK",
             icon: ShieldCheck,
             variant: "primary",
             href: `${config.basePath}/pelaksanaan`
@@ -230,7 +230,7 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
         >
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
             <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              Objek Diaudit (SIMAK)
+              Objek Pengawasan (SIMAK)
             </span>
             <div
               style={{
@@ -254,10 +254,10 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
             </div>
             <div style={{ marginTop: "10px" }}>
               <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "999px", overflow: "hidden" }}>
-                <div style={{ width: "82%", height: "100%", backgroundColor: "#059669", borderRadius: "999px" }} />
+                <div style={{ width: "83%", height: "100%", backgroundColor: "#059669", borderRadius: "999px" }} />
               </div>
               <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700, marginTop: "4px", display: "inline-block" }}>
-                Rata-rata Skor: 82% (Tertib)
+                Tingkat Kepatuhan: 83% Patuh
               </span>
             </div>
           </div>
@@ -306,6 +306,129 @@ export default function TertibOverviewView({ tertibType }: TertibOverviewViewPro
               <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>
                 Status: Dalam Pemantauan
               </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Eksekutif Card: Perbandingan Target Rencana vs Realisasi Pengawasan Makro Tahunan */}
+      <div
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: "16px",
+          border: "1px solid #CBD5E1",
+          boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+          overflow: "hidden"
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "#0F2E5C",
+            color: "#FFFFFF",
+            padding: "14px 20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "10px"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "10px",
+                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#FFC000"
+              }}
+            >
+              <Target style={{ width: "20px", height: "20px" }} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: "14px", fontWeight: 800, margin: 0 }}>
+                Perbandingan Target Rencana vs Realisasi Pengawasan Tahunan ({config.shortTitle})
+              </h3>
+              <p style={{ fontSize: "11px", color: "#93C5FD", margin: "2px 0 0 0" }}>
+                Monitoring target sasaran pengawasan tahunan standar SIPJAKI Kementerian PUPR TA 2026
+              </p>
+            </div>
+          </div>
+          <span style={{ fontSize: "11px", fontWeight: 800, color: "#FFC000", backgroundColor: "rgba(255, 192, 0, 0.15)", padding: "4px 10px", borderRadius: "9999px", border: "1px solid rgba(255, 192, 0, 0.3)" }}>
+            Ringkasan Eksekutif
+          </span>
+        </div>
+
+        <div style={{ padding: "18px 20px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px", backgroundColor: "#F8FAFC" }}>
+          {/* Metrik 1: Target Objek Pengawasan vs Realisasi */}
+          <div style={{ backgroundColor: "#FFFFFF", padding: "16px", borderRadius: "12px", border: "1px solid #E2E8F0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase" }}>
+                Target Objek Pengawasan (SIMAK)
+              </span>
+              <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "9999px" }}>
+                Target: 15 Objek
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px", margin: "6px 0" }}>
+              <span style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C" }}>
+                {pelaksanaanCount || 12} Objek
+              </span>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#166534" }}>
+                ({Math.round(((pelaksanaanCount || 12) / 15) * 100)}% Capaian Rencana)
+              </span>
+            </div>
+            <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "9999px", overflow: "hidden", marginTop: "6px" }}>
+              <div style={{ width: `${Math.min(Math.round(((pelaksanaanCount || 12) / 15) * 100), 100)}%`, height: "100%", backgroundColor: "#10B981", borderRadius: "9999px" }} />
+            </div>
+          </div>
+
+          {/* Metrik 2: Target Pagu Anggaran vs Realisasi Serapan */}
+          <div style={{ backgroundColor: "#FFFFFF", padding: "16px", borderRadius: "12px", border: "1px solid #E2E8F0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase" }}>
+                Serapan Pagu Anggaran RKA
+              </span>
+              <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "9999px" }}>
+                Pagu: Rp {(totalPagu / 1000000).toLocaleString('id-ID')} Jt
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px", margin: "6px 0" }}>
+              <span style={{ fontSize: "24px", fontWeight: 900, color: "#2563EB" }}>
+                82%
+              </span>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>
+                Terealisasi Rp {Math.round(totalPagu * 0.82 / 1000000).toLocaleString('id-ID')} Jt
+              </span>
+            </div>
+            <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "9999px", overflow: "hidden", marginTop: "6px" }}>
+              <div style={{ width: "82%", height: "100%", backgroundColor: "#2563EB", borderRadius: "9999px" }} />
+            </div>
+          </div>
+
+          {/* Metrik 3: Target Kepatuhan Rekomendasi vs Realisasi */}
+          <div style={{ backgroundColor: "#FFFFFF", padding: "16px", borderRadius: "12px", border: "1px solid #E2E8F0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase" }}>
+                Tindak Lanjut Rekomendasi
+              </span>
+              <span style={{ fontSize: "10px", fontWeight: 800, color: "#166534", backgroundColor: "#DCFCE7", padding: "2px 8px", borderRadius: "9999px" }}>
+                Target: 100% Sah
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px", margin: "6px 0" }}>
+              <span style={{ fontSize: "24px", fontWeight: 900, color: "#059669" }}>
+                {rekomendasiCount} Surat
+              </span>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>
+                Tersinkronisasi ke SIPJAKI
+              </span>
+            </div>
+            <div style={{ width: "100%", height: "6px", backgroundColor: "#E2E8F0", borderRadius: "9999px", overflow: "hidden", marginTop: "6px" }}>
+              <div style={{ width: "75%", height: "100%", backgroundColor: "#059669", borderRadius: "9999px" }} />
             </div>
           </div>
         </div>

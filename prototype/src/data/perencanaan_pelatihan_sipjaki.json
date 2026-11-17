@@ -1,0 +1,36 @@
+[
+  {
+    "id": "PRC-PEL-2026-001",
+    "tahun": "2026",
+    "wilayah": "JAWA BARAT, KABUPATEN BOGOR",
+    "kab_kota": "KABUPATEN BOGOR",
+    "propinsi": "JAWA BARAT",
+    "target_pelaksanaan": 3,
+    "satuan_target": "Pelaksanaan",
+    "dokumen_url": "KAK_Rencana_Pelatihan_TKK_Kab_Bogor_2026.pdf",
+    "dokumen_kak_url": "KAK_Rencana_Pelatihan_TKK_Kab_Bogor_2026.pdf",
+    "status": "Menunggu Verifikasi",
+    "catatan_verifikasi": "Dokumen KAK dan usulan anggaran telah disubmit ke Balai Jasa Konstruksi Wilayah III, menunggu review verifikator.",
+    "anggaran_estimasi": 450000000,
+    "uraian_rencana": "Usulan Rencana Kerja Tahunan Pembinaan TKK: 1. Pelatihan Pelaksana Lapangan Jalan Madya, 2. Bimtek Petugas K3 Konstruksi & SMKK, 3. Mobile Training Unit (MTU) Tukang Pasang Bata & Plesteran.",
+    "created_at": "2026-02-01T08:00:00.000Z",
+    "updated_at": "2026-03-01T10:30:00.000Z"
+  },
+  {
+    "id": "PRC-PEL-2025-001",
+    "tahun": "2025",
+    "wilayah": "JAWA BARAT, KABUPATEN BOGOR",
+    "kab_kota": "KABUPATEN BOGOR",
+    "propinsi": "JAWA BARAT",
+    "target_pelaksanaan": 5,
+    "satuan_target": "Pelaksanaan",
+    "dokumen_url": "KAK_Rencana_Pelatihan_TKK_Kab_Bogor_2025.pdf",
+    "dokumen_kak_url": "KAK_Rencana_Pelatihan_TKK_Kab_Bogor_2025.pdf",
+    "status": "Terverifikasi",
+    "catatan_verifikasi": "Rencana kerja telah disetujui penuh oleh Tim Pembina Jasa Konstruksi Provinsi Jawa Barat.",
+    "anggaran_estimasi": 620000000,
+    "uraian_rencana": "Realisasi 5 paket pelatihan vokasi & uji sertifikasi tenaga terampil gedung dan jalan Kabupaten Bogor.",
+    "created_at": "2025-01-15T08:30:00.000Z",
+    "updated_at": "2025-02-01T14:00:00.000Z"
+  }
+]

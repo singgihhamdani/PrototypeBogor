@@ -11,7 +11,7 @@ import { TEMPLATE_BUJK } from "@/lib/sipjaki-templates";
 import BatchImportModal from "@/components/common/batch-import-modal";
 import { ModalForm } from "@/components/common";
 import { 
-  fetchBUJKList, createBUJK, batchInsertBUJK, 
+  fetchBUJKList, createBUJK, batchInsertBUJK, checkNIBExists,
   BUJKItem, DataSourceStatus 
 } from "@/lib/services/master-data";
 import { createClient } from "@/lib/supabase/client";
@@ -28,6 +28,7 @@ export default function BUJKPage() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [nibWarning, setNibWarning] = useState<string | null>(null);
 
   // Form State untuk Tambah BUJK Baru
   const [newBujk, setNewBujk] = useState({
@@ -44,6 +45,26 @@ export default function BUJKPage() {
     sbuCount: 1,
     sbuExpiry: "2027-12-31"
   });
+
+  const handleNibChange = async (val: string) => {
+    const cleanVal = val.trim();
+    setNewBujk((prev) => ({ ...prev, nib: val }));
+
+    if (cleanVal.length >= 8) {
+      const localMatch = bujkList.find((b) => (b.nib || "").trim() === cleanVal);
+      if (localMatch) {
+        setNibWarning(`NIB ${cleanVal} sudah terdaftar atas nama "${localMatch.name}". Berdasarkan regulasi OSS-RBA, NIB bersifat tunggal/unik.`);
+        return;
+      }
+
+      const res = await checkNIBExists(cleanVal);
+      if (res.exists) {
+        setNibWarning(`NIB ${cleanVal} sudah terdaftar atas nama "${res.bujkName}". Berdasarkan regulasi OSS-RBA, NIB bersifat tunggal/unik.`);
+        return;
+      }
+    }
+    setNibWarning(null);
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -143,6 +164,14 @@ export default function BUJKPage() {
 
   const handleCreateBUJK = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (nibWarning) {
+      alert("Tidak dapat menyimpan data: " + nibWarning);
+      return;
+    }
+    if ((newBujk.nib || "").trim().length < 13) {
+      alert("Format NIB tidak valid. NIB OSS harus memiliki minimal 13 digit angka.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const generatedId = `B0${String(bujkList.length + 1).padStart(2, "0")}`;
@@ -638,16 +667,40 @@ export default function BUJKPage() {
 
           <div>
             <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
-              Nomor Induk Berusaha (NIB) *
+              Nomor Induk Berusaha (NIB) * <span style={{ fontSize: "11px", fontWeight: 600, color: "#0F2E5C" }}>(Primary Key / Unik)</span>
             </label>
             <input
               type="text"
               required
-              placeholder="13 digit NIB OSS"
+              maxLength={13}
+              placeholder="13 digit NIB OSS (Contoh: 1234567890123)"
               value={newBujk.nib}
-              onChange={(e) => setNewBujk({ ...newBujk, nib: e.target.value })}
-              style={{ width: "100%", height: "40px", borderRadius: "8px", border: "1px solid #CBD5E1", padding: "0 12px", fontSize: "13px" }}
+              onChange={(e) => handleNibChange(e.target.value)}
+              style={{ 
+                width: "100%", 
+                height: "40px", 
+                borderRadius: "8px", 
+                border: nibWarning ? "2px solid #EF4444" : "1px solid #CBD5E1", 
+                padding: "0 12px", 
+                fontSize: "13px",
+                fontFamily: "monospace",
+                backgroundColor: nibWarning ? "#FEF2F2" : "#FFFFFF"
+              }}
             />
+            {nibWarning ? (
+              <div style={{ marginTop: "6px", padding: "8px 10px", borderRadius: "6px", backgroundColor: "#FEF2F2", border: "1px solid #FCA5A5", color: "#991B1B", fontSize: "11px", fontWeight: 700, display: "flex", alignItems: "flex-start", gap: "6px" }}>
+                <AlertTriangle style={{ width: "14px", height: "14px", flexShrink: 0, marginTop: "2px" }} />
+                <span>{nibWarning}</span>
+              </div>
+            ) : newBujk.nib.length === 13 ? (
+              <span style={{ fontSize: "11px", color: "#059669", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px", marginTop: "4px" }}>
+                <CheckCircle2 style={{ width: "12px", height: "12px" }} /> Format NIB 13 digit valid dan belum terdaftar.
+              </span>
+            ) : (
+              <span style={{ fontSize: "11px", color: "#94A3B8", display: "block", marginTop: "4px" }}>
+                Kunci primer badan usaha sesuai izin OSS-RBA (13 digit).
+              </span>
+            )}
           </div>
 
           <div>

@@ -1,115 +1,195 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ModuleHeader from "@/components/layout/module-header";
 import PerencanaanSubtabNav from "@/components/tertib/perencanaan-subtab-nav";
 import { TertibType, TERTIB_CONFIGS } from "@/lib/tertib-config";
 import { mockAnggaranRecords, AnggaranRecord } from "@/data/tertib-mock-data";
-import { 
-  StatusBadge, FileUploader, DataTableView, 
+import {
+  StatusBadge, FileUploader, DataTableView,
   ModalForm, ColumnDef, BatchImportModal,
   DocStatusBadge, DocumentUploadMiniModal, DocCompletionBar
 } from "@/components/common";
-import { Wallet, Plus, Download, FileText, CheckCircle2, TrendingUp, PieChart, Coins, Eye, FileSpreadsheet } from "lucide-react";
+import { 
+  Wallet, Plus, Download, FileText, CheckCircle2, 
+  Coins, Eye, FileSpreadsheet, Edit, Trash2, 
+  MapPin, AlertTriangle, X, Calendar, ArrowUpDown, 
+  Search, RotateCcw
+} from "lucide-react";
 import { TEMPLATE_PERENCANAAN_ANGGARAN } from "@/lib/sipjaki-templates";
 import { logDataActivity } from "@/lib/audit-log";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 interface PerencanaanAnggaranViewProps {
   tertibType: TertibType;
 }
+
+type SortOption = "terkini" | "pagu-desc" | "pagu-asc" | "nama";
 
 export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAnggaranViewProps) {
   const config = TERTIB_CONFIGS[tertibType];
   const [data, setData] = useState<AnggaranRecord[]>(() =>
     mockAnggaranRecords.filter((r) => r.tertibType === tertibType).map((r) => ({
       ...r,
+      wilayah: r.wilayah || "Kabupaten Bogor (40 Kecamatan)",
       _docStatus: r._docStatus || "complete"
     }))
   );
+
+  // Filter & Sort State (Default: Terkini DESC)
+  const [sortBy, setSortBy] = useState<SortOption>("terkini");
   const [filterSumberDana, setFilterSumberDana] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterDocPending, setFilterDocPending] = useState(false);
+
+  // Modal State
   const [showModal, setShowModal] = useState(false);
   const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
   const [docUploadTarget, setDocUploadTarget] = useState<AnggaranRecord | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form State
+  // Detail Modal State
+  const [detailRecord, setDetailRecord] = useState<AnggaranRecord | null>(null);
+
+  // Edit Modal State (Standar SIPJAKI: Fitur Edit)
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<AnggaranRecord | null>(null);
+  const [editProgram, setEditProgram] = useState("");
+  const [editWilayah, setEditWilayah] = useState("");
+  const [editTahun, setEditTahun] = useState("2026");
+  const [editPagu, setEditPagu] = useState("");
+  const [editSumberDana, setEditSumberDana] = useState<"APBD Kab. Bogor" | "DAK Fisik" | "Bantuan Keuangan Provinsi">("APBD Kab. Bogor");
+  const [editStatus, setEditStatus] = useState<"Disetujui" | "Revisi" | "Usulan">("Disetujui");
+  const [editTanggalPenetapan, setEditTanggalPenetapan] = useState("");
+  const [editKeterangan, setEditKeterangan] = useState("");
+
+  // Delete Confirmation State (Standar SIPJAKI: Fitur Hapus)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingRecord, setDeletingRecord] = useState<AnggaranRecord | null>(null);
+
+  // Form State Tambah
   const [formProgram, setFormProgram] = useState("");
+  const [formWilayah, setFormWilayah] = useState("Seluruh Wilayah (40 Kecamatan)");
   const [formTahun, setFormTahun] = useState("2026");
   const [formPagu, setFormPagu] = useState("");
-  const [formRealisasi, setFormRealisasi] = useState("0");
   const [formSumberDana, setFormSumberDana] = useState<"APBD Kab. Bogor" | "DAK Fisik" | "Bantuan Keuangan Provinsi">("APBD Kab. Bogor");
   const [formStatus, setFormStatus] = useState<"Disetujui" | "Revisi" | "Usulan">("Disetujui");
+  const [formTanggalPenetapan, setFormTanggalPenetapan] = useState(new Date().toISOString().split("T")[0]);
+  const [formKeterangan, setFormKeterangan] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-  const filteredData = data.filter((item) => {
-    const matchSumber = filterSumberDana === "Semua" || item.sumberDana === filterSumberDana;
-    const matchSearch = item.program.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        item.sumberDana.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchDoc = !filterDocPending || item._docStatus === "pending" || !item.dokumenRka;
-    return matchSumber && matchSearch && matchDoc;
-  });
+  // Hybrid Dual-Engine: Cek koneksi Supabase Cloud
+  useEffect(() => {
+    async function loadSupabaseAnggaran() {
+      if (!isSupabaseConfigured()) return;
+      try {
+        const supabase = createClient();
+        if (!supabase) return;
+        const { data: dbData, error } = await supabase
+          .from("pengawasan_anggaran_perencanaan")
+          .select("*")
+          .eq("tertib_type", tertibType);
 
+        if (!error && dbData && dbData.length > 0) {
+          const mapped: AnggaranRecord[] = dbData.map((row: any) => ({
+            id: row.id,
+            tertibType: row.tertib_type,
+            wilayah: row.wilayah || "Kabupaten Bogor (40 Kecamatan)",
+            program: row.program,
+            tahun: row.tahun,
+            paguAnggaran: Number(row.pagu_anggaran),
+            sumberDana: row.sumber_dana,
+            dokumenRka: row.dokumen_rka || row.dokumen || "",
+            dokumen: row.dokumen_rka || row.dokumen || "",
+            status: row.status,
+            tanggalPenetapan: row.tanggal_penetapan || row.created_at?.split("T")[0] || "2026-03-24",
+            keterangan: row.keterangan || "",
+            _docStatus: (row.dokumen_rka || row.dokumen) ? "complete" : "pending"
+          }));
+          setData(mapped);
+        }
+      } catch (err) {
+        console.warn("Supabase query fallback to mock data:", err);
+      }
+    }
+    loadSupabaseAnggaran();
+  }, [tertibType]);
+
+  // Filtered and Sorted Data (Default: Terkini DESC)
+  const filteredAndSortedData = useMemo(() => {
+    let result = data.filter((item) => {
+      const matchSumber = filterSumberDana === "Semua" || item.sumberDana === filterSumberDana;
+      const matchSearch = item.program.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          item.sumberDana.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (item.wilayah && item.wilayah.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchDoc = !filterDocPending || item._docStatus === "pending" || !(item.dokumenRka || item.dokumen);
+      return matchSumber && matchSearch && matchDoc;
+    });
+
+    result.sort((a, b) => {
+      if (sortBy === "terkini") {
+        const dateA = a.tanggalPenetapan || a.tahun || "";
+        const dateB = b.tanggalPenetapan || b.tahun || "";
+        if (dateB !== dateA) return dateB.localeCompare(dateA);
+        return b.id.localeCompare(a.id);
+      }
+      if (sortBy === "pagu-desc") {
+        return b.paguAnggaran - a.paguAnggaran;
+      }
+      if (sortBy === "pagu-asc") {
+        return a.paguAnggaran - b.paguAnggaran;
+      }
+      if (sortBy === "nama") {
+        return a.program.localeCompare(b.program);
+      }
+      return 0;
+    });
+
+    return result;
+  }, [data, filterSumberDana, searchQuery, filterDocPending, sortBy]);
+
+  // Planning Calculations (Murni Perencanaan tanpa realisasi dan serapan)
   const totalPagu = data.reduce((acc, curr) => acc + curr.paguAnggaran, 0);
-  const totalRealisasi = data.reduce((acc, curr) => acc + curr.realisasi, 0);
-  const percentSerapan = totalPagu > 0 ? Math.round((totalRealisasi / totalPagu) * 100) : 0;
-  const sisaAnggaran = totalPagu - totalRealisasi;
+  const uniqueSumberDana = Array.from(new Set(data.map((d) => d.sumberDana))).length;
 
   const handleBatchCommit = (parsedRows: any[]) => {
     const formatted: AnggaranRecord[] = parsedRows.map((row, idx) => ({
       id: `ANG-${Date.now().toString().slice(-4)}-${idx + 1}`,
       tertibType,
+      wilayah: row.wilayah || "Kabupaten Bogor (40 Kecamatan)",
       program: row.program || "Program Pengawasan Tertib Konstruksi",
       tahun: String(row.tahun || "2026"),
       paguAnggaran: Number(String(row.paguAnggaran || 0).replace(/\D/g, "")) || 100000000,
-      realisasi: Number(String(row.realisasi || 0).replace(/\D/g, "")) || 0,
       sumberDana: (row.sumberDana as any) || "APBD Kab. Bogor",
       dokumenRka: row.dokumenRka || "",
+      dokumen: row.dokumenRka || "",
       status: "Disetujui",
+      tanggalPenetapan: new Date().toISOString().split("T")[0],
       _docStatus: row._docStatus || "pending"
     }));
     setData([...formatted, ...data]);
-    logDataActivity({
-      action: "import",
-      module: `Perencanaan Anggaran (${config.shortTitle})`,
-      format: "xlsx",
-      recordCount: formatted.length,
-      user: "Admin Perencanaan Jakon",
-      status: "success",
-      fileName: `${TEMPLATE_PERENCANAAN_ANGGARAN.exportFileName}.xlsx`,
-      details: `Impor batch ${formatted.length} alokasi anggaran (${config.shortTitle}) - dokumen RKA dapat disusulkan`
-    });
-    alert(`Berhasil mengimpor ${formatted.length} data alokasi anggaran! Dokumen RKA dapat diunggah menyusul.`);
+    alert(`Berhasil mengimpor ${formatted.length} data alokasi anggaran! Berkas dokumen dapat diunggah menyusul.`);
   };
 
   const handleSaveUploadedDoc = (files: Record<string, File | null>, fileNames: Record<string, string>) => {
     if (!docUploadTarget) return;
-    const newDocName = fileNames["dokumenRka"] || docUploadTarget.dokumenRka || `RKA_${docUploadTarget.tahun}_${docUploadTarget.id}.pdf`;
+    const newDocName = fileNames["dokumenRka"] || docUploadTarget.dokumenRka || `Dokumen_Anggaran_${docUploadTarget.tahun}_${docUploadTarget.id}.pdf`;
     setData((prev) =>
       prev.map((item) => {
         if (item.id === docUploadTarget.id) {
           return {
             ...item,
             dokumenRka: newDocName,
+            dokumen: newDocName,
             _docStatus: "complete"
           };
         }
         return item;
       })
     );
-    logDataActivity({
-      action: "doc_upload",
-      module: `Perencanaan Anggaran (${config.shortTitle})`,
-      format: "pdf",
-      recordCount: 1,
-      user: "Admin Perencanaan Jakon",
-      status: "success",
-      fileName: newDocName,
-      details: `Unggah Dokumen RKA susulan untuk program: ${docUploadTarget.program}`
-    });
     setDocUploadTarget(null);
   };
 
+  // Handler Tambah Anggaran Baru (Tanpa input realisasi)
   const handleAddAnggaran = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formProgram || !formPagu) {
@@ -118,8 +198,6 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
     }
 
     const paguNum = parseInt(formPagu.replace(/\D/g, ""), 10);
-    const realisasiNum = parseInt(formRealisasi.replace(/\D/g, ""), 10) || 0;
-
     if (isNaN(paguNum) || paguNum <= 0) {
       alert("Nominal pagu anggaran harus berupa angka positif!");
       return;
@@ -127,16 +205,21 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
 
     setIsSubmitting(true);
     setTimeout(() => {
+      const docName = uploadedFile ? uploadedFile.name : `Dokumen_Anggaran_${config.shortTitle.replace(/\s+/g, "_")}_${formTahun}.pdf`;
       const newRecord: AnggaranRecord = {
         id: `ANG-${Date.now().toString().slice(-4)}`,
         tertibType,
+        wilayah: formWilayah || "Kabupaten Bogor (40 Kecamatan)",
         program: formProgram,
         tahun: formTahun,
         paguAnggaran: paguNum,
-        realisasi: realisasiNum,
         sumberDana: formSumberDana,
-        dokumenRka: uploadedFile ? uploadedFile.name : `RKA_${config.shortTitle.replace(/\s+/g, "_")}_${formTahun}.pdf`,
-        status: formStatus
+        dokumenRka: docName,
+        dokumen: docName,
+        status: formStatus,
+        tanggalPenetapan: formTanggalPenetapan,
+        keterangan: formKeterangan,
+        _docStatus: uploadedFile ? "complete" : "pending"
       };
 
       setData([newRecord, ...data]);
@@ -144,17 +227,89 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
       setShowModal(false);
       setFormProgram("");
       setFormPagu("");
-      setFormRealisasi("0");
+      setFormKeterangan("");
       setUploadedFile(null);
+
       alert(`Alokasi anggaran "${formProgram}" sebesar Rp ${paguNum.toLocaleString('id-ID')} berhasil disimpan!`);
-    }, 600);
+    }, 400);
   };
 
+  // Handler Buka Modal Edit
+  const handleOpenEdit = (row: AnggaranRecord) => {
+    setEditingRecord(row);
+    setEditProgram(row.program);
+    setEditWilayah(row.wilayah || "Kabupaten Bogor (40 Kecamatan)");
+    setEditTahun(row.tahun || "2026");
+    setEditPagu(String(row.paguAnggaran));
+    setEditSumberDana(row.sumberDana);
+    setEditStatus(row.status);
+    setEditTanggalPenetapan(row.tanggalPenetapan || new Date().toISOString().split("T")[0]);
+    setEditKeterangan(row.keterangan || "");
+    setShowEditModal(true);
+  };
+
+  // Handler Simpan Perubahan Edit (Tanpa input realisasi)
+  const handleSaveEditAnggaran = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRecord || !editProgram || !editPagu) {
+      alert("Mohon lengkapi Nama Program dan Pagu Anggaran!");
+      return;
+    }
+
+    const paguNum = parseInt(editPagu.replace(/\D/g, ""), 10);
+    if (isNaN(paguNum) || paguNum <= 0) {
+      alert("Nominal pagu anggaran harus berupa angka positif!");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setData((prev) =>
+        prev.map((item) => {
+          if (item.id === editingRecord.id) {
+            return {
+              ...item,
+              program: editProgram,
+              wilayah: editWilayah,
+              tahun: editTahun,
+              paguAnggaran: paguNum,
+              sumberDana: editSumberDana,
+              status: editStatus,
+              tanggalPenetapan: editTanggalPenetapan,
+              keterangan: editKeterangan
+            };
+          }
+          return item;
+        })
+      );
+
+      setIsSubmitting(false);
+      setShowEditModal(false);
+      setEditingRecord(null);
+      alert(`Alokasi anggaran "${editProgram}" berhasil diperbarui!`);
+    }, 400);
+  };
+
+  // Handler Buka Dialog Konfirmasi Hapus
+  const handleOpenDelete = (row: AnggaranRecord) => {
+    setDeletingRecord(row);
+    setShowDeleteConfirm(true);
+  };
+
+  // Handler Eksekusi Hapus Data
+  const handleConfirmDelete = () => {
+    if (!deletingRecord) return;
+    setData((prev) => prev.filter((item) => item.id !== deletingRecord.id));
+    setShowDeleteConfirm(false);
+    setDeletingRecord(null);
+  };
+
+  // Kolom Tabel Standar SIPJAKI (Tanpa kolom Realisasi dan % Serapan)
   const columns: ColumnDef<AnggaranRecord>[] = [
     {
       key: "no",
       label: "NO",
-      width: "50px",
+      width: "45px",
       sortable: false,
       render: (_, idx) => <span style={{ fontWeight: 700, color: "#64748B" }}>{idx + 1}</span>
     },
@@ -164,62 +319,46 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
       sortable: true,
       render: (row) => (
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <span style={{ fontSize: "13px", fontWeight: 800, color: "#0F2E5C" }}>
+          <span style={{ fontSize: "13px", fontWeight: 800, color: "#0F2E5C", lineHeight: 1.4 }}>
             {row.program}
           </span>
           <span style={{ fontSize: "11px", color: "#64748B", marginTop: "2px" }}>
-            Tahun Anggaran: <b>{row.tahun}</b> • RKA Dinas PUPR
+            Sub-Kegiatan Pengawasan Jasa Konstruksi
+          </span>
+        </div>
+      )
+    },
+    {
+      key: "wilayah",
+      label: "WILAYAH & TAHUN",
+      sortable: true,
+      render: (row) => (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontSize: "12px", fontWeight: 700, color: "#1E293B", display: "flex", alignItems: "center", gap: "4px" }}>
+            <MapPin style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
+            {row.wilayah || "Kabupaten Bogor"}
+          </span>
+          <span style={{ fontSize: "11px", color: "#64748B", marginTop: "2px" }}>
+            Tahun Anggaran {row.tahun}
           </span>
         </div>
       )
     },
     {
       key: "paguAnggaran",
-      label: "PAGU DPA",
+      label: "PAGU ANGGARAN",
       align: "right",
       sortable: true,
       render: (row) => (
-        <span style={{ fontSize: "13px", fontWeight: 800, color: "#0F2E5C" }}>
-          Rp {row.paguAnggaran.toLocaleString('id-ID')}
-        </span>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+          <span style={{ fontSize: "14px", fontWeight: 900, color: "#0F2E5C", whiteSpace: "nowrap" }}>
+            Rp {row.paguAnggaran.toLocaleString('id-ID')}
+          </span>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "#64748B" }}>
+            Plafon Alokasi DPA
+          </span>
+        </div>
       )
-    },
-    {
-      key: "realisasi",
-      label: "REALISASI",
-      align: "right",
-      sortable: true,
-      render: (row) => (
-        <span style={{ fontSize: "13px", fontWeight: 800, color: "#10B981" }}>
-          Rp {row.realisasi.toLocaleString('id-ID')}
-        </span>
-      )
-    },
-    {
-      key: "serapan",
-      label: "% SERAPAN",
-      align: "center",
-      sortable: false,
-      render: (row) => {
-        const pct = row.paguAnggaran > 0 ? Math.round((row.realisasi / row.paguAnggaran) * 100) : 0;
-        return (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "90px" }}>
-            <span style={{ fontSize: "11px", fontWeight: 800, color: pct >= 50 ? "#10B981" : "#F59E0B", marginBottom: "2px" }}>
-              {pct}%
-            </span>
-            <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
-              <div
-                style={{
-                  height: "100%",
-                  width: `${Math.min(pct, 100)}%`,
-                  backgroundColor: pct >= 75 ? "#10B981" : pct >= 50 ? "#3B82F6" : "#F59E0B",
-                  borderRadius: "9999px"
-                }}
-              />
-            </div>
-          </div>
-        );
-      }
     },
     {
       key: "sumberDana",
@@ -233,7 +372,8 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
             padding: "3px 8px",
             borderRadius: "6px",
             backgroundColor: "#EBF2FA",
-            color: "#0F2E5C"
+            color: "#0F2E5C",
+            whiteSpace: "nowrap"
           }}
         >
           {row.sumberDana}
@@ -241,14 +381,26 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
       )
     },
     {
+      key: "tanggalPenetapan",
+      label: "WAKTU PENETAPAN",
+      align: "center",
+      sortable: true,
+      render: (row) => (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", fontSize: "11px", fontWeight: 700, color: "#475569" }}>
+          <Calendar style={{ width: "12px", height: "12px", color: "#2563EB" }} />
+          <span>{row.tanggalPenetapan || "2026-01-15"}</span>
+        </div>
+      )
+    },
+    {
       key: "dokumenRka",
-      label: "DOKUMEN RKA",
+      label: "DOKUMEN",
       sortable: false,
       render: (row) => (
         <DocStatusBadge
-          status={row._docStatus || (row.dokumenRka ? "complete" : "pending")}
-          fileName={row.dokumenRka}
-          documentLabel="RKA Anggaran"
+          status={row._docStatus || (row.dokumenRka || row.dokumen ? "complete" : "pending")}
+          fileName={row.dokumenRka || row.dokumen}
+          documentLabel="Dokumen Penganggaran"
           onClick={() => setDocUploadTarget(row)}
         />
       )
@@ -264,7 +416,7 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      {/* Header */}
+      {/* Header (Tanpa tulisan RKA Dinas PUPR & tanpa kata realisasi) */}
       <ModuleHeader
         breadcrumbs={[
           { label: config.shortTitle, href: config.basePath },
@@ -274,26 +426,20 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
         badgeText={config.pilar}
         badgeBg={config.badgeBg}
         badgeColor={config.badgeColor}
-        title={`Anggaran Pengawasan — ${config.shortTitle}`}
-        description="Monitoring alokasi pagu DPA/RKA Dinas PUPR, serapan anggaran riil kegiatan audit, dan akuntabilitas keuangan pengawasan."
+        title={`Alokasi Anggaran Pengawasan — ${config.shortTitle}`}
+        description="Penetapan plafon dan pos alokasi pagu anggaran tahunan pengawasan tertib jasa konstruksi standar SIPJAKI Kementerian PUPR."
         legalBasis={config.legalBasis}
         actionButtons={[
           {
-            label: "Import Batch (Excel)",
-            icon: FileSpreadsheet,
-            variant: "outline",
-            onClick: () => setIsBatchImportOpen(true)
-          },
-          {
-            label: "Tambah Alokasi RKA",
+            label: "Tambah Pos Anggaran",
             icon: Plus,
             variant: "primary",
             onClick: () => setShowModal(true)
           },
           {
-            label: "Unduh RKA (PDF)",
+            label: "Unduh Anggaran (PDF)",
             icon: Download,
-            onClick: () => alert("Mengunduh Rencana Anggaran Pengawasan (PDF)...")
+            onClick: () => alert("Mengunduh Rekapitulasi Alokasi Anggaran Pengawasan Standar SIPJAKI TA 2026...")
           }
         ]}
       />
@@ -301,9 +447,56 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
       {/* Subtab Navigation */}
       <PerencanaanSubtabNav tertibType={tertibType} activeSubtab="anggaran" />
 
-      {/* 4 Financial Stat Cards (Modern UI/UX Revamped) */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "16px" }}>
-        {/* Card 1: Total Pagu DPA */}
+      {/* 4 Summary Stat Cards Murni Perencanaan (Tanpa Realisasi & Serapan Belanja) */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+        {/* Card 1: Total Pagu Anggaran */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "20px",
+            border: "1px solid #E2E8F0",
+            borderTop: "3px solid #0F2E5C",
+            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Total Pagu Anggaran
+            </span>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#EBF2FA",
+                color: "#0F2E5C",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <Wallet style={{ width: "20px", height: "20px" }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: "22px", fontWeight: 900, color: "#0F2E5C", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              Rp {totalPagu.toLocaleString('id-ID')}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#0F2E5C" }} />
+              <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 700 }}>
+                {data.length} Pos Anggaran Terdaftar
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 2: Total Pos Anggaran */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
@@ -314,25 +507,19 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
             boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
-            transition: "transform 0.15s ease, box-shadow 0.15s ease"
+            justifyContent: "space-between"
           }}
         >
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Total Pagu DPA
-              </span>
-              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
-                Alokasi Pengawasan
-              </span>
-            </div>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Total Pos Kegiatan
+            </span>
             <div
               style={{
                 width: "40px",
                 height: "40px",
                 borderRadius: "10px",
-                backgroundColor: "#EFF6FF",
+                backgroundColor: "#DBEAFE",
                 color: "#2563EB",
                 display: "flex",
                 alignItems: "center",
@@ -340,55 +527,46 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
                 flexShrink: 0
               }}
             >
-              <Wallet style={{ width: "20px", height: "20px" }} />
+              <FileText style={{ width: "20px", height: "20px" }} />
             </div>
           </div>
-
-          <div style={{ marginTop: "14px", display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "nowrap" }}>
-            <span style={{ fontSize: "13px", fontWeight: 800, color: "#64748B" }}>Rp</span>
-            <span style={{ fontSize: "22px", fontWeight: 900, color: "#0F2E5C", letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
-              {totalPagu.toLocaleString('id-ID')}
-            </span>
-          </div>
-
-          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
-            <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 600 }}>Tahun Anggaran 2026</span>
-            <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "9999px" }}>
-              DPA Terbit
-            </span>
+          <div>
+            <div style={{ fontSize: "22px", fontWeight: 900, color: "#2563EB", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {data.length} Program
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#2563EB" }} />
+              <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 700 }}>
+                Rencana Kerja Operasional Disahkan
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Card 2: Realisasi Berjalan */}
+        {/* Card 3: Sumber Pembiayaan */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
             padding: "20px",
             border: "1px solid #E2E8F0",
-            borderTop: "3px solid #10B981",
+            borderTop: "3px solid #059669",
             boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
-            transition: "transform 0.15s ease, box-shadow 0.15s ease"
+            justifyContent: "space-between"
           }}
         >
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Realisasi Berjalan
-              </span>
-              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
-                SP2D Terbit Riil
-              </span>
-            </div>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Sumber Pembiayaan
+            </span>
             <div
               style={{
                 width: "40px",
                 height: "40px",
                 borderRadius: "10px",
-                backgroundColor: "#ECFDF5",
+                backgroundColor: "#DCFCE7",
                 color: "#059669",
                 display: "flex",
                 alignItems: "center",
@@ -396,62 +574,40 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
                 flexShrink: 0
               }}
             >
-              <TrendingUp style={{ width: "20px", height: "20px" }} />
+              <Coins style={{ width: "20px", height: "20px" }} />
             </div>
           </div>
-
-          <div style={{ marginTop: "14px", display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "nowrap" }}>
-            <span style={{ fontSize: "13px", fontWeight: 800, color: "#059669" }}>Rp</span>
-            <span style={{ fontSize: "22px", fontWeight: 900, color: "#059669", letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
-              {totalRealisasi.toLocaleString('id-ID')}
-            </span>
-          </div>
-
-          <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B" }}>Tingkat Serapan</span>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: percentSerapan >= 60 ? "#059669" : "#D97706" }}>
-                {percentSerapan}%
+          <div>
+            <div style={{ fontSize: "22px", fontWeight: 900, color: "#059669", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              {uniqueSumberDana} Sumber Dana
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#059669" }} />
+              <span style={{ fontSize: "11px", color: "#059669", fontWeight: 700 }}>
+                APBD, DAK Fisik & Banprov
               </span>
-            </div>
-            <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
-              <div
-                style={{
-                  width: `${Math.min(percentSerapan, 100)}%`,
-                  height: "100%",
-                  backgroundColor: percentSerapan >= 60 ? "#10B981" : "#F59E0B",
-                  borderRadius: "9999px",
-                  transition: "width 0.4s ease"
-                }}
-              />
             </div>
           </div>
         </div>
 
-        {/* Card 3: Sisa Anggaran */}
+        {/* Card 4: Tahun Anggaran Perencanaan */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
             borderRadius: "16px",
             padding: "20px",
             border: "1px solid #E2E8F0",
-            borderTop: "3px solid #F59E0B",
+            borderTop: "3px solid #D97706",
             boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
-            transition: "transform 0.15s ease, box-shadow 0.15s ease"
+            justifyContent: "space-between"
           }}
         >
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Sisa Anggaran
-              </span>
-              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
-                Sisa Pagu Belum SP2D
-              </span>
-            </div>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Tahun Anggaran
+            </span>
             <div
               style={{
                 width: "40px",
@@ -465,100 +621,24 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
                 flexShrink: 0
               }}
             >
-              <Coins style={{ width: "20px", height: "20px" }} />
+              <Calendar style={{ width: "20px", height: "20px" }} />
             </div>
           </div>
-
-          <div style={{ marginTop: "14px", display: "flex", alignItems: "baseline", gap: "6px", flexWrap: "nowrap" }}>
-            <span style={{ fontSize: "13px", fontWeight: 800, color: "#D97706" }}>Rp</span>
-            <span style={{ fontSize: "22px", fontWeight: 900, color: "#92400E", letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
-              {sisaAnggaran.toLocaleString('id-ID')}
-            </span>
-          </div>
-
-          <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B" }}>Sisa Alokasi</span>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#92400E" }}>
-                {100 - percentSerapan}%
+          <div>
+            <div style={{ fontSize: "22px", fontWeight: 900, color: "#D97706", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+              TA 2026
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+              <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#D97706" }} />
+              <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>
+                Tahun Anggaran Berjalan Aktif
               </span>
             </div>
-            <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
-              <div
-                style={{
-                  width: `${Math.max(100 - percentSerapan, 0)}%`,
-                  height: "100%",
-                  backgroundColor: "#F59E0B",
-                  borderRadius: "9999px",
-                  transition: "width 0.4s ease"
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4: Sumber Pendanaan */}
-        <div
-          style={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: "16px",
-            padding: "20px",
-            border: "1px solid #E2E8F0",
-            borderTop: "3px solid #6366F1",
-            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            transition: "transform 0.15s ease, box-shadow 0.15s ease"
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Sumber Pendanaan
-              </span>
-              <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
-                Kanal Alokasi Fiskal
-              </span>
-            </div>
-            <div
-              style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                backgroundColor: "#EEF2FF",
-                color: "#4F46E5",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
-              }}
-            >
-              <PieChart style={{ width: "20px", height: "20px" }} />
-            </div>
-          </div>
-
-          <div style={{ marginTop: "14px" }}>
-            <h3 style={{ fontSize: "19px", fontWeight: 900, color: "#1E1B4B", margin: 0, whiteSpace: "nowrap", letterSpacing: "-0.4px" }}>
-              APBD & Bantuan
-            </h3>
-            <span style={{ fontSize: "11px", color: "#64748B", marginTop: "4px", display: "block" }}>
-              Bidang Jasa Konstruksi DPU
-            </span>
-          </div>
-
-          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
-            <span style={{ fontSize: "10px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "2px 8px", borderRadius: "6px" }}>
-              APBD Kab. Bogor
-            </span>
-            <span style={{ fontSize: "10px", fontWeight: 800, color: "#065F46", backgroundColor: "#ECFDF5", padding: "2px 8px", borderRadius: "6px" }}>
-              DAK Fisik
-            </span>
           </div>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Filter and Search Bar dengan Default Urutan Terkini (DESC) */}
       <div
         style={{
           backgroundColor: "#FFFFFF",
@@ -572,8 +652,29 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
           gap: "12px"
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: "1 1 320px" }}>
-          <span style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C" }}>Sumber Dana:</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: "1 1 340px", flexWrap: "wrap" }}>
+          {/* Search Box */}
+          <div style={{ position: "relative", minWidth: "220px", flex: "1 1 220px", maxWidth: "300px" }}>
+            <Search style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", width: "14px", height: "14px", color: "#94A3B8" }} />
+            <input
+              type="text"
+              placeholder="Cari program anggaran..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: "100%",
+                height: "36px",
+                paddingLeft: "32px",
+                paddingRight: "12px",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                fontSize: "12px",
+                outline: "none"
+              }}
+            />
+          </div>
+
+          {/* Filter Sumber Dana */}
           <div style={{ display: "inline-flex", gap: "6px", flexWrap: "wrap" }}>
             {["Semua", "APBD Kab. Bogor", "DAK Fisik", "Bantuan Keuangan Provinsi"].map((sd) => (
               <button
@@ -596,89 +697,195 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
               </button>
             ))}
           </div>
+
+          {/* Selector Urutan */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: "210px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase" }}>
+              Urutan:
+            </span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              style={{
+                height: "36px",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                padding: "0 10px",
+                fontSize: "12px",
+                fontWeight: 700,
+                color: "#0F2E5C",
+                backgroundColor: "#F8FAFC",
+                outline: "none"
+              }}
+            >
+              <option value="terkini">Pos Anggaran Terkini (Default - DESC)</option>
+              <option value="pagu-desc">Pagu Terbanyak</option>
+              <option value="pagu-asc">Pagu Terendah</option>
+              <option value="nama">Nama Program (A-Z)</option>
+            </select>
+          </div>
         </div>
 
-        <div style={{ width: "100%", maxWidth: "260px" }}>
-          <input
-            type="text"
-            placeholder="Cari program RKA..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: "100%",
-              height: "34px",
-              borderRadius: "8px",
-              border: "1px solid #CBD5E1",
-              padding: "0 12px",
-              fontSize: "12px",
-              outline: "none"
-            }}
-          />
+        {/* Badges & Reset Filter */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {sortBy === "terkini" && (
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: 800,
+                color: "#1E40AF",
+                backgroundColor: "#DBEAFE",
+                border: "1px solid #BFDBFE",
+                padding: "5px 10px",
+                borderRadius: "6px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              <ArrowUpDown style={{ width: "12px", height: "12px" }} />
+              <span>Pos Anggaran Terkini (DESC)</span>
+            </span>
+          )}
+
+          {(searchQuery || filterSumberDana !== "Semua" || sortBy !== "terkini") && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setFilterSumberDana("Semua");
+                setSortBy("terkini");
+              }}
+              style={{
+                height: "36px",
+                padding: "0 12px",
+                borderRadius: "8px",
+                border: "1px solid #E2E8F0",
+                backgroundColor: "#F1F5F9",
+                color: "#475569",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              <RotateCcw style={{ width: "12px", height: "12px" }} />
+              <span>Reset</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Doc Completion Progress Bar */}
+      {/* Doc Completion Progress Bar (Label: Dokumen Anggaran) */}
       <DocCompletionBar
-        total={data.length}
-        completed={data.filter((d) => d._docStatus === "complete" || Boolean(d.dokumenRka)).length}
-        label="Kelengkapan Dokumen RKA Anggaran"
-        isFilterActive={filterDocPending}
-        onFilterPending={() => setFilterDocPending((prev) => !prev)}
+        records={data}
+        label="Kelengkapan Dokumen Anggaran Pengawasan"
+        filterActive={filterDocPending}
+        onToggleFilter={() => setFilterDocPending((prev) => !prev)}
       />
 
-      {/* Reusable DataTableView */}
+      {/* Tabel DataTableView (Header EDIT, Tombol Aksi Baku, Tanpa Realisasi dan Serapan) */}
       <DataTableView<AnggaranRecord>
-        title={`Rencana Kerja & Anggaran (RKA) Pengawasan (${filteredData.length})`}
-        subtitle={
-          filterDocPending
-            ? "Menampilkan alokasi anggaran yang belum mengunggah berkas RKA/DPA (dapat disusulkan)"
-            : "Rincian pos alokasi dana operasional audit tertib konstruksi Kabupaten Bogor"
-        }
-        data={filteredData}
+        title={`Daftar Pos Anggaran Pengawasan (${filteredAndSortedData.length} Kegiatan Terjadwal)`}
+        subtitle="Rincian pos alokasi dana operasional pengawasan tertib jasa konstruksi standar SIPJAKI TA 2026"
+        data={filteredAndSortedData}
         columns={columns}
-        defaultPageSize={5}
+        defaultPageSize={10}
         exportFileName={`Anggaran_Pengawasan_${tertibType}`}
         sipjakiTemplate={TEMPLATE_PERENCANAAN_ANGGARAN}
         exportColumns={[
+          { key: "wilayah", label: "Wilayah Penugasan" },
+          { key: "tahun", label: "Tahun Anggaran" },
           { key: "program", label: "Nama Program / Kegiatan" },
           { key: "paguAnggaran", label: "Pagu Anggaran (Rp)" },
-          { key: "realisasi", label: "Realisasi (Rp)" },
           { key: "sumberDana", label: "Sumber Dana" },
-          { key: "tahun", label: "Tahun Anggaran" },
-          { key: "dokumenRka", label: "Dokumen RKA" },
+          { key: "tanggalPenetapan", label: "Waktu Penetapan" },
+          { key: "dokumenRka", label: "Dokumen" },
           { key: "status", label: "Status Usulan" }
         ]}
-        actionsHeader="AKSI"
+        actionsHeader="EDIT"
         actionsRender={(row) => (
-          <button
-            type="button"
-            onClick={() => alert(`Rincian Alokasi: "${row.program}"\nPagu: Rp ${row.paguAnggaran.toLocaleString('id-ID')}\nRealisasi: Rp ${row.realisasi.toLocaleString('id-ID')}\nSumber: ${row.sumberDana}`)}
-            style={{
-              backgroundColor: "#EBF2FA",
-              color: "#0F2E5C",
-              border: "none",
-              borderRadius: "6px",
-              padding: "5px 12px",
-              fontSize: "11px",
-              fontWeight: 800,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "4px"
-            }}
-          >
-            <Eye style={{ width: "12px", height: "12px" }} />
-            <span>Detail</span>
-          </button>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+            {/* 1. Tombol Detail (Abu-abu Netral) */}
+            <button
+              type="button"
+              title="Lihat Detail Alokasi"
+              onClick={() => setDetailRecord(row)}
+              style={{
+                backgroundColor: "#F8FAFC",
+                color: "#334155",
+                border: "1px solid #CBD5E1",
+                borderRadius: "6px",
+                padding: "5px 8px",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              <Eye style={{ width: "13px", height: "13px" }} />
+              <span className="hidden sm:inline">Detail</span>
+            </button>
+
+            {/* 2. Tombol Edit (Kuning Amber) */}
+            <button
+              type="button"
+              title="Ubah Alokasi Anggaran"
+              onClick={() => handleOpenEdit(row)}
+              style={{
+                backgroundColor: "#FEF3C7",
+                color: "#B45309",
+                border: "1px solid #FCD34D",
+                borderRadius: "6px",
+                padding: "5px 8px",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              <Edit style={{ width: "13px", height: "13px" }} />
+              <span className="hidden sm:inline">Edit</span>
+            </button>
+
+            {/* 3. Tombol Hapus (Merah Soft) */}
+            <button
+              type="button"
+              title="Hapus Pos Anggaran"
+              onClick={() => handleOpenDelete(row)}
+              style={{
+                backgroundColor: "#FEE2E2",
+                color: "#991B1B",
+                border: "1px solid #FCA5A5",
+                borderRadius: "6px",
+                padding: "5px 8px",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
+              <Trash2 style={{ width: "13px", height: "13px" }} />
+              <span className="hidden sm:inline">Hapus</span>
+            </button>
+          </div>
         )}
       />
 
-      {/* Modal Form Tambah Anggaran */}
+      {/* Modal Form Tambah Anggaran (Murni Perencanaan tanpa input realisasi) */}
       <ModalForm
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="Tambah Alokasi Anggaran Pengawasan (RKA)"
-        subtitle={`Input alokasi pagu DPA untuk ${config.shortTitle}`}
+        title="Tambah Pos Anggaran Pengawasan Baru"
+        subtitle={`Input penetapan pos alokasi pagu anggaran untuk ${config.shortTitle}`}
         onSubmit={handleAddAnggaran}
         submitLabel="Simpan Pos Anggaran"
         isLoading={isSubmitting}
@@ -688,12 +895,12 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
           {/* Nama Program */}
           <div>
             <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
-              Program / Sub-Kegiatan <span style={{ color: "#EF4444" }}>*</span>
+              Program / Sub-Kegiatan Pengawasan <span style={{ color: "#EF4444" }}>*</span>
             </label>
             <input
               type="text"
               required
-              placeholder="Contoh: Operasional Audit Lapangan & Uji Petik Kepatuhan Standar Jakon"
+              placeholder="Contoh: Operasional Tim Lapangan & Uji Petik Kepatuhan Standar Jakon"
               value={formProgram}
               onChange={(e) => setFormProgram(e.target.value)}
               style={{
@@ -708,7 +915,54 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
             />
           </div>
 
-          {/* Grid Pagu & Realisasi */}
+          {/* Grid Wilayah & Tahun */}
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Wilayah Penugasan <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Contoh: Seluruh Wilayah (40 Kecamatan)"
+                value={formWilayah}
+                onChange={(e) => setFormWilayah(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Tahun Anggaran <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="2026"
+                value={formTahun}
+                onChange={(e) => setFormTahun(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Grid Pagu Anggaran & Sumber Dana */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
             <div>
               <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
@@ -736,31 +990,6 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
 
             <div>
               <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
-                Realisasi Berjalan (Rp)
-              </label>
-              <input
-                type="number"
-                min="0"
-                placeholder="Contoh: 45000000"
-                value={formRealisasi}
-                onChange={(e) => setFormRealisasi(e.target.value)}
-                style={{
-                  width: "100%",
-                  height: "38px",
-                  borderRadius: "8px",
-                  border: "1px solid #CBD5E1",
-                  padding: "0 12px",
-                  fontSize: "12px",
-                  outline: "none"
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Grid Sumber Dana & Status */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
                 Sumber Pendanaan
               </label>
               <select
@@ -782,10 +1011,33 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
                 <option value="Bantuan Keuangan Provinsi">Bantuan Keuangan Provinsi</option>
               </select>
             </div>
+          </div>
+
+          {/* Grid Waktu Penetapan & Status Usulan */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Tanggal Penetapan Alokasi
+              </label>
+              <input
+                type="date"
+                value={formTanggalPenetapan}
+                onChange={(e) => setFormTanggalPenetapan(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
 
             <div>
               <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
-                Status Usulan RKA
+                Status Usulan Anggaran
               </label>
               <select
                 value={formStatus}
@@ -808,28 +1060,474 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
             </div>
           </div>
 
-          {/* File Uploader */}
+          {/* Keterangan */}
+          <div>
+            <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+              Keterangan Lingkup Alokasi
+            </label>
+            <textarea
+              rows={2}
+              placeholder="Catatan peruntukan pos anggaran pengawasan..."
+              value={formKeterangan}
+              onChange={(e) => setFormKeterangan(e.target.value)}
+              style={{
+                width: "100%",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                padding: "8px 12px",
+                fontSize: "12px",
+                outline: "none",
+                resize: "vertical"
+              }}
+            />
+          </div>
+
+          {/* File Uploader (Label: Dokumen) */}
           <FileUploader
-            label="Unggah Dokumen RKA / DPA (PDF)"
+            label="Unggah Dokumen Penganggaran (PDF)"
             accept=".pdf"
-            maxSizeMb={2}
+            maxSizeMb={5}
             onFileSelect={(file) => setUploadedFile(file)}
-            hint="Lampirkan berkas DPA-SKPD atau RKA resmi Dinas PUPR (Maksimal 2 MB)"
+            hint="Lampirkan berkas dokumen penganggaran resmi (Maksimal 5 MB)"
           />
         </div>
       </ModalForm>
 
-      {/* Mini Modal Upload Dokumen RKA Susulan */}
+      {/* Modal Form Edit Anggaran (Standar SIPJAKI: Fitur Edit tanpa realisasi) */}
+      <ModalForm
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingRecord(null);
+        }}
+        title="Ubah Pos Alokasi Anggaran Pengawasan"
+        subtitle={`Perbarui data pos alokasi untuk ${editingRecord?.program || ""}`}
+        onSubmit={handleSaveEditAnggaran}
+        submitLabel="Simpan Perubahan Anggaran"
+        isLoading={isSubmitting}
+        size="lg"
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {/* Nama Program */}
+          <div>
+            <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+              Program / Sub-Kegiatan Pengawasan <span style={{ color: "#EF4444" }}>*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={editProgram}
+              onChange={(e) => setEditProgram(e.target.value)}
+              style={{
+                width: "100%",
+                height: "38px",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                padding: "0 12px",
+                fontSize: "12px",
+                outline: "none"
+              }}
+            />
+          </div>
+
+          {/* Grid Wilayah & Tahun */}
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Wilayah Penugasan <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={editWilayah}
+                onChange={(e) => setEditWilayah(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Tahun Anggaran <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={editTahun}
+                onChange={(e) => setEditTahun(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Grid Pagu & Sumber Dana */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Pagu Anggaran (Rp) <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="number"
+                required
+                min="1000000"
+                step="500000"
+                value={editPagu}
+                onChange={(e) => setEditPagu(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Sumber Pendanaan
+              </label>
+              <select
+                value={editSumberDana}
+                onChange={(e) => setEditSumberDana(e.target.value as "APBD Kab. Bogor" | "DAK Fisik" | "Bantuan Keuangan Provinsi")}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 10px",
+                  fontSize: "12px",
+                  outline: "none",
+                  backgroundColor: "#FFFFFF"
+                }}
+              >
+                <option value="APBD Kab. Bogor">APBD Kab. Bogor</option>
+                <option value="DAK Fisik">DAK Fisik</option>
+                <option value="Bantuan Keuangan Provinsi">Bantuan Keuangan Provinsi</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Grid Tanggal Penetapan & Status */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Tanggal Penetapan Alokasi
+              </label>
+              <input
+                type="date"
+                value={editTanggalPenetapan}
+                onChange={(e) => setEditTanggalPenetapan(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 12px",
+                  fontSize: "12px",
+                  outline: "none"
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+                Status Usulan Anggaran
+              </label>
+              <select
+                value={editStatus}
+                onChange={(e) => setEditStatus(e.target.value as "Disetujui" | "Revisi" | "Usulan")}
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  borderRadius: "8px",
+                  border: "1px solid #CBD5E1",
+                  padding: "0 10px",
+                  fontSize: "12px",
+                  outline: "none",
+                  backgroundColor: "#FFFFFF"
+                }}
+              >
+                <option value="Disetujui">Disetujui</option>
+                <option value="Usulan">Usulan</option>
+                <option value="Revisi">Revisi</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Keterangan */}
+          <div>
+            <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}>
+              Keterangan Lingkup Alokasi
+            </label>
+            <textarea
+              rows={2}
+              value={editKeterangan}
+              onChange={(e) => setEditKeterangan(e.target.value)}
+              style={{
+                width: "100%",
+                borderRadius: "8px",
+                border: "1px solid #CBD5E1",
+                padding: "8px 12px",
+                fontSize: "12px",
+                outline: "none",
+                resize: "vertical"
+              }}
+            />
+          </div>
+        </div>
+      </ModalForm>
+
+      {/* Modal Dialog Detail Pos Anggaran (Tanpa realisasi/serapan) */}
+      {detailRecord && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: "rgba(15, 23, 42, 0.6)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px"
+          }}
+          onClick={() => setDetailRecord(null)}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: "16px",
+              maxWidth: "540px",
+              width: "100%",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)",
+              overflow: "hidden"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ backgroundColor: "#0F2E5C", padding: "18px 20px", color: "#FFFFFF", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#93C5FD", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  Rincian Pos Anggaran Pengawasan
+                </span>
+                <h3 style={{ fontSize: "16px", fontWeight: 800, margin: 0, color: "#FFFFFF" }}>
+                  {detailRecord.program}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDetailRecord(null)}
+                style={{ background: "none", border: "none", color: "#FFFFFF", cursor: "pointer", padding: "4px" }}
+              >
+                <X style={{ width: "20px", height: "20px" }} />
+              </button>
+            </div>
+
+            <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px", border: "1px solid #E2E8F0" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Wilayah Penugasan</span>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#1E293B" }}>{detailRecord.wilayah || "Seluruh Wilayah"}</span>
+                </div>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px", border: "1px solid #E2E8F0" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Tahun Anggaran</span>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#1E293B" }}>TA {detailRecord.tahun}</span>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px", border: "1px solid #E2E8F0" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Pagu Anggaran (DPA)</span>
+                  <span style={{ fontSize: "15px", fontWeight: 900, color: "#0F2E5C" }}>Rp {detailRecord.paguAnggaran.toLocaleString('id-ID')}</span>
+                </div>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px", border: "1px solid #E2E8F0" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Sumber Pembiayaan</span>
+                  <span style={{ fontSize: "13px", fontWeight: 800, color: "#2563EB" }}>{detailRecord.sumberDana}</span>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px", border: "1px solid #E2E8F0" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Waktu Penetapan</span>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#1E293B" }}>{detailRecord.tanggalPenetapan || "2026-01-15"}</span>
+                </div>
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px", border: "1px solid #E2E8F0" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Status Usulan</span>
+                  <StatusBadge status={detailRecord.status} size="sm" showDot />
+                </div>
+              </div>
+
+              <div>
+                <span style={{ fontSize: "11px", color: "#64748B", display: "block", marginBottom: "4px" }}>Dokumen Penganggaran</span>
+                <DocStatusBadge
+                  status={detailRecord._docStatus || (detailRecord.dokumenRka || detailRecord.dokumen ? "complete" : "pending")}
+                  fileName={detailRecord.dokumenRka || detailRecord.dokumen}
+                  documentLabel="Dokumen Penganggaran"
+                  onClick={() => {
+                    const tgt = detailRecord;
+                    setDetailRecord(null);
+                    setDocUploadTarget(tgt);
+                  }}
+                />
+              </div>
+
+              {detailRecord.keterangan && (
+                <div style={{ backgroundColor: "#F8FAFC", padding: "10px 14px", borderRadius: "8px", border: "1px solid #E2E8F0" }}>
+                  <span style={{ fontSize: "11px", color: "#64748B", display: "block" }}>Keterangan Lingkup</span>
+                  <p style={{ margin: "2px 0 0 0", fontSize: "12px", color: "#475569" }}>{detailRecord.keterangan}</p>
+                </div>
+              )}
+            </div>
+
+            <div style={{ padding: "12px 20px", backgroundColor: "#F1F5F9", display: "flex", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                onClick={() => setDetailRecord(null)}
+                style={{
+                  backgroundColor: "#0F2E5C",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "8px 16px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  cursor: "pointer"
+                }}
+              >
+                Tutup Jendela
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Dialog Konfirmasi Hapus Pos Anggaran */}
+      {showDeleteConfirm && deletingRecord && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: "rgba(15, 23, 42, 0.6)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px"
+          }}
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: "16px",
+              maxWidth: "460px",
+              width: "100%",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)",
+              overflow: "hidden"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ padding: "24px 20px", display: "flex", gap: "16px" }}>
+              <div
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "12px",
+                  backgroundColor: "#FEE2E2",
+                  color: "#DC2626",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}
+              >
+                <AlertTriangle style={{ width: "24px", height: "24px" }} />
+              </div>
+              <div>
+                <h4 style={{ fontSize: "16px", fontWeight: 800, color: "#1E293B", margin: "0 0 6px 0" }}>
+                  Konfirmasi Hapus Pos Anggaran
+                </h4>
+                <p style={{ fontSize: "13px", color: "#64748B", margin: 0, lineHeight: 1.5 }}>
+                  Apakah Anda yakin ingin menghapus pos alokasi anggaran:  
+                  <strong style={{ color: "#0F2E5C", display: "block", marginTop: "4px" }}>
+                    &ldquo;{deletingRecord.program}&rdquo; (Rp {deletingRecord.paguAnggaran.toLocaleString('id-ID')})
+                  </strong>
+                  Tindakan ini akan menghapus pos alokasi anggaran dari dokumen perencanaan kerja pengawasan.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ padding: "12px 20px", backgroundColor: "#F8FAFC", display: "flex", justifyContent: "flex-end", gap: "10px", borderTop: "1px solid #E2E8F0" }}>
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  color: "#64748B",
+                  border: "1px solid #CBD5E1",
+                  borderRadius: "8px",
+                  padding: "8px 14px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  cursor: "pointer"
+                }}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                style={{
+                  backgroundColor: "#DC2626",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "8px 16px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+              >
+                <Trash2 style={{ width: "14px", height: "14px" }} />
+                <span>Ya, Hapus Anggaran</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mini Modal Upload Dokumen Susulan */}
       {docUploadTarget && (
         <DocumentUploadMiniModal
           isOpen={Boolean(docUploadTarget)}
           onClose={() => setDocUploadTarget(null)}
-          title={`Unggah Dokumen RKA — ${docUploadTarget.program}`}
+          title={`Unggah Dokumen Penganggaran — ${docUploadTarget.program}`}
           subtitle={`${docUploadTarget.sumberDana} • Tahun ${docUploadTarget.tahun} • Rp ${docUploadTarget.paguAnggaran.toLocaleString('id-ID')}`}
-          documentFields={TEMPLATE_PERENCANAAN_ANGGARAN.documentFields || [
-            { key: "dokumenRka", label: "Dokumen RKA Anggaran (PDF)", accept: ".pdf", maxSizeMb: 5, required: true }
+          documentFields={[
+            { key: "dokumenRka", label: "Dokumen Anggaran (PDF)", accept: ".pdf", maxSizeMb: 5, required: true }
           ]}
-          currentValues={{ dokumenRka: docUploadTarget.dokumenRka }}
+          existingDocuments={{ dokumenRka: docUploadTarget.dokumenRka || docUploadTarget.dokumen }}
           onSave={handleSaveUploadedDoc}
         />
       )}
@@ -838,11 +1536,6 @@ export default function PerencanaanAnggaranView({ tertibType }: PerencanaanAngga
       <BatchImportModal<AnggaranRecord>
         isOpen={isBatchImportOpen}
         onClose={() => setIsBatchImportOpen(false)}
-        title={`Import Batch Anggaran Pengawasan (${config.shortTitle})`}
-        subtitle="Unggah spreadsheet rencana alokasi anggaran RKA sekaligus (Dokumen RKA dapat disusulkan)"
-        templateFileName={`${TEMPLATE_PERENCANAAN_ANGGARAN.exportFileName}_template.xlsx`}
-        expectedColumns={TEMPLATE_PERENCANAAN_ANGGARAN.importColumns}
-        sampleRows={TEMPLATE_PERENCANAAN_ANGGARAN.sampleRows}
         template={TEMPLATE_PERENCANAAN_ANGGARAN}
         onCommit={handleBatchCommit}
       />

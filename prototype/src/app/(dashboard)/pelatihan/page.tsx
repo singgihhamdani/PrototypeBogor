@@ -1,9 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { 
   GraduationCap, Search, Calendar, Users, Award, Download, 
   CheckCircle2, Clock, Plus, QrCode, FileCheck, Eye, X, FileSpreadsheet,
-  Database as DbIcon, RefreshCw, AlertCircle, UserPlus
+  Database as DbIcon, RefreshCw, AlertCircle, UserPlus, Edit3, Trash2,
+  Filter, ArrowUpDown, ShieldCheck, Check, Sparkles
 } from "lucide-react";
 import BatchImportModal from "@/components/common/batch-import-modal";
 import { TEMPLATE_PELATIHAN } from "@/lib/sipjaki-templates";
@@ -13,9 +14,33 @@ import {
   createPelatihanAgenda, 
   registerPesertaPelatihan, 
   batchImportPelatihan, 
+  updateParticipant,
+  deleteParticipant,
+  validateParticipantDpu,
+  deletePelatihanAgenda,
   TrainingItem, 
-  DataSourceStatus 
+  TrainingParticipant,
+  DataSourceStatus,
+  JenjangPP14
 } from "@/lib/services/pelatihan-service";
+
+const JENJANG_PP14_OPTIONS: JenjangPP14[] = [
+  "Jenjang 1",
+  "Jenjang 2",
+  "Jenjang 3",
+  "Jenjang 4",
+  "Jenjang 5",
+  "Jenjang 6"
+];
+
+const JENJANG_PP14_LABELS: Record<JenjangPP14, string> = {
+  "Jenjang 1": "Jenjang 1 (Operator Pemula)",
+  "Jenjang 2": "Jenjang 2 (Operator / Tukang)",
+  "Jenjang 3": "Jenjang 3 (Teknisi Pemula / Mandor)",
+  "Jenjang 4": "Jenjang 4 (Teknisi / Analis)",
+  "Jenjang 5": "Jenjang 5 (Teknisi / Analis Madya)",
+  "Jenjang 6": "Jenjang 6 (Teknisi / Analis Utama)"
+};
 
 export default function PelatihanPage() {
   const [trainings, setTrainings] = useState<TrainingItem[]>([]);
@@ -26,10 +51,45 @@ export default function PelatihanPage() {
   });
 
   const [activeTab, setActiveTab] = useState<"programs" | "tkk" | "cert">("programs");
+  
+  // Multi-Filter State (Setting Default: Riwayat Terkini DESC)
   const [search, setSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState("Semua");
+  const [filterJenjang, setFilterJenjang] = useState("Semua");
+  const [filterStatus, setFilterStatus] = useState("Semua");
+  const [filterCert, setFilterCert] = useState("Semua");
+  const [sortBy, setSortBy] = useState<"terkini" | "terlama" | "nilai">("terkini");
+
+  // Modal States
   const [showImportModal, setShowImportModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRegisterParticipantModal, setShowRegisterParticipantModal] = useState<string | null>(null);
+
+  // Edit Participant Modal State
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingParticipant, setEditingParticipant] = useState<{
+    agendaId: string;
+    nik: string;
+    name: string;
+    bujk: string;
+    skkLevel: string;
+    score: number;
+    certNoDpu: string;
+    certNoLpjk: string;
+    isValidated: boolean;
+    status: string;
+  } | null>(null);
+
+  // Delete Confirm Dialog State
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deletingParticipant, setDeletingParticipant] = useState<{
+    agendaId: string;
+    nik: string;
+    name: string;
+  } | null>(null);
+
+  // Action status feedback
+  const [actionNotice, setActionNotice] = useState<string | null>(null);
 
   // New Training Form State
   const [newTraining, setNewTraining] = useState({
@@ -40,7 +100,7 @@ export default function PelatihanPage() {
     endDate: new Date(Date.now() + 5 * 86400000).toISOString().split("T")[0],
     location: "Auditorium DPU Kab. Bogor",
     quota: 40,
-    skkLevel: "Jenjang 5 (Teknisi/Analis)",
+    skkLevel: "Jenjang 5",
     organizer: "Bidang Jasa Konstruksi DPU Kab. Bogor",
     instructor: ""
   });
@@ -49,7 +109,8 @@ export default function PelatihanPage() {
   const [participantForm, setParticipantForm] = useState({
     nik: "",
     name: "",
-    bujk: ""
+    bujk: "",
+    skkLevel: "Jenjang 3"
   });
 
   const [selectedCert, setSelectedCert] = useState<{
@@ -57,7 +118,9 @@ export default function PelatihanPage() {
     nik: string;
     bujk: string;
     certNo: string;
+    certType: "DPU" | "LPJK";
     trainingTitle: string;
+    skkLevel?: string;
   } | null>(null);
 
   const loadData = async () => {
@@ -77,15 +140,66 @@ export default function PelatihanPage() {
     loadData();
   }, []);
 
-  // Extract all participants across training
-  const allTkk = trainings.flatMap(t => 
-    (t.participants || []).map(p => ({
-      ...p,
-      trainingTitle: t.title,
-      skkLevel: t.skkLevel,
-      date: t.endDate
-    }))
-  );
+  const triggerNotice = (msg: string) => {
+    setActionNotice(msg);
+    setTimeout(() => setActionNotice(null), 3500);
+  };
+
+  // Extract all participants across training with sorting and filtering
+  const allTkk = useMemo(() => {
+    const list: Array<TrainingParticipant & {
+      agendaId: string;
+      trainingTitle: string;
+      trainingCategory: string;
+      date: string;
+      updatedAt: string;
+    }> = [];
+
+    trainings.forEach(t => {
+      (t.participants || []).forEach(p => {
+        list.push({
+          ...p,
+          agendaId: t.id,
+          trainingTitle: t.title,
+          trainingCategory: t.category,
+          skkLevel: p.skkLevel || t.skkLevel || "Jenjang 3",
+          date: t.endDate,
+          updatedAt: p.updatedAt || t.endDate || t.startDate
+        });
+      });
+    });
+
+    return list
+      .filter(t => {
+        const matchSearch = 
+          (t.name || "").toLowerCase().includes(search.toLowerCase()) ||
+          (t.nik || "").includes(search) ||
+          (t.bujk || "").toLowerCase().includes(search.toLowerCase()) ||
+          (t.certNoDpu || "").toLowerCase().includes(search.toLowerCase()) ||
+          (t.certNoLpjk || "").toLowerCase().includes(search.toLowerCase());
+        
+        const matchCat = filterCategory === "Semua" || t.trainingCategory === filterCategory;
+        const matchJenjang = filterJenjang === "Semua" || t.skkLevel === filterJenjang;
+        const matchStatus = filterStatus === "Semua" || t.status === filterStatus;
+        const matchCert = filterCert === "Semua" || 
+          (filterCert === "Sertifikat DPU Terbit" && !!t.certNoDpu) ||
+          (filterCert === "SKK LPJK Terbit" && !!t.certNoLpjk) ||
+          (filterCert === "Belum Terbit" && !t.certNoDpu && !t.certNoLpjk);
+
+        return matchSearch && matchCat && matchJenjang && matchStatus && matchCert;
+      })
+      .sort((a, b) => {
+        if (sortBy === "terkini") {
+          // Setting Default: Riwayat Terkini di Atas (DESC)
+          return new Date(b.updatedAt || b.date).getTime() - new Date(a.updatedAt || a.date).getTime();
+        } else if (sortBy === "terlama") {
+          return new Date(a.updatedAt || a.date).getTime() - new Date(b.updatedAt || b.date).getTime();
+        } else if (sortBy === "nilai") {
+          return (Number(b.score) || 0) - (Number(a.score) || 0);
+        }
+        return 0;
+      });
+  }, [trainings, search, filterCategory, filterJenjang, filterStatus, filterCert, sortBy]);
 
   const handleCreateTraining = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +210,7 @@ export default function PelatihanPage() {
 
     const res = await createPelatihanAgenda(newTraining);
     if (res.success) {
-      alert("Agenda pelatihan baru berhasil dibuat!");
+      triggerNotice("Agenda pelatihan baru berhasil dibuka dan tersimpan di database!");
       setShowAddModal(false);
       setNewTraining({
         title: "",
@@ -106,7 +220,7 @@ export default function PelatihanPage() {
         endDate: new Date(Date.now() + 5 * 86400000).toISOString().split("T")[0],
         location: "Auditorium DPU Kab. Bogor",
         quota: 40,
-        skkLevel: "Jenjang 5 (Teknisi/Analis)",
+        skkLevel: "Jenjang 5",
         organizer: "Bidang Jasa Konstruksi DPU Kab. Bogor",
         instructor: ""
       });
@@ -126,42 +240,137 @@ export default function PelatihanPage() {
 
     const res = await registerPesertaPelatihan(showRegisterParticipantModal, participantForm);
     if (res.success) {
-      alert("Peserta berhasil didaftarkan ke kegiatan pelatihan!");
+      triggerNotice("Peserta berhasil didaftarkan ke kegiatan pelatihan!");
       setShowRegisterParticipantModal(null);
-      setParticipantForm({ nik: "", name: "", bujk: "" });
+      setParticipantForm({ nik: "", name: "", bujk: "", skkLevel: "Jenjang 3" });
       loadData();
     } else {
       alert(`Gagal mendaftarkan peserta: ${res.error}`);
     }
   };
 
+  // Validasi Registrasi & Auto-generate Sertifikat DPU
+  const handleValidateDpu = async (agendaId: string, nik: string, name: string) => {
+    const res = await validateParticipantDpu(agendaId, nik);
+    if (res.success) {
+      triggerNotice(`Registrasi tervalidasi! Sertifikat Partisipasi DPU berhasil diterbitkan otomatis: ${res.certNoDpu}`);
+      loadData();
+    } else {
+      alert(`Gagal validasi sertifikat: ${res.error}`);
+    }
+  };
+
+  // Open Edit Modal
+  const handleOpenEdit = (tkk: any) => {
+    setEditingParticipant({
+      agendaId: tkk.agendaId,
+      nik: tkk.nik,
+      name: tkk.name,
+      bujk: tkk.bujk || "",
+      skkLevel: tkk.skkLevel || "Jenjang 3",
+      score: tkk.score || 0,
+      certNoDpu: tkk.certNoDpu || "",
+      certNoLpjk: tkk.certNoLpjk || "",
+      isValidated: !!tkk.isValidated || !!tkk.certNoDpu,
+      status: tkk.status || "Terdaftar"
+    });
+    setEditModalOpen(true);
+  };
+
+  // Save Edit Participant
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingParticipant) return;
+
+    const res = await updateParticipant(editingParticipant.agendaId, editingParticipant.nik, {
+      name: editingParticipant.name,
+      bujk: editingParticipant.bujk,
+      skkLevel: editingParticipant.skkLevel,
+      score: Number(editingParticipant.score),
+      certNoDpu: editingParticipant.certNoDpu,
+      certNoLpjk: editingParticipant.certNoLpjk,
+      isValidated: editingParticipant.isValidated,
+      status: editingParticipant.status
+    });
+
+    if (res.success) {
+      triggerNotice(`Data peserta ${editingParticipant.name} (NIK: ${editingParticipant.nik}) berhasil diperbarui!`);
+      setEditModalOpen(false);
+      setEditingParticipant(null);
+      loadData();
+    } else {
+      alert(`Gagal memperbarui data: ${res.error}`);
+    }
+  };
+
+  // Open Delete Confirm Dialog
+  const handleOpenDelete = (agendaId: string, nik: string, name: string) => {
+    setDeletingParticipant({ agendaId, nik, name });
+    setDeleteConfirmOpen(true);
+  };
+
+  // Execute Delete
+  const handleConfirmDelete = async () => {
+    if (!deletingParticipant) return;
+    const res = await deleteParticipant(deletingParticipant.agendaId, deletingParticipant.nik);
+    if (res.success) {
+      triggerNotice(`Data peserta ${deletingParticipant.name} berhasil dihapus dari database.`);
+      setDeleteConfirmOpen(false);
+      setDeletingParticipant(null);
+      loadData();
+    } else {
+      alert(`Gagal menghapus data: ${res.error}`);
+    }
+  };
+
   const handleBatchCommit = async (parsedData: Record<string, any>[]) => {
     const res = await batchImportPelatihan(parsedData);
     if (res.success) {
-      alert(`Berhasil mengimpor ${res.insertedCount} kegiatan pelatihan ke dalam database!`);
+      triggerNotice(`Berhasil mengimpor ${res.insertedCount} kegiatan pelatihan ke dalam database!`);
       loadData();
     } else {
       alert(`Gagal impor batch: ${res.error}`);
     }
   };
 
-  const filteredTkk = allTkk.filter(t => 
-    (t.name || "").toLowerCase().includes(search.toLowerCase()) ||
-    (t.nik || "").includes(search) ||
-    (t.bujk || "").toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+      
+      {/* Toast Notification */}
+      {actionNotice && (
+        <div 
+          style={{
+            position: "fixed",
+            top: "24px",
+            right: "24px",
+            backgroundColor: "#0F2E5C",
+            color: "#FFFFFF",
+            padding: "14px 20px",
+            borderRadius: "14px",
+            boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            zIndex: 99999,
+            fontSize: "13px",
+            fontWeight: 700,
+            border: "1px solid #FFC000"
+          }}
+        >
+          <Sparkles style={{ width: "18px", height: "18px", color: "#FFC000" }} />
+          <span>{actionNotice}</span>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 10px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-              <GraduationCap style={{ width: "12px", height: "12px" }} /> Pilar 5: Pengembangan SDM & TKK
+              <GraduationCap style={{ width: "12px", height: "12px" }} /> Pilar 5: Penyelenggaraan Pelatihan & Fasilitasi Sertifikasi TKK
             </span>
             <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", backgroundColor: "#F1F5F9", padding: "3px 10px", borderRadius: "9999px" }}>
-              Integrasi: BNSP & SIPJAKI
+              Standar PP No. 14 Tahun 2021 & Permen PUPR 1/2023
             </span>
             {/* Live Database Badge */}
             <span style={{
@@ -181,10 +390,10 @@ export default function PelatihanPage() {
             </span>
           </div>
           <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#0F172A", margin: 0, letterSpacing: "-0.5px" }}>
-            Pelatihan & Sertifikasi Tenaga Kerja Konstruksi (TKK)
+            Hub Pelatihan & Fasilitasi Sertifikasi Tenaga Kerja Konstruksi (TKK)
           </h1>
           <p style={{ fontSize: "13px", color: "#64748B", margin: "4px 0 0 0" }}>
-            Fasilitasi uji kompetensi, sertifikasi SKK, bimtek K3 SMKK, dan penerbitan e-Certificate Jasa Konstruksi
+            Penerbitan otomatis Sertifikat Partisipasi DPU, integrasi registrasi SKK LPJK, dan manajemen portofolio TKK Kabupaten Bogor
           </p>
         </div>
 
@@ -300,7 +509,7 @@ export default function PelatihanPage() {
           </div>
           <div>
             <p style={{ fontSize: "28px", fontWeight: 900, color: "#0F172A", margin: 0, lineHeight: 1.1 }}>{trainings.length}</p>
-            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>TA 2026 ({trainings.length} Program)</p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>TA 2026 ({trainings.length} Program Aktif)</p>
           </div>
         </div>
 
@@ -321,7 +530,7 @@ export default function PelatihanPage() {
 
         <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "20px 22px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: "10px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Lulus Bersertifikat</span>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>Lulus Bersertifikat DPU/SKK</span>
             <div style={{ height: "36px", width: "36px", borderRadius: "10px", backgroundColor: "#ECFDF5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Award style={{ width: "18px", height: "18px" }} />
             </div>
@@ -330,7 +539,7 @@ export default function PelatihanPage() {
             <p style={{ fontSize: "28px", fontWeight: 900, color: "#059669", margin: 0, lineHeight: 1.1 }}>
               {trainings.reduce((acc, t) => acc + (t.passed || 0), 0)}
             </p>
-            <p style={{ fontSize: "11px", color: "#059669", fontWeight: 700, margin: "4px 0 0 0" }}>Tersertifikasi BNSP / SKK</p>
+            <p style={{ fontSize: "11px", color: "#059669", fontWeight: 700, margin: "4px 0 0 0" }}>Terverifikasi DPU & LPJK</p>
           </div>
         </div>
 
@@ -358,7 +567,7 @@ export default function PelatihanPage() {
       {/* Tab Navigation */}
       <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "1px solid #E2E8F0", paddingBottom: "10px" }}>
         {[
-          { id: "programs", label: "Program Pelatihan & Bimtek" },
+          { id: "programs", label: `Program Pelatihan & Bimtek (${trainings.length})` },
           { id: "tkk", label: `Database TKK Tersertifikasi (${allTkk.length})` },
           { id: "cert", label: "Verifikasi e-Certificate QR" },
         ].map((tab) => {
@@ -399,83 +608,49 @@ export default function PelatihanPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))", gap: "16px" }}>
           {trainings.map((t) => (
             <div 
-              key={t.id} 
+              key={t.id}
               style={{
+                backgroundColor: "#FFFFFF",
                 borderRadius: "18px",
                 border: "1px solid #E2E8F0",
-                backgroundColor: "#FFFFFF",
-                padding: "24px",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+                padding: "20px",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
-                gap: "18px"
+                gap: "16px"
               }}
             >
-              <div>
-                {/* Row 1: Top Meta Bar (ID + Category Left, Status Badge Right) */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                    <span 
-                      style={{ 
-                        fontFamily: "monospace", 
-                        fontSize: "11px", 
-                        fontWeight: 800, 
-                        backgroundColor: "#EBF2FA", 
-                        color: "#0F2E5C", 
-                        padding: "3px 8px", 
-                        borderRadius: "6px",
-                        whiteSpace: "nowrap",
-                        letterSpacing: "0.2px"
-                      }}
-                    >
-                      {t.id}
-                    </span>
-                    <span 
-                      style={{ 
-                        fontSize: "11px", 
-                        fontWeight: 700, 
-                        backgroundColor: "#F1F5F9", 
-                        color: "#475569", 
-                        padding: "3px 9px", 
-                        borderRadius: "9999px",
-                        whiteSpace: "nowrap"
-                      }}
-                    >
+                    <span style={{ fontSize: "10px", fontWeight: 800, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "2px 8px", borderRadius: "6px" }}>
                       {t.category}
+                    </span>
+                    <span style={{ fontSize: "10px", fontWeight: 700, color: "#64748B", backgroundColor: "#F1F5F9", padding: "2px 8px", borderRadius: "6px" }}>
+                      {t.batch}
+                    </span>
+                    <span style={{ fontSize: "10px", fontWeight: 800, color: "#0284C7", backgroundColor: "#E0F2FE", padding: "2px 8px", borderRadius: "6px" }}>
+                      PP 14/2021: {t.skkLevel}
                     </span>
                   </div>
 
-                  <span 
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      padding: "3px 10px",
-                      borderRadius: "9999px",
-                      whiteSpace: "nowrap",
-                      flexShrink: 0,
-                      backgroundColor: t.status === "Selesai" ? "#ECFDF5" : t.status === "Sedang Berjalan" ? "#EFF6FF" : "#FFFBEB",
-                      color: t.status === "Selesai" ? "#059669" : t.status === "Sedang Berjalan" ? "#1E40AF" : "#D97706",
-                      border: t.status === "Pendaftaran Dibuka" ? "1px solid #FDE68A" : "none"
-                    }}
-                  >
-                    {t.status === "Selesai" ? "✓ Selesai" : t.status === "Sedang Berjalan" ? "● Sedang Berjalan" : "● Pendaftaran Dibuka"}
+                  <span style={{
+                    fontSize: "11px",
+                    fontWeight: 800,
+                    padding: "3px 10px",
+                    borderRadius: "9999px",
+                    backgroundColor: t.status === "Selesai" ? "#ECFDF5" : t.status === "Sedang Berjalan" ? "#EFF6FF" : "#FFFBEB",
+                    color: t.status === "Selesai" ? "#065F46" : t.status === "Sedang Berjalan" ? "#1E40AF" : "#92400E",
+                    border: `1px solid ${t.status === "Selesai" ? "#A7F3D0" : t.status === "Sedang Berjalan" ? "#BFDBFE" : "#FDE68A"}`
+                  }}>
+                    {t.status}
                   </span>
                 </div>
 
-                {/* Row 2: Full-width Title */}
-                <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: "0 0 6px 0", lineHeight: 1.4 }}>
+                <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0F172A", margin: 0, lineHeight: 1.35 }}>
                   {t.title}
                 </h3>
-
-                {/* Row 3: Subtitle & Jenjang SKK */}
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", fontSize: "11.5px", color: "#64748B", marginBottom: "12px" }}>
-                  <span style={{ fontWeight: 600 }}>{t.batch}</span>
-                  <span>•</span>
-                  <span style={{ backgroundColor: "#F8FAFC", padding: "2px 8px", borderRadius: "6px", border: "1px solid #E2E8F0", color: "#334155", fontWeight: 700 }}>
-                    Jenjang SKK: {t.skkLevel}
-                  </span>
-                </div>
 
                 {/* Info Details Box */}
                 <div style={{ backgroundColor: "#F8FAFC", borderRadius: "12px", border: "1px solid #E2E8F0", padding: "12px 14px", display: "flex", flexDirection: "column", gap: "8px", fontSize: "12px", color: "#475569" }}>
@@ -542,121 +717,398 @@ export default function PelatihanPage() {
         </div>
       )}
 
-      {/* Tab 2: Database TKK */}
+      {/* Tab 2: Database TKK Tersertifikasi */}
       {!loading && activeTab === "tkk" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-          {/* Search bar */}
-          <div style={{ borderRadius: "16px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-            <Search style={{ width: "16px", height: "16px", color: "#94A3B8" }} />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari berdasarkan nama TKK, NIK, atau nama badan usaha..."
-              style={{
-                border: "none",
-                outline: "none",
-                width: "100%",
-                fontSize: "13px",
-                color: "#0F172A",
-                backgroundColor: "transparent"
-              }}
-            />
+          
+          {/* TOOLBAR FILTER DATABASE TERPADU (DEFAULT: KRONOLOGIS TERKINI DESC) */}
+          <div 
+            style={{ 
+              borderRadius: "18px", 
+              border: "1px solid #E2E8F0", 
+              backgroundColor: "#FFFFFF", 
+              padding: "18px 22px", 
+              display: "flex", 
+              flexDirection: "column", 
+              gap: "14px", 
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04)" 
+            }}
+          >
+            {/* Top Row: Search Box & Default Badge */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+              <div 
+                style={{ 
+                  flex: 1, 
+                  minWidth: "280px", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: "10px", 
+                  borderRadius: "12px", 
+                  border: "1px solid #CBD5E1", 
+                  backgroundColor: "#F8FAFC", 
+                  padding: "8px 14px" 
+                }}
+              >
+                <Search style={{ width: "16px", height: "16px", color: "#94A3B8" }} />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Cari berdasarkan nama TKK, NIK, BUJK, atau nomor sertifikat..."
+                  style={{
+                    border: "none",
+                    outline: "none",
+                    width: "100%",
+                    fontSize: "12px",
+                    color: "#0F172A",
+                    backgroundColor: "transparent"
+                  }}
+                />
+              </div>
+
+              {/* Badge Indikator Setting Default */}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span 
+                  style={{ 
+                    fontSize: "11px", 
+                    fontWeight: 800, 
+                    color: "#0F2E5C", 
+                    backgroundColor: "#E0F2FE", 
+                    padding: "6px 12px", 
+                    borderRadius: "9999px", 
+                    border: "1px solid #BAE6FD",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}
+                >
+                  <ArrowUpDown style={{ width: "12px", height: "12px", color: "#0284C7" }} />
+                  <span>Default: Riwayat Terkini (DESC)</span>
+                </span>
+                
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B" }}>
+                  Total: <strong>{allTkk.length}</strong> TKK
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom Row: Multi-Filter Selects */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "10px" }}>
+              
+              {/* Filter 1: Kategori Pelatihan */}
+              <div>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  Kategori Pelatihan
+                </label>
+                <select
+                  value={filterCategory}
+                  onChange={e => setFilterCategory(e.target.value)}
+                  style={{ width: "100%", padding: "7px 10px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "12px", backgroundColor: "#FFFFFF", color: "#0F172A" }}
+                >
+                  <option value="Semua">Semua Kategori</option>
+                  <option value="K3 Konstruksi">K3 Konstruksi</option>
+                  <option value="Tenaga Terampil">Tenaga Terampil</option>
+                  <option value="Teknologi & Digitalisasi">Teknologi & Digitalisasi</option>
+                  <option value="Tata Kelola & Regulasi">Tata Kelola & Regulasi</option>
+                </select>
+              </div>
+
+              {/* Filter 2: Jenjang PP 14/2021 (Diskret 1 s/d 6) */}
+              <div>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  Jenjang PP 14/2021
+                </label>
+                <select
+                  value={filterJenjang}
+                  onChange={e => setFilterJenjang(e.target.value)}
+                  style={{ width: "100%", padding: "7px 10px", borderRadius: "10px", border: "1px solid #0284C7", fontSize: "12px", backgroundColor: "#F0F9FF", color: "#0369A1", fontWeight: 700 }}
+                >
+                  <option value="Semua">Semua Jenjang</option>
+                  {JENJANG_PP14_OPTIONS.map(j => (
+                    <option key={j} value={j}>{JENJANG_PP14_LABELS[j]}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Filter 3: Status Kelulusan */}
+              <div>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  Status Kelulusan
+                </label>
+                <select
+                  value={filterStatus}
+                  onChange={e => setFilterStatus(e.target.value)}
+                  style={{ width: "100%", padding: "7px 10px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "12px", backgroundColor: "#FFFFFF", color: "#0F172A" }}
+                >
+                  <option value="Semua">Semua Status</option>
+                  <option value="Lulus">Lulus</option>
+                  <option value="Proses Bimtek">Proses Bimtek</option>
+                  <option value="Terdaftar">Terdaftar</option>
+                </select>
+              </div>
+
+              {/* Filter 4: Status Sertifikat */}
+              <div>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  Status Sertifikat
+                </label>
+                <select
+                  value={filterCert}
+                  onChange={e => setFilterCert(e.target.value)}
+                  style={{ width: "100%", padding: "7px 10px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "12px", backgroundColor: "#FFFFFF", color: "#0F172A" }}
+                >
+                  <option value="Semua">Semua Sertifikat</option>
+                  <option value="Sertifikat DPU Terbit">Sertifikat DPU Terbit</option>
+                  <option value="SKK LPJK Terbit">SKK LPJK Terbit</option>
+                  <option value="Belum Terbit">Belum Terbit</option>
+                </select>
+              </div>
+
+              {/* Filter 5: Urutan / Sort By */}
+              <div>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  Urutan Data
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={e => setSortBy(e.target.value as any)}
+                  style={{ width: "100%", padding: "7px 10px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "12px", backgroundColor: "#FFFFFF", color: "#0F172A", fontWeight: 700 }}
+                >
+                  <option value="terkini">Riwayat Terkini (Default)</option>
+                  <option value="terlama">Riwayat Terlama</option>
+                  <option value="nilai">Nilai Uji Tertinggi</option>
+                </select>
+              </div>
+            </div>
           </div>
 
-          {/* Table Container */}
+          {/* Table Container 9 Kolom Standar */}
           <div style={{ borderRadius: "18px", border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
                 <thead>
-                  <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "2px solid #E2E8F0", textAlign: "left" }}>
-                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NAMA & NIK</th>
-                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>BADAN USAHA / BUJK</th>
-                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>PROGRAM PELATIHAN</th>
-                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NO. SERTIFIKAT SKK</th>
-                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>NILAI</th>
-                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px" }}>STATUS</th>
-                    <th style={{ padding: "14px 18px", fontWeight: 800, color: "#475569", textTransform: "uppercase", fontSize: "11px", letterSpacing: "0.5px", textAlign: "center" }}>E-SERTIFIKAT</th>
+                  <tr style={{ backgroundColor: "#0F2E5C", color: "#FFFFFF", borderBottom: "3px solid #FFC000", textAlign: "left" }}>
+                    <th style={{ padding: "14px 14px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px", width: "40px", textAlign: "center" }}>NO</th>
+                    <th style={{ padding: "14px 16px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px" }}>NAMA & NIK</th>
+                    <th style={{ padding: "14px 16px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px" }}>BADAN USAHA / BUJK</th>
+                    <th style={{ padding: "14px 16px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px" }}>PROGRAM PELATIHAN</th>
+                    <th style={{ padding: "14px 14px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px" }}>JENJANG (PP 14/2021)</th>
+                    <th style={{ padding: "14px 16px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px" }}>SERTIFIKAT PARTISIPASI (DPU)</th>
+                    <th style={{ padding: "14px 16px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px" }}>SERTIFIKAT SKK (LPJK)</th>
+                    <th style={{ padding: "14px 14px", fontWeight: 800, fontSize: "11px", letterSpacing: "0.5px", textAlign: "center" }}>NILAI & STATUS</th>
+                    {/* Header Kolom Aksi Dinamai "EDIT" Sesuai Permintaan */}
+                    <th style={{ padding: "14px 16px", fontWeight: 900, fontSize: "11px", letterSpacing: "0.5px", textAlign: "center", backgroundColor: "#07182E" }}>EDIT</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredTkk.length === 0 ? (
+                  {allTkk.length === 0 ? (
                     <tr>
-                      <td colSpan={7} style={{ padding: "36px", textAlign: "center", color: "#64748B" }}>
-                        Belum ada peserta pelatihan yang terdaftar atau lulus.
+                      <td colSpan={9} style={{ padding: "36px", textAlign: "center", color: "#64748B" }}>
+                        Tidak ada data tenaga kerja konstruksi yang sesuai dengan kriteria filter.
                       </td>
                     </tr>
                   ) : (
-                    filteredTkk.map((tkk, idx) => (
-                      <tr key={tkk.nik || idx} style={{ borderBottom: "1px solid #F1F5F9", transition: "background-color 0.15s ease" }}>
-                        <td style={{ padding: "16px 18px" }}>
+                    allTkk.map((tkk, idx) => (
+                      <tr 
+                        key={tkk.nik || idx} 
+                        style={{ 
+                          borderBottom: "1px solid #F1F5F9", 
+                          backgroundColor: idx === 0 ? "#F8FAFC" : "transparent",
+                          transition: "background-color 0.15s ease" 
+                        }}
+                      >
+                        {/* 1. NO */}
+                        <td style={{ padding: "14px 14px", textAlign: "center", fontWeight: 700, color: "#64748B" }}>
+                          {idx + 1}
+                        </td>
+
+                        {/* 2. NAMA & NIK */}
+                        <td style={{ padding: "14px 16px" }}>
                           <p style={{ fontWeight: 800, color: "#0F172A", margin: 0, fontSize: "13px" }}>{tkk.name}</p>
                           <p style={{ fontSize: "11px", fontFamily: "monospace", color: "#64748B", margin: "2px 0 0 0" }}>NIK: {tkk.nik}</p>
                         </td>
-                        <td style={{ padding: "16px 18px", color: "#334155", fontWeight: 600 }}>
-                          {tkk.bujk}
+
+                        {/* 3. BADAN USAHA */}
+                        <td style={{ padding: "14px 16px", color: "#334155", fontWeight: 600 }}>
+                          {tkk.bujk || "-"}
                         </td>
-                        <td style={{ padding: "16px 18px" }}>
-                          <p style={{ fontWeight: 700, color: "#0F172A", margin: 0 }}>{tkk.trainingTitle}</p>
-                          <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>Jenjang: {tkk.skkLevel}</p>
+
+                        {/* 4. PROGRAM PELATIHAN */}
+                        <td style={{ padding: "14px 16px" }}>
+                          <p style={{ fontWeight: 700, color: "#0F172A", margin: 0, maxWidth: "260px" }}>{tkk.trainingTitle}</p>
+                          <span style={{ fontSize: "10px", color: "#64748B" }}>{tkk.trainingCategory} • {tkk.date}</span>
                         </td>
-                        <td style={{ padding: "16px 18px" }}>
-                          {tkk.certNo ? (
-                            <span style={{ fontFamily: "monospace", fontWeight: 700, color: "#0F2E5C", backgroundColor: "#EBF2FA", padding: "3px 8px", borderRadius: "6px", fontSize: "11px" }}>
-                              {tkk.certNo}
-                            </span>
+
+                        {/* 5. JENJANG DISKRET PP 14/2021 */}
+                        <td style={{ padding: "14px 14px" }}>
+                          <span 
+                            style={{ 
+                              display: "inline-block",
+                              fontFamily: "monospace", 
+                              fontWeight: 800, 
+                              color: "#0369A1", 
+                              backgroundColor: "#E0F2FE", 
+                              padding: "3px 8px", 
+                              borderRadius: "6px", 
+                              fontSize: "11px",
+                              border: "1px solid #BAE6FD",
+                              whiteSpace: "nowrap"
+                            }}
+                          >
+                            {tkk.skkLevel || "Jenjang 3"}
+                          </span>
+                        </td>
+
+                        {/* 6. SERTIFIKAT PARTISIPASI (DPU - OTOMATIS BY SISTEM) */}
+                        <td style={{ padding: "14px 16px" }}>
+                          {tkk.certNoDpu ? (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                              <span style={{ fontFamily: "monospace", fontWeight: 800, color: "#065F46", backgroundColor: "#ECFDF5", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", border: "1px solid #A7F3D0" }}>
+                                {tkk.certNoDpu}
+                              </span>
+                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                <span style={{ fontSize: "10px", color: "#059669", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                                  <CheckCircle2 style={{ width: "11px", height: "11px" }} /> Terbit Otomatis
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedCert({
+                                    name: tkk.name,
+                                    nik: tkk.nik,
+                                    bujk: tkk.bujk,
+                                    certNo: tkk.certNoDpu || "",
+                                    certType: "DPU",
+                                    trainingTitle: tkk.trainingTitle,
+                                    skkLevel: tkk.skkLevel
+                                  })}
+                                  style={{ background: "none", border: "none", cursor: "pointer", color: "#0F2E5C", fontSize: "11px", fontWeight: 800, textDecoration: "underline", padding: 0 }}
+                                >
+                                  Lihat E-Sertifikat
+                                </button>
+                              </div>
+                            </div>
                           ) : (
-                            <span style={{ color: "#94A3B8", fontStyle: "italic" }}>Belum terbit</span>
+                            <button
+                              type="button"
+                              onClick={() => handleValidateDpu(tkk.agendaId, tkk.nik, tkk.name)}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                backgroundColor: "#FEF3C7",
+                                color: "#92400E",
+                                border: "1px solid #FCD34D",
+                                padding: "4px 10px",
+                                borderRadius: "8px",
+                                fontSize: "11px",
+                                fontWeight: 800,
+                                cursor: "pointer"
+                              }}
+                              title="Validasi registrasi dan generate nomor sertifikat otomatis"
+                            >
+                              <Sparkles style={{ width: "12px", height: "12px", color: "#D97706" }} />
+                              <span>Validasi & Terbitkan</span>
+                            </button>
                           )}
                         </td>
-                        <td style={{ padding: "16px 18px", fontWeight: 800, color: "#0F172A", fontSize: "13px" }}>
-                          {tkk.score !== undefined ? `${tkk.score} / 100` : "-"}
+
+                        {/* 7. SERTIFIKAT SKK (LPJK - INPUT MANUAL) */}
+                        <td style={{ padding: "14px 16px" }}>
+                          {tkk.certNoLpjk ? (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                              <span style={{ fontFamily: "monospace", fontWeight: 800, color: "#1E40AF", backgroundColor: "#EFF6FF", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", border: "1px solid #BFDBFE" }}>
+                                {tkk.certNoLpjk}
+                              </span>
+                              <span style={{ fontSize: "10px", color: "#2563EB", fontWeight: 700 }}>
+                                Terdaftar LPJK / BNSP
+                              </span>
+                            </div>
+                          ) : (
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span style={{ color: "#94A3B8", fontStyle: "italic", fontSize: "11px" }}>
+                                Belum Terbit (LPJK)
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEdit(tkk)}
+                                title="Klik untuk menginput nomor SKK LPJK"
+                                style={{ background: "none", border: "none", cursor: "pointer", color: "#0284C7", fontSize: "11px", fontWeight: 700, padding: 0 }}
+                              >
+                                + Input SKK
+                              </button>
+                            </div>
+                          )}
                         </td>
-                        <td style={{ padding: "16px 18px" }}>
+
+                        {/* 8. NILAI & STATUS */}
+                        <td style={{ padding: "14px 14px", textAlign: "center" }}>
+                          <p style={{ fontWeight: 800, color: "#0F172A", fontSize: "12px", margin: 0 }}>
+                            {tkk.score !== undefined && tkk.score > 0 ? `${tkk.score} / 100` : "-"}
+                          </p>
                           <span style={{ 
                             display: "inline-block", 
-                            backgroundColor: tkk.status === "Lulus" ? "#ECFDF5" : "#EFF6FF", 
-                            color: tkk.status === "Lulus" ? "#059669" : "#1E40AF", 
-                            padding: "3px 10px", 
+                            marginTop: "3px",
+                            backgroundColor: tkk.status === "Lulus" ? "#ECFDF5" : tkk.status === "Proses Bimtek" ? "#EFF6FF" : "#F1F5F9", 
+                            color: tkk.status === "Lulus" ? "#059669" : tkk.status === "Proses Bimtek" ? "#1E40AF" : "#475569", 
+                            padding: "2px 8px", 
                             borderRadius: "9999px", 
-                            fontSize: "11px", 
+                            fontSize: "10px", 
                             fontWeight: 800 
                           }}>
                             {tkk.status || "Terdaftar"}
                           </span>
                         </td>
-                        <td style={{ padding: "16px 18px", textAlign: "center" }}>
-                          {tkk.status === "Lulus" ? (
+
+                        {/* 9. KOLOM AKSI: EDIT (TOMBOL EDIT & HAPUS) */}
+                        <td style={{ padding: "14px 16px", textAlign: "center" }}>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            {/* Tombol Edit */}
                             <button
                               type="button"
-                              onClick={() => {
-                                setSelectedCert({
-                                  name: tkk.name,
-                                  nik: tkk.nik,
-                                  bujk: tkk.bujk,
-                                  certNo: tkk.certNo || "SKK-VERIFIED-2026",
-                                  trainingTitle: tkk.trainingTitle,
-                                });
-                              }}
+                              onClick={() => handleOpenEdit(tkk)}
+                              title="Edit Data Peserta & Sertifikat"
                               style={{
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: "4px",
                                 borderRadius: "8px",
-                                backgroundColor: "#F1F5F9",
-                                color: "#0F2E5C",
+                                backgroundColor: "#0F2E5C",
+                                color: "#FFFFFF",
                                 padding: "6px 12px",
                                 fontSize: "11px",
+                                fontWeight: 800,
+                                border: "none",
+                                cursor: "pointer",
+                                boxShadow: "0 1px 3px rgba(15,46,92,0.2)"
+                              }}
+                            >
+                              <Edit3 style={{ width: "12px", height: "12px", color: "#FFC000" }} />
+                              <span>Edit</span>
+                            </button>
+
+                            {/* Tombol Hapus */}
+                            <button
+                              type="button"
+                              onClick={() => handleOpenDelete(tkk.agendaId, tkk.nik, tkk.name)}
+                              title="Hapus Peserta dari Database"
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                borderRadius: "8px",
+                                backgroundColor: "#FEF2F2",
+                                color: "#DC2626",
+                                padding: "6px 10px",
+                                fontSize: "11px",
                                 fontWeight: 700,
-                                border: "1px solid #E2E8F0",
+                                border: "1px solid #FECACA",
                                 cursor: "pointer"
                               }}
                             >
-                              <Eye style={{ width: "13px", height: "13px" }} /> Lihat
+                              <Trash2 style={{ width: "12px", height: "12px" }} />
+                              <span>Hapus</span>
                             </button>
-                          ) : (
-                            <span style={{ fontSize: "11px", color: "#94A3B8" }}>Proses Bimtek</span>
-                          )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -681,19 +1133,19 @@ export default function PelatihanPage() {
               Verifikasi Keaslian e-Certificate TKK
             </h2>
             <p style={{ fontSize: "13px", color: "#64748B", margin: "6px 0 0 0" }}>
-              Pindai QR Code pada sertifikat fisik atau masukkan nomor registrasi SKK / NIK untuk memvalidasi keabsahan data di SIPJAKI PUPR
+              Pindai QR Code pada sertifikat fisik atau masukkan nomor registrasi SKK / Sertifikat DPU / NIK untuk memvalidasi keabsahan data di SIPJAKI PUPR
             </p>
           </div>
 
           <div style={{ display: "flex", gap: "10px", maxWidth: "460px", margin: "0 auto", width: "100%" }}>
             <input
               type="text"
-              placeholder="Masukkan No. Sertifikat (cth: SKK-2026-001)"
+              placeholder="Nomor Sertifikat DPU atau SKK LPJK"
               style={{ flex: 1, borderRadius: "10px", border: "1px solid #CBD5E1", padding: "10px 14px", fontSize: "13px", outline: "none" }}
             />
             <button
               type="button"
-              onClick={() => alert("Memverifikasi nomor sertifikat ke server LPJK & BNSP...")}
+              onClick={() => alert("Memverifikasi nomor sertifikat ke server LPJK & SIPJAKI DPU Kab. Bogor...")}
               style={{ borderRadius: "10px", backgroundColor: "#0F2E5C", color: "#FFFFFF", border: "none", padding: "10px 20px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}
             >
               Cek Validasi
@@ -702,7 +1154,244 @@ export default function PelatihanPage() {
         </div>
       )}
 
-      {/* Modal Tambah Pelatihan Baru */}
+      {/* MODAL EDIT PESERTA & SERTIFIKASI LENGKAP */}
+      {editModalOpen && editingParticipant && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.65)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: "24px", maxWidth: "680px", width: "100%", padding: "32px", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", display: "flex", flexDirection: "column", gap: "18px", maxHeight: "92vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #E2E8F0", paddingBottom: "14px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "40px", height: "40px", borderRadius: "12px", backgroundColor: "#EBF2FA", color: "#0F2E5C", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Edit3 style={{ width: "20px", height: "20px" }} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: "17px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
+                    Edit Data Peserta & Sertifikasi TKK
+                  </h3>
+                  <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>
+                    Kelola identitas, jenjang PP 14/2021, sertifikat DPU dan nomor SKK LPJK
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setEditModalOpen(false)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B", padding: "6px", borderRadius: "8px" }}
+              >
+                <X style={{ width: "20px", height: "20px" }} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#334155", textTransform: "uppercase", marginBottom: "6px" }}>
+                    Nomor Induk Kependudukan (NIK)
+                  </label>
+                  <input 
+                    type="text"
+                    disabled
+                    value={editingParticipant.nik}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #E2E8F0", fontSize: "13px", backgroundColor: "#F8FAFC", fontFamily: "monospace", color: "#64748B", boxSizing: "border-box" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#334155", textTransform: "uppercase", marginBottom: "6px" }}>
+                    Nama Lengkap Peserta *
+                  </label>
+                  <input 
+                    type="text"
+                    required
+                    value={editingParticipant.name}
+                    onChange={e => setEditingParticipant({ ...editingParticipant, name: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", fontWeight: 600, color: "#0F172A", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#334155", textTransform: "uppercase", marginBottom: "6px" }}>
+                  Asal Badan Usaha (BUJK) / Instansi
+                </label>
+                <input 
+                  type="text"
+                  value={editingParticipant.bujk}
+                  onChange={e => setEditingParticipant({ ...editingParticipant, bujk: e.target.value })}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", color: "#0F172A", boxSizing: "border-box" }}
+                />
+              </div>
+
+              {/* Jenjang Kualifikasi Diskret PP 14/2021 */}
+              <div>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#0F2E5C", textTransform: "uppercase", marginBottom: "6px" }}>
+                  Klasifikasi Jenjang Tenaga Terampil (PP No. 14 Tahun 2021) *
+                </label>
+                <select
+                  value={editingParticipant.skkLevel}
+                  onChange={e => setEditingParticipant({ ...editingParticipant, skkLevel: e.target.value })}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "2px solid #0284C7", fontSize: "13px", backgroundColor: "#F0F9FF", color: "#0369A1", fontWeight: 700, boxSizing: "border-box" }}
+                >
+                  {JENJANG_PP14_OPTIONS.map(j => (
+                    <option key={j} value={j}>{JENJANG_PP14_LABELS[j]}</option>
+                  ))}
+                </select>
+                <span style={{ fontSize: "11px", color: "#64748B", marginTop: "4px", display: "block" }}>
+                  *Sesuai ketentuan PP No. 14/2021, jenjang dicatat diskret (1 s/d 6) tanpa rentang gabungan.
+                </span>
+              </div>
+
+              {/* Nilai Akhir & Status Kelulusan */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#334155", textTransform: "uppercase", marginBottom: "6px" }}>
+                    Nilai Akhir (0 - 100)
+                  </label>
+                  <input 
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.5"
+                    value={editingParticipant.score}
+                    onChange={e => setEditingParticipant({ ...editingParticipant, score: Number(e.target.value) })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", fontWeight: 700, boxSizing: "border-box" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#334155", textTransform: "uppercase", marginBottom: "6px" }}>
+                    Status Kelulusan
+                  </label>
+                  <select
+                    value={editingParticipant.status}
+                    onChange={e => setEditingParticipant({ ...editingParticipant, status: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", backgroundColor: "#FFFFFF", fontWeight: 600, boxSizing: "border-box" }}
+                  >
+                    <option value="Terdaftar">Terdaftar</option>
+                    <option value="Proses Bimtek">Proses Bimtek</option>
+                    <option value="Lulus">Lulus</option>
+                    <option value="Tidak Lulus">Tidak Lulus</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Bagian 2 Sertifikat */}
+              <div style={{ backgroundColor: "#F8FAFC", borderRadius: "14px", border: "1px solid #E2E8F0", padding: "18px", display: "flex", flexDirection: "column", gap: "14px" }}>
+                <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  Integrasi 2 Sertifikasi (DPU vs LPJK)
+                </span>
+
+                {/* Kolom 1: Sertifikat Partisipasi DPU (Auto Generated) */}
+                <div>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#065F46", marginBottom: "6px" }}>
+                    1. Sertifikat Partisipasi (Kegiatan DPU Kab. Bogor)
+                  </label>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <input 
+                      type="text"
+                      placeholder="Contoh: 2026/DPU-K3/0014"
+                      value={editingParticipant.certNoDpu}
+                      onChange={e => setEditingParticipant({ ...editingParticipant, certNoDpu: e.target.value })}
+                      style={{ flex: 1, padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", fontFamily: "monospace", backgroundColor: "#FFFFFF", boxSizing: "border-box" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const yr = new Date().getFullYear();
+                        const rnd = Math.floor(1000 + Math.random() * 9000);
+                        const autoCert = `${yr}/DPU-TKK/${rnd}`;
+                        setEditingParticipant({
+                          ...editingParticipant,
+                          certNoDpu: autoCert,
+                          isValidated: true,
+                          status: "Lulus"
+                        });
+                      }}
+                      style={{ padding: "10px 16px", borderRadius: "10px", backgroundColor: "#ECFDF5", color: "#065F46", border: "1px solid #A7F3D0", fontSize: "12px", fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap" }}
+                    >
+                      Generate Auto DPU
+                    </button>
+                  </div>
+                </div>
+
+                {/* Kolom 2: Sertifikat Kompetensi Kerja / SKK (Manual Input LPJK) */}
+                <div>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#1E40AF", marginBottom: "6px" }}>
+                    2. Sertifikat Kompetensi Kerja / SKK (Input Manual Nomor LPJK)
+                  </label>
+                  <input 
+                    type="text"
+                    placeholder="Contoh: REG-2026-LPJK-88219 atau SKK-TUK-2026-041"
+                    value={editingParticipant.certNoLpjk}
+                    onChange={e => setEditingParticipant({ ...editingParticipant, certNoLpjk: e.target.value })}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", fontFamily: "monospace", backgroundColor: "#FFFFFF", boxSizing: "border-box" }}
+                  />
+                  <span style={{ fontSize: "11px", color: "#64748B", marginTop: "4px", display: "block" }}>
+                    *Nomor SKK resmi diinput manual sesuai dengan lembar sertifikat yang diterbitkan LPJK/BNSP.
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "10px", borderTop: "1px solid #E2E8F0", paddingTop: "18px" }}>
+                <button
+                  type="button"
+                  onClick={() => setEditModalOpen(false)}
+                  style={{ padding: "10px 20px", borderRadius: "12px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", fontSize: "13px", fontWeight: 700, color: "#475569", cursor: "pointer" }}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  style={{ padding: "10px 24px", borderRadius: "12px", border: "none", backgroundColor: "#0F2E5C", color: "#FFFFFF", fontSize: "13px", fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(15,46,92,0.25)", borderBottom: "2px solid #FFC000" }}
+                >
+                  Simpan Perubahan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG KONFIRMASI HAPUS PESERTA */}
+      {deleteConfirmOpen && deletingParticipant && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.65)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: "24px", maxWidth: "480px", width: "100%", padding: "32px", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", display: "flex", flexDirection: "column", gap: "18px", textAlign: "center" }}>
+            <div style={{ width: "56px", height: "56px", borderRadius: "18px", backgroundColor: "#FEF2F2", color: "#DC2626", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", border: "1px solid #FECACA" }}>
+              <Trash2 style={{ width: "28px", height: "28px" }} />
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: "16px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
+                Hapus Data Peserta Pelatihan?
+              </h3>
+              <p style={{ fontSize: "13px", color: "#64748B", margin: "8px 0 0 0", lineHeight: 1.5 }}>
+                Apakah Anda yakin ingin menghapus peserta <strong>{deletingParticipant.name}</strong> (NIK: <span style={{ fontFamily: "monospace" }}>{deletingParticipant.nik}</span>) dari basis data? Tindakan ini tidak dapat dibatalkan.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "10px" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteConfirmOpen(false);
+                  setDeletingParticipant(null);
+                }}
+                style={{ padding: "9px 18px", borderRadius: "10px", border: "1px solid #CBD5E1", backgroundColor: "#FFFFFF", fontSize: "12px", fontWeight: 700, color: "#475569", cursor: "pointer" }}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                style={{ padding: "9px 20px", borderRadius: "10px", border: "none", backgroundColor: "#DC2626", color: "#FFFFFF", fontSize: "12px", fontWeight: 800, cursor: "pointer", boxShadow: "0 2px 6px rgba(220,38,38,0.25)" }}
+              >
+                Hapus Permanen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Buka Pelatihan Baru */}
       {showAddModal && (
         <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
           <div style={{ backgroundColor: "#FFFFFF", borderRadius: "20px", maxWidth: "580px", width: "100%", padding: "28px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: "18px", maxHeight: "90vh", overflowY: "auto" }}>
@@ -773,7 +1462,6 @@ export default function PelatihanPage() {
                   </label>
                   <input 
                     type="date"
-                    required
                     value={newTraining.startDate}
                     onChange={e => setNewTraining({ ...newTraining, startDate: e.target.value })}
                     style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
@@ -786,7 +1474,6 @@ export default function PelatihanPage() {
                   </label>
                   <input 
                     type="date"
-                    required
                     value={newTraining.endDate}
                     onChange={e => setNewTraining({ ...newTraining, endDate: e.target.value })}
                     style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px" }}
@@ -794,7 +1481,7 @@ export default function PelatihanPage() {
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "12px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
                     Lokasi Pelatihan
@@ -822,20 +1509,19 @@ export default function PelatihanPage() {
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                {/* Opsi Jenjang Diskret PP 14/2021 */}
                 <div>
                   <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
-                    Target Jenjang SKK
+                    Target Jenjang SKK (PP 14/2021)
                   </label>
                   <select
                     value={newTraining.skkLevel}
                     onChange={e => setNewTraining({ ...newTraining, skkLevel: e.target.value })}
                     style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", backgroundColor: "#FFFFFF" }}
                   >
-                    <option value="Jenjang 1-2 (Operator/Tukang)">Jenjang 1-2 (Operator/Tukang)</option>
-                    <option value="Jenjang 3-4 (Teknisi Junior)">Jenjang 3-4 (Teknisi Junior)</option>
-                    <option value="Jenjang 5 (Teknisi/Analis)">Jenjang 5 (Teknisi/Analis)</option>
-                    <option value="Jenjang 6 (Ahli Muda)">Jenjang 6 (Ahli Muda)</option>
-                    <option value="Semua Jenjang">Semua Jenjang</option>
+                    {JENJANG_PP14_OPTIONS.map(j => (
+                      <option key={j} value={j}>{JENJANG_PP14_LABELS[j]}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -935,6 +1621,21 @@ export default function PelatihanPage() {
                 />
               </div>
 
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#334155", marginBottom: "4px" }}>
+                  Jenjang Kualifikasi PP 14/2021
+                </label>
+                <select
+                  value={participantForm.skkLevel}
+                  onChange={e => setParticipantForm({ ...participantForm, skkLevel: e.target.value })}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #CBD5E1", fontSize: "13px", backgroundColor: "#FFFFFF" }}
+                >
+                  {JENJANG_PP14_OPTIONS.map(j => (
+                    <option key={j} value={j}>{JENJANG_PP14_LABELS[j]}</option>
+                  ))}
+                </select>
+              </div>
+
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px", borderTop: "1px solid #F1F5F9", paddingTop: "14px" }}>
                 <button
                   type="button"
@@ -955,15 +1656,15 @@ export default function PelatihanPage() {
         </div>
       )}
 
-      {/* Modal e-Certificate */}
+      {/* Modal e-Certificate Viewer */}
       {selectedCert && (
         <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
           <div style={{ backgroundColor: "#FFFFFF", borderRadius: "18px", maxWidth: "560px", width: "100%", padding: "28px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: "18px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F1F5F9", paddingBottom: "14px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <Award style={{ width: "20px", height: "20px", color: "#059669" }} />
+                <Award style={{ width: "20px", height: "20px", color: selectedCert.certType === "DPU" ? "#059669" : "#1E40AF" }} />
                 <h3 style={{ fontSize: "16px", fontWeight: 900, color: "#0F172A", margin: 0 }}>
-                  Salinan e-Certificate TKK
+                  {selectedCert.certType === "DPU" ? "Salinan E-Sertifikat Partisipasi DPU" : "Salinan Sertifikat SKK (LPJK)"}
                 </h3>
               </div>
               <button 
@@ -987,23 +1688,30 @@ export default function PelatihanPage() {
               </div>
 
               <div>
-                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Bidang Pelatihan & Kompetensi:</span>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Bidang Pelatihan & Kualifikasi:</span>
                 <p style={{ margin: "2px 0 0 0", fontWeight: 700, color: "#0F2E5C" }}>{selectedCert.trainingTitle}</p>
+                {selectedCert.skkLevel && (
+                  <span style={{ fontSize: "11px", color: "#0284C7", fontWeight: 700 }}>{selectedCert.skkLevel} (PP 14/2021)</span>
+                )}
               </div>
 
               <div>
-                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Nomor Registrasi Sertifikat:</span>
-                <p style={{ margin: "2px 0 0 0", fontFamily: "monospace", fontWeight: 800, color: "#059669" }}>{selectedCert.certNo}</p>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+                  {selectedCert.certType === "DPU" ? "Nomor Sertifikat DPU (Otomatis):" : "Nomor Registrasi SKK (LPJK):"}
+                </span>
+                <p style={{ margin: "2px 0 0 0", fontFamily: "monospace", fontWeight: 800, color: selectedCert.certType === "DPU" ? "#059669" : "#1E40AF", fontSize: "15px" }}>
+                  {selectedCert.certNo}
+                </p>
               </div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
               <button
                 type="button"
-                onClick={() => alert("Mengunduh sertifikat digital resmi bertanda tangan elektronik...")}
+                onClick={() => alert(`Mengunduh salinan resmi dokumen ${selectedCert.certNo} (PDF) bertanda tangan elektronik...`)}
                 style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "10px", backgroundColor: "#0F2E5C", color: "#FFFFFF", border: "none", padding: "8px 18px", fontSize: "12px", fontWeight: 800, cursor: "pointer" }}
               >
-                <Download style={{ width: "14px", height: "14px" }} /> Unduh e-Certificate (PDF)
+                <Download style={{ width: "14px", height: "14px" }} /> Unduh E-Sertifikat (PDF)
               </button>
             </div>
           </div>

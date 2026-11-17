@@ -2,7 +2,7 @@
 
 @import "tailwindcss";
 
-@source "../src";
+@source "..";
 
 @theme {
   --color-primary: #0F2E5C;
@@ -38,10 +38,10 @@
   --pupr-amber: #F59E0B;
 }
 
-* { 
-  box-sizing: border-box; 
-  margin: 0; 
-  padding: 0; 
+@layer base {
+  * { 
+    box-sizing: border-box; 
+  }
 }
 
 body {

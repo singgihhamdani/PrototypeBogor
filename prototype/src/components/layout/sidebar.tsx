@@ -138,8 +138,8 @@ const navSections: NavSection[] = [
           { label: "Profil OPD PUPR", href: "/profil-opd" },
           { label: "Data Paket Pekerjaan", href: "/paket-pekerjaan" },
           { label: "Data Kecelakaan K3", href: "/kecelakaan" },
-          { label: "Warta & Berita Jakon", href: "/berita" },
-          { label: "Regulasi & Peraturan", href: "/regulasi" },
+          { label: "Data Kebijakan", href: "/regulasi" },
+          { label: "Berita & Pengawasan Jakon", href: "/berita" },
           { label: "Dashboard Pelatihan SIPJAKI", href: "/sipjaki/pelatihan" }
         ]
       }
@@ -166,21 +166,6 @@ const navSections: NavSection[] = [
   {
     sectionTitle: "SISTEM & ADMINISTRASI",
     items: [
-      {
-        id: "pengawasan-hub",
-        label: "Portal Pengawasan SIMAK",
-        href: "/pengawasan",
-        icon: ClipboardCheck,
-        badge: 3,
-        allowedRoles: ["SUPER_ADMIN", "ADMIN_BIDANG"]
-      },
-      {
-        id: "pelaporan-terpadu",
-        label: "Pelaporan SIPJAKI",
-        href: "/pelaporan",
-        icon: FileBarChart,
-        allowedRoles: ["SUPER_ADMIN", "ADMIN_BIDANG", "EKSEKUTIF"]
-      },
       {
         id: "pengaturan",
         label: "Pengaturan & Role",
@@ -441,10 +426,10 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMob
                   const hasChildren = item.children && item.children.length > 0;
                   const isGroupOpen = !!openGroups[item.id];
 
-                  const isDirectActive = item.href 
-                    ? (item.href === "/pengawasan" 
-                        ? pathname === "/pengawasan" 
-                        : pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`)))
+                  const isDirectActive = item.href
+                    ? (item.href === "/pengawasan"
+                      ? pathname === "/pengawasan"
+                      : pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`)))
                     : false;
 
                   const isChildActive = Boolean(
