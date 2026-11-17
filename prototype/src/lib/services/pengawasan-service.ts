@@ -61,16 +61,22 @@ export async function fetchPelaksanaanList(tertibType: TertibType): Promise<{ da
             keabsahanBb: d.keabsahan_bb || "Sah",
             propinsi: d.propinsi || "Jawa Barat",
             kabKota: d.kab_kota || "Kabupaten Bogor",
+            nib: d.nib || (d.simak_code === "1.b.1" ? "0220108381921" : d.simak_code === "1.b.2" ? "9120005432198" : d.simak_code === "1.d" ? "8120309918234" : d.simak_code === "1.f" ? "0129847182934" : undefined),
+            statusPerizinan: d.status_perizinan || "Aktif Terverifikasi (OSS-RBA)",
+            subItems: d.sub_items || undefined,
             catatanTemuan: d.catatan_temuan,
             rekomendasi: d.rekomendasi,
             updatedAt: d.updated_at,
             // Standar SIMAK 2 (Tertib Penyelenggaraan / Proyek Konstruksi)
             namaProyek: d.nama_proyek || d.nama_objek,
             nilaiProyek: Number(d.nilai_proyek) || 0,
-            nomorPerjanjian: d.nomor_perjanjian || "-",
+            nomorKontrak: d.nomor_kontrak || d.nomor_perjanjian || "-",
+            nomorPerjanjian: d.nomor_perjanjian || d.nomor_kontrak || "-",
             waktuPelaksanaan: d.waktu_pelaksanaan || "-",
             penyediaJasa: d.penyedia_jasa || d.badan_usaha,
             namaPemilikPekerjaan: d.nama_pemilik_pekerjaan || "Dinas PUPR Kab. Bogor",
+            namaSkpd: d.nama_skpd || d.nama_pemilik_pekerjaan || "Dinas PUPR Kab. Bogor",
+            namaSatuanKerja: d.nama_satuan_kerja || d.nama_pemilik_pekerjaan || "Satuan Kerja PJN Wilayah I",
             waktuPengawasan: d.waktu_pengawasan || d.tanggal_audit,
             // Standar SIMAK 3 (Tertib Pemanfaatan / Bangunan Purna-Konstruksi)
             namaBangunan: d.nama_bangunan || d.nama_objek,
@@ -133,16 +139,22 @@ export async function createPelaksanaanAudit(record: {
   // Standar SIMAK 2 (Tertib Penyelenggaraan / Proyek Konstruksi)
   namaProyek?: string;
   nilaiProyek?: number;
+  nomorKontrak?: string;
   nomorPerjanjian?: string;
   waktuPelaksanaan?: string;
   penyediaJasa?: string;
   namaPemilikPekerjaan?: string;
+  namaSkpd?: string;
+  namaSatuanKerja?: string;
   waktuPengawasan?: string;
   // Standar SIMAK 3 (Tertib Pemanfaatan / Bangunan Purna-Konstruksi)
   namaBangunan?: string;
   namaPengelola?: string;
   fungsiBangunan?: string;
   statusSlf?: string;
+  nib?: string;
+  statusPerizinan?: string;
+  subItems?: any[];
 }): Promise<{ success: boolean; data?: PelaksanaanRecord; error?: string }> {
   const generatedId = `PEL-${record.tertibType.substring(0, 2).toUpperCase()}-${Date.now().toString().slice(-4)}`;
   const statusKepatuhanVal = record.statusKepatuhan || (record.skorTertib && record.skorTertib >= 80 ? "Patuh" : "Tidak Patuh");
@@ -179,16 +191,20 @@ export async function createPelaksanaanAudit(record: {
     // Kolom SIMAK 2
     nama_proyek: record.namaProyek || record.namaObjek,
     nilai_proyek: record.nilaiProyek || 0,
-    nomor_perjanjian: record.nomorPerjanjian || null,
+    nomor_kontrak: record.nomorKontrak || record.nomorPerjanjian || null,
+    nomor_perjanjian: record.nomorPerjanjian || record.nomorKontrak || null,
     waktu_pelaksanaan: record.waktuPelaksanaan || null,
     penyedia_jasa: record.penyediaJasa || record.badanUsaha,
-    nama_pemilik_pekerjaan: record.namaPemilikPekerjaan || null,
+    nama_pemilik_pekerjaan: record.namaPemilikPekerjaan || record.namaSkpd || record.namaSatuanKerja || null,
+    nama_skpd: record.namaSkpd || record.namaPemilikPekerjaan || null,
+    nama_satuan_kerja: record.namaSatuanKerja || record.namaPemilikPekerjaan || null,
     waktu_pengawasan: record.waktuPengawasan || record.tanggalAudit,
     // Kolom SIMAK 3
     nama_bangunan: record.namaBangunan || record.namaObjek,
     nama_pengelola: record.namaPengelola || null,
     fungsi_bangunan: record.fungsiBangunan || null,
-    status_slf: record.statusSlf || "Memiliki SLF"
+    status_slf: record.statusSlf || "Memiliki SLF",
+    sub_items: record.subItems || []
   };
 
   if (isSupabaseConfigured()) {
@@ -236,16 +252,22 @@ export async function createPelaksanaanAudit(record: {
             // Standar SIMAK 2
             namaProyek: data.nama_proyek || data.nama_objek,
             nilaiProyek: Number(data.nilai_proyek) || 0,
-            nomorPerjanjian: data.nomor_perjanjian || "-",
+            nomorKontrak: data.nomor_kontrak || data.nomor_perjanjian || "-",
+            nomorPerjanjian: data.nomor_perjanjian || data.nomor_kontrak || "-",
             waktuPelaksanaan: data.waktu_pelaksanaan || "-",
             penyediaJasa: data.penyedia_jasa || data.badan_usaha,
             namaPemilikPekerjaan: data.nama_pemilik_pekerjaan || "Dinas PUPR Kab. Bogor",
+            namaSkpd: data.nama_skpd || data.nama_pemilik_pekerjaan || "Dinas PUPR Kab. Bogor",
+            namaSatuanKerja: data.nama_satuan_kerja || data.nama_pemilik_pekerjaan || "Satuan Kerja PJN Wilayah I",
             waktuPengawasan: data.waktu_pengawasan || data.tanggal_audit,
             // Standar SIMAK 3
             namaBangunan: data.nama_bangunan || data.nama_objek,
             namaPengelola: data.nama_pengelola || "-",
             fungsiBangunan: data.fungsi_bangunan || "Bangunan Gedung / Infrastruktur",
-            statusSlf: data.status_slf || "Memiliki SLF"
+            statusSlf: data.status_slf || "Memiliki SLF",
+            nib: data.nib || record.nib,
+            statusPerizinan: data.status_perizinan || record.statusPerizinan,
+            subItems: data.sub_items || record.subItems
           }
         };
       }
@@ -286,13 +308,19 @@ export async function createPelaksanaanAudit(record: {
       keabsahanBb: record.keabsahanBb || "Sah",
       propinsi: record.propinsi || "Jawa Barat",
       kabKota: record.kabKota || "Kabupaten Bogor",
+      nib: record.nib,
+      statusPerizinan: record.statusPerizinan,
+      subItems: record.subItems,
       // Standar SIMAK 2
       namaProyek: record.namaProyek || record.namaObjek,
       nilaiProyek: record.nilaiProyek || 0,
-      nomorPerjanjian: record.nomorPerjanjian || "-",
+      nomorKontrak: record.nomorKontrak || record.nomorPerjanjian || "-",
+      nomorPerjanjian: record.nomorPerjanjian || record.nomorKontrak || "-",
       waktuPelaksanaan: record.waktuPelaksanaan || "-",
       penyediaJasa: record.penyediaJasa || record.badanUsaha,
-      namaPemilikPekerjaan: record.namaPemilikPekerjaan || "Dinas PUPR Kab. Bogor",
+      namaPemilikPekerjaan: record.namaPemilikPekerjaan || record.namaSkpd || record.namaSatuanKerja || "Dinas PUPR Kab. Bogor",
+      namaSkpd: record.namaSkpd || record.namaPemilikPekerjaan || "Dinas PUPR Kab. Bogor",
+      namaSatuanKerja: record.namaSatuanKerja || record.namaPemilikPekerjaan || "Satuan Kerja PJN Wilayah I",
       waktuPengawasan: record.waktuPengawasan || record.tanggalAudit,
       // Standar SIMAK 3
       namaBangunan: record.namaBangunan || record.namaObjek,
@@ -341,16 +369,22 @@ export async function updatePelaksanaan(
         // Kolom SIMAK 2
         if (record.namaProyek !== undefined) payload.nama_proyek = record.namaProyek;
         if (record.nilaiProyek !== undefined) payload.nilai_proyek = record.nilaiProyek;
+        if (record.nomorKontrak !== undefined) payload.nomor_kontrak = record.nomorKontrak;
         if (record.nomorPerjanjian !== undefined) payload.nomor_perjanjian = record.nomorPerjanjian;
         if (record.waktuPelaksanaan !== undefined) payload.waktu_pelaksanaan = record.waktuPelaksanaan;
         if (record.penyediaJasa !== undefined) payload.penyedia_jasa = record.penyediaJasa;
         if (record.namaPemilikPekerjaan !== undefined) payload.nama_pemilik_pekerjaan = record.namaPemilikPekerjaan;
+        if (record.namaSkpd !== undefined) payload.nama_skpd = record.namaSkpd;
+        if (record.namaSatuanKerja !== undefined) payload.nama_satuan_kerja = record.namaSatuanKerja;
         if (record.waktuPengawasan !== undefined) payload.waktu_pengawasan = record.waktuPengawasan;
         // Kolom SIMAK 3
         if (record.namaBangunan !== undefined) payload.nama_bangunan = record.namaBangunan;
         if (record.namaPengelola !== undefined) payload.nama_pengelola = record.namaPengelola;
         if (record.fungsiBangunan !== undefined) payload.fungsi_bangunan = record.fungsiBangunan;
         if (record.statusSlf !== undefined) payload.status_slf = record.statusSlf;
+        if (record.nib !== undefined) payload.nib = record.nib;
+        if (record.statusPerizinan !== undefined) payload.status_perizinan = record.statusPerizinan;
+        if (record.subItems !== undefined) payload.sub_items = record.subItems;
 
         const { error } = await (client.from("pengawasan_sesi") as any)
           .update(payload)

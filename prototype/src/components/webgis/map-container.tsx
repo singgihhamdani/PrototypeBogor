@@ -59,17 +59,26 @@ interface MapProps {
   basemap?: "osm" | "satellite";
   totalProjectsCount?: number;
   totalBujkCount?: number;
+  focusedCoordinate?: { lat: number; lng: number } | null;
 }
 
-function FlyToDistrict({ district }: { district: District | undefined }) {
+function FlyToLocation({ 
+  district, 
+  focusedCoordinate 
+}: { 
+  district: District | undefined;
+  focusedCoordinate?: { lat: number; lng: number } | null;
+}) {
   const map = useMap();
   useEffect(() => {
-    if (district) {
+    if (focusedCoordinate) {
+      map.flyTo([focusedCoordinate.lat, focusedCoordinate.lng], 15, { duration: 1.4 });
+    } else if (district) {
       map.flyTo([district.lat, district.lng], 13, { duration: 1.2 });
     } else {
       map.flyTo([-6.55, 106.78], 10, { duration: 1.2 });
     }
-  }, [district, map]);
+  }, [district, focusedCoordinate, map]);
   return null;
 }
 
@@ -100,7 +109,8 @@ export default function MapComponent({
   onSelectDistrict,
   basemap = "osm",
   totalProjectsCount = 8,
-  totalBujkCount = 10
+  totalBujkCount = 10,
+  focusedCoordinate = null
 }: MapProps) {
   const selectedDist = districts.find((d) => d.id === selectedDistrict);
 
@@ -121,7 +131,7 @@ export default function MapComponent({
         zoomControl={true}
       >
         <TileLayer key={basemap} attribution={tileAttribution} url={tileUrl} />
-        <FlyToDistrict district={selectedDist} />
+        <FlyToLocation district={selectedDist} focusedCoordinate={focusedCoordinate} />
 
         {/* 1. Selected District Highlight Ring (Hanya jika kecamatan difokuskan) */}
         {selectedDist && (

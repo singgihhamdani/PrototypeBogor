@@ -6,7 +6,8 @@ import {
   MapPin, Building2, ChevronRight, CheckCircle2, 
   List, SlidersHorizontal, Database as DbIcon, Loader2, RefreshCw,
   Search, X, RotateCcw, Globe, Satellite, Activity, Coins,
-  Award, Briefcase, ShieldCheck, Phone, Mail, ExternalLink
+  Award, Briefcase, ShieldCheck, Phone, Mail, ExternalLink,
+  UploadCloud
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import districtsData from "@/data/districts.json";
@@ -16,6 +17,7 @@ import {
   DataSourceStatus 
 } from "@/lib/services/master-data";
 import type { MapProjectItem, MapBUJKItem } from "@/components/webgis/map-container";
+import SpatialUploadModal from "@/components/webgis/spatial-upload-modal";
 
 const MapComponent = dynamic(() => import("@/components/webgis/map-container"), { 
   ssr: false, 
@@ -59,6 +61,30 @@ export default function WebGISPage() {
   const [bujkTypeFilter, setBujkTypeFilter] = useState<string>("all");
   const [bujkStatusFilter, setBujkStatusFilter] = useState<string>("all");
   const [bujkProjectFilter, setBujkProjectFilter] = useState<"all" | "active" | "none">("all");
+
+  // State Modal Upload Data & Plot Titik Spasial
+  const [isSpatialModalOpen, setIsSpatialModalOpen] = useState(false);
+  const [focusedCoordinate, setFocusedCoordinate] = useState<{ lat: number; lng: number } | null>(null);
+  const [spatialSuccessBanner, setSpatialSuccessBanner] = useState<string | null>(null);
+
+  const handleSpatialUploadSuccess = (
+    newPoints: { lat: number; lng: number; name: string }[], 
+    uploadedLayer: "projects" | "bujk"
+  ) => {
+    loadData();
+    if (layer !== uploadedLayer) {
+      setLayer(uploadedLayer);
+    }
+    if (newPoints.length > 0) {
+      setFocusedCoordinate({ lat: newPoints[0].lat, lng: newPoints[0].lng });
+      setSpatialSuccessBanner(
+        newPoints.length === 1
+          ? `Titik "${newPoints[0].name}" berhasil dipetakan ke WebGIS!`
+          : `Berhasil menambahkan ${newPoints.length} titik spasial baru ke WebGIS!`
+      );
+      setTimeout(() => setSpatialSuccessBanner(null), 6000);
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -276,6 +302,29 @@ export default function WebGISPage() {
 
         {/* Controls: Basemap & Layer Switchers */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", width: isSmallScreen ? "100%" : "auto" }}>
+          {/* Tombol Upload & Plot Titik Spasial */}
+          <button
+            type="button"
+            onClick={() => setIsSpatialModalOpen(true)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "7px",
+              borderRadius: "10px",
+              padding: isSmallScreen ? "7px 12px" : "8px 16px",
+              fontSize: "12px",
+              fontWeight: 800,
+              cursor: "pointer",
+              backgroundColor: "#059669",
+              color: "#FFFFFF",
+              border: "none",
+              boxShadow: "0 2px 4px rgba(5, 150, 105, 0.25)"
+            }}
+          >
+            <UploadCloud style={{ width: "15px", height: "15px" }} />
+            <span>+ Upload / Plot Titik Spasial</span>
+          </button>
+
           {/* Refresh Button */}
           <button
             type="button"
@@ -396,6 +445,35 @@ export default function WebGISPage() {
           </button>
         </div>
       </div>
+
+      {/* Success Notification Banner Setelah Upload / Plot Titik */}
+      {spatialSuccessBanner && (
+        <div style={{
+          backgroundColor: "#ECFDF5",
+          border: "1px solid #A7F3D0",
+          color: "#065F46",
+          padding: "12px 18px",
+          borderRadius: "12px",
+          fontSize: "13px",
+          fontWeight: 700,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          boxShadow: "0 2px 4px rgba(5, 150, 105, 0.1)"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <CheckCircle2 style={{ width: "20px", height: "20px", color: "#059669", flexShrink: 0 }} />
+            <span>{spatialSuccessBanner}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSpatialSuccessBanner(null)}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#065F46" }}
+          >
+            <X style={{ width: "16px", height: "16px" }} />
+          </button>
+        </div>
+      )}
 
       {/* 2. Multi-Criteria Filter Bar (Adapts to Active Layer) */}
       <div 
@@ -825,6 +903,7 @@ export default function WebGISPage() {
               basemap={basemap}
               totalProjectsCount={projects.length}
               totalBujkCount={bujkList.length}
+              focusedCoordinate={focusedCoordinate}
             />
           </div>
         )}
@@ -1170,6 +1249,14 @@ export default function WebGISPage() {
           </div>
         )}
       </div>
+
+      {/* Modal Upload & Plot Titik Spasial */}
+      <SpatialUploadModal
+        isOpen={isSpatialModalOpen}
+        onClose={() => setIsSpatialModalOpen(false)}
+        onSuccess={handleSpatialUploadSuccess}
+        initialLayer={layer}
+      />
     </div>
   );
 }

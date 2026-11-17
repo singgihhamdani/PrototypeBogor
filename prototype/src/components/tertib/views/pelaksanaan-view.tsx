@@ -8,7 +8,8 @@ import {
   Search, ShieldCheck, Filter, ArrowUpRight, Award, 
   AlertCircle, XCircle, Printer, Eye, Trash2, Calendar, 
   MapPin, Building2, HardHat, FileSpreadsheet, Sparkles, 
-  Check, X, RefreshCw, Database as DbIcon, Loader2, Edit, Phone, User
+  Check, X, RefreshCw, Database as DbIcon, Loader2, Edit, Phone, User,
+  ChevronLeft, ChevronRight, AlertTriangle
 } from "lucide-react";
 import DataTableView, { ColumnDef } from "@/components/common/data-table-view";
 import ModalForm from "@/components/common/modal-form";
@@ -80,9 +81,18 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
   const [activeVariant, setActiveVariant] = useState<string>("Semua");
   const [filterStatusVerifikasi, setFilterStatusVerifikasi] = useState<string>("Semua");
   const [filterKepatuhan, setFilterKepatuhan] = useState<string>("Semua");
-  const [filterTahun, setFilterTahun] = useState<string>("2026");
+  const [filterTahun, setFilterTahun] = useState<string>("Semua");
   const [filterDocPending, setFilterDocPending] = useState(false);
   const [sortBy, setSortBy] = useState<"terkini" | "kepatuhan" | "nama" | "terlama">("terkini");
+
+  // Tab Carousel Scroll Ref
+  const tabScrollRef = React.useRef<HTMLDivElement>(null);
+  const scrollTabs = (direction: "left" | "right") => {
+    if (tabScrollRef.current) {
+      const scrollAmount = direction === "left" ? -280 : 280;
+      tabScrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
 
   // Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -100,6 +110,8 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
   const [editNamaPemilik, setEditNamaPemilik] = useState("");
   const [editNoKontak, setEditNoKontak] = useState("");
   const [editKualifikasi, setEditKualifikasi] = useState<"Kecil" | "Menengah" | "Besar" | "Spesialis">("Kecil");
+  const [editNib, setEditNib] = useState("");
+  const [editStatusPerizinan, setEditStatusPerizinan] = useState("Aktif Terverifikasi (OSS-RBA)");
   const [editTanggal, setEditTanggal] = useState("");
   const [editLokasi, setEditLokasi] = useState("");
   const [editKepemilikanIzin, setEditKepemilikanIzin] = useState<"Memiliki" | "Tidak Memiliki">("Memiliki");
@@ -114,13 +126,16 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
   const [editCatatan, setEditCatatan] = useState("");
   const [editRekomendasi, setEditRekomendasi] = useState("");
 
-  // Edit Modal State Khusus SIMAK 2 (Tertib Penyelenggaraan: 11 Parameter SIPJAKI)
+  // Edit Modal State Khusus SIMAK 2 (Tertib Penyelenggaraan: 12 Kolom Baku Dokumen Excel)
   const [editNamaProyek, setEditNamaProyek] = useState("");
   const [editNilaiProyek, setEditNilaiProyek] = useState<number>(0);
+  const [editNomorKontrak, setEditNomorKontrak] = useState("");
   const [editNomorPerjanjian, setEditNomorPerjanjian] = useState("");
   const [editWaktuPelaksanaan, setEditWaktuPelaksanaan] = useState("");
   const [editPenyediaJasa, setEditPenyediaJasa] = useState("");
   const [editNamaPemilikPekerjaan, setEditNamaPemilikPekerjaan] = useState("");
+  const [editNamaSkpd, setEditNamaSkpd] = useState("");
+  const [editNamaSatuanKerja, setEditNamaSatuanKerja] = useState("");
   const [editWaktuPengawasan, setEditWaktuPengawasan] = useState("");
   const [editPropinsi, setEditPropinsi] = useState("Jawa Barat");
   const [editKabKota, setEditKabKota] = useState("Kabupaten Bogor");
@@ -140,14 +155,16 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
   const [verifyTarget, setVerifyTarget] = useState<PelaksanaanRecord | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Form State untuk Tambah Pengawasan Baru (Standar SIPJAKI SIMAK 1 & SIMAK 2)
+  // Form State untuk Tambah Pengawasan Baru (Standar SIPJAKI SIMAK 1, 2 & 3)
   const [addForm, setAddForm] = useState({
-    simakCode: config.simakVariants[0]?.code || "SIMAK 1a1",
+    simakCode: config.simakVariants[0]?.code || "1.a.1",
     namaObjek: "",
     namaProdusen: "",
     namaPemilik: "",
     noKontak: "",
     kualifikasi: "Kecil" as "Kecil" | "Menengah" | "Besar" | "Spesialis",
+    nib: "",
+    statusPerizinan: "Aktif Terverifikasi (OSS-RBA)",
     lokasi: "Kecamatan Cibinong",
     tanggal: new Date().toISOString().split("T")[0],
     pengawas: "Ir. Hendra Setiawan, S.T. (Tim Pembina Jakon)",
@@ -163,10 +180,13 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
     // Field Tambahan Standar SIMAK 2 (Tertib Penyelenggaraan Paket Proyek Fisik)
     namaProyek: "",
     nilaiProyek: 0,
+    nomorKontrak: "",
     nomorPerjanjian: "",
     waktuPelaksanaan: "",
     penyediaJasa: "",
     namaPemilikPekerjaan: "Dinas PUPR Kab. Bogor",
+    namaSkpd: "Dinas PUPR Kab. Bogor",
+    namaSatuanKerja: "Satuan Kerja PJN Wilayah I",
     waktuPengawasan: new Date().toISOString().split("T")[0],
     propinsi: "Jawa Barat",
     kabKota: "Kabupaten Bogor",
@@ -199,38 +219,61 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
     });
   }, [data, sortBy]);
 
-  // Filtered Records
+  // Filtered Records Sesuai Komponen Antarmuka Dokumen Excel
   const filteredData = sortedData.filter((item) => {
-    const matchVariant = activeVariant === "Semua" || item.simakCode === activeVariant;
+    const matchVariant = activeVariant === "Semua" || 
+      item.simakCode === activeVariant ||
+      (activeVariant === "1.a.1" && (item.simakCode === "SIMAK 1a1" || item.simakCode === "SIMAK 1a2" || item.simakCode === "SIMAK 1a3" || item.simakCode === "1.a.1")) ||
+      (activeVariant === "1.a.2" && (item.simakCode === "SIMAK 1c" || item.simakCode === "1.a.2")) ||
+      (activeVariant === "1.d" && (item.simakCode === "SIMAK 1d" || item.simakCode === "1.d")) ||
+      (activeVariant === "1.e" && (item.simakCode === "SIMAK 1e" || item.simakCode === "1.e")) ||
+      (activeVariant === "1.f" && (item.simakCode === "SIMAK 1f" || item.simakCode === "1.f")) ||
+      (activeVariant === "2.a" && (item.simakCode === "SIMAK 2a" || item.simakCode === "SIMAK 2.a" || item.simakCode === "2.a")) ||
+      (activeVariant === "2.b" && (item.simakCode === "SIMAK 2b" || item.simakCode === "SIMAK 2.b" || item.simakCode === "2.b")) ||
+      (activeVariant === "2.c" && (item.simakCode === "SIMAK 2c" || item.simakCode === "SIMAK 2.c" || item.simakCode === "2.c")) ||
+      (activeVariant === "2.d" && (item.simakCode === "SIMAK 2d" || item.simakCode === "SIMAK 2.d" || item.simakCode === "2.d")) ||
+      ((activeVariant === "Daftar Simak 3" || activeVariant === "SIMAK 3") && (item.simakCode === "Daftar Simak 3" || item.simakCode === "SIMAK 3" || item.simakCode === "simak-3" || isSimak3));
+
     const matchVerif = filterStatusVerifikasi === "Semua" || 
       (filterStatusVerifikasi === "pending" && item.statusVerifikasi === "Draft") ||
       (filterStatusVerifikasi === "verified" && item.statusVerifikasi === "Terverifikasi") ||
       (filterStatusVerifikasi === "rejected" && item.statusVerifikasi === "Ditolak");
+
+    const rowDate = item.waktuPengawasan || item.tanggal || item.tanggalAudit || "";
+    const rowYear = rowDate.split("-")[0] || (item as any).tahun || "2026";
+    const matchYear = filterTahun === "Semua" || rowYear === filterTahun || (item as any).tahun === filterTahun;
+
     const matchKepatuhan = filterKepatuhan === "Semua" || item.statusKepatuhan === filterKepatuhan;
     const matchDoc = !filterDocPending || item._docStatus === "pending" || (!item.dokumen && !item.dokumenBAP);
-    return matchVariant && matchVerif && matchKepatuhan && matchDoc;
+    return matchVariant && matchVerif && matchYear && matchKepatuhan && matchDoc;
   });
 
-  // Calculate Stats (Tanpa kata audit & skor tertib)
-  const statTotal = data.length;
-  const statPatuh = data.filter((r) => r.statusKepatuhan === "Patuh").length;
-  const statTidakPatuh = data.filter((r) => r.statusKepatuhan === "Tidak Patuh").length;
-  const statPending = data.filter((r) => r.statusVerifikasi === "Draft").length;
+  // 4 Summary Cards Baku Sesuai Spesifikasi Excel Komponen Antarmuka
+  const statTotal = filteredData.length;
+  const statPending = filteredData.filter((r) => r.statusVerifikasi === "Draft").length;
+  const statVerified = filteredData.filter((r) => r.statusVerifikasi === "Terverifikasi").length;
+  const statRejected = filteredData.filter((r) => r.statusVerifikasi === "Ditolak").length;
+  const statPatuh = filteredData.filter((r) => r.statusKepatuhan === "Patuh").length;
+  const statTidakPatuh = filteredData.filter((r) => r.statusKepatuhan === "Tidak Patuh").length;
 
   // Helper Auto-Fill dari Master Paket Pekerjaan untuk SIMAK 2
   const handleSelectPaketAutoFill = (paketId: string) => {
     const found = masterPaketList.find((p) => p.id === paketId);
     if (found) {
+      const generatedNoKontrak = (found as any).nomor_kontrak || `602.1/0${found.id.replace(/\D/g, '') || '45'}/SPK/DPUPR/2026`;
       setAddForm((prev) => ({
         ...prev,
         namaProyek: found.nama_paket,
         nilaiProyek: Number(found.nilai_kontrak) || 0,
-        nomorPerjanjian: (found as any).nomor_kontrak || `602.1/0${found.id.replace(/\D/g, '') || '45'}/SPK/DPUPR/2026`,
+        nomorKontrak: generatedNoKontrak,
+        nomorPerjanjian: generatedNoKontrak,
         waktuPelaksanaan: found.tanggal_mulai && found.tanggal_selesai
           ? `${found.tanggal_mulai} s/d ${found.tanggal_selesai}`
           : "180 Hari Kalender",
         penyediaJasa: found.nama_penyedia || "PT. Kontraktor Pelaksana",
         namaPemilikPekerjaan: found.nama_instansi || "Dinas PUPR Kab. Bogor",
+        namaSkpd: found.nama_instansi || "Dinas PUPR Kab. Bogor",
+        namaSatuanKerja: "Satuan Kerja PJN Wilayah I",
         lokasi: found.kecamatan || "Kabupaten Bogor"
       }));
     }
@@ -245,6 +288,8 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
     setEditNamaPemilik(row.namaPemilik || "");
     setEditNoKontak(row.noKontak || "");
     setEditKualifikasi(row.kualifikasi || "Kecil");
+    setEditNib(row.nib || "");
+    setEditStatusPerizinan(row.statusPerizinan || "Aktif Terverifikasi (OSS-RBA)");
     setEditTanggal(row.tanggal || row.tanggalAudit || new Date().toISOString().split("T")[0]);
     setEditLokasi(row.lokasi);
     setEditKepemilikanIzin(row.kepemilikanIzin || "Memiliki");
@@ -259,13 +304,16 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
     setEditCatatan(row.catatanTemuan || "");
     setEditRekomendasi(row.rekomendasi || "");
 
-    // Nilai SIMAK 2 (Tertib Penyelenggaraan: 11 Parameter SIPJAKI)
+    // Nilai SIMAK 2 (Tertib Penyelenggaraan: 12 Kolom Baku Dokumen Excel)
     setEditNamaProyek(row.namaProyek || row.namaObjek || "");
     setEditNilaiProyek(row.nilaiProyek || 0);
-    setEditNomorPerjanjian(row.nomorPerjanjian || "");
+    setEditNomorKontrak(row.nomorKontrak || row.nomorPerjanjian || "");
+    setEditNomorPerjanjian(row.nomorPerjanjian || row.nomorKontrak || "");
     setEditWaktuPelaksanaan(row.waktuPelaksanaan || "");
     setEditPenyediaJasa(row.penyediaJasa || row.namaProdusen || row.badanUsaha || "");
     setEditNamaPemilikPekerjaan(row.namaPemilikPekerjaan || "Dinas PUPR Kab. Bogor");
+    setEditNamaSkpd(row.namaSkpd || row.namaPemilikPekerjaan || "Dinas PUPR Kab. Bogor");
+    setEditNamaSatuanKerja(row.namaSatuanKerja || row.namaPemilikPekerjaan || "Satuan Kerja PJN Wilayah I");
     setEditWaktuPengawasan(row.waktuPengawasan || row.tanggal || row.tanggalAudit || new Date().toISOString().split("T")[0]);
     setEditPropinsi(row.propinsi || "Jawa Barat");
     setEditKabKota(row.kabKota || "Kabupaten Bogor");
@@ -310,6 +358,8 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       namaPemilik: editNamaPemilik,
       noKontak: editNoKontak,
       kualifikasi: editKualifikasi,
+      nib: editNib,
+      statusPerizinan: editStatusPerizinan,
       tanggal: (isSimak2 || isSimak3) ? editWaktuPengawasan : editTanggal,
       tanggalAudit: (isSimak2 || isSimak3) ? editWaktuPengawasan : editTanggal,
       lokasi: editLokasi,
@@ -328,10 +378,13 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       // Field SIMAK 2
       namaProyek: editNamaProyek,
       nilaiProyek: editNilaiProyek,
-      nomorPerjanjian: editNomorPerjanjian,
+      nomorKontrak: editNomorKontrak || editNomorPerjanjian,
+      nomorPerjanjian: editNomorPerjanjian || editNomorKontrak,
       waktuPelaksanaan: editWaktuPelaksanaan,
       penyediaJasa: editPenyediaJasa,
       namaPemilikPekerjaan: editNamaPemilikPekerjaan,
+      namaSkpd: editNamaSkpd || editNamaPemilikPekerjaan,
+      namaSatuanKerja: editNamaSatuanKerja || editNamaPemilikPekerjaan,
       waktuPengawasan: editWaktuPengawasan,
       propinsi: editPropinsi,
       kabKota: editKabKota,
@@ -429,6 +482,8 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       namaPemilik: addForm.namaPemilik,
       noKontak: addForm.noKontak,
       kualifikasi: addForm.kualifikasi,
+      nib: addForm.nib,
+      statusPerizinan: addForm.statusPerizinan,
       lokasi: addForm.lokasi,
       tanggalAudit: (isSimak2 || isSimak3) ? addForm.waktuPengawasan : addForm.tanggal,
       pengawas: addForm.pengawas,
@@ -444,10 +499,13 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
       // Field SIMAK 2
       namaProyek: addForm.namaProyek,
       nilaiProyek: addForm.nilaiProyek,
-      nomorPerjanjian: addForm.nomorPerjanjian,
+      nomorKontrak: addForm.nomorKontrak || addForm.nomorPerjanjian,
+      nomorPerjanjian: addForm.nomorPerjanjian || addForm.nomorKontrak,
       waktuPelaksanaan: addForm.waktuPelaksanaan,
       penyediaJasa: addForm.penyediaJasa,
       namaPemilikPekerjaan: addForm.namaPemilikPekerjaan,
+      namaSkpd: addForm.namaSkpd || addForm.namaPemilikPekerjaan,
+      namaSatuanKerja: addForm.namaSatuanKerja || addForm.namaPemilikPekerjaan,
       waktuPengawasan: addForm.waktuPengawasan,
       propinsi: addForm.propinsi,
       kabKota: addForm.kabKota,
@@ -464,12 +522,14 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
 
       // Reset Form
       setAddForm({
-        simakCode: config.simakVariants[0]?.code || "SIMAK 1a1",
+        simakCode: config.simakVariants[0]?.code || "1.a.1",
         namaObjek: "",
         namaProdusen: "",
         namaPemilik: "",
         noKontak: "",
         kualifikasi: "Kecil",
+        nib: "",
+        statusPerizinan: "Aktif Terverifikasi (OSS-RBA)",
         lokasi: "Kecamatan Cibinong",
         tanggal: new Date().toISOString().split("T")[0],
         pengawas: "Ir. Hendra Setiawan, S.T. (Tim Pembina Jakon)",
@@ -484,10 +544,13 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
         dokumenFile: null,
         namaProyek: "",
         nilaiProyek: 0,
+        nomorKontrak: "",
         nomorPerjanjian: "",
         waktuPelaksanaan: "",
         penyediaJasa: "",
         namaPemilikPekerjaan: "Dinas PUPR Kab. Bogor",
+        namaSkpd: "Dinas PUPR Kab. Bogor",
+        namaSatuanKerja: "Satuan Kerja PJN Wilayah I",
         waktuPengawasan: new Date().toISOString().split("T")[0],
         propinsi: "Jawa Barat",
         kabKota: "Kabupaten Bogor",
@@ -645,279 +708,1149 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
     setVerifyTarget(null);
   };
 
-  // Columns for DataTableView (Opsi 2: Harmonisasi Standar SIPJAKI 7 Kolom Utama + Visibilitas Operasional SIJAKON)
-  const tableColumns: ColumnDef<PelaksanaanRecord>[] = [
-    {
-      key: "no",
-      label: "NO",
-      width: "55px",
-      align: "center",
-      render: (_row, index) => (
-        <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>
-          {index + 1}
+  // Helper Render Status Badge Kolom
+  const renderSimakStatus = (row: PelaksanaanRecord) => {
+    const isPatuh = row.statusKepatuhan === "Patuh";
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+        <span
+          style={{
+            fontSize: "10px",
+            fontWeight: 900,
+            padding: "2px 8px",
+            borderRadius: "9999px",
+            backgroundColor: isPatuh ? "#DCFCE7" : "#FEE2E2",
+            color: isPatuh ? "#166534" : "#991B1B",
+            border: `1px solid ${isPatuh ? "#86EFAC" : "#FCA5A5"}`,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "3px"
+          }}
+        >
+          {isPatuh ? <Check style={{ width: "10px", height: "10px" }} /> : <X style={{ width: "10px", height: "10px" }} />}
+          <span>{row.statusKepatuhan}</span>
         </span>
-      )
-    },
-    {
-      key: "tanggal",
-      label: "TANGGAL PENGAWASAN",
-      width: "165px",
-      render: (row) => (
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <Calendar style={{ width: "13px", height: "13px", color: "#2563EB", flexShrink: 0 }} />
-          <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
-            {row.tanggal || row.tanggalAudit}
-          </span>
-        </div>
-      )
-    },
-    {
-      key: "tahun",
-      label: "TAHUN",
-      width: "80px",
-      align: "center",
-      render: () => (
-        <span style={{ fontSize: "11px", fontWeight: 800, backgroundColor: "#EBF2FA", color: "#0F2E5C", padding: "3px 8px", borderRadius: "6px" }}>
-          {filterTahun}
-        </span>
-      )
-    },
-    {
-      key: "wilayah",
-      label: "WILAYAH & OBJEK PENGAWASAN",
-      render: (row) => (
-        <div>
-          <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", display: "flex", alignItems: "center", gap: "5px" }}>
-            <MapPin style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
-            <span>{row.lokasi}, Kabupaten Bogor</span>
-          </div>
-          <div style={{ fontSize: "12px", fontWeight: 700, color: "#0F172A", marginTop: "3px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
-            <Building2 style={{ width: "11px", height: "11px", color: "#64748B", flexShrink: 0 }} />
-            <span>{row.namaProdusen || row.badanUsaha}</span>
-            <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "1px 6px", borderRadius: "4px" }}>
+        <StatusBadge status={row.statusVerifikasi} />
+      </div>
+    );
+  };
+
+  // Helper Badge Status Izin / Perizinan Berusaha
+  const renderIzinBadge = (val?: string, isPositiveSah = false) => {
+    const isGood = isPositiveSah ? (val === "Sah" || val === "Aktif") : (val === "Memiliki" || val === "Ada" || (val && val.includes("Aktif")));
+    return (
+      <span
+        style={{
+          fontSize: "11px",
+          fontWeight: 700,
+          padding: "2px 8px",
+          borderRadius: "6px",
+          backgroundColor: isGood ? "#ECFDF5" : "#FEF2F2",
+          color: isGood ? "#065F46" : "#991B1B",
+          border: `1px solid ${isGood ? "#A7F3D0" : "#FECACA"}`,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "4px"
+        }}
+      >
+        {isGood ? <CheckCircle2 style={{ width: "11px", height: "11px", color: "#10B981" }} /> : <AlertTriangle style={{ width: "11px", height: "11px", color: "#EF4444" }} />}
+        <span>{val || (isPositiveSah ? "Sah" : "Memiliki")}</span>
+      </span>
+    );
+  };
+
+  // Dynamic Columns Generator for SIMAK 1 (1.a.1 s/d 1.f & Semua) Sesuai Dokumen Format_Rinci_Pelaksanaan_Pengawasan_1a_sd_1f.xlsx
+  const getSimak1Columns = (variant: string): ColumnDef<PelaksanaanRecord>[] => {
+    // 1.a.1: Produsen Rantai Pasok Material Konstruksi (15 Kolom Baku)
+    if (variant === "1.a.1" || variant === "SIMAK 1a1") {
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "45px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "kualifikasi",
+          label: "KUALIFIKASI",
+          width: "95px",
+          align: "center",
+          render: (row) => (
+            <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "6px" }}>
               {row.kualifikasi || "Kecil"}
             </span>
-          </div>
-          <div style={{ fontSize: "11px", color: "#64748B", marginTop: "2px", display: "flex", alignItems: "center", gap: "4px" }}>
-            <span style={{ fontSize: "9px", fontWeight: 900, color: "#0F2E5C", backgroundColor: "#F1F5F9", padding: "1px 5px", borderRadius: "4px", fontFamily: "monospace" }}>
-              {row.simakCode}
-            </span>
-            <span style={{ color: "#475569" }}>{row.namaObjek}</span>
-          </div>
-        </div>
-      )
-    },
-    {
-      key: "dokumen",
-      label: "DOKUMEN",
-      width: "185px",
-      render: (row) => (
-        <DocStatusBadge
-          status={row._docStatus || (row.dokumen || row.dokumenBAP ? "complete" : "pending")}
-          fileName={row.dokumen || row.dokumenBAP}
-          documentLabel="Dokumen Pengawasan"
-          onClick={() => setDocUploadTarget(row)}
-        />
-      )
-    },
-    {
-      key: "status",
-      label: "STATUS",
-      width: "150px",
-      align: "center",
-      render: (row) => {
-        const isPatuh = row.statusKepatuhan === "Patuh";
-        return (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-            <span
-              style={{
-                fontSize: "10px",
-                fontWeight: 900,
-                padding: "2px 8px",
-                borderRadius: "9999px",
-                backgroundColor: isPatuh ? "#DCFCE7" : "#FEE2E2",
-                color: isPatuh ? "#166534" : "#991B1B",
-                border: `1px solid ${isPatuh ? "#86EFAC" : "#FCA5A5"}`,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "3px"
-              }}
-            >
-              {isPatuh ? <Check style={{ width: "10px", height: "10px" }} /> : <X style={{ width: "10px", height: "10px" }} />}
-              <span>{row.statusKepatuhan}</span>
-            </span>
-            <StatusBadge status={row.statusVerifikasi} />
-          </div>
-        );
-      }
+          )
+        },
+        {
+          key: "namaProdusen",
+          label: "NAMA PRODUSEN",
+          width: "190px",
+          render: (row) => (
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C" }}>{row.namaProdusen || row.badanUsaha}</div>
+              <div style={{ fontSize: "10px", color: "#64748B" }}>{row.namaObjek}</div>
+            </div>
+          )
+        },
+        {
+          key: "namaPemilik",
+          label: "NAMA PEMILIK",
+          width: "140px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 600, color: "#334155" }}>{row.namaPemilik || "-"}</span>
+        },
+        {
+          key: "noKontak",
+          label: "NO KONTAK",
+          width: "125px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#475569", fontFamily: "monospace" }}>{row.noKontak || "-"}</span>
+        },
+        {
+          key: "tanggal",
+          label: "TANGGAL",
+          width: "105px",
+          align: "center",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.tanggal || row.tanggalAudit}</span>
+        },
+        {
+          key: "kepemilikanIzin",
+          label: "KEPEMILIKAN IZIN",
+          width: "130px",
+          align: "center",
+          render: (row) => renderIzinBadge(row.kepemilikanIzin)
+        },
+        {
+          key: "keabsahanIzin",
+          label: "KEABSAHAN IZIN",
+          width: "120px",
+          align: "center",
+          render: (row) => renderIzinBadge(row.keabsahanIzin, true)
+        },
+        {
+          key: "kapasitas",
+          label: "KAPASITAS",
+          width: "140px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#334155" }}>{row.kapasitas || "-"}</span>
+        },
+        {
+          key: "izinBb",
+          label: "IZIN BB",
+          width: "90px",
+          align: "center",
+          render: (row) => renderIzinBadge(row.izinBb)
+        },
+        {
+          key: "keabsahanBb",
+          label: "KEABSAHAN BB",
+          width: "110px",
+          align: "center",
+          render: (row) => renderIzinBadge(row.keabsahanBb, true)
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "95px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "115px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "130px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
     }
-  ];
 
-  // Columns Khusus SIMAK 2 (Tertib Penyelenggaraan: 11 Kolom Standar Resmi SIPJAKI Kementerian PUPR)
-  const simak2TableColumns: ColumnDef<PelaksanaanRecord>[] = [
-    {
-      key: "no",
-      label: "NO",
-      width: "50px",
-      align: "center",
-      render: (_row, index) => (
-        <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>
-          {index + 1}
-        </span>
-      )
-    },
-    {
-      key: "namaProyek",
-      label: "NAMA PROYEK",
-      width: "250px",
-      render: (row) => (
-        <div>
-          <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", lineHeight: "1.4" }}>
-            {row.namaProyek || row.namaObjek}
-          </div>
-          <div style={{ fontSize: "11px", color: "#64748B", marginTop: "3px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "9px", fontWeight: 900, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "1px 5px", borderRadius: "4px", fontFamily: "monospace" }}>
-              {row.simakCode}
-            </span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
-              <MapPin style={{ width: "10px", height: "10px", color: "#2563EB" }} />
-              {row.lokasi}
-            </span>
-          </div>
-        </div>
-      )
-    },
-    {
-      key: "nilaiProyek",
-      label: "NILAI PROYEK",
-      width: "145px",
-      align: "right",
-      render: (row) => {
-        const val = row.nilaiProyek || 0;
-        return (
-          <span style={{ fontSize: "12px", fontWeight: 800, color: "#047857", fontFamily: "monospace" }}>
-            {val > 0 ? `Rp ${val.toLocaleString("id-ID")}` : "-"}
-          </span>
-        );
-      }
-    },
-    {
-      key: "nomorPerjanjian",
-      label: "NOMOR PERJANJIAN",
-      width: "165px",
-      render: (row) => (
-        <span style={{ fontSize: "11px", fontWeight: 600, color: "#334155", wordBreak: "break-word" }}>
-          {row.nomorPerjanjian || "-"}
-        </span>
-      )
-    },
-    {
-      key: "waktuPelaksanaan",
-      label: "WAKTU PELAKSANAAN",
-      width: "150px",
-      render: (row) => (
-        <span style={{ fontSize: "11px", color: "#475569" }}>
-          {row.waktuPelaksanaan || "-"}
-        </span>
-      )
-    },
-    {
-      key: "penyediaJasa",
-      label: "PENYEDIA JASA",
-      width: "170px",
-      render: (row) => (
-        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <Building2 style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
-          <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
-            {row.penyediaJasa || row.namaProdusen || row.badanUsaha}
-          </span>
-        </div>
-      )
-    },
-    {
-      key: "namaPemilikPekerjaan",
-      label: "NAMA PEMILIK PEKERJAAN",
-      width: "175px",
-      render: (row) => (
-        <span style={{ fontSize: "11px", fontWeight: 600, color: "#1E293B" }}>
-          {row.namaPemilikPekerjaan || "Dinas PUPR Kab. Bogor"}
-        </span>
-      )
-    },
-    {
-      key: "waktuPengawasan",
-      label: "WAKTU PENGAWASAN",
-      width: "140px",
-      align: "center",
-      render: (row) => (
-        <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-          <Calendar style={{ width: "12px", height: "12px", color: "#2563EB" }} />
-          <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
-            {row.waktuPengawasan || row.tanggal || row.tanggalAudit || "-"}
-          </span>
-        </div>
-      )
-    },
-    {
-      key: "wilayah",
-      label: "PROPINSI KAB/KOTA",
-      width: "140px",
-      render: (row) => (
-        <div>
-          <div style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C" }}>
-            {row.propinsi || "Jawa Barat"}
-          </div>
-          <div style={{ fontSize: "10px", color: "#64748B" }}>
-            {row.kabKota || "Kabupaten Bogor"}
-          </div>
-        </div>
-      )
-    },
-    {
-      key: "dokumen",
-      label: "DOKUMEN",
-      width: "160px",
-      render: (row) => (
-        <DocStatusBadge
-          status={row._docStatus || (row.dokumen || row.dokumenBAP ? "complete" : "pending")}
-          fileName={row.dokumen || row.dokumenBAP}
-          documentLabel="Dokumen SIMAK 2"
-          onClick={() => setDocUploadTarget(row)}
-        />
-      )
-    },
-    {
-      key: "status",
-      label: "STATUS",
-      width: "135px",
-      align: "center",
-      render: (row) => {
-        const isPatuh = row.statusKepatuhan === "Patuh";
-        return (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-            <span
-              style={{
-                fontSize: "10px",
-                fontWeight: 900,
-                padding: "2px 8px",
-                borderRadius: "9999px",
-                backgroundColor: isPatuh ? "#DCFCE7" : "#FEE2E2",
-                color: isPatuh ? "#166534" : "#991B1B",
-                border: `1px solid ${isPatuh ? "#86EFAC" : "#FCA5A5"}`,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "3px"
-              }}
-            >
-              {isPatuh ? <Check style={{ width: "10px", height: "10px" }} /> : <X style={{ width: "10px", height: "10px" }} />}
-              <span>{row.statusKepatuhan}</span>
-            </span>
-            <StatusBadge status={row.statusVerifikasi} />
-          </div>
-        );
-      }
+    // 1.a.2 s/d 1.a.6: Distributor / Peralatan / Teknologi Rantai Pasok (9 Kolom Baku)
+    if (variant === "1.a.2" || variant === "1.a.3" || variant === "1.a.4" || variant === "1.a.5" || variant === "1.a.6") {
+      const entityLabel = 
+        variant === "1.a.2" ? "NAMA DISTRIBUTOR" :
+        variant === "1.a.3" ? "NAMA BUJK / PEMILIK PERALATAN" :
+        variant === "1.a.4" ? "NAMA USAHA PENYEWAAN" :
+        variant === "1.a.5" ? "NAMA DISTRIBUTOR / AGEN TUNGGAL" : "NAMA BADAN USAHA TEKNOLOGI";
+
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "50px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "namaEntitas",
+          label: entityLabel,
+          width: "240px",
+          render: (row) => (
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C" }}>{row.namaProdusen || row.badanUsaha}</div>
+              <div style={{ fontSize: "10px", color: "#64748B" }}>{row.namaObjek}</div>
+            </div>
+          )
+        },
+        {
+          key: "tanggal",
+          label: "TANGGAL",
+          width: "120px",
+          align: "center",
+          render: (row) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>{row.tanggal || row.tanggalAudit}</span>
+        },
+        {
+          key: "kepemilikanIzin",
+          label: "KEPEMILIKAN PERIZINAN BERUSAHA",
+          width: "210px",
+          align: "center",
+          render: (row) => renderIzinBadge(row.kepemilikanIzin || "Memiliki")
+        },
+        {
+          key: "keabsahanIzin",
+          label: "KEABSAHAN PERIZINAN BERUSAHA",
+          width: "200px",
+          align: "center",
+          render: (row) => renderIzinBadge(row.keabsahanIzin || "Sah", true)
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "110px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "130px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "135px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
     }
-  ];
+
+    // 1.b.1 & 1.b.2: Kesesuaian Bentuk, Kualifikasi, Jenis, Layanan (9 Kolom Baku)
+    if (variant === "1.b.1" || variant === "1.b.2") {
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "50px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "namaBadanUsaha",
+          label: "NAMA BADAN USAHA",
+          width: "230px",
+          render: (row) => (
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C" }}>{row.namaProdusen || row.badanUsaha}</div>
+              <div style={{ fontSize: "10px", color: "#64748B" }}>{row.namaObjek}</div>
+            </div>
+          )
+        },
+        {
+          key: "nib",
+          label: "NIB",
+          width: "150px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 700, fontFamily: "monospace", color: "#1E40AF", backgroundColor: "#EFF6FF", padding: "2px 6px", borderRadius: "4px" }}>
+              {row.nib || "9120001234567"}
+            </span>
+          )
+        },
+        {
+          key: "statusPerizinan",
+          label: "STATUS PERIZINAN BERUSAHA",
+          width: "190px",
+          align: "center",
+          render: (row) => renderIzinBadge(row.statusPerizinan || "Aktif Terverifikasi (OSS-RBA)")
+        },
+        {
+          key: "waktuPengawasan",
+          label: "WAKTU PENGAWASAN",
+          width: "135px",
+          align: "center",
+          render: (row) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>{row.waktuPengawasan || row.tanggal || row.tanggalAudit}</span>
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "110px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "130px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "135px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
+    }
+
+    // 1.c: Pemenuhan Persyaratan Usaha Lapangan (7 Kolom Baku)
+    if (variant === "1.c") {
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "50px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "namaBadanUsaha",
+          label: "NAMA BADAN USAHA",
+          width: "260px",
+          render: (row) => (
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C" }}>{row.namaProdusen || row.badanUsaha}</div>
+              <div style={{ fontSize: "10px", color: "#64748B" }}>{row.namaObjek}</div>
+            </div>
+          )
+        },
+        {
+          key: "tanggal",
+          label: "TANGGAL PENGAWASAN",
+          width: "150px",
+          align: "center",
+          render: (row) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>{row.tanggal || row.tanggalAudit}</span>
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "110px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "130px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "135px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
+    }
+
+    // 1.d & 1.f: Penyediaan Tenaga Kerja Konstruksi & Usaha Berkelanjutan (8 Kolom Baku)
+    if (variant === "1.d" || variant === "1.f") {
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "50px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "namaBadanUsaha",
+          label: "NAMA BADAN USAHA",
+          width: "250px",
+          render: (row) => (
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C" }}>{row.namaProdusen || row.badanUsaha}</div>
+              <div style={{ fontSize: "10px", color: "#64748B" }}>{row.namaObjek}</div>
+            </div>
+          )
+        },
+        {
+          key: "nib",
+          label: "NIB",
+          width: "150px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 700, fontFamily: "monospace", color: "#1E40AF", backgroundColor: "#EFF6FF", padding: "2px 6px", borderRadius: "4px" }}>
+              {row.nib || "9120001234567"}
+            </span>
+          )
+        },
+        {
+          key: "tanggal",
+          label: "TANGGAL PENGAWASAN",
+          width: "150px",
+          align: "center",
+          render: (row) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>{row.tanggal || row.tanggalAudit}</span>
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "110px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "130px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "135px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
+    }
+
+    // 1.e: Pengawasan Sertifikat Standar & Kepemilikan Lisensi (6 Kolom Baku)
+    if (variant === "1.e") {
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "50px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "tanggal",
+          label: "TANGGAL PENGAWASAN",
+          width: "170px",
+          align: "center",
+          render: (row) => (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <Calendar style={{ width: "13px", height: "13px", color: "#2563EB" }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>{row.tanggal || row.tanggalAudit}</span>
+            </div>
+          )
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "120px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "140px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "140px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
+    }
+
+    // Default / "Semua" (Harmonisasi Komprehensif Seluruh Daftar Simak)
+    return [
+      {
+        key: "no",
+        label: "NO",
+        width: "50px",
+        align: "center",
+        render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+      },
+      {
+        key: "tanggal",
+        label: "TANGGAL",
+        width: "125px",
+        align: "center",
+        render: (row) => (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+            <Calendar style={{ width: "12px", height: "12px", color: "#2563EB" }} />
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>{row.tanggal || row.tanggalAudit}</span>
+          </div>
+        )
+      },
+      {
+        key: "simakCode",
+        label: "DAFTAR SIMAK",
+        width: "120px",
+        align: "center",
+        render: (row) => (
+          <span style={{ fontSize: "11px", fontWeight: 900, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "3px 8px", borderRadius: "6px", fontFamily: "monospace" }}>
+            {row.simakCode}
+          </span>
+        )
+      },
+      {
+        key: "objek",
+        label: "OBJEK & BADAN USAHA",
+        render: (row) => (
+          <div>
+            <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", display: "flex", alignItems: "center", gap: "5px" }}>
+              <Building2 style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
+              <span>{row.namaProdusen || row.badanUsaha}</span>
+              <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#EFF6FF", padding: "1px 6px", borderRadius: "4px" }}>
+                {row.kualifikasi || "Kecil"}
+              </span>
+            </div>
+            <div style={{ fontSize: "11px", color: "#64748B", marginTop: "2px" }}>
+              {row.namaObjek} {row.nib ? `• NIB: ${row.nib}` : ""}
+            </div>
+          </div>
+        )
+      },
+      {
+        key: "wilayah",
+        label: "WILAYAH PENUGASAN",
+        width: "155px",
+        render: (row) => (
+          <div>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C", display: "flex", alignItems: "center", gap: "4px" }}>
+              <MapPin style={{ width: "11px", height: "11px", color: "#2563EB", flexShrink: 0 }} />
+              <span>{row.lokasi}</span>
+            </div>
+            <div style={{ fontSize: "10px", color: "#64748B" }}>Kabupaten Bogor</div>
+          </div>
+        )
+      },
+      {
+        key: "dokumen",
+        label: "DOKUMEN",
+        width: "160px",
+        render: (row) => (
+          <DocStatusBadge
+            status={row._docStatus || (row.dokumen || row.dokumenBAP ? "complete" : "pending")}
+            fileName={row.dokumen || row.dokumenBAP}
+            documentLabel="Dokumen Pengawasan"
+            onClick={() => setDocUploadTarget(row)}
+          />
+        )
+      },
+      {
+        key: "status",
+        label: "STATUS",
+        width: "135px",
+        align: "center",
+        render: (row) => renderSimakStatus(row)
+      }
+    ];
+  };
+
+  // Dynamic Columns Generator Khusus SIMAK 2 (Tertib Penyelenggaraan: 12 Kolom Baku Dokumen Excel 2.a s/d 2.d)
+  const getSimak2Columns = (variant: string): ColumnDef<PelaksanaanRecord>[] => {
+    // Tab 2.a: Pengawasan Tertib Penyelenggaraan Terhadap Pemenuhan Standar K4 (12 Kolom Baku)
+    if (variant === "2.a" || variant === "SIMAK 2a") {
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "45px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "namaProyek",
+          label: "NAMA PROYEK",
+          width: "250px",
+          render: (row) => (
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", lineHeight: "1.4" }}>
+                {row.namaProyek || row.namaObjek}
+              </div>
+              <div style={{ fontSize: "11px", color: "#64748B", marginTop: "3px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "9px", fontWeight: 900, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "1px 5px", borderRadius: "4px", fontFamily: "monospace" }}>
+                  2.a (K4)
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                  <MapPin style={{ width: "10px", height: "10px", color: "#2563EB" }} />
+                  {row.lokasi}
+                </span>
+              </div>
+            </div>
+          )
+        },
+        {
+          key: "nilaiProyek",
+          label: "NILAI PROYEK",
+          width: "140px",
+          align: "right",
+          render: (row) => {
+            const val = row.nilaiProyek || 0;
+            return (
+              <span style={{ fontSize: "12px", fontWeight: 800, color: "#047857", fontFamily: "monospace" }}>
+                {val > 0 ? `Rp ${val.toLocaleString("id-ID")}` : "-"}
+              </span>
+            );
+          }
+        },
+        {
+          key: "nomorKontrak",
+          label: "NOMOR KONTRAK",
+          width: "170px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 600, color: "#334155", wordBreak: "break-word" }}>
+              {row.nomorKontrak || row.nomorPerjanjian || "-"}
+            </span>
+          )
+        },
+        {
+          key: "waktuPelaksanaan",
+          label: "WAKTU PELAKSANAAN",
+          width: "140px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#475569" }}>{row.waktuPelaksanaan || "-"}</span>
+        },
+        {
+          key: "penyediaJasa",
+          label: "PENYEDIA JASA",
+          width: "180px",
+          render: (row) => (
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <Building2 style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+                {row.penyediaJasa || row.namaProdusen || row.badanUsaha}
+              </span>
+            </div>
+          )
+        },
+        {
+          key: "namaSkpd",
+          label: "NAMA SKPD",
+          width: "175px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#1E293B" }}>
+              {row.namaSkpd || row.namaPemilikPekerjaan || "Dinas PUPR Kab. Bogor"}
+            </span>
+          )
+        },
+        {
+          key: "waktuPengawasan",
+          label: "WAKTU PENGAWASAN",
+          width: "135px",
+          align: "center",
+          render: (row) => (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <Calendar style={{ width: "12px", height: "12px", color: "#2563EB" }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+                {row.waktuPengawasan || row.tanggal || row.tanggalAudit || "-"}
+              </span>
+            </div>
+          )
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "105px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "125px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "130px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
+    }
+
+    // Tab 2.b: Pengawasan Insidental dengan Sumber Dana APBD (12 Kolom Baku)
+    if (variant === "2.b" || variant === "SIMAK 2b") {
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "45px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "namaProyek",
+          label: "NAMA PROYEK",
+          width: "250px",
+          render: (row) => (
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", lineHeight: "1.4" }}>
+                {row.namaProyek || row.namaObjek}
+              </div>
+              <div style={{ fontSize: "11px", color: "#64748B", marginTop: "3px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "9px", fontWeight: 900, color: "#D97706", backgroundColor: "#FEF3C7", padding: "1px 5px", borderRadius: "4px", fontFamily: "monospace" }}>
+                  2.b (APBD)
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                  <MapPin style={{ width: "10px", height: "10px", color: "#2563EB" }} />
+                  {row.lokasi}
+                </span>
+              </div>
+            </div>
+          )
+        },
+        {
+          key: "nilaiProyek",
+          label: "NILAI PROYEK",
+          width: "140px",
+          align: "right",
+          render: (row) => {
+            const val = row.nilaiProyek || 0;
+            return (
+              <span style={{ fontSize: "12px", fontWeight: 800, color: "#047857", fontFamily: "monospace" }}>
+                {val > 0 ? `Rp ${val.toLocaleString("id-ID")}` : "-"}
+              </span>
+            );
+          }
+        },
+        {
+          key: "nomorKontrak",
+          label: "NOMOR KONTRAK",
+          width: "170px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 600, color: "#334155", wordBreak: "break-word" }}>
+              {row.nomorKontrak || row.nomorPerjanjian || "-"}
+            </span>
+          )
+        },
+        {
+          key: "waktuPelaksanaan",
+          label: "WAKTU PELAKSANAAN",
+          width: "140px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#475569" }}>{row.waktuPelaksanaan || "-"}</span>
+        },
+        {
+          key: "penyediaJasa",
+          label: "PENYEDIA JASA",
+          width: "180px",
+          render: (row) => (
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <Building2 style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+                {row.penyediaJasa || row.namaProdusen || row.badanUsaha}
+              </span>
+            </div>
+          )
+        },
+        {
+          key: "namaSatuanKerja",
+          label: "NAMA SATUAN KERJA",
+          width: "180px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#1E293B" }}>
+              {row.namaSatuanKerja || row.namaPemilikPekerjaan || "Satuan Kerja PJN Wilayah I"}
+            </span>
+          )
+        },
+        {
+          key: "waktuPengawasan",
+          label: "WAKTU PENGAWASAN",
+          width: "135px",
+          align: "center",
+          render: (row) => (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <Calendar style={{ width: "12px", height: "12px", color: "#2563EB" }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+                {row.waktuPengawasan || row.tanggal || row.tanggalAudit || "-"}
+              </span>
+            </div>
+          )
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "105px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "125px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "130px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
+    }
+
+    // Tab 2.c: Pengawasan Insidental dengan Sumber Dana Selain APBD (12 Kolom Baku)
+    if (variant === "2.c" || variant === "SIMAK 2c") {
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "45px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "namaProyek",
+          label: "NAMA PROYEK",
+          width: "250px",
+          render: (row) => (
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", lineHeight: "1.4" }}>
+                {row.namaProyek || row.namaObjek}
+              </div>
+              <div style={{ fontSize: "11px", color: "#64748B", marginTop: "3px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "9px", fontWeight: 900, color: "#059669", backgroundColor: "#D1FAE5", padding: "1px 5px", borderRadius: "4px", fontFamily: "monospace" }}>
+                  2.c (Non-APBD)
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                  <MapPin style={{ width: "10px", height: "10px", color: "#2563EB" }} />
+                  {row.lokasi}
+                </span>
+              </div>
+            </div>
+          )
+        },
+        {
+          key: "nilaiProyek",
+          label: "NILAI PROYEK",
+          width: "140px",
+          align: "right",
+          render: (row) => {
+            const val = row.nilaiProyek || 0;
+            return (
+              <span style={{ fontSize: "12px", fontWeight: 800, color: "#047857", fontFamily: "monospace" }}>
+                {val > 0 ? `Rp ${val.toLocaleString("id-ID")}` : "-"}
+              </span>
+            );
+          }
+        },
+        {
+          key: "nomorKontrak",
+          label: "NOMOR KONTRAK",
+          width: "170px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 600, color: "#334155", wordBreak: "break-word" }}>
+              {row.nomorKontrak || row.nomorPerjanjian || "-"}
+            </span>
+          )
+        },
+        {
+          key: "waktuPelaksanaan",
+          label: "WAKTU PELAKSANAAN",
+          width: "140px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#475569" }}>{row.waktuPelaksanaan || "-"}</span>
+        },
+        {
+          key: "penyediaJasa",
+          label: "PENYEDIA JASA",
+          width: "180px",
+          render: (row) => (
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <Building2 style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+                {row.penyediaJasa || row.namaProdusen || row.badanUsaha}
+              </span>
+            </div>
+          )
+        },
+        {
+          key: "namaPemilikPekerjaan",
+          label: "NAMA PEMILIK PEKERJAAN",
+          width: "185px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#1E293B" }}>
+              {row.namaPemilikPekerjaan || "PT. Swasta Propertindo"}
+            </span>
+          )
+        },
+        {
+          key: "waktuPengawasan",
+          label: "WAKTU PENGAWASAN",
+          width: "135px",
+          align: "center",
+          render: (row) => (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <Calendar style={{ width: "12px", height: "12px", color: "#2563EB" }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+                {row.waktuPengawasan || row.tanggal || row.tanggalAudit || "-"}
+              </span>
+            </div>
+          )
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "105px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "125px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "130px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
+    }
+
+    // Tab 2.d: Pengawasan Insidental dengan Dana Selain dari APBD (12 Kolom Baku - Nomor Perjanjian)
+    if (variant === "2.d" || variant === "SIMAK 2d") {
+      return [
+        {
+          key: "no",
+          label: "NO",
+          width: "45px",
+          align: "center",
+          render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+        },
+        {
+          key: "namaProyek",
+          label: "NAMA PROYEK",
+          width: "250px",
+          render: (row) => (
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", lineHeight: "1.4" }}>
+                {row.namaProyek || row.namaObjek}
+              </div>
+              <div style={{ fontSize: "11px", color: "#64748B", marginTop: "3px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "9px", fontWeight: 900, color: "#7C3AED", backgroundColor: "#EDE9FE", padding: "1px 5px", borderRadius: "4px", fontFamily: "monospace" }}>
+                  2.d (Perjanjian)
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                  <MapPin style={{ width: "10px", height: "10px", color: "#2563EB" }} />
+                  {row.lokasi}
+                </span>
+              </div>
+            </div>
+          )
+        },
+        {
+          key: "nilaiProyek",
+          label: "NILAI PROYEK",
+          width: "140px",
+          align: "right",
+          render: (row) => {
+            const val = row.nilaiProyek || 0;
+            return (
+              <span style={{ fontSize: "12px", fontWeight: 800, color: "#047857", fontFamily: "monospace" }}>
+                {val > 0 ? `Rp ${val.toLocaleString("id-ID")}` : "-"}
+              </span>
+            );
+          }
+        },
+        {
+          key: "nomorPerjanjian",
+          label: "NOMOR PERJANJIAN",
+          width: "175px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#1E40AF", wordBreak: "break-word" }}>
+              {row.nomorPerjanjian || row.nomorKontrak || "-"}
+            </span>
+          )
+        },
+        {
+          key: "waktuPelaksanaan",
+          label: "WAKTU PELAKSANAAN",
+          width: "140px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#475569" }}>{row.waktuPelaksanaan || "-"}</span>
+        },
+        {
+          key: "penyediaJasa",
+          label: "PENYEDIA JASA",
+          width: "180px",
+          render: (row) => (
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <Building2 style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+                {row.penyediaJasa || row.namaProdusen || row.badanUsaha}
+              </span>
+            </div>
+          )
+        },
+        {
+          key: "namaPemilikPekerjaan",
+          label: "NAMA PEMILIK PEKERJAAN",
+          width: "185px",
+          render: (row) => (
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#1E293B" }}>
+              {row.namaPemilikPekerjaan || "PT. Pengembang Bogor Asri"}
+            </span>
+          )
+        },
+        {
+          key: "waktuPengawasan",
+          label: "WAKTU PENGAWASAN",
+          width: "135px",
+          align: "center",
+          render: (row) => (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <Calendar style={{ width: "12px", height: "12px", color: "#2563EB" }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+                {row.waktuPengawasan || row.tanggal || row.tanggalAudit || "-"}
+              </span>
+            </div>
+          )
+        },
+        {
+          key: "propinsi",
+          label: "PROPINSI",
+          width: "105px",
+          render: (row) => <span style={{ fontSize: "11px", fontWeight: 700, color: "#0F2E5C" }}>{row.propinsi || "Jawa Barat"}</span>
+        },
+        {
+          key: "kabKota",
+          label: "KAB/KOTA",
+          width: "125px",
+          render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+        },
+        {
+          key: "status",
+          label: "STATUS",
+          width: "130px",
+          align: "center",
+          render: (row) => renderSimakStatus(row)
+        }
+      ];
+    }
+
+    // Default / "Semua" (Harmonisasi Seluruh Daftar Simak 2.a s/d 2.d - 12 Kolom Baku)
+    return [
+      {
+        key: "no",
+        label: "NO",
+        width: "45px",
+        align: "center",
+        render: (_row, index) => <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B" }}>{index + 1}</span>
+      },
+      {
+        key: "namaProyek",
+        label: "NAMA PROYEK",
+        width: "250px",
+        render: (row) => (
+          <div>
+            <div style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", lineHeight: "1.4" }}>
+              {row.namaProyek || row.namaObjek}
+            </div>
+            <div style={{ fontSize: "11px", color: "#64748B", marginTop: "3px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "9px", fontWeight: 900, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "1px 5px", borderRadius: "4px", fontFamily: "monospace" }}>
+                {row.simakCode}
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                <MapPin style={{ width: "10px", height: "10px", color: "#2563EB" }} />
+                {row.lokasi}
+              </span>
+            </div>
+          </div>
+        )
+      },
+      {
+        key: "nilaiProyek",
+        label: "NILAI PROYEK",
+        width: "140px",
+        align: "right",
+        render: (row) => {
+          const val = row.nilaiProyek || 0;
+          return (
+            <span style={{ fontSize: "12px", fontWeight: 800, color: "#047857", fontFamily: "monospace" }}>
+              {val > 0 ? `Rp ${val.toLocaleString("id-ID")}` : "-"}
+            </span>
+          );
+        }
+      },
+      {
+        key: "nomorKontrak",
+        label: "NOMOR KONTRAK / PERJANJIAN",
+        width: "175px",
+        render: (row) => (
+          <span style={{ fontSize: "11px", fontWeight: 600, color: "#334155", wordBreak: "break-word" }}>
+            {row.nomorPerjanjian || row.nomorKontrak || "-"}
+          </span>
+        )
+      },
+      {
+        key: "waktuPelaksanaan",
+        label: "WAKTU PELAKSANAAN",
+        width: "140px",
+        render: (row) => <span style={{ fontSize: "11px", color: "#475569" }}>{row.waktuPelaksanaan || "-"}</span>
+      },
+      {
+        key: "penyediaJasa",
+        label: "PENYEDIA JASA",
+        width: "180px",
+        render: (row) => (
+          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <Building2 style={{ width: "12px", height: "12px", color: "#2563EB", flexShrink: 0 }} />
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+              {row.penyediaJasa || row.namaProdusen || row.badanUsaha}
+            </span>
+          </div>
+        )
+      },
+      {
+        key: "namaInstansi",
+        label: "SKPD / SATUAN KERJA / PEMILIK",
+        width: "185px",
+        render: (row) => (
+          <span style={{ fontSize: "11px", fontWeight: 700, color: "#1E293B" }}>
+            {row.namaSkpd || row.namaSatuanKerja || row.namaPemilikPekerjaan || "Dinas PUPR Kab. Bogor"}
+          </span>
+        )
+      },
+      {
+        key: "simakCode",
+        label: "DAFTAR SIMAK",
+        width: "110px",
+        align: "center",
+        render: (row) => (
+          <span style={{ fontSize: "11px", fontWeight: 900, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "6px", fontFamily: "monospace" }}>
+            {row.simakCode}
+          </span>
+        )
+      },
+      {
+        key: "waktuPengawasan",
+        label: "WAKTU PENGAWASAN",
+        width: "135px",
+        align: "center",
+        render: (row) => (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <Calendar style={{ width: "12px", height: "12px", color: "#2563EB" }} />
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F2E5C" }}>
+              {row.waktuPengawasan || row.tanggal || row.tanggalAudit || "-"}
+            </span>
+          </div>
+        )
+      },
+      {
+        key: "kabKota",
+        label: "KAB/KOTA",
+        width: "125px",
+        render: (row) => <span style={{ fontSize: "11px", color: "#64748B" }}>{row.kabKota || "Kabupaten Bogor"}</span>
+      },
+      {
+        key: "status",
+        label: "STATUS",
+        width: "130px",
+        align: "center",
+        render: (row) => renderSimakStatus(row)
+      }
+    ];
+  };
 
   // Columns Khusus SIMAK 3 (Tertib Pemanfaatan: 10 Kolom Standar Resmi SIPJAKI Kementerian PUPR)
   const simak3TableColumns: ColumnDef<PelaksanaanRecord>[] = [
@@ -1055,19 +1988,6 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
           </div>
         );
       }
-    },
-    {
-      key: "dokumen",
-      label: "DOKUMEN",
-      width: "160px",
-      render: (row) => (
-        <DocStatusBadge
-          status={row._docStatus || (row.dokumen || row.dokumenBAP ? "complete" : "pending")}
-          fileName={row.dokumen || row.dokumenBAP}
-          documentLabel="Dokumen SIMAK 3"
-          onClick={() => setDocUploadTarget(row)}
-        />
-      )
     }
   ];
 
@@ -1126,7 +2046,7 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
             onClick: () => setIsBatchImportOpen(true)
           },
           {
-            label: "Tambah Pengawasan Baru",
+            label: isSimak3 ? "Tambah Simak 3" : "Tambah Pengawasan Baru",
             icon: Plus,
             variant: "primary",
             onClick: () => setIsAddModalOpen(true)
@@ -1150,9 +2070,9 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
         ]}
       />
 
-      {/* Top 4 Summary Stat Cards (Tanpa kata audit & skor numerik) */}
+      {/* Top 4 Summary Stat Cards (Sesuai Komponen Antarmuka Dokumen Excel Referensi) */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "16px" }}>
-        {/* Card 1: Total Pengawasan */}
+        {/* Card 1: TOTAL DATA */}
         <div
           style={{
             backgroundColor: "#FFFFFF",
@@ -1169,219 +2089,207 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
             <div>
               <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Total Pengawasan
+                TOTAL DATA
               </span>
               <span style={{ display: "block", fontSize: "11px", color: "#94A3B8", marginTop: "2px" }}>
-                Pemeriksaan Lapangan SIMAK
+                {isSimak2 ? "Seluruh Daftar Simak 2.a s/d 2.d" : isSimak3 ? "Seluruh Daftar Simak 3" : "Seluruh Daftar Simak 1.a s/d 1.f"}
               </span>
             </div>
+                <div
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "10px",
+                    backgroundColor: "#EFF6FF",
+                    color: "#2563EB",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}
+                >
+                  <FileText style={{ width: "20px", height: "20px" }} />
+                </div>
+              </div>
+
+              <div style={{ marginTop: "14px" }}>
+                <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#0F2E5C", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+                  {statTotal} {isSimak2 ? "Paket" : "Objek"}
+                </h3>
+              </div>
+
+              <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+                <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 600 }}>Tahun Anggaran {filterTahun}</span>
+                <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "9999px" }}>
+                  Akumulasi
+                </span>
+              </div>
+            </div>
+
+            {/* Card 2: MENUNGGU VERIFIKASI */}
             <div
               style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                backgroundColor: "#EFF6FF",
-                color: "#2563EB",
+                backgroundColor: "#FFFFFF",
+                borderRadius: "16px",
+                padding: "20px",
+                border: "1px solid #E2E8F0",
+                borderTop: "3px solid #F59E0B",
+                boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
+                flexDirection: "column",
+                justifyContent: "space-between"
               }}
             >
-              <ClipboardCheck style={{ width: "20px", height: "20px" }} />
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+                <div>
+                  <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    MENUNGGU VERIFIKASI
+                  </span>
+                  <span style={{ display: "block", fontSize: "11px", color: "#D97706", fontWeight: 700, marginTop: "2px" }}>
+                    {isSimak2 ? "Perlu Verifikasi Pengawas" : "Perlu Pemeriksaan Pengawas"}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "10px",
+                    backgroundColor: "#FEF3C7",
+                    color: "#D97706",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}
+                >
+                  <AlertCircle style={{ width: "20px", height: "20px" }} />
+                </div>
+              </div>
+
+              <div style={{ marginTop: "14px" }}>
+                <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#D97706", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+                  {statPending} Draft
+                </h3>
+              </div>
+
+              <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+                <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>Menunggu Validasi</span>
+                <span style={{ fontSize: "10px", fontWeight: 800, color: "#92400E", backgroundColor: "#FEF3C7", padding: "2px 8px", borderRadius: "9999px" }}>
+                  Antrian
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div style={{ marginTop: "14px" }}>
-            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#0F2E5C", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
-              {statTotal} Objek
-            </h3>
-          </div>
-
-          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
-            <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 600 }}>Tahun Anggaran {filterTahun}</span>
-            <span style={{ fontSize: "10px", fontWeight: 800, color: "#1E40AF", backgroundColor: "#DBEAFE", padding: "2px 8px", borderRadius: "9999px" }}>
-              Terbaru di Atas
-            </span>
-          </div>
-        </div>
-
-        {/* Card 2: Status Patuh */}
-        <div
-          style={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: "16px",
-            padding: "20px",
-            border: "1px solid #E2E8F0",
-            borderTop: "3px solid #10B981",
-            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between"
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Status Kepatuhan: Patuh
-              </span>
-              <span style={{ display: "block", fontSize: "11px", color: "#166534", fontWeight: 700, marginTop: "2px" }}>
-                Memenuhi Seluruh Syarat
-              </span>
-            </div>
+            {/* Card 3: VERIFIED */}
             <div
               style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                backgroundColor: "#DCFCE7",
-                color: "#166534",
+                backgroundColor: "#FFFFFF",
+                borderRadius: "16px",
+                padding: "20px",
+                border: "1px solid #E2E8F0",
+                borderTop: "3px solid #10B981",
+                boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
+                flexDirection: "column",
+                justifyContent: "space-between"
               }}
             >
-              <CheckCircle2 style={{ width: "20px", height: "20px" }} />
-            </div>
-          </div>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+                <div>
+                  <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    VERIFIED
+                  </span>
+                  <span style={{ display: "block", fontSize: "11px", color: "#166534", fontWeight: 700, marginTop: "2px" }}>
+                    {isSimak2 ? "Terverifikasi / Sah" : "Terverifikasi / Sah"}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "10px",
+                    backgroundColor: "#DCFCE7",
+                    color: "#166534",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}
+                >
+                  <CheckCircle2 style={{ width: "20px", height: "20px" }} />
+                </div>
+              </div>
 
-          <div style={{ marginTop: "14px" }}>
-            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#166534", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
-              {statPatuh} Kegiatan
-            </h3>
-          </div>
+              <div style={{ marginTop: "14px" }}>
+                <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#166534", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+                  {statVerified} {isSimak2 ? "Paket" : "Berkas"}
+                </h3>
+              </div>
 
-          <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #F1F5F9" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B" }}>Tingkat Kepatuhan</span>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#166534" }}>
-                {statTotal > 0 ? Math.round((statPatuh / statTotal) * 100) : 0}%
-              </span>
+              <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+                <span style={{ fontSize: "11px", color: "#166534", fontWeight: 700 }}>Dokumen Lengkap</span>
+                <span style={{ fontSize: "10px", fontWeight: 800, color: "#166534", backgroundColor: "#DCFCE7", padding: "2px 8px", borderRadius: "9999px" }}>
+                  Disetujui
+                </span>
+              </div>
             </div>
-            <div style={{ width: "100%", height: "6px", backgroundColor: "#F1F5F9", borderRadius: "9999px", overflow: "hidden" }}>
-              <div
-                style={{
-                  width: `${statTotal > 0 ? Math.min(Math.round((statPatuh / statTotal) * 100), 100) : 0}%`,
-                  height: "100%",
-                  backgroundColor: "#10B981",
-                  borderRadius: "9999px"
-                }}
-              />
-            </div>
-          </div>
-        </div>
 
-        {/* Card 3: Status Tidak Patuh */}
-        <div
-          style={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: "16px",
-            padding: "20px",
-            border: "1px solid #E2E8F0",
-            borderTop: "3px solid #EF4444",
-            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between"
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Status: Tidak Patuh
-              </span>
-              <span style={{ display: "block", fontSize: "11px", color: "#DC2626", fontWeight: 700, marginTop: "2px" }}>
-                Perlu Tindakan Korektif
-              </span>
-            </div>
+            {/* Card 4: REJECTED */}
             <div
               style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                backgroundColor: "#FEE2E2",
-                color: "#DC2626",
+                backgroundColor: "#FFFFFF",
+                borderRadius: "16px",
+                padding: "20px",
+                border: "1px solid #E2E8F0",
+                borderTop: "3px solid #EF4444",
+                boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
+                flexDirection: "column",
+                justifyContent: "space-between"
               }}
             >
-              <XCircle style={{ width: "20px", height: "20px" }} />
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+                <div>
+                  <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    REJECTED
+                  </span>
+                  <span style={{ display: "block", fontSize: "11px", color: "#DC2626", fontWeight: 700, marginTop: "2px" }}>
+                    {isSimak2 ? "Ditolak / Perbaikan" : "Ditolak / Perlu Perbaikan"}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "10px",
+                    backgroundColor: "#FEE2E2",
+                    color: "#DC2626",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}
+                >
+                  <XCircle style={{ width: "20px", height: "20px" }} />
+                </div>
+              </div>
+
+              <div style={{ marginTop: "14px" }}>
+                <h3 style={{ fontSize: "24px", fontWeight: 900, color: "#DC2626", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+                  {statRejected} Temuan
+                </h3>
+              </div>
+
+              <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
+                <span style={{ fontSize: "11px", color: statRejected > 0 ? "#DC2626" : "#64748B", fontWeight: 700 }}>
+                  {statRejected > 0 ? "Perlu Tindak Lanjut" : "Nihil Penolakan"}
+                </span>
+                <span style={{ fontSize: "10px", fontWeight: 800, color: statRejected > 0 ? "#991B1B" : "#166534", backgroundColor: statRejected > 0 ? "#FEE2E2" : "#DCFCE7", padding: "2px 8px", borderRadius: "9999px" }}>
+                  {statRejected > 0 ? "Perbaikan" : "Aman"}
+                </span>
+              </div>
             </div>
           </div>
-
-          <div style={{ marginTop: "14px" }}>
-            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#DC2626", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
-              {statTidakPatuh} Temuan
-            </h3>
-          </div>
-
-          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
-            <span style={{ fontSize: "11px", color: statTidakPatuh > 0 ? "#DC2626" : "#64748B", fontWeight: 700 }}>
-              {statTidakPatuh > 0 ? "Wajib Surat Peringatan" : "Nihil Pelanggaran"}
-            </span>
-            <span style={{ fontSize: "10px", fontWeight: 800, color: statTidakPatuh > 0 ? "#991B1B" : "#166534", backgroundColor: statTidakPatuh > 0 ? "#FEE2E2" : "#DCFCE7", padding: "2px 8px", borderRadius: "9999px" }}>
-              {statTidakPatuh > 0 ? "Perhatian" : "Aman"}
-            </span>
-          </div>
-        </div>
-
-        {/* Card 4: Menunggu Verifikasi */}
-        <div
-          style={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: "16px",
-            padding: "20px",
-            border: "1px solid #E2E8F0",
-            borderTop: "3px solid #F59E0B",
-            boxShadow: "0 2px 10px rgba(15, 46, 92, 0.04)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between"
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Menunggu Verifikasi
-              </span>
-              <span style={{ display: "block", fontSize: "11px", color: "#D97706", fontWeight: 700, marginTop: "2px" }}>
-                Perlu Tindakan Pengawas
-              </span>
-            </div>
-            <div
-              style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                backgroundColor: "#FEF3C7",
-                color: "#D97706",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
-              }}
-            >
-              <AlertCircle style={{ width: "20px", height: "20px" }} />
-            </div>
-          </div>
-
-          <div style={{ marginTop: "14px" }}>
-            <h3 style={{ fontSize: "22px", fontWeight: 900, color: "#D97706", margin: 0, letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
-              {statPending} Draft
-            </h3>
-          </div>
-
-          <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #F1F5F9" }}>
-            <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 700 }}>Menunggu Review</span>
-            <span style={{ fontSize: "10px", fontWeight: 800, color: "#92400E", backgroundColor: "#FEF3C7", padding: "2px 8px", borderRadius: "9999px" }}>
-              Antrian
-            </span>
-          </div>
-        </div>
-      </div>
 
       {/* Global Filter Bar (Standar Paket Pekerjaan Terkini: Urutan Terbaru di Atas) */}
       <div 
@@ -1441,8 +2349,8 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
             >
               <option value="Semua">Semua Status</option>
               <option value="pending">Menunggu Verifikasi (Draft)</option>
-              <option value="verified">Terverifikasi</option>
-              <option value="rejected">Ditolak / Investigasi</option>
+              <option value="verified">Verified (Terverifikasi)</option>
+              <option value="rejected">Rejected (Ditolak)</option>
             </select>
           </div>
 
@@ -1463,11 +2371,17 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                 color: "#1E293B"
               }}
             >
+              <option value="Semua">Semua Tahun</option>
               <option value="2026">2026</option>
               <option value="2025">2025</option>
               <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+              <option value="2020">2020</option>
             </select>
           </div>
+
           {/* Selector Urutan (Sort Selector) */}
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <label style={{ fontSize: "10px", fontWeight: 800, color: "#64748B", textTransform: "uppercase", display: "block" }}>
@@ -1543,54 +2457,111 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
         </div>
       </div>
 
-      {/* SIMAK Variant Scrollable Selector Chips */}
+      {/* Navigasi 12 Tab Berpanah Geser (Carousel Tabs) Sesuai Spesifikasi Excel */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: "8px",
-          overflowX: "auto",
-          padding: "10px",
           backgroundColor: "#FFFFFF",
           borderRadius: "14px",
-          border: "1px solid #E2E8F0"
+          border: "1px solid #E2E8F0",
+          padding: "8px"
         }}
       >
         <button
-          onClick={() => setActiveVariant("Semua")}
+          type="button"
+          onClick={() => scrollTabs("left")}
           style={{
-            padding: "6px 14px",
+            width: "32px",
+            height: "36px",
             borderRadius: "8px",
-            fontSize: "12px",
-            fontWeight: 800,
+            border: "1px solid #CBD5E1",
+            backgroundColor: "#F8FAFC",
+            color: "#0F2E5C",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             cursor: "pointer",
-            border: "none",
-            backgroundColor: activeVariant === "Semua" ? "#0F2E5C" : "#F1F5F9",
-            color: activeVariant === "Semua" ? "#FFFFFF" : "#64748B",
-            whiteSpace: "nowrap"
+            flexShrink: 0
+          }}
+          title="Geser Tab ke Kiri"
+        >
+          <ChevronLeft style={{ width: "16px", height: "16px" }} />
+        </button>
+
+        <div
+          ref={tabScrollRef}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            overflowX: "auto",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            flex: 1,
+            padding: "2px 0"
           }}
         >
-          Semua Form ({config.simakVariants.length})
-        </button>
-        {config.simakVariants.map((v) => (
           <button
-            key={v.code}
-            onClick={() => setActiveVariant(v.code)}
+            onClick={() => setActiveVariant("Semua")}
             style={{
-              padding: "6px 14px",
+              padding: "7px 14px",
               borderRadius: "8px",
               fontSize: "12px",
               fontWeight: 800,
               cursor: "pointer",
               border: "none",
+              backgroundColor: activeVariant === "Semua" ? "#0F2E5C" : "#F1F5F9",
+              color: activeVariant === "Semua" ? "#FFFFFF" : "#64748B",
               whiteSpace: "nowrap",
-              backgroundColor: activeVariant === v.code ? "#0F2E5C" : "#F1F5F9",
-              color: activeVariant === v.code ? "#FFFFFF" : "#64748B"
+              transition: "all 0.15s ease-in-out"
             }}
           >
-            {v.code}: {v.label.split("(")[0]}
+            Semua Form ({config.simakVariants.length})
           </button>
-        ))}
+          {config.simakVariants.map((v) => (
+            <button
+              key={v.code}
+              onClick={() => setActiveVariant(v.code)}
+              style={{
+                padding: "7px 14px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 800,
+                cursor: "pointer",
+                border: "none",
+                whiteSpace: "nowrap",
+                backgroundColor: activeVariant === v.code ? "#0F2E5C" : "#F1F5F9",
+                color: activeVariant === v.code ? "#FFFFFF" : "#64748B",
+                transition: "all 0.15s ease-in-out"
+              }}
+            >
+              {v.code}: {v.label.split("(")[0]}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => scrollTabs("right")}
+          style={{
+            width: "32px",
+            height: "36px",
+            borderRadius: "8px",
+            border: "1px solid #CBD5E1",
+            backgroundColor: "#F8FAFC",
+            color: "#0F2E5C",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            flexShrink: 0
+          }}
+          title="Geser Tab ke Kanan"
+        >
+          <ChevronRight style={{ width: "16px", height: "16px" }} />
+        </button>
       </div>
 
       {/* Doc Completion Progress Bar */}
@@ -1609,7 +2580,7 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
             ? `Daftar Pengawasan Tertib Penyelenggaraan SIMAK 2 (${filteredData.length} Paket Proyek)`
             : isSimak3
             ? `Daftar Pengawasan Tertib Pemanfaatan SIMAK 3 (${filteredData.length} Bangunan/Infrastruktur)`
-            : `Daftar Pengawasan Lapangan SIMAK (${filteredData.length} Kegiatan)`
+            : `Daftar Pengawasan Lapangan SIMAK 1 (${filteredData.length} Kegiatan)`
         }
         subtitle={
           filterDocPending
@@ -1618,14 +2589,14 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
             ? "Data pengawasan paket pekerjaan fisik konstruksi standar SIPJAKI SIMAK 2 Kementerian PUPR dan Kabupaten Bogor"
             : isSimak3
             ? "Data pengawasan kelaikan fungsi dan pemeliharaan bangunan gedung purna-konstruksi standar SIPJAKI SIMAK 3"
-            : "Data hasil pengawasan 3 tertib standar SIPJAKI Kementerian PUPR dan Kabupaten Bogor"
+            : "Data hasil pengawasan 12 instrumen baku Daftar Simak 1.a s/d 1.f standar SIPJAKI Kementerian PUPR dan Kabupaten Bogor"
         }
         data={filteredData}
-        columns={isSimak2 ? simak2TableColumns : isSimak3 ? simak3TableColumns : tableColumns}
+        columns={isSimak2 ? getSimak2Columns(activeVariant) : isSimak3 ? simak3TableColumns : getSimak1Columns(activeVariant)}
         exportFileName={isSimak2 ? "pengawasan-simak2-tertib-penyelenggaraan-bogor" : isSimak3 ? "pengawasan-simak3-tertib-pemanfaatan-bogor" : `pengawasan-simak-${tertibType}-bogor`}
         sipjakiTemplate={isSimak2 ? TEMPLATE_PELAKSANAAN_SIMAK2 : isSimak3 ? TEMPLATE_PELAKSANAAN_SIMAK3 : TEMPLATE_PELAKSANAAN}
         exportColumns={(isSimak2 ? TEMPLATE_PELAKSANAAN_SIMAK2 : isSimak3 ? TEMPLATE_PELAKSANAAN_SIMAK3 : TEMPLATE_PELAKSANAAN).columns}
-        actionsHeader="EDIT"
+        actionsHeader="AKSI"
         actionsRender={(row) => (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
             {/* Tombol 1: Verifikasi (Hanya Muncul jika Draft) */}
@@ -1904,17 +2875,17 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                 </div>
               </div>
 
-              {/* Row 3: Nomor Perjanjian & Waktu Pelaksanaan */}
+              {/* Row 3: Nomor Kontrak / Perjanjian & Waktu Pelaksanaan */}
               <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "14px" }}>
                 <div>
                   <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
-                    Nomor Perjanjian / Kontrak
+                    {addForm.simakCode === "2.d" ? "Nomor Perjanjian" : "Nomor Kontrak"}
                   </label>
                   <input
                     type="text"
-                    placeholder="Contoh: 602.1/045/SPK-KTR/DPUPR/2026"
-                    value={addForm.nomorPerjanjian}
-                    onChange={(e) => setAddForm({ ...addForm, nomorPerjanjian: e.target.value })}
+                    placeholder={addForm.simakCode === "2.d" ? "Contoh: 003/PKS/DEV-BOGOR/2026" : "Contoh: 602.1/045/SPK-KTR/DPUPR/2026"}
+                    value={addForm.nomorKontrak || addForm.nomorPerjanjian}
+                    onChange={(e) => setAddForm({ ...addForm, nomorKontrak: e.target.value, nomorPerjanjian: e.target.value })}
                     style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
                   />
                 </div>
@@ -1933,7 +2904,7 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                 </div>
               </div>
 
-              {/* Row 4: Penyedia Jasa & Nama Pemilik Pekerjaan */}
+              {/* Row 4: Penyedia Jasa & Instansi Penanggung Jawab (Nama SKPD / Satuan Kerja / Pemilik Pekerjaan) */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                 <div>
                   <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
@@ -1951,13 +2922,28 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
 
                 <div>
                   <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
-                    Nama Pemilik Pekerjaan (PPK / Dinas)
+                    {addForm.simakCode === "2.a" 
+                      ? "Nama SKPD" 
+                      : addForm.simakCode === "2.b" 
+                      ? "Nama Satuan Kerja" 
+                      : "Nama Pemilik Pekerjaan"}
                   </label>
                   <input
                     type="text"
-                    placeholder="Contoh: Dinas PUPR Kab. Bogor / PPK Bidang Jalan"
-                    value={addForm.namaPemilikPekerjaan}
-                    onChange={(e) => setAddForm({ ...addForm, namaPemilikPekerjaan: e.target.value })}
+                    placeholder={
+                      addForm.simakCode === "2.a"
+                        ? "Contoh: Dinas PUPR Kabupaten Bogor"
+                        : addForm.simakCode === "2.b"
+                        ? "Contoh: Satuan Kerja PJN Wilayah I Jawa Barat"
+                        : "Contoh: PT. Summarecon Bogor / Pemilik Pekerjaan"
+                    }
+                    value={addForm.namaSkpd || addForm.namaSatuanKerja || addForm.namaPemilikPekerjaan}
+                    onChange={(e) => setAddForm({ 
+                      ...addForm, 
+                      namaPemilikPekerjaan: e.target.value,
+                      namaSkpd: e.target.value,
+                      namaSatuanKerja: e.target.value
+                    })}
                     style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
                   />
                 </div>
@@ -2030,7 +3016,7 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                     onChange={(e) => setAddForm({ ...addForm, simakCode: e.target.value })}
                     style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
                   >
-                    <option value="SIMAK 3">SIMAK 3 — Pengawasan Pemanfaatan Produk Konstruksi</option>
+                    <option value="Daftar Simak 3">Daftar Simak 3 — Pengawasan Tertib Pemanfaatan Produk Konstruksi Terhadap Bangunan Konstruksi</option>
                   </select>
                 </div>
 
@@ -2266,6 +3252,38 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                     onChange={(e) => setAddForm({ ...addForm, namaProdusen: e.target.value })}
                     style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
                   />
+                </div>
+              </div>
+
+              {/* Row 2.5: NIB & Status Perizinan Berusaha OSS */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                <div>
+                  <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
+                    NIB (Nomor Induk Berusaha)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: 9120001234567"
+                    value={addForm.nib}
+                    onChange={(e) => setAddForm({ ...addForm, nib: e.target.value })}
+                    style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px", fontFamily: "monospace" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
+                    Status Perizinan Berusaha (OSS-RBA)
+                  </label>
+                  <select
+                    value={addForm.statusPerizinan}
+                    onChange={(e) => setAddForm({ ...addForm, statusPerizinan: e.target.value })}
+                    style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                  >
+                    <option value="Aktif Terverifikasi (OSS-RBA)">Aktif Terverifikasi (OSS-RBA)</option>
+                    <option value="Menunggu Verifikasi Persyaratan">Menunggu Verifikasi Persyaratan</option>
+                    <option value="Belum Memenuhi Komitmen">Belum Memenuhi Komitmen</option>
+                    <option value="Kedaluwarsa">Kedaluwarsa</option>
+                  </select>
                 </div>
               </div>
 
@@ -2601,16 +3619,19 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                 </div>
               </div>
 
-              {/* Row 3: Nomor Perjanjian & Waktu Pelaksanaan */}
+              {/* Row 3: Nomor Kontrak / Perjanjian & Waktu Pelaksanaan */}
               <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "14px" }}>
                 <div>
                   <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
-                    Nomor Perjanjian / Kontrak
+                    {editSimakCode === "2.d" ? "Nomor Perjanjian" : "Nomor Kontrak"}
                   </label>
                   <input
                     type="text"
-                    value={editNomorPerjanjian}
-                    onChange={(e) => setEditNomorPerjanjian(e.target.value)}
+                    value={editNomorKontrak || editNomorPerjanjian}
+                    onChange={(e) => {
+                      setEditNomorKontrak(e.target.value);
+                      setEditNomorPerjanjian(e.target.value);
+                    }}
                     style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
                   />
                 </div>
@@ -2628,7 +3649,7 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                 </div>
               </div>
 
-              {/* Row 4: Penyedia Jasa & Nama Pemilik Pekerjaan */}
+              {/* Row 4: Penyedia Jasa & Instansi Penanggung Jawab */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                 <div>
                   <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
@@ -2645,12 +3666,20 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
 
                 <div>
                   <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
-                    Nama Pemilik Pekerjaan (PPK / Dinas)
+                    {editSimakCode === "2.a" 
+                      ? "Nama SKPD" 
+                      : editSimakCode === "2.b" 
+                      ? "Nama Satuan Kerja" 
+                      : "Nama Pemilik Pekerjaan"}
                   </label>
                   <input
                     type="text"
-                    value={editNamaPemilikPekerjaan}
-                    onChange={(e) => setEditNamaPemilikPekerjaan(e.target.value)}
+                    value={editNamaSkpd || editNamaSatuanKerja || editNamaPemilikPekerjaan}
+                    onChange={(e) => {
+                      setEditNamaPemilikPekerjaan(e.target.value);
+                      setEditNamaSkpd(e.target.value);
+                      setEditNamaSatuanKerja(e.target.value);
+                    }}
                     style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
                   />
                 </div>
@@ -2736,7 +3765,7 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                     onChange={(e) => setEditSimakCode(e.target.value)}
                     style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
                   >
-                    <option value="SIMAK 3">SIMAK 3 — Pengawasan Pemanfaatan Produk Konstruksi</option>
+                    <option value="Daftar Simak 3">Daftar Simak 3 — Pengawasan Tertib Pemanfaatan Produk Konstruksi Terhadap Bangunan Konstruksi</option>
                   </select>
                 </div>
 
@@ -2995,6 +4024,38 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                     onChange={(e) => setEditNamaProdusen(e.target.value)}
                     style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
                   />
+                </div>
+              </div>
+
+              {/* Row 2.5: NIB & Status Perizinan Berusaha OSS */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                <div>
+                  <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
+                    NIB (Nomor Induk Berusaha)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: 9120001234567"
+                    value={editNib}
+                    onChange={(e) => setEditNib(e.target.value)}
+                    style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px", fontFamily: "monospace" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "12px", fontWeight: 700, color: "#334155", display: "block", marginBottom: "4px" }}>
+                    Status Perizinan Berusaha (OSS-RBA)
+                  </label>
+                  <select
+                    value={editStatusPerizinan}
+                    onChange={(e) => setEditStatusPerizinan(e.target.value)}
+                    style={{ width: "100%", padding: "9px 12px", borderRadius: "8px", border: "1px solid #CBD5E1", fontSize: "13px" }}
+                  >
+                    <option value="Aktif Terverifikasi (OSS-RBA)">Aktif Terverifikasi (OSS-RBA)</option>
+                    <option value="Menunggu Verifikasi Persyaratan">Menunggu Verifikasi Persyaratan</option>
+                    <option value="Belum Memenuhi Komitmen">Belum Memenuhi Komitmen</option>
+                    <option value="Kedaluwarsa">Kedaluwarsa</option>
+                  </select>
                 </div>
               </div>
 
@@ -3335,42 +4396,316 @@ export default function PelaksanaanView({ tertibType }: PelaksanaanViewProps) {
                 Pemerintah Kabupaten Bogor — Dinas Pekerjaan Umum dan Penataan Ruang
               </span>
               <h3 style={{ fontSize: "16px", fontWeight: 900, color: "#0F2E5C", margin: "4px 0" }}>
-                LEMBAR DOKUMEN HASIL PENGAWASAN JASA KONSTRUKSI
+                {isSimak2 
+                  ? "LEMBAR DOKUMEN PENGAWASAN TERTIB PENYELENGGARAAN JASA KONSTRUKSI"
+                  : isSimak3
+                  ? "LEMBAR DOKUMEN PENGAWASAN TERTIB PEMANFAATAN PRODUK JASA KONSTRUKSI"
+                  : "LEMBAR DOKUMEN HASIL PENGAWASAN JASA KONSTRUKSI"}
               </h3>
               <span style={{ fontSize: "11px", color: "#475569" }}>
-                Nomor: 600.1.2/DOK-JAKON/{selectedRecordForDoc.id}/2026 • Berdasarkan Permen PUPR No. 1/2023 & Standar SIPJAKI
+                {isSimak2
+                  ? `Nomor: 600.2.1/DOK-PENYELENGGARAAN/${selectedRecordForDoc.id}/2026 • Berdasarkan Permen PUPR No. 1/2023 & Standar K4 SMKK Permen PUPR No. 10/2021`
+                  : isSimak3
+                  ? `Nomor: 600.3.1/DOK-PEMANFAATAN/${selectedRecordForDoc.id}/2026 • Berdasarkan Permen PUPR No. 1/2023 & Standar SLF`
+                  : `Nomor: 600.1.2/DOK-JAKON/${selectedRecordForDoc.id}/2026 • Berdasarkan Permen PUPR No. 1/2023 & Standar SIPJAKI`}
               </span>
             </div>
 
             {/* Parameter Dokumen Details */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", backgroundColor: "#F8FAFC", padding: "14px", borderRadius: "10px", border: "1px solid #E2E8F0" }}>
-              <div>
-                <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Objek Pengawasan:</span>
-                <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>{selectedRecordForDoc.namaObjek}</p>
+            {isSimak2 ? (
+              /* Blok Identitas Proyek & Kontrak Khusus SIMAK 2 (Tertib Penyelenggaraan) */
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", backgroundColor: "#F8FAFC", padding: "14px", borderRadius: "10px", border: "1px solid #E2E8F0" }}>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nama Paket Proyek:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.namaProyek || selectedRecordForDoc.namaObjek}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nilai Proyek:</span>
+                  <p style={{ fontSize: "13px", fontWeight: 800, color: "#047857", fontFamily: "monospace", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.nilaiProyek ? `Rp ${Number(selectedRecordForDoc.nilaiProyek).toLocaleString("id-ID")}` : "-"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>
+                    {selectedRecordForDoc.simakCode === "2.d" ? "Nomor Perjanjian:" : "Nomor Kontrak:"}
+                  </span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#1E40AF", fontFamily: "monospace", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.nomorPerjanjian || selectedRecordForDoc.nomorKontrak || "-"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Waktu Pelaksanaan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#334155", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.waktuPelaksanaan || "-"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Penyedia Jasa (Kontraktor):</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.penyediaJasa || selectedRecordForDoc.namaProdusen || selectedRecordForDoc.badanUsaha}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>
+                    {selectedRecordForDoc.simakCode === "2.a" 
+                      ? "Nama SKPD:" 
+                      : selectedRecordForDoc.simakCode === "2.b" 
+                      ? "Nama Satuan Kerja:" 
+                      : "Nama Pemilik Pekerjaan:"}
+                  </span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#1E293B", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.namaSkpd || selectedRecordForDoc.namaSatuanKerja || selectedRecordForDoc.namaPemilikPekerjaan || "Dinas PUPR Kab. Bogor"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Waktu Pengawasan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.waktuPengawasan || selectedRecordForDoc.tanggal || selectedRecordForDoc.tanggalAudit}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Wilayah Penugasan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 700, color: "#334155", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.lokasi}, {selectedRecordForDoc.kabKota || "Kabupaten Bogor"}, {selectedRecordForDoc.propinsi || "Jawa Barat"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nama Produsen / Badan Usaha:</span>
-                <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>{selectedRecordForDoc.namaProdusen || selectedRecordForDoc.badanUsaha}</p>
+            ) : isSimak3 ? (
+              /* Blok Identitas Bangunan & Pengawasan Khusus SIMAK 3 (Tertib Pemanfaatan - Lampiran 3) */
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", backgroundColor: "#F8FAFC", padding: "14px", borderRadius: "10px", border: "1px solid #E2E8F0" }}>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nama Bangunan Konstruksi:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.namaBangunan || selectedRecordForDoc.namaObjek}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Fungsi Bangunan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#065F46", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.fungsiBangunan || "Bangunan Gedung / Fasilitas Publik"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nama Pemilik Bangunan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.namaPemilik || selectedRecordForDoc.badanUsaha || "Pemerintah Kabupaten Bogor"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nama Pengelola Bangunan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#1E293B", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.namaPengelola || "-"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Status Sertifikat Laik Fungsi (SLF):</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#1E40AF", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.statusSlf || "Memiliki SLF (Aktif)"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Waktu Pengawasan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.waktuPengawasan || selectedRecordForDoc.tanggal || selectedRecordForDoc.tanggalAudit}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Alamat / Lokasi Bangunan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 700, color: "#334155", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.lokasi}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Wilayah Penugasan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 700, color: "#334155", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.kabKota || "Kabupaten Bogor"}, {selectedRecordForDoc.propinsi || "Jawa Barat"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nama Pemilik & Kontak:</span>
-                <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
-                  {selectedRecordForDoc.namaPemilik || "Penanggung Jawab"} ({selectedRecordForDoc.noKontak || "0812-3456-7890"})
+            ) : (
+              /* Parameter Dokumen Details SIMAK 1 */
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", backgroundColor: "#F8FAFC", padding: "14px", borderRadius: "10px", border: "1px solid #E2E8F0" }}>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Objek Pengawasan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>{selectedRecordForDoc.namaObjek}</p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nama Produsen / Badan Usaha:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>{selectedRecordForDoc.namaProdusen || selectedRecordForDoc.badanUsaha}</p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nomor Induk Berusaha (NIB):</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#1E40AF", fontFamily: "monospace", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.nib || "9120001234567"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Status Perizinan Berusaha (OSS-RBA):</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#047857", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.statusPerizinan || "Aktif Terverifikasi (OSS-RBA)"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Nama Pemilik & Kontak:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.namaPemilik || "Penanggung Jawab"} ({selectedRecordForDoc.noKontak || "0812-3456-7890"})
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Kualifikasi Usaha & Wilayah:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.kualifikasi || "Kecil"} • {selectedRecordForDoc.lokasi}, {selectedRecordForDoc.kabKota || "Kabupaten Bogor"}
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Kapasitas & Izin Bahan Baku:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 700, color: "#334155", margin: "2px 0 0 0" }}>
+                    {selectedRecordForDoc.kapasitas || "Kapasitas Operasional Standar"} (Izin BB: {selectedRecordForDoc.izinBb || "Ada"} - {selectedRecordForDoc.keabsahanBb || "Sah"})
+                  </p>
+                </div>
+                <div>
+                  <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Tanggal Pengawasan:</span>
+                  <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>{selectedRecordForDoc.tanggal || selectedRecordForDoc.tanggalAudit}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Tabel Rincian Sub-Item Pengawasan Lapangan Sesuai Standar Format Excel */}
+            {(() => {
+              const code = selectedRecordForDoc.simakCode || (isSimak2 ? "2.a" : "1.a.1");
+              let subItemsList: any[] = selectedRecordForDoc.subItems || [];
+              
+              if (!subItemsList || subItemsList.length === 0) {
+                if (isSimak2 || code.startsWith("2.") || code.startsWith("SIMAK 2")) {
+                  // 6 Lingkup Indikator Pengawasan Teknis Standar K4 & SMKK Permen PUPR No. 10/2021
+                  subItemsList = [
+                    { no: 1, item: "Proses Pemilihan Penyedia Jasa", uraian: "Dokumen pengadaan pemilihan penyedia melalui SPSE / e-Katalog terverifikasi sesuai ketentuan dan kualifikasi usaha.", standar: "Permen PUPR No. 1/2023 Pasal 21", hasil: "Sesuai" },
+                    { no: 2, item: "Penyusunan & Pelaksanaan Kontrak Kerja Konstruksi", uraian: "Surat perjanjian kontrak mencakup hak/kewajiban para pihak, klausul SMKK, penjaminan mutu, jaminan pelaksanaan, dan jadwal termijn.", standar: "Standar Kontrak Permen PUPR No. 1/2023", hasil: "Sesuai" },
+                    { no: 3, item: "Penerapan Standar K4 & Penerapan SMKK", uraian: "Rencana Keselamatan Konstruksi (RKK) disetujui, induksi K3, kelengkapan APD/APK di lapangan, dan Ahli/Petugas K3 Konstruksi bersertifikat.", standar: "Permen PUPR No. 10/2021 (SMKK)", hasil: "Sesuai" },
+                    { no: 4, item: "Penerapan Sistem Manajemen Mutu Konstruksi", uraian: "Rencana Mutu Pekerjaan Konstruksi (RMPK), job mix formula (JMF), dan sertifikat hasil uji mutu material laboratorium berkala.", standar: "Spesifikasi Umum Bina Marga / Cipta Karya", hasil: "Sesuai" },
+                    { no: 5, item: "Penggunaan Material, Peralatan & Teknologi Konstruksi", uraian: "Material ber-SNI, surat izin kelaikan operasi (SILO) alat berat terbitan Disnakertrans, dan sertifikat kompetensi operator (SIO) aktif.", standar: "Standar Nasional Indonesia (SNI)", hasil: "Sesuai" },
+                    { no: 6, item: "Pengelolaan & Pemanfaatan Sumber Material Konstruksi", uraian: "Legalitas kuari galian C berizin (SIPB) terverifikasi dan pengelolaan sisa material konstruksi ramah lingkungan.", standar: "UU No. 3/2020 Minerba & Dokumen LH", hasil: "Sesuai" }
+                  ];
+                } else if (isSimak3 || code === "Daftar Simak 3" || code === "SIMAK 3" || code.startsWith("3")) {
+                  // 4 Lingkup Indikator Pengawasan Teknis Tertib Pemanfaatan (Lampiran 3)
+                  subItemsList = [
+                    { no: 1, item: "Pengawasan fungsi peruntukan terhadap tertib pemanfaatan produk Jasa Konstruksi", uraian: "Pemeriksaan kesesuaian pemanfaatan bangunan konstruksi (gedung/sipil) dan kesesuaian lokasi terhadap RDTR/KKPR melalui dokumen perizinan dan surat pernyataan instansi.", standar: "RTRW/RDTR Kab. Bogor, KKPR & PBG (PP No. 16/2021)", hasil: selectedRecordForDoc.statusKepatuhan === "Patuh" ? "Sesuai" : "Tidak Sesuai" },
+                    { no: 2, item: "Pengawasan terhadap rencana umur konstruksi", uraian: "Pemeriksaan jaminan bangunan konstruksi tetap laik fungsi sepanjang umur konstruksi melalui ketersediaan Sertifikat Laik Fungsi (SLF) yang aktif.", standar: "Permen PUPR No. 27/PRT/M/2018 & PP No. 16/2021", hasil: selectedRecordForDoc.statusKepatuhan === "Patuh" ? "Sesuai" : "Tidak Sesuai" },
+                    { no: 3, item: "Pengawasan terhadap kapasitas dan beban", uraian: "Pemeriksaan jaminan bangunan konstruksi terhindar dari kelebihan kapasitas dan beban melalui surat keterangan instansi atau laporan pemilik/pengelola.", standar: "SNI 1727:2020 Beban Desain Gedung", hasil: selectedRecordForDoc.statusKepatuhan === "Patuh" ? "Sesuai" : "Tidak Sesuai" },
+                    { no: 4, item: "Pengawasan terhadap pemeliharaan produk jasa konstruksi", uraian: "Pemeriksaan pelaksanaan pemeliharaan bangunan melalui program pemeliharaan/perawatan dan laporan berkala pemilik/pengelola bangunan.", standar: "Permen PUPR No. 24/PRT/M/2008 Pedoman Pemeliharaan", hasil: selectedRecordForDoc.statusKepatuhan === "Patuh" ? "Sesuai" : "Tidak Sesuai" }
+                  ];
+                } else if (code.includes("1.a.1") || code.includes("1a1")) {
+                  subItemsList = [
+                    { no: 1, item: "Izin Usaha Industri Konstruksi", uraian: "Izin PB-UMKU Terdaftar Aktif pada OSS-RBA", standar: "Permen PUPR No. 1/2023 Pasal 14", hasil: "Sesuai" },
+                    { no: 2, item: "Sertifikasi Mutu Standar (SNI/ISO)", uraian: "Dokumen SNI Mutu Beton Ready-Mix Terverifikasi", standar: "SNI 2847:2019 / ISO 9001", hasil: "Sesuai" },
+                    { no: 3, item: "Kelaikan Mesin & Kapasitas Batching Plant", uraian: `Kapasitas terpasang ${selectedRecordForDoc.kapasitas || "60 m³/jam"} beroperasi normal`, standar: "Manual Teknis Pabrikan", hasil: "Sesuai" },
+                    { no: 4, item: "Legalitas Sumber Bahan Baku (Quarry / Pasir)", uraian: `Izin SIPB Bahan Baku ${selectedRecordForDoc.izinBb || "Ada"} & Keabsahan ${selectedRecordForDoc.keabsahanBb || "Sah"}`, standar: "UU No. 3/2020 Minerba", hasil: selectedRecordForDoc.keabsahanBb === "Sah" ? "Sesuai" : "Tidak Sesuai" }
+                  ];
+                } else if (code.includes("1.a.2") || code.includes("1.a.5")) {
+                  subItemsList = [
+                    { no: 1, item: "Perizinan Berusaha Distributor Rantai Pasok", uraian: "NIB terdaftar KBLI 4663 (Perdagangan Besar Bahan Bangunan)", standar: "PP No. 5/2021", hasil: "Sesuai" },
+                    { no: 2, item: "Keabsahan Surat Penunjukan Distributor / Agen", uraian: "Surat Agen Tunggal resmi dari pabrikan prinsipal masih berlaku", standar: "Permendag No. 24/2021", hasil: "Sesuai" },
+                    { no: 3, item: "Sertifikat Uji Mutu Material Pasokan", uraian: "Uji tarik baja & mutu semen tertera di Certificate of Analysis", standar: "Standar Industri Indonesia", hasil: "Sesuai" }
+                  ];
+                } else if (code.includes("1.a.3") || code.includes("1.a.4")) {
+                  subItemsList = [
+                    { no: 1, item: "Kepemilikan Bukti Peralatan Konstruksi", uraian: "Bukti invoice/BPKB alat berat terdaftar di SIMPK PUPR", standar: "Permen PUPR No. 1/2023 Pasal 17", hasil: "Sesuai" },
+                    { no: 2, item: "Surat Keterangan Kelaikan Teknis (SILO)", uraian: "Pemeriksaan berkala SILO diterbitkan Disnakertrans Jabar", standar: "Permenaker No. 8/2020", hasil: "Sesuai" },
+                    { no: 3, item: "Operator Alat Bersertifikat SIO", uraian: "Operator excavator & crane memiliki SIO K3 aktif", standar: "Permenaker No. 8/2020", hasil: "Sesuai" }
+                  ];
+                } else if (code.includes("1.b.1") || code.includes("1.b.2")) {
+                  subItemsList = [
+                    { no: 1, item: "Kesesuaian Bentuk & Kualifikasi Usaha", uraian: `Badan Usaha berbentuk PT/CV dengan kualifikasi ${selectedRecordForDoc.kualifikasi || "Kecil"}`, standar: "PP No. 14/2021 Pasal 12", hasil: "Sesuai" },
+                    { no: 2, item: "Kesesuaian NIB & Status OSS-RBA", uraian: `NIB ${selectedRecordForDoc.nib || "9120001234567"} dengan status izin ${selectedRecordForDoc.statusPerizinan || "Aktif"}`, standar: "PP No. 5/2021", hasil: "Sesuai" },
+                    { no: 3, item: "Kesesuaian SBU Terdaftar di LPJK", uraian: "Subklasifikasi SBU masih berlaku dan aktif", standar: "Permen PUPR No. 6/2021", hasil: "Sesuai" }
+                  ];
+                } else if (code.includes("1.d")) {
+                  subItemsList = [
+                    { no: 1, item: "Tenaga Ahli Penanggung Jawab Teknis (PJT)", uraian: "PJT bersertifikat SKK Konstruksi Jenjang 7/8", standar: "UU No. 2/2017 Pasal 70", hasil: "Sesuai" },
+                    { no: 2, item: "Tenaga Kerja Terampil / Mandor Konstruksi", uraian: "Seluruh mandor & tukang memiliki SKK Kerja Konstruksi", standar: "PP No. 14/2021", hasil: "Sesuai" },
+                    { no: 3, item: "Ahli Keselamatan Konstruksi (SMKK)", uraian: "Petugas K3 Konstruksi memiliki sertifikat kompetensi BNSP", standar: "Permen PUPR No. 10/2021", hasil: "Sesuai" }
+                  ];
+                } else {
+                  subItemsList = [
+                    { no: 1, item: "Kepemilikan Dokumen Legalitas Berusaha", uraian: "Izin usaha dan pemenuhan persyaratan standar terverifikasi", standar: "Permen PUPR No. 1/2023", hasil: "Sesuai" },
+                    { no: 2, item: "Kepatuhan Operasional Lapangan", uraian: "Pelaksanaan operasional memenuhi tata cara baku perundangan", standar: "PP No. 14/2021", hasil: "Sesuai" },
+                    { no: 3, item: "Kelayakan Teknis & Sertifikasi", uraian: "Dokumen bukti kepatuhan lengkap dan dapat dipertanggungjawabkan", standar: "Standar Teknis PUPR", hasil: "Sesuai" }
+                  ];
+                }
+              }
+
+              return (
+                <div style={{ border: "1px solid #E2E8F0", borderRadius: "10px", overflow: "hidden" }}>
+                  <div style={{ backgroundColor: "#F1F5F9", padding: "10px 14px", borderBottom: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 800, color: "#0F2E5C", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                      {isSimak2
+                        ? "6 Lingkup Indikator Pengawasan Teknis Konstruksi (K4 & SMKK)"
+                        : isSimak3
+                        ? "4 Lingkup Indikator Pengawasan Teknis (Tertib Pemanfaatan Produk Konstruksi)"
+                        : `Rincian Sub-Item Pengawasan Lapangan (${subItemsList.length} Parameter)`}
+                    </span>
+                    <span style={{ fontSize: "10px", fontWeight: 700, color: isSimak3 ? "#065F46" : "#2563EB", backgroundColor: isSimak3 ? "#D1FAE5" : "#EFF6FF", padding: "2px 8px", borderRadius: "9999px" }}>
+                      {isSimak2 ? "Permen PUPR No. 10/2021 (SMKK)" : isSimak3 ? "Permen PUPR No. 1/2023 & PP No. 16/2021" : "Permen PUPR No. 1/2023"}
+                    </span>
+                  </div>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }}>
+                    <thead>
+                      <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "1px solid #E2E8F0", textAlign: "left", color: "#64748B", fontWeight: 800 }}>
+                        <th style={{ padding: "8px 12px", width: "40px", textAlign: "center" }}>NO</th>
+                        <th style={{ padding: "8px 12px", width: "230px" }}>
+                          {(isSimak2 || isSimak3) ? "LINGKUP INDIKATOR PENGAWASAN" : "ITEM PEMERIKSAAN"}
+                        </th>
+                        <th style={{ padding: "8px 12px" }}>
+                          {(isSimak2 || isSimak3) ? "URAIAN DOKUMEN / FAKTUAL LAPANGAN" : "URAIAN FAKTUAL LAPANGAN"}
+                        </th>
+                        <th style={{ padding: "8px 12px", width: "190px" }}>STANDAR / REGULASI</th>
+                        <th style={{ padding: "8px 12px", width: "105px", textAlign: "center" }}>
+                          {(isSimak2 || isSimak3) ? "HASIL EVALUASI" : "HASIL"}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subItemsList.map((item: any, idx: number) => (
+                        <tr key={idx} style={{ borderBottom: "1px solid #F1F5F9", backgroundColor: idx % 2 === 0 ? "#FFFFFF" : "#FAFAFA" }}>
+                          <td style={{ padding: "8px 12px", textAlign: "center", fontWeight: 700, color: "#64748B" }}>{item.no || idx + 1}</td>
+                          <td style={{ padding: "8px 12px", fontWeight: 700, color: "#0F2E5C" }}>{item.indikator || item.item}</td>
+                          <td style={{ padding: "8px 12px", color: "#334155" }}>{item.uraian}</td>
+                          <td style={{ padding: "8px 12px", color: "#64748B", fontStyle: "italic" }}>{item.standar}</td>
+                          <td style={{ padding: "8px 12px", textAlign: "center" }}>
+                            <span style={{
+                              fontSize: "10px",
+                              fontWeight: 800,
+                              padding: "2px 8px",
+                              borderRadius: "9999px",
+                              backgroundColor: item.hasil === "Sesuai" || item.hasil === "Patuh" ? "#DCFCE7" : "#FEE2E2",
+                              color: item.hasil === "Sesuai" || item.hasil === "Patuh" ? "#166534" : "#991B1B"
+                            }}>
+                              {item.hasil}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })()}
+
+            {/* Catatan Temuan & Rekomendasi Pengawasan */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div style={{ padding: "10px 12px", borderRadius: "8px", backgroundColor: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                <span style={{ fontSize: "10px", fontWeight: 800, color: "#64748B", textTransform: "uppercase" }}>Catatan Temuan Lapangan:</span>
+                <p style={{ fontSize: "11px", color: "#334155", margin: "4px 0 0 0", lineHeight: "1.4" }}>
+                  {selectedRecordForDoc.catatanTemuan || "Pemeriksaan lapangan berjalan sesuai ketentuan, perizinan berusaha aktif dan persyaratan teknis terpenuhi."}
                 </p>
               </div>
-              <div>
-                <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Kualifikasi Usaha:</span>
-                <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>{selectedRecordForDoc.kualifikasi || "Kecil"}</p>
-              </div>
-              <div>
-                <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Wilayah Penugasan:</span>
-                <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>
-                  {selectedRecordForDoc.lokasi}, {selectedRecordForDoc.kabKota || "Kabupaten Bogor"}, {selectedRecordForDoc.propinsi || "Jawa Barat"}
+              <div style={{ padding: "10px 12px", borderRadius: "8px", backgroundColor: "#F0FDF4", border: "1px solid #DCFCE7" }}>
+                <span style={{ fontSize: "10px", fontWeight: 800, color: "#166534", textTransform: "uppercase" }}>Rekomendasi Tindak Lanjut:</span>
+                <p style={{ fontSize: "11px", color: "#166534", margin: "4px 0 0 0", lineHeight: "1.4" }}>
+                  {selectedRecordForDoc.rekomendasi || "Pertahankan pemenuhan standar kelaikan dan perpanjangan berkala sertifikat perizinan berusaha sebelum masa berlaku berakhir."}
                 </p>
-              </div>
-              <div>
-                <span style={{ fontSize: "10px", color: "#64748B", fontWeight: 700 }}>Tanggal Pengawasan:</span>
-                <p style={{ fontSize: "12px", fontWeight: 800, color: "#0F2E5C", margin: "2px 0 0 0" }}>{selectedRecordForDoc.tanggal || selectedRecordForDoc.tanggalAudit}</p>
               </div>
             </div>
 
